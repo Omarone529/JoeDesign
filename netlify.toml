@@ -1,0 +1,21 @@
+# Configurazione di deploy su Netlify.
+# Netlify esegue la build, pubblica la cartella dist/ e assegna al sito un URL
+# (es. https://<nome>.netlify.app, o il dominio personalizzato che aggiungerai).
+# Quell'URL viene passato allo script di pre-rendering tramite la variabile
+# d'ambiente URL, così sitemap, canonical e Open Graph combaciano sempre.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Fallback di sicurezza: le pagine pre-renderizzate (es. /progetto/flue) sono
+# file reali e vengono servite direttamente da Netlify. Questa regola cattura
+# solo gli indirizzi inesistenti (link vecchi, refusi) e li porta al sito
+# invece di mostrare un errore. I file esistenti hanno sempre la precedenza.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

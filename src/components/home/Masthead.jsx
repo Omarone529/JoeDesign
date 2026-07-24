@@ -6,7 +6,7 @@ export default function Masthead() {
       <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[1.35fr_.65fr] lg:gap-16">
         <div>
           <h1 className="m-0 text-[clamp(48px,10.5vw,168px)] font-bold uppercase leading-[0.9] tracking-[-0.02em]">
-            {profile.name}
+            {profile.displayName}
           </h1>
         </div>
         <div className="pb-2">

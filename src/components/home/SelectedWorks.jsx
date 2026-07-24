@@ -1,7 +1,8 @@
 import { focusItems } from '../../data/siteData'
+import { Link } from '../../router'
 
 /*
- * "Lavori selezionati" — griglia delle 5 schede in evidenza.
+ * "Lavori selezionati" - griglia delle 5 schede in evidenza.
  * Mobile-first: 1 colonna → 2 (sm) → 3 (md), come il template originale
  * su desktop. L'immagine ha un delicato zoom in hover.
  * Le card diventeranno cliccabili verso la scheda progetto quando
@@ -14,17 +15,17 @@ export default function SelectedWorks() {
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
           Lavori selezionati
         </h2>
-        <a
-          href="#archivio"
+        <Link
+          to="/archivio"
           className="whitespace-nowrap border-b border-ink pb-[3px] text-[11px] uppercase tracking-[0.2em]"
         >
           Archivio completo →
-        </a>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
         {focusItems.map((p) => (
-          <a key={p.id} href={`#progetto/${p.slug}`} className="group block cursor-pointer">
+          <Link key={p.id} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 <img
@@ -46,7 +47,7 @@ export default function SelectedWorks() {
                 </div>
               </div>
             </article>
-          </a>
+          </Link>
         ))}
       </div>
     </section>

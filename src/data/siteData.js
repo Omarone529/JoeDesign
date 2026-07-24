@@ -1,5 +1,5 @@
 /*
- * Contenuti della homepage — fonte di verità: template "Direzione A"
+ * Contenuti della homepage - fonte di verità: template "Direzione A"
  * creato con Claude Design (Giovanni "Joe" Sarchiolla, 2026).
  *
  * NOTA sulle immagini
@@ -17,6 +17,7 @@
 
 export const profile = {
   name: 'Giovanni Sarchiolla',
+  displayName: 'Joe Sarchiolla', // nome "d'arte" mostrato nel sito (home, chi sono)
   nick: 'Joe',
   role: 'Product Designer',
   place: 'Reggio Emilia, Italia',
@@ -27,11 +28,11 @@ export const profile = {
   phone: '+39 333 8238671',
   phoneHref: 'tel:+393338238671',
   manifesto:
-    'Prendo ispirazione dall’arte, dalla moda e dalla grafica e poi creo il prodotto. Cerco sempre la forma che non ha bisogno di parole.',
+    'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
 }
 
 /*
- * "Lavori selezionati" — le 5 schede in evidenza in homepage.
+ * "Lavori selezionati" - le 5 schede in evidenza in homepage.
  * L'ordine riproduce quello del template originale.
  */
 export const focusItems = [
@@ -77,20 +78,75 @@ export const focusItems = [
   },
 ]
 
-/* Fascia immagine a tutta larghezza — "La famiglia di prodotti" */
+/* Fascia immagine a tutta larghezza - "La famiglia di prodotti" */
 export const familyBand = {
   src: '/images/home/family-band.webp',
   alt: 'La famiglia di prodotti',
 }
 
 /*
- * ARCHIVIO — tutti i progetti.
+ * "Chi sono" - testi e foto della pagina about.
+ * Foto ottimizzate in public/images/about/ (sorgenti in media/FOTO JOE...).
+ */
+export const about = {
+  // Intro impersonale (dal portfolio "MI PRESENTO").
+  intro:
+    'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
+  experience: [
+    { anno: '2020–2021', titolo: 'Arredatore', luogo: 'Emilia Casa SRL' },
+    { anno: '2021–2022', titolo: 'Arredatore', luogo: 'Casa Midì' },
+    { anno: '2025', titolo: 'Partecipazione Salone Satellite', luogo: 'Milano' },
+    { anno: '2025–2026', titolo: 'Concorsi Grafica & Product Design', luogo: '' },
+  ],
+  skills: [
+    'Illustrator',
+    'Photoshop',
+    'InDesign',
+    'Rhino 3D',
+    'Shapr3D',
+    'Affinity',
+    'Mobilturi 3D',
+    'Metron (Imab)',
+    '3CAD',
+    'GSG',
+    'PowerPoint',
+    'Keynote',
+    'Canva',
+  ],
+  education: [
+    { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
+    { anno: '2026', titolo: 'Accademia di Belle Arti di Bologna', luogo: 'ABABO' },
+  ],
+  // "Bannerino" replica della card Instagram, sovrapposto alla foto.
+  instagram: {
+    handle: 'joesarchiolla.design',
+    role: 'Experimental Product Designer',
+    bio: 'Forme semplici trasformate in oggetti di design',
+    stats: [
+      ['68', 'post'],
+      ['2.765', 'follower'],
+      ['1.129', 'seguiti'],
+    ],
+    avatar: '/images/about/joe-avatar.webp',
+    qr: '/images/about/qr-instagram.png',
+    url: 'https://instagram.com/joesarchiolla.design',
+  },
+  photos: {
+    hero: { src: '/images/about/joe-cutout.webp', alt: 'Ritratto di Joe Sarchiolla a braccia conserte' },
+    lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
+    flue: { src: '/images/about/joe-flue.webp', alt: 'La lampada FLUE osservata durante la lavorazione' },
+    dado: { src: '/images/about/joe-dado.webp', alt: 'Un prototipo di lampada in stampa 3D' },
+  },
+}
+
+/*
+ * ARCHIVIO - tutti i progetti.
  * Ogni voce punta a public/images/products/<slug>/ dove:
  *   cover.webp           → copertina (griglia + testata dettaglio)
  *   01.webp … NN.webp    → galleria del progetto (in ordine)
  * `photos` = numero di foto galleria presenti (NN.webp).
  *
- * NOTA metadata: `cat` (categoria) e `year` sono da confermare —
+ * NOTA metadata: `cat` (categoria) e `year` sono da confermare -
  * inseriti come miglior stima. Dove l'anno non è certo è omesso.
  * Le foto sono curate a partire da "ARCHIVIO WEBP".
  */
@@ -143,7 +199,7 @@ export const archive = [
     cat: 'Appendiabiti',
     year: '2026',
     photos: 8,
-    desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente nel mio linguaggio progettuale, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
+    desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
     spec: {
       Oggetto: 'Appendiabiti',
       Contesto: 'Concorso Design Wanted',
@@ -157,7 +213,7 @@ export const archive = [
     cat: 'Lampada da terra',
     year: '2024',
     photos: 8,
-    desc: 'Con la Dog Lamp ho voluto creare una lampada che fosse molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
+    desc: 'La Dog Lamp è pensata per essere molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
     spec: {
       Oggetto: 'Lampada per bambini',
       Contesto: 'Progetto Universitario',
@@ -199,7 +255,7 @@ export const archive = [
     cat: 'Seduta · Autoprogettazione',
     year: '2026',
     photos: 2,
-    desc: 'Ho reinterpretato la sedia Autoprogettazione di Enzo Mari attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
+    desc: 'La sedia Autoprogettazione di Enzo Mari è reinterpretata attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
     spec: {
       Oggetto: 'Sedia',
       Contesto: 'Progetto Personale · omaggio a Enzo Mari',
@@ -241,7 +297,7 @@ export const archive = [
     cat: 'Seduta · Eco design',
     year: '2025',
     photos: 2,
-    desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Mi interessa l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
+    desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Conta l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
     spec: {
       Oggetto: 'Seduta',
       Contesto: 'Progetto Universitario · Eco design',
@@ -324,7 +380,7 @@ export const archive = [
     cat: 'Lunch box',
     year: '2024',
     photos: 2,
-    desc: 'Ho progettato questa lunch box non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
+    desc: 'Questa lunch box è progettata non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
     spec: {
       Oggetto: 'Lunch box',
       Contesto: 'Progetto Universitario',

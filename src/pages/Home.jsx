@@ -5,7 +5,7 @@ import FamilyBand from '../components/home/FamilyBand'
 import ContestsTicker from '../components/home/ContestsTicker'
 
 /*
- * Homepage / Indice — riproduzione della "Direzione A".
+ * Homepage / Indice - riproduzione della "Direzione A".
  * La classe animate-viewIn replica la transizione d'ingresso `.view`
  * del template originale.
  */

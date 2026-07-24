@@ -6,6 +6,7 @@ export default {
       colors: {
         // Palette "Direzione A" — carta / inchiostro
         paper: '#f4f3f1', // sfondo principale
+        accent: '#e5341f', // rosso di accento (barra "Chi sono", come nel portfolio)
         ink: '#14110f', // testo / nero caldo
         muted: '#8f8b86', // grigio testo secondario
         line: '#d7d4cf', // bordi chiari

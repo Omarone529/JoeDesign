@@ -1,6 +1,6 @@
 import { contests } from '../../data/siteData'
 
-/* "Concorsi & partecipazioni" — elenco a scorrimento tipografico. */
+/* "Concorsi & partecipazioni" - elenco a scorrimento tipografico. */
 export default function ContestsTicker() {
   return (
     <section className="border-b border-t-2 border-b-line border-t-ink px-5 py-7 sm:px-8 sm:py-10 lg:px-[72px] lg:py-12">

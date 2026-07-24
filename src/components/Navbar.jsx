@@ -1,14 +1,15 @@
 import { profile } from '../data/siteData'
+import { Link } from '../router'
 
 /*
  * Voce di navigazione. La sottolineatura è posizionata in assoluto
  * (non occupa spazio nel flusso): compare sulla pagina attiva e in hover,
  * senza mai spostare il testo. Animata da sinistra a destra.
  */
-function NavLink({ href, active = false, muted = false, children }) {
+function NavLink({ to, active = false, muted = false, children }) {
   return (
-    <a
-      href={href}
+    <Link
+      to={to}
       aria-current={active ? 'page' : undefined}
       className={`group relative py-1 text-[11px] uppercase tracking-[0.2em] transition-colors ${
         muted ? 'text-muted hover:text-ink' : 'text-ink'
@@ -21,7 +22,7 @@ function NavLink({ href, active = false, muted = false, children }) {
           active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
         }`}
       />
-    </a>
+    </Link>
   )
 }
 
@@ -34,30 +35,30 @@ function NavLink({ href, active = false, muted = false, children }) {
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const links = [
-    { label: 'Home', href: '#top', active: name === 'home' },
-    { label: 'Archivio', href: '#archivio', active: name === 'archive' || name === 'project' },
-    { label: 'Chi sono', href: '#', active: false },
+    { label: 'Home', to: '/', active: name === 'home' },
+    { label: 'Archivio', to: '/archivio', active: name === 'archive' || name === 'project' },
+    { label: 'Chi sono', to: '/chi-sono', active: name === 'about' },
   ]
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink bg-paper/90 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-5 sm:px-8 lg:px-[72px]">
         {/* Brand */}
-        <a href="#top" className="flex items-baseline gap-3">
+        <Link to="/" className="flex items-baseline gap-3">
           <span className="text-[19px] font-bold tracking-[0.14em]">SARCHIOLLA</span>
           <span className="hidden text-[9px] tracking-[0.24em] text-muted sm:inline">
             STUDIO · IT
           </span>
-        </a>
+        </Link>
 
         {/* Navigazione */}
         <nav className="flex items-center gap-4 sm:gap-6 lg:gap-10">
           {links.map((l) => (
-            <NavLink key={l.label} href={l.href} active={l.active}>
+            <NavLink key={l.label} to={l.to} active={l.active}>
               {l.label}
             </NavLink>
           ))}
-          <NavLink href={`mailto:${profile.email}`} muted>
+          <NavLink to={`mailto:${profile.email}`} muted>
             Contatti
           </NavLink>
         </nav>

@@ -1,10 +1,11 @@
 import { archive, projectImages } from '../data/siteData'
+import { Link } from '../router'
 
 /*
- * ARCHIVIO — griglia completa dei progetti.
+ * ARCHIVIO - griglia completa dei progetti.
  * Riprende lo stile di "Lavori selezionati": griglia 1 → 2 → 3 colonne,
  * immagine 4:5 con zoom in hover. Ogni scheda apre la pagina di dettaglio
- * (#progetto/<slug>) con la galleria completa.
+ * (/progetto/<slug>) con la galleria completa.
  */
 export default function Archive() {
   return (
@@ -37,7 +38,7 @@ export default function Archive() {
           {archive.map((p) => {
             const { cover } = projectImages(p)
             return (
-              <a key={p.slug} href={`#progetto/${p.slug}`} className="group block cursor-pointer">
+              <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
                 <article>
                   <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                     <img
@@ -61,7 +62,7 @@ export default function Archive() {
                     )}
                   </div>
                 </article>
-              </a>
+              </Link>
             )
           })}
         </div>
