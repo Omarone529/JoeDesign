@@ -1,4 +1,4 @@
-import { about, archive, profile, projectImages } from './data/siteData'
+import { about, archive, periodoArchivio, profile, projectImages } from './data/siteData'
 
 /*
  * Metadati SEO per ogni rotta: title, description, canonical, immagine social.
@@ -20,6 +20,16 @@ export const SITE = (ENV_SITE || 'https://joedesign.netlify.app').replace(/\/+$/
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
+/*
+ * Periodo coperto dall'archivio, per le description: si aggiorna da solo
+ * aggiungendo progetti (es. "2024 · 2026", oppure il solo anno se coincidono).
+ */
+const PERIODO = periodoArchivio
+  ? periodoArchivio.primo === periodoArchivio.ultimo
+    ? `${periodoArchivio.primo}`
+    : `${periodoArchivio.primo} · ${periodoArchivio.ultimo}`
+  : ''
+
 /* Taglia una descrizione a ~155 caratteri (lunghezza ideale per Google). */
 function clip(text, max = 155) {
   const t = String(text).replace(/\s+/g, ' ').trim()
@@ -30,9 +40,8 @@ function clip(text, max = 155) {
 export function metaForRoute(route) {
   if (route.name === 'archive') {
     return {
-      title: 'Archivio · Giovanni “Joe” Sarchiolla',
-      description:
-        'Tutti i progetti di Giovanni “Joe” Sarchiolla: product design, arredo, packaging e grafica. Portfolio 2024 · 2026.',
+      title: `Archivio progetti · ${profile.name} “${profile.nick}”`,
+      description: `Tutti i ${archive.length} progetti di ${profile.name} “${profile.nick}”: product design, arredo, packaging e grafica. Portfolio ${PERIODO}.`,
       canonical: `${SITE}/archivio`,
       image: abs('/images/home/family-band.webp'),
       type: 'website',
@@ -41,10 +50,12 @@ export function metaForRoute(route) {
 
   if (route.name === 'about') {
     return {
-      title: `Chi sono · ${profile.displayName}`,
-      description: about.intro,
+      title: `Chi sono · ${profile.displayName} · ${profile.role}`,
+      description: clip(about.intro),
       canonical: `${SITE}/chi-sono`,
-      image: abs(about.photos.hero.src),
+      // Non il ritratto ritagliato: ha il fondo trasparente, che nelle anteprime
+      // dei link diventa nero. Serve un'immagine piena e orizzontale.
+      image: abs(about.photos.lab.src),
       type: 'profile',
     }
   }
@@ -64,10 +75,11 @@ export function metaForRoute(route) {
     }
   }
 
-  // Home (default)
+  // Home (default). Il title porta nome, ruolo e città: sono le tre chiavi con
+  // cui ha senso farsi trovare (ricerche sul nome e ricerche locali).
   return {
-    title: `${profile.name} “${profile.nick}” · ${profile.role}`,
-    description: `${profile.name} “${profile.nick}”, ${profile.role} a ${profile.place}. Portfolio 2024 · 2026: prodotto, arredo, packaging e grafica.`,
+    title: `${profile.name} “${profile.nick}” · ${profile.role} a Reggio Emilia`,
+    description: `${profile.name} “${profile.nick}”, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,
     canonical: `${SITE}/`,
     image: abs('/images/home/family-band.webp'),
     type: 'website',

@@ -2,54 +2,78 @@ import { about, profile } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * "Chi sono" - impostata sulla pagina "MI PRESENTO" del portfolio Direzione A:
- * intro con barra rossa, EXPERIENCE · SKILLS · EDUCATION, foto ritagliata con
- * la card Instagram e il QR sovrapposti ("bannerini"). Tono impersonale.
+ * "Chi sono" - impostata sulla pagina "MI PRESENTO" del portfolio Direzione A.
+ * Hero su fondo intonaco: intro in nero bold in alto a sinistra, nome enorme in
+ * basso a sinistra, figura ritagliata a destra; una linea nera chiude la testata
+ * sul fondo della foto. Sotto: EXPERIENCE · EDUCATION · SKILLS · CONTACTS su due
+ * colonne. Tono impersonale.
  */
 export default function About() {
   const { hero, lab, flue, dado } = about.photos
-  const ig = about.instagram
 
   return (
     <main className="animate-viewIn">
-      {/* Testata: titolo diviso stile "MI · PRESENTO" */}
-      <section className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-16">
-        <div className="mb-6 text-[11px] uppercase tracking-[0.24em] text-muted">Chi sono</div>
-        <h1 className="m-0 flex flex-wrap items-baseline justify-between gap-x-4 text-[clamp(44px,11vw,176px)] font-bold uppercase leading-[0.85] tracking-[-0.02em]">
-          <span>Joe</span>
-          <span>Sarchiolla</span>
-        </h1>
-      </section>
-
-      {/* Corpo: colonna testo (CV) + foto con bannerini */}
-      <section className="mt-8 grid grid-cols-1 gap-y-12 px-5 sm:px-8 md:mt-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
-        {/* Colonna sinistra */}
-        <div className="order-2 md:order-1">
-          {/* Intro con barra rossa */}
-          <p className="border-l-2 border-accent pl-4 text-[clamp(16px,1.7vw,21px)] leading-[1.5]">
+      {/*
+       * Hero su fondo carta. Due colonne: a sinistra occhiello e descrizione in
+       * alto e il nome enorme allineato a sinistra in basso, a destra la figura
+       * ritagliata che parte attaccata alla navbar. La foto è l'elemento più
+       * alto, quindi la linea nera chiude la sezione esattamente sul suo fondo.
+       * Il padding alto sta sulla colonna di sinistra, non sulla sezione: così
+       * la foto tocca il bordo superiore senza margini negativi.
+       */}
+      <section className="grid grid-cols-1 gap-y-10 border-b-2 border-ink px-5 sm:px-8 md:min-h-[calc(100vh-4rem)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
+        <div className="flex flex-col pt-10 sm:pt-14 md:col-start-1 md:row-start-1 lg:pt-16">
+          <div className="mb-6 text-[11px] uppercase tracking-[0.24em] text-muted">Chi sono</div>
+          <p className="m-0 max-w-[42ch] text-[clamp(15px,1.15vw,18px)] leading-[1.5]">
             {about.intro}
           </p>
+          {/*
+           * Corpo tarato sulla larghezza della colonna: "SARCHIOLLA" (6.355em
+           * col tracking applicato) la riempie quasi tutta, "JOE" chiude dove
+           * finisce. Se cambi griglia, padding o tracking, ricalcola i coefficienti.
+           */}
+          <h1
+            aria-label={profile.displayName}
+            className="m-0 mt-12 font-bold uppercase leading-[0.85] tracking-[-0.03em] text-[min(calc((100vw_-_40px)*0.1526),300px)] sm:text-[min(calc((100vw_-_64px)*0.1526),300px)] md:mt-auto md:text-[min(calc((100vw_-_104px)*0.0954),300px)] lg:text-[min(calc((100vw_-_208px)*0.0954),300px)]"
+          >
+            {/* Lo spazio fra le due righe serve al testo estratto dai crawler:
+                senza, il contenuto dell'h1 sarebbe "JoeSarchiolla" attaccato. */}
+            <span className="block">Joe</span>{' '}
+            <span className="block">Sarchiolla</span>
+          </h1>
+        </div>
 
-          <div className="mt-12 space-y-12">
+        {/*
+         * Foto: attaccata alla navbar, chiude in basso sulla linea. Da md in su
+         * riempie in altezza la cella (che la sezione stira fino alla piega):
+         * `object-cover` rifila i margini trasparenti ai lati, `object-top`
+         * tiene la testa ancorata in alto.
+         */}
+        <div className="mx-auto w-full max-w-[440px] md:col-start-2 md:row-start-1 md:max-w-none">
+          <img
+            src={hero.src}
+            alt={hero.alt}
+            width="1600"
+            height="2132"
+            className="block w-full md:h-full md:object-cover md:object-top"
+          />
+        </div>
+      </section>
+
+      {/*
+       * Sotto la linea: CV su due colonne. Da lg in su corpi e spaziature
+       * crescono e le colonne si distanziano: con la stessa scala del mobile il
+       * testo risultava minuto e sperduto nella larghezza dello schermo.
+       */}
+      <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
+          <div className="space-y-12 lg:space-y-16">
             <ArrowBlock label="Experience">
               <dl className="m-0">
                 {about.experience.map((it) => (
                   <Row key={it.titolo + it.anno} anno={it.anno} titolo={it.titolo} luogo={it.luogo} />
                 ))}
               </dl>
-            </ArrowBlock>
-
-            <ArrowBlock label="Skills">
-              <ul className="flex flex-wrap gap-2">
-                {about.skills.map((s) => (
-                  <li
-                    key={s}
-                    className="border border-line bg-paper px-3 py-1 text-[13px] tracking-[0.02em]"
-                  >
-                    {s}
-                  </li>
-                ))}
-              </ul>
             </ArrowBlock>
 
             <ArrowBlock label="Education">
@@ -59,9 +83,24 @@ export default function About() {
                 ))}
               </dl>
             </ArrowBlock>
+          </div>
+
+          <div className="space-y-12 lg:space-y-16">
+            <ArrowBlock label="Skills">
+              <ul className="flex flex-wrap gap-2">
+                {about.skills.map((s) => (
+                  <li
+                    key={s}
+                    className="border border-line bg-paper px-3 py-1 text-[13px] tracking-[0.02em] lg:px-4 lg:py-1.5 lg:text-[15px]"
+                  >
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </ArrowBlock>
 
             <ArrowBlock label="Contacts">
-              <div className="space-y-1 text-[15px]">
+              <div className="space-y-1 text-[15px] lg:space-y-2 lg:text-[17px]">
                 <a href={profile.phoneHref} className="block hover:underline">
                   {profile.phone}
                 </a>
@@ -72,69 +111,24 @@ export default function About() {
             </ArrowBlock>
           </div>
         </div>
-
-        {/* Colonna destra: foto ritagliata + bannerini */}
-        <div className="relative order-1 self-end md:order-2">
-          <img
-            src={hero.src}
-            alt={hero.alt}
-            width="1600"
-            height="2132"
-            className="mx-auto block w-full max-w-[440px] md:max-w-none"
-          />
-
-          {/* Bannerino: card Instagram */}
-          <a
-            href={ig.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group absolute bottom-16 right-0 w-[min(88%,320px)] rounded-2xl bg-paper/95 p-4 shadow-[0_8px_30px_rgba(20,17,15,0.16)] ring-1 ring-line backdrop-blur-sm transition-transform hover:-translate-y-0.5 md:-right-4"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src={ig.avatar}
-                alt=""
-                className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-accent"
-              />
-              <div className="min-w-0">
-                <div className="flex items-center gap-1 text-[14px] font-bold leading-tight">
-                  <span className="truncate">{ig.handle}</span>
-                  <span aria-hidden className="text-accent">✦</span>
-                </div>
-                <div className="truncate text-[11px] text-muted">{ig.role}</div>
-              </div>
-            </div>
-            <div className="mt-3 flex gap-4 border-t border-line-soft pt-3">
-              {ig.stats.map(([n, l]) => (
-                <div key={l} className="text-[12px] leading-tight">
-                  <span className="font-bold">{n}</span> <span className="text-muted">{l}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-2 text-[12px] leading-snug text-ink/80">{ig.bio}</p>
-          </a>
-
-          {/* Bannerino: QR Instagram */}
-          <div className="absolute -bottom-2 left-2 rounded-xl bg-paper p-2 shadow-[0_6px_20px_rgba(20,17,15,0.14)] ring-1 ring-line sm:left-4">
-            <img src={ig.qr} alt="QR del profilo Instagram" className="h-[72px] w-[72px] sm:h-20 sm:w-20" />
-          </div>
-        </div>
       </section>
 
       {/* Citazione / manifesto */}
-      <section className="mt-16 border-t-2 border-ink px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
+      <section className="border-t-2 border-ink px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
         <blockquote className="m-0 max-w-[24ch] text-[clamp(26px,4vw,56px)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
           “{profile.manifesto}”
         </blockquote>
       </section>
 
-      {/* Galleria */}
+      {/* Galleria. Altezza naturale: la foto si vede intera, senza tagli. */}
       <section className="bg-night">
         <img
           src={lab.src}
           alt={lab.alt}
           loading="lazy"
-          className="h-[clamp(300px,60vh,680px)] w-full object-cover"
+          width="1900"
+          height="1425"
+          className="block h-auto w-full"
         />
       </section>
       <section className="grid grid-cols-1 sm:grid-cols-2">
@@ -175,13 +169,21 @@ export default function About() {
   )
 }
 
-/* Blocco con etichetta e freccia ↘ (stile portfolio). */
+/*
+ * Blocco con etichetta e freccia ↘ (stile portfolio).
+ * La freccia porta in coda U+FE0E (variation selector-15), che impone la resa
+ * TESTUALE: senza, iOS e Android disegnano ↘ come emoji blu al posto del segno
+ * nero. Vale per le frecce diagonali (↖ ↗ ↘ ↙) e per ↔ ↕, che hanno una
+ * variante emoji; ← → ↑ ↓ non ce l'hanno e restano sempre testo.
+ */
 function ArrowBlock({ label, children }) {
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2">
-        <span aria-hidden className="text-[15px] leading-none">↘</span>
-        <h2 className="m-0 text-[13px] font-bold uppercase tracking-[0.22em]">{label}</h2>
+      <div className="mb-4 flex items-center gap-2 lg:mb-6">
+        <span aria-hidden className="text-[15px] leading-none lg:text-[17px]">{'↘︎'}</span>
+        <h2 className="m-0 text-[13px] font-bold uppercase tracking-[0.22em] lg:text-[15px]">
+          {label}
+        </h2>
       </div>
       {children}
     </div>
@@ -191,9 +193,9 @@ function ArrowBlock({ label, children }) {
 /* Riga anno · titolo · luogo per experience/education. */
 function Row({ anno, titolo, luogo }) {
   return (
-    <div className="grid grid-cols-[96px_1fr] gap-4 border-t border-line-soft py-3">
-      <dt className="text-[13px] font-bold tabular-nums tracking-[0.02em]">{anno}</dt>
-      <dd className="m-0 text-[14px] leading-snug">
+    <div className="grid grid-cols-[96px_1fr] gap-4 border-t border-line-soft py-3 lg:grid-cols-[132px_1fr] lg:gap-6 lg:py-4">
+      <dt className="text-[13px] font-bold tabular-nums tracking-[0.02em] lg:text-[15px]">{anno}</dt>
+      <dd className="m-0 text-[14px] leading-snug lg:text-[17px]">
         {titolo}
         {luogo && <span className="text-muted"> · {luogo}</span>}
       </dd>

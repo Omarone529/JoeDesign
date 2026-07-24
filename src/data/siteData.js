@@ -31,53 +31,6 @@ export const profile = {
     'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
 }
 
-/*
- * "Lavori selezionati" - le 5 schede in evidenza in homepage.
- * L'ordine riproduce quello del template originale.
- */
-export const focusItems = [
-  {
-    id: 'flue',
-    slug: 'flue',
-    title: 'FLUE',
-    cat: 'Sistema di illuminazione',
-    year: '2026',
-    cover: '/images/products/flue/cover.webp',
-  },
-  {
-    id: 'orbit',
-    slug: 'orbit',
-    title: 'ORBIT',
-    cat: 'Servomuto',
-    year: '2026',
-    cover: '/images/products/orbit/cover.webp',
-  },
-  {
-    id: 'arrow',
-    slug: 'directional-arrow',
-    title: 'DIRECTIONAL ARROW',
-    cat: 'Appendiabiti',
-    year: '2026',
-    cover: '/images/products/directional-arrow/cover.webp',
-  },
-  {
-    id: 'dado',
-    slug: 'dado-lamp',
-    title: 'DADO LAMP',
-    cat: 'Lampada da tavolo',
-    year: '2026',
-    cover: '/images/products/dado-lamp/cover.webp',
-  },
-  {
-    id: 'dog',
-    slug: 'dog-lamp',
-    title: 'DOG LAMP',
-    cat: 'Lampada da terra',
-    year: '2024',
-    cover: '/images/products/dog-lamp/cover.webp',
-  },
-]
-
 /* Fascia immagine a tutta larghezza - "La famiglia di prodotti" */
 export const familyBand = {
   src: '/images/home/family-band.webp',
@@ -149,8 +102,11 @@ export const about = {
  * NOTA metadata: `cat` (categoria) e `year` sono da confermare -
  * inseriti come miglior stima. Dove l'anno non è certo è omesso.
  * Le foto sono curate a partire da "ARCHIVIO WEBP".
+ *
+ * L'ordine qui sotto è quello curato a parità di anno: l'ordinamento vero
+ * (dal più recente) lo fa `archive`, subito dopo l'elenco.
  */
-export const archive = [
+const progetti = [
   {
     slug: 'flue',
     title: 'FLUE',
@@ -184,7 +140,7 @@ export const archive = [
     title: 'DADO LAMP',
     cat: 'Lampada da tavolo',
     year: '2026',
-    photos: 7,
+    photos: 5,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
       Oggetto: 'Lampada',
@@ -410,6 +366,34 @@ export const archive = [
   },
 ]
 
+/*
+ * Anni citati in una voce. `year` è una stringa e può contenere più anni
+ * (es. "2024 · 2026" della raccolta grafica) o mancare del tutto.
+ */
+export function anniDi(item) {
+  return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
+}
+
+/* Anno di riferimento per l'ordinamento: il più recente citato, 0 se assente. */
+const annoRecente = (item) => Math.max(0, ...anniDi(item))
+
+/*
+ * ARCHIVIO ordinato dal progetto più recente. L'ordine vale ovunque: griglia
+ * dell'archivio, navigazione precedente/successivo nella scheda progetto,
+ * sitemap e pre-rendering. A parità di anno resta l'ordine curato nell'elenco
+ * qui sopra, perché Array.sort è stabile. Le voci senza anno finiscono in coda.
+ */
+export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
+
+/*
+ * Estremi temporali coperti dall'archivio, per l'intestazione della pagina.
+ * `null` se nessuna voce ha un anno. Si aggiorna da sé aggiungendo progetti.
+ */
+export const periodoArchivio = (() => {
+  const anni = archive.flatMap(anniDi)
+  return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
+})()
+
 /* Percorsi immagine di un progetto d'archivio. */
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
@@ -419,6 +403,21 @@ export function projectImages(item) {
   )
   return { cover: `${base}/cover.webp`, gallery }
 }
+
+/*
+ * "Lavori selezionati" - le schede in evidenza in homepage.
+ * Qui si sceglie solo QUALI progetti mostrare e in che ordine: titolo,
+ * categoria, anno e copertina arrivano dall'archivio, quindi restano allineati
+ * da soli se li modifichi lassù. Sei voci = due righe piene nella griglia a 3
+ * colonne, senza buchi.
+ */
+const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'zeta-3', 'dog-lamp']
+
+export const focusItems = focusSlugs.map((slug) => {
+  const item = progetti.find((p) => p.slug === slug)
+  if (!item) throw new Error(`focusItems: nessun progetto con slug "${slug}" nell'archivio`)
+  return { ...item, id: slug, cover: projectImages(item).cover }
+})
 
 /* Ticker "Concorsi & partecipazioni" */
 export const contests = [

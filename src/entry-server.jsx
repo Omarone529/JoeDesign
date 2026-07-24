@@ -19,4 +19,5 @@ export function render(path) {
 // Ri-esportati così che lo script di pre-rendering importi tutto dal bundle già
 // compilato da Vite (niente JSX/CSS da gestire a mano in Node).
 export { allRoutes, metaForRoute, SITE } from './seo.js'
+export { profile } from './data/siteData'
 export { parsePath }

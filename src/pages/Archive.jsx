@@ -1,11 +1,13 @@
-import { archive, projectImages } from '../data/siteData'
+import { archive, periodoArchivio, projectImages } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * ARCHIVIO - griglia completa dei progetti.
+ * ARCHIVIO - griglia completa dei progetti, dal più recente.
  * Riprende lo stile di "Lavori selezionati": griglia 1 → 2 → 3 colonne,
  * immagine 4:5 con zoom in hover. Ogni scheda apre la pagina di dettaglio
  * (/progetto/<slug>) con la galleria completa.
+ * Conteggio e periodo in testa alla griglia sono calcolati dai dati: basta
+ * aggiungere una voce in `archive` e si aggiornano da soli.
  */
 export default function Archive() {
   return (
@@ -27,11 +29,15 @@ export default function Archive() {
       <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-[72px] lg:pb-28">
         <div className="mb-6 flex items-baseline justify-between border-t border-line pt-5 sm:mb-8">
           <span className="text-[11px] uppercase tracking-[0.2em] text-muted">
-            {archive.length} progetti
+            {archive.length} {archive.length === 1 ? 'progetto' : 'progetti'}
           </span>
-          <span className="text-[11px] uppercase tracking-[0.2em] text-muted">
-            2024 · 2026
-          </span>
+          {periodoArchivio && (
+            <span className="text-[11px] uppercase tracking-[0.2em] text-muted">
+              {periodoArchivio.primo === periodoArchivio.ultimo
+                ? periodoArchivio.primo
+                : `${periodoArchivio.primo} · ${periodoArchivio.ultimo}`}
+            </span>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">

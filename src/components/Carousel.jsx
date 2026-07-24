@@ -32,7 +32,7 @@ export default function Carousel({ images, title }) {
 
   return (
     <div
-      className="group relative mx-auto w-full max-w-[400px]"
+      className="group relative mx-auto w-full max-w-[560px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -45,8 +45,12 @@ export default function Carousel({ images, title }) {
         if (e.key === 'ArrowLeft') prev()
       }}
     >
-      {/* Cornice immagini */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-placeholder">
+      {/*
+       * Cornice immagini: misura fissa (non dipende dall'immagine mostrata) e
+       * stesso fondo della pagina, così non si stacca. Le foto stanno dentro
+       * con `object-contain`, qualunque sia il loro formato.
+       */}
+      <div className="relative h-[400px] overflow-hidden bg-paper sm:h-[480px] lg:h-[560px]">
         {images.map((src, i) => (
           <img
             key={src}

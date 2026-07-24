@@ -25,7 +25,7 @@ const distDir = path.join(root, 'dist')
 const server = await import(
   pathToFileURL(path.join(root, 'dist-ssr', 'entry-server.js')).href
 )
-const { render, allRoutes, metaForRoute, parsePath, SITE } = server
+const { render, allRoutes, metaForRoute, parsePath, SITE, profile } = server
 
 const esc = (s) =>
   String(s)
@@ -56,34 +56,65 @@ function headTags(meta) {
   return tags.join('\n    ')
 }
 
-/* Dati strutturati schema.org: Person in home, CreativeWork nelle schede. */
+/*
+ * Dati strutturati schema.org. Tutti i valori vengono da `profile` in
+ * siteData.js: aggiornando lì i dati si aggiornano anche qui.
+ *   - schede progetto → CreativeWork + BreadcrumbList (Google mostra il
+ *     percorso Home › Archivio › Progetto al posto dell'URL nudo);
+ *   - tutte le altre  → Person, con ruolo, città e recapiti.
+ */
 function jsonLd(meta) {
+  const persona = {
+    '@type': 'Person',
+    name: profile.name,
+    alternateName: profile.displayName,
+    jobTitle: profile.role,
+    url: `${SITE}/`,
+  }
+
   if (meta.project) {
     const p = meta.project
-    return JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'CreativeWork',
-      name: p.title,
-      description: meta.description,
-      image: meta.image,
-      url: meta.canonical,
-      dateCreated: p.year,
-      creator: {
-        '@type': 'Person',
-        name: 'Giovanni Sarchiolla',
-        alternateName: 'Joe Sarchiolla',
+    // `year` può essere un intervallo ("2024 · 2026"): come data tiene il più recente.
+    const anni = String(p.year || '').match(/\d{4}/g)
+
+    return JSON.stringify([
+      {
+        '@context': 'https://schema.org',
+        '@type': 'CreativeWork',
+        name: p.title,
+        description: meta.description,
+        image: meta.image,
+        url: meta.canonical,
+        ...(anni ? { dateCreated: anni[anni.length - 1] } : {}),
+        creator: persona,
       },
-    })
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
+          { '@type': 'ListItem', position: 3, name: p.title, item: meta.canonical },
+        ],
+      },
+    ])
   }
+
   return JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: 'Giovanni Sarchiolla',
-    alternateName: 'Joe Sarchiolla',
-    jobTitle: 'Product Designer',
-    url: `${SITE}/`,
-    address: { '@type': 'PostalAddress', addressLocality: 'Reggio Emilia', addressCountry: 'IT' },
-    sameAs: ['https://instagram.com/joesarchiolla.design'],
+    ...persona,
+    description: `${profile.role} a ${profile.place}.`,
+    email: `mailto:${profile.email}`,
+    telephone: profile.phone,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: profile.place.split(',')[0].trim(),
+      addressRegion: 'Emilia-Romagna',
+      addressCountry: 'IT',
+    },
+    alumniOf: { '@type': 'CollegeOrUniversity', name: profile.formazione },
+    knowsAbout: ['Product design', 'Industrial design', 'Packaging design', 'Graphic design'],
+    sameAs: [profile.instagram],
   })
 }
 

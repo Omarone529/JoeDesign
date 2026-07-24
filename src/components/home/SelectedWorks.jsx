@@ -5,12 +5,14 @@ import { Link } from '../../router'
  * "Lavori selezionati" - griglia delle 5 schede in evidenza.
  * Mobile-first: 1 colonna → 2 (sm) → 3 (md), come il template originale
  * su desktop. L'immagine ha un delicato zoom in hover.
+ * La linea spessa in testa separa dal masthead (prima la portava la striscia
+ * di dati anagrafici, ora spostata tutta nella pagina "Chi sono").
  * Le card diventeranno cliccabili verso la scheda progetto quando
  * l'Archivio sarà pronto.
  */
 export default function SelectedWorks() {
   return (
-    <section className="px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20">
+    <section className="border-t-2 border-ink px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20">
       <div className="mb-6 flex items-baseline justify-between sm:mb-8 lg:mb-12">
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
           Lavori selezionati
