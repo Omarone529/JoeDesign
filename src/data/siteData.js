@@ -1,0 +1,374 @@
+/*
+ * Contenuti della homepage — fonte di verità: template "Direzione A"
+ * creato con Claude Design (Giovanni "Joe" Sarchiolla, 2026).
+ *
+ * NOTA sulle immagini
+ * -------------------
+ * Ogni progetto vive in una sua cartella dedicata sotto:
+ *   public/images/products/<slug>/
+ * dove per ora è presente `cover.webp`. Le pagine di dettaglio
+ * dell'Archivio (che aggiungeremo in seguito) troveranno qui tutte
+ * le foto del singolo prodotto, mantenendo un albero chiaro:
+ *   public/images/products/flue/cover.webp
+ *   public/images/products/flue/01.webp  ← future foto galleria
+ *   public/images/products/flue/02.webp
+ *   ...
+ */
+
+export const profile = {
+  name: 'Giovanni Sarchiolla',
+  nick: 'Joe',
+  role: 'Product Designer',
+  place: 'Reggio Emilia, Italia',
+  formazione: 'Accademia di Belle Arti, Bologna',
+  handle: 'joesarchiolla.design',
+  instagram: 'https://instagram.com/joesarchiolla.design',
+  email: 'joe.artedesign@gmail.com',
+  phone: '+39 333 8238671',
+  phoneHref: 'tel:+393338238671',
+  manifesto:
+    'Prendo ispirazione dall’arte, dalla moda e dalla grafica e poi creo il prodotto. Cerco sempre la forma che non ha bisogno di parole.',
+}
+
+/*
+ * "Lavori selezionati" — le 5 schede in evidenza in homepage.
+ * L'ordine riproduce quello del template originale.
+ */
+export const focusItems = [
+  {
+    id: 'flue',
+    slug: 'flue',
+    title: 'FLUE',
+    cat: 'Sistema di illuminazione',
+    year: '2026',
+    cover: '/images/products/flue/cover.webp',
+  },
+  {
+    id: 'orbit',
+    slug: 'orbit',
+    title: 'ORBIT',
+    cat: 'Servomuto',
+    year: '2026',
+    cover: '/images/products/orbit/cover.webp',
+  },
+  {
+    id: 'arrow',
+    slug: 'directional-arrow',
+    title: 'DIRECTIONAL ARROW',
+    cat: 'Appendiabiti',
+    year: '2026',
+    cover: '/images/products/directional-arrow/cover.webp',
+  },
+  {
+    id: 'dado',
+    slug: 'dado-lamp',
+    title: 'DADO LAMP',
+    cat: 'Lampada da tavolo',
+    year: '2026',
+    cover: '/images/products/dado-lamp/cover.webp',
+  },
+  {
+    id: 'dog',
+    slug: 'dog-lamp',
+    title: 'DOG LAMP',
+    cat: 'Lampada da terra',
+    year: '2024',
+    cover: '/images/products/dog-lamp/cover.webp',
+  },
+]
+
+/* Fascia immagine a tutta larghezza — "La famiglia di prodotti" */
+export const familyBand = {
+  src: '/images/home/family-band.webp',
+  alt: 'La famiglia di prodotti',
+}
+
+/*
+ * ARCHIVIO — tutti i progetti.
+ * Ogni voce punta a public/images/products/<slug>/ dove:
+ *   cover.webp           → copertina (griglia + testata dettaglio)
+ *   01.webp … NN.webp    → galleria del progetto (in ordine)
+ * `photos` = numero di foto galleria presenti (NN.webp).
+ *
+ * NOTA metadata: `cat` (categoria) e `year` sono da confermare —
+ * inseriti come miglior stima. Dove l'anno non è certo è omesso.
+ * Le foto sono curate a partire da "ARCHIVIO WEBP".
+ */
+export const archive = [
+  {
+    slug: 'flue',
+    title: 'FLUE',
+    cat: 'Sistema di illuminazione',
+    year: '2026',
+    photos: 8,
+    desc: 'FLUE nasce dall’osservazione del cambio di diametro nelle linee di estrusione, una fase produttiva che genera elementi fuori standard destinati allo smaltimento. Attraverso un approccio di upcycling strutturale, il progetto valorizza questi scarti preservandone forma, dimensione e identità industriale. I diametri standard diventano così il principio generativo di una collezione modulare di sistemi di illuminazione.',
+    spec: {
+      Oggetto: 'Lampade · Sistema di illuminazione',
+      Contesto: 'Tesi di Laurea · Accademia di Belle Arti di Bologna',
+      Materiale: 'PVC / PLA',
+      Colore: 'Arancione / Bianco / Nero',
+    },
+  },
+  {
+    slug: 'orbit',
+    title: 'ORBIT',
+    cat: 'Servomuto · HIRO',
+    year: '2026',
+    photos: 8,
+    desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
+    spec: {
+      Oggetto: 'Servomuto',
+      Contesto: 'Concorso HIRO Design',
+      Materiale: 'Acciaio',
+      Colore: 'Arancione / Nero',
+    },
+  },
+  {
+    slug: 'dado-lamp',
+    title: 'DADO LAMP',
+    cat: 'Lampada da tavolo',
+    year: '2026',
+    photos: 7,
+    desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
+    spec: {
+      Oggetto: 'Lampada',
+      Contesto: 'Progetto Personale',
+      Materiale: 'PLA (stampa 3D)',
+      Colore: 'Nero / Rosso',
+    },
+  },
+  {
+    slug: 'directional-arrow',
+    title: 'DIRECTIONAL ARROW',
+    cat: 'Appendiabiti',
+    year: '2026',
+    photos: 8,
+    desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente nel mio linguaggio progettuale, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
+    spec: {
+      Oggetto: 'Appendiabiti',
+      Contesto: 'Concorso Design Wanted',
+      Materiale: 'Acciaio',
+      Colore: 'Nero / Rosso',
+    },
+  },
+  {
+    slug: 'dog-lamp',
+    title: 'DOG LAMP',
+    cat: 'Lampada da terra',
+    year: '2024',
+    photos: 8,
+    desc: 'Con la Dog Lamp ho voluto creare una lampada che fosse molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
+    spec: {
+      Oggetto: 'Lampada per bambini',
+      Contesto: 'Progetto Universitario',
+      Materiale: 'PLA',
+      Colore: 'Bianco',
+    },
+  },
+  {
+    slug: 'trave',
+    title: 'TRAVE DESIGN',
+    cat: 'Gioielli · Fashion',
+    year: '2025',
+    photos: 7,
+    desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola “Structure” incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
+    spec: {
+      Oggetto: 'Orecchini',
+      Contesto: 'Collaborazione QAIA Laboratorio',
+      Materiale: 'Argento 925',
+      Colore: 'Argento',
+    },
+  },
+  {
+    slug: 'nymphe',
+    title: 'NYMPHĒ',
+    cat: 'Packaging · Davines',
+    year: '2024',
+    photos: 3,
+    desc: 'Nymphē è un progetto di packaging e identità visiva sviluppato per Davines, ispirato al mondo mitologico delle ninfe e al loro legame con la natura. Le silhouette delle boccette prendono ispirazione dai flaconi delle essenze chimiche, reinterpretati in chiave elegante per evocare l’idea di formule naturali e ingredienti puri.',
+    spec: {
+      Oggetto: 'Packaging · Prodotti per capelli',
+      Contesto: 'Contest Universitario',
+      Materiale: 'PLA (prototipo)',
+      Colore: 'Nero / Trasparente',
+    },
+  },
+  {
+    slug: 'mari-chair',
+    title: 'MARI CHAIR',
+    cat: 'Seduta · Autoprogettazione',
+    year: '2026',
+    photos: 2,
+    desc: 'Ho reinterpretato la sedia Autoprogettazione di Enzo Mari attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
+    spec: {
+      Oggetto: 'Sedia',
+      Contesto: 'Progetto Personale · omaggio a Enzo Mari',
+      Materiale: 'Legno di abete',
+      Colore: 'Nero / Bianco',
+    },
+  },
+  {
+    slug: 'fuori-asse',
+    title: 'FUORI ASSE',
+    cat: 'Sgabello · Legno',
+    year: '2026',
+    photos: 3,
+    desc: 'Fuori asse è uno sgabello realizzato accostando tavole in legno recuperato, mantenute volutamente separate da una distanza funzionale di 30 mm. La fessura centrale diventa una presa integrata e, allo stesso tempo, il segno visibile dell’incontro tra elementi diversi: una condizione tipica del riuso trasformata in principio costruttivo e identitario.',
+    spec: {
+      Oggetto: 'Sgabello',
+      Contesto: 'Concorso RiLegno · MasterWood',
+      Materiale: 'Legno recuperato',
+      Colore: 'Legno chiaro',
+    },
+  },
+  {
+    slug: 'zeta-3',
+    title: 'ZETA 3',
+    cat: 'Postazione di lavoro',
+    year: '2025',
+    photos: 2,
+    desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
+    spec: {
+      Oggetto: 'Postazione di lavoro',
+      Contesto: 'Salone Satellite Milano · Meco / Mobilferro',
+      Materiale: 'Legno / Acciaio',
+      Colore: 'Legno / Nero',
+    },
+  },
+  {
+    slug: 'zero-sfrido',
+    title: 'ZERO SFRIDO',
+    cat: 'Seduta · Eco design',
+    year: '2025',
+    photos: 2,
+    desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Mi interessa l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
+    spec: {
+      Oggetto: 'Seduta',
+      Contesto: 'Progetto Universitario · Eco design',
+      Materiale: 'Legno di okumè',
+      Colore: 'Okumè',
+    },
+  },
+  {
+    slug: 'sedia-tempo-determinato',
+    title: 'SEDIA A TEMPO DETERMINATO',
+    cat: 'Scultura design',
+    year: '2026',
+    photos: 2,
+    desc: '“Sedia a tempo determinato” è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
+    spec: {
+      Oggetto: 'Scultura design',
+      Contesto: 'Concorso In Sicurezza · UIL Ravenna',
+      Materiale: 'Cartone / Scotch',
+      Colore: 'Marrone',
+    },
+  },
+  {
+    slug: 'stanza-nella-stanza',
+    title: 'STANZA NELLA STANZA',
+    cat: 'Architettura · Interior',
+    year: '2025',
+    photos: 3,
+    desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
+    spec: {
+      Oggetto: 'Architettura / Interior',
+      Contesto: 'Progetto Universitario',
+      Materiale: 'Cemento / Legno',
+    },
+  },
+  {
+    slug: 'pistone',
+    title: 'PISTONE',
+    cat: 'Coprivaso',
+    year: '2024',
+    photos: 2,
+    desc: 'Pistone è un coprivaso in plastica realizzato tramite stampaggio a iniezione, progettato per unire funzionalità e carattere estetico. Il design prende ispirazione dalla forma dei pistoni dei motori, reinterpretata in chiave morbida e contemporanea per adattarsi agli ambienti domestici.',
+    spec: {
+      Oggetto: 'Coprivaso',
+      Contesto: 'Progetto Universitario',
+      Materiale: 'PLA',
+      Colore: 'Blu / Grigio',
+    },
+  },
+  {
+    slug: 'bullone',
+    title: 'BULLONE',
+    cat: 'Portapenne · Desk',
+    year: '2025',
+    photos: 3,
+    desc: 'Bullone è un portapenne ispirato alla forma iconica del bullone industriale, reinterpretato in chiave contemporanea per portare alla luce quegli oggetti nascosti ma essenziali che spesso passano inosservati. Molti oggetti funzionali restano dietro le quinte: Bullone vuole dare loro voce, trasformandoli in protagonisti dello spazio quotidiano.',
+    spec: {
+      Oggetto: 'Portapenne',
+      Contesto: 'Progetto Personale',
+      Materiale: 'PLA',
+      Colore: 'Bianco / Blu / Rosso',
+    },
+  },
+  {
+    slug: 'anelli',
+    title: 'ANELLI',
+    cat: 'Portariviste',
+    year: '2024',
+    photos: 2,
+    desc: '“Anelli” è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
+    spec: {
+      Oggetto: 'Portariviste',
+      Contesto: 'Progetto Universitario',
+      Materiale: 'PLA',
+      Colore: 'Nero',
+    },
+  },
+  {
+    slug: 'food',
+    title: 'FOOD',
+    cat: 'Lunch box',
+    year: '2024',
+    photos: 2,
+    desc: 'Ho progettato questa lunch box non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
+    spec: {
+      Oggetto: 'Lunch box',
+      Contesto: 'Progetto Universitario',
+      Materiale: 'PLA',
+      Colore: 'Grigio / Bianco',
+    },
+  },
+  {
+    slug: 'grafica',
+    title: 'PROGETTI GRAFICI',
+    cat: 'Graphic Design',
+    year: '2024 · 2026',
+    photos: 7,
+    desc: 'Progetti grafici presentati a concorsi e bandi nazionali e internazionali, dal 2024 a oggi. Manifesti e mascotte che uniscono un linguaggio essenziale e geometrico a un messaggio sociale.',
+    spec: {
+      Oggetto: 'Manifesti e identità visive',
+      Contesto: 'Concorsi e bandi nazionali e internazionali',
+    },
+    works: [
+      { title: '“Il Fauno” · Mascotte', meta: 'Emilia Romagna, 2025', note: 'Omaggio a Fortunato Depero, maestro del Futurismo, reinterpretato in chiave contemporanea con linee nette e forme geometriche.' },
+      { title: '“Possiamo ancora far crescere i fiori”', meta: 'Emilia Romagna, 2024 · 4° posto', note: 'Un invito a credere nella rinascita anche nei momenti più oscuri: i fiori come simboli fragili ma ostinati di vita, contro l’ombra della guerra.' },
+      { title: '“In the Box” · Sketch your Deck', meta: 'Bonobolabo, Bologna 2025', note: 'Una riflessione sulla condizione abitativa del futuro: la città racchiusa in uno scatolone, simbolo di spazi sempre più piccoli e temporanei.' },
+      { title: '“Un’Europa che unisce”', meta: 'Emilia Romagna, 2025 · Vincitore, 3° posto', note: 'Un pacco da spedizione che ruota attorno a un mondo stilizzato: metafora di un’Europa in movimento che unisce persone, culture e valori.' },
+      { title: '“La Città parla e tu?”', meta: 'IGPDecaux Graphic Award, Milano 2025', note: 'Due sedie vuote e un giallo acceso per richiamare il dialogo che manca e invitare i giovani a fermarsi, incontrarsi e tornare a parlare.' },
+      { title: '“Direzione tolleranza”', meta: 'Friuli Venezia Giulia, 2026', note: 'Frecce e segnaletica urbana: ogni elemento mantiene la propria direzione ma convive in un unico sistema. La parola TOLLERANZA contiene le differenze.' },
+    ],
+  },
+]
+
+/* Percorsi immagine di un progetto d'archivio. */
+export function projectImages(item) {
+  const base = `/images/products/${item.slug}`
+  const gallery = Array.from(
+    { length: item.photos },
+    (_, i) => `${base}/${String(i + 1).padStart(2, '0')}.webp`,
+  )
+  return { cover: `${base}/cover.webp`, gallery }
+}
+
+/* Ticker "Concorsi & partecipazioni" */
+export const contests = [
+  { name: 'Design Wanted' },
+  { name: 'HIRO Design' },
+  { name: 'Salone Satellite' },
+  { name: 'UIL Ravenna' },
+  { name: 'Rilegno · MasterWood' },
+]
