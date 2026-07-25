@@ -54,10 +54,18 @@ function headTags(meta) {
     `<meta property="og:description" content="${esc(meta.description)}" />`,
     ...(meta.canonical ? [`<meta property="og:url" content="${meta.canonical}" />`] : []),
     `<meta property="og:image" content="${meta.image}" />`,
+    // Dimensioni dichiarate: senza, alla prima condivisione la piattaforma
+    // deve scaricare il file per sapere come impaginarlo, e spesso mostra
+    // l'anteprima senza immagine proprio la prima volta - quella che conta.
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:type" content="image/jpeg" />`,
+    ...(meta.imageAlt ? [`<meta property="og:image:alt" content="${esc(meta.imageAlt)}" />`] : []),
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(meta.title)}" />`,
     `<meta name="twitter:description" content="${esc(meta.description)}" />`,
     `<meta name="twitter:image" content="${meta.image}" />`,
+    ...(meta.imageAlt ? [`<meta name="twitter:image:alt" content="${esc(meta.imageAlt)}" />`] : []),
   ]
   // Dati strutturati solo sulle pagine vere: descrivere un errore a un motore
   // di ricerca non ha senso.
@@ -170,20 +178,21 @@ for (const pathname of routes) {
 fs.writeFileSync(path.join(distDir, '404.html'), buildPage('/404'), 'utf8')
 console.log(`  ✓ 404  →  dist/404.html`)
 
-/* sitemap.xml */
-const today = new Date().toISOString().slice(0, 10)
+/*
+ * sitemap.xml — il solo elenco degli indirizzi.
+ *
+ * Niente `changefreq` né `priority`: Google li ignora da anni, dichiarati o no.
+ * Niente `lastmod`: qui potrebbe valere solo la data della build, che cambia a
+ * ogni deploy anche quando i contenuti sono identici. Un "modificato oggi"
+ * ripetuto su tutte le pagine viene riconosciuto come falso e fa scartare il
+ * campo per l'intero sito - meglio non dichiararlo che dichiararlo a caso.
+ * (Se un giorno le voci dell'archivio avranno una data di aggiornamento vera,
+ * quella sì che varrà la pena di scriverla qui.)
+ */
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  routes
-    .map(
-      (r) =>
-        `  <url>\n    <loc>${SITE}${r === '/' ? '/' : r}</loc>\n` +
-        `    <lastmod>${today}</lastmod>\n` +
-        `    <changefreq>monthly</changefreq>\n` +
-        `    <priority>${r === '/' ? '1.0' : '0.8'}</priority>\n  </url>`,
-    )
-    .join('\n') +
+  routes.map((r) => `  <url><loc>${SITE}${r === '/' ? '/' : r}</loc></url>`).join('\n') +
   `\n</urlset>\n`
 fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8')
 console.log(`  ✓ sitemap.xml (${routes.length} URL)`)

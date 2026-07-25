@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
+      Icona del sito, in tre formati: .ico per la richiesta automatica che ogni
+      browser fa a /favicon.ico, .svg per chi lo supporta (nitido a ogni
+      dimensione), .png per la schermata Home di iOS. Si generano con
+      `node scripts/favicon.js`.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f4f3f1" />
+    <!--
       Segnaposto: in produzione title e description vengono riscritti per ogni
       pagina da scripts/prerender.js. Contano solo in `npm run dev`.
     -->

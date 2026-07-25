@@ -42,6 +42,21 @@ URL reali, non hash:
 `App.jsx` legge la rotta con `useRoute()` e monta la pagina giusta. Funziona sia nel
 browser sia in SSR (in build) tramite `RouterProvider` con `initialPath`.
 
+### Anteprime social e icona — file già pronti, NON si rigenerano a ogni build
+Due script si lanciano **a mano** e salvano il risultato dentro `public/`, come le altre immagini:
+
+```bash
+node scripts/og-image.js   # public/images/og/*.jpg — anteprime dei link (1200×630)
+node scripts/favicon.js    # favicon.ico/.svg, apple-touch-icon, icon-192/512, site.webmanifest
+```
+
+- **`og-image.js` va rilanciato dopo aver aggiunto un progetto o cambiato una copertina**,
+  altrimenti la scheda nuova punta a un JPEG che non esiste. È l'unico passo manuale
+  quando cresce l'archivio.
+- Le anteprime sono in **JPEG e non in WebP**: LinkedIn e WhatsApp non mostrano le WebP,
+  e il link condiviso uscirebbe senza immagine. Non ricondurle al WebP del sito.
+- `favicon.js` serve solo se cambia il marchio.
+
 ### Pre-rendering / SEO (`scripts/prerender.js` + `src/seo.js` + `src/entry-server.jsx`)
 Ogni rotta viene renderizzata in un **HTML statico già completo** (es. `dist/progetto/flue/index.html`),
 con title, meta description, Open Graph, Twitter card e JSON-LD schema.org **per pagina**.
@@ -63,8 +78,9 @@ Tutti i testi e i dati stanno qui, non nel markup:
    Per mailto/tel/URL esterni/`#` va bene `<a>` (o `Link`, che li gestisce come anchor normali).
 2. **Niente `fetch`/API a runtime** per contenuti che devono essere indicizzati: tienili in `siteData.js`.
    Il pre-rendering "fotografa" ciò che è nei dati statici.
-3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella).
-   Entra automaticamente in pre-rendering, sitemap e con i suoi meta tag. Nessun altro passo.
+3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella),
+   poi lancia `node scripts/og-image.js` per l'anteprima social. Pre-rendering, sitemap
+   e meta tag si aggiornano da soli.
 4. **Non reintrodurre l'hash routing** (`#progetto/...`): romperebbe SEO e link profondi.
 5. Evita di usare `window`/`document` durante il render dei componenti (solo dentro `useEffect`/handler),
    altrimenti il pre-rendering fallisce.
@@ -160,6 +176,8 @@ src/
 
 scripts/
 ├── prerender.js         # pre-rendering + sitemap + robots (parte di `npm run build`)
+├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
+├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
 ├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
 └── ink-alpha.js         # tratto su fondo bianco → webp con alpha (firme, scansioni)
@@ -182,8 +200,12 @@ con base a Reggio Emilia», «Si parte da un vincolo…». Mantenere questo regi
 ## Da fare (noto)
 
 - Il sito è ancora in costruzione: aspettarsi nuove sezioni, contenuti e progetti.
-- Le foto di molti progetti d'archivio vanno ancora inserite (galleria `01.webp…` dalla
-  cartella `ARCHIVIO WEBP`).
+- Le gallerie dei 18 progetti attuali sono **complete** (cover + `01.webp…NN.webp` per
+  tutti); mancano solo le foto dei progetti futuri.
+- Prima/subito dopo il primo deploy: registrare il sito su **Google Search Console** e
+  inviare `/sitemap.xml`. Valutare un'analitica leggera (Plausible/Umami, senza cookie).
+- **Decidere il dominio prima di pubblicare**: cambiarlo dopo che Google ha indicizzato
+  gli indirizzi `*.netlify.app` obbliga a gestire i redirect.
 
 ## Fonte dei contenuti (bio, CV, testi)
 

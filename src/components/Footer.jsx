@@ -8,9 +8,19 @@ import { Link } from '../router'
  * Tre fasce separate da filetti: contatti e navigazione su griglia a 12 colonne,
  * firma tipografica, coda legale. Ogni recapito compare una volta sola.
  */
-export default function Footer() {
-  const anno = new Date().getFullYear()
+/*
+ * Anno del copyright, fissato al momento della build.
+ *
+ * Non `new Date().getFullYear()` durante il render: le pagine sono statiche e
+ * l'anno resterebbe cucito nell'HTML generato: al primo gennaio il browser
+ * calcolerebbe l'anno nuovo su un HTML che dice quello vecchio, React
+ * troverebbe due testi diversi e l'aggancio (hydration) fallirebbe su tutte le
+ * pagine. Vite sostituisce questa costante con il valore letterale in fase di
+ * compilazione, così HTML e browser dicono sempre la stessa cosa.
+ */
+const ANNO = __ANNO_BUILD__
 
+export default function Footer() {
   const recapiti = [
     { label: 'Telefono', valore: profile.phone, href: profile.phoneHref },
     { label: 'Sede', valore: profile.place },
@@ -126,7 +136,7 @@ export default function Footer() {
       {/* 3. Coda */}
       <div className="flex flex-col gap-4 border-t border-paper/12 px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-[72px]">
         <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
-          © {anno} {profile.name} · Tutti i diritti riservati
+          © {ANNO} {profile.name} · Tutti i diritti riservati
         </div>
         <button
           type="button"

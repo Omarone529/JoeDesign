@@ -34,25 +34,49 @@ function clip(text, max = 155) {
   return t.slice(0, max - 1).replace(/\s+\S*$/, '').trim() + '…'
 }
 
+/*
+ * Immagini per le anteprime social: JPEG 1200×630 in public/images/og/,
+ * preparate da `node scripts/og-image.js`. Non si usano le WebP del sito
+ * perché LinkedIn e WhatsApp non le mostrano, e chi condivide il link
+ * vedrebbe un riquadro vuoto.
+ */
+const ogImage = (nome) => abs(`/images/og/${nome}.jpg`)
+
+const FIRMA = `${profile.name} “${profile.nick}”`
+
+/*
+ * Titolo di una scheda progetto. Porta sempre il nome per esteso: le schede
+ * sono la maggior parte del sito, e con il solo "Joe" non risponderebbero a
+ * chi cerca "Giovanni Sarchiolla". Se la riga supera i ~62 caratteri Google la
+ * tronca con i puntini, quindi la categoria cade per prima: è l'informazione
+ * che il titolo del progetto già lascia intuire.
+ */
+function titoloProgetto(item) {
+  const pieno = `${item.title} · ${item.cat} · ${FIRMA}`
+  if (pieno.length <= 62) return pieno
+  const senzaCategoria = `${item.title} · ${FIRMA}`
+  return senzaCategoria.length <= 62 ? senzaCategoria : `${item.title} · ${profile.name}`
+}
+
 export function metaForRoute(route) {
   if (route.name === 'archive') {
     return {
-      title: `Archivio progetti · ${profile.name} “${profile.nick}”`,
-      description: `Tutti i ${archive.length} progetti di ${profile.name} “${profile.nick}”: product design, arredo, packaging e grafica. Portfolio ${PERIODO}.`,
+      title: `Archivio progetti · ${FIRMA}`,
+      description: `Tutti i ${archive.length} progetti di ${FIRMA}: product design, arredo, packaging e grafica. Portfolio ${PERIODO}.`,
       canonical: `${SITE}/archivio`,
-      image: abs('/images/home/family-band.webp'),
+      image: ogImage('archivio'),
+      imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
       type: 'website',
     }
   }
 
   if (route.name === 'about') {
     return {
-      title: `Chi sono · ${profile.displayName} · ${profile.role}`,
+      title: `Chi sono · ${FIRMA} · ${profile.role}`,
       description: clip(about.intro),
       canonical: `${SITE}/chi-sono`,
-      // Non il ritratto scontornato: le anteprime social non gestiscono la
-      // trasparenza e la rendono su fondo nero. Serve un'immagine piena.
-      image: abs(about.photos.lab.src),
+      image: ogImage('chi-sono'),
+      imageAlt: about.photos.lab.alt,
       preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
     }
@@ -63,10 +87,11 @@ export function metaForRoute(route) {
     if (item) {
       const { cover } = projectImages(item)
       return {
-        title: `${item.title} · ${item.cat} · Joe Sarchiolla`,
+        title: titoloProgetto(item),
         description: clip(item.desc),
         canonical: `${SITE}/progetto/${item.slug}`,
-        image: abs(cover),
+        image: ogImage(item.slug),
+        imageAlt: `${item.title} · ${item.cat}`,
         preload: cover, // prima diapositiva del carosello
         type: 'article',
         project: item,
@@ -79,9 +104,10 @@ export function metaForRoute(route) {
   // "giusto" direbbe a Google che quell'indirizzo è un'altra pagina del sito.
   if (route.name === 'notfound') {
     return {
-      title: `Pagina non trovata · ${profile.name} “${profile.nick}”`,
-      description: `L'indirizzo non corrisponde a nessuna pagina del sito di ${profile.name} “${profile.nick}”.`,
-      image: abs('/images/home/family-band.webp'),
+      title: `Pagina non trovata · ${FIRMA}`,
+      description: `L'indirizzo non corrisponde a nessuna pagina del sito di ${FIRMA}.`,
+      image: ogImage('home'),
+      imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
       type: 'website',
       noindex: true,
     }
@@ -90,10 +116,11 @@ export function metaForRoute(route) {
   // Home. Il title porta nome, ruolo e città: sono le chiavi delle ricerche
   // realistiche, sul nome e su base locale.
   return {
-    title: `${profile.name} “${profile.nick}” · ${profile.role} a Reggio Emilia`,
-    description: `${profile.name} “${profile.nick}”, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,
+    title: `${FIRMA} · ${profile.role} a Reggio Emilia`,
+    description: `${FIRMA}, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,
     canonical: `${SITE}/`,
-    image: abs('/images/home/family-band.webp'),
+    image: ogImage('home'),
+    imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
     type: 'website',
   }
 }

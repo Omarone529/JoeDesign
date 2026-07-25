@@ -11,6 +11,23 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Intestazioni di sicurezza, valide per tutte le pagine.
+# Il sito è statico e non raccoglie dati, ma queste tre righe chiudono gli
+# abusi classici e sono ciò che qualunque analisi del sito va a cercare.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Impedisce al browser di "indovinare" il tipo di un file ignorando quello
+    # dichiarato: è il trucco con cui un file caricato può farsi eseguire.
+    X-Content-Type-Options = "nosniff"
+    # Vieta di incorniciare il sito dentro un altro sito (clickjacking).
+    X-Frame-Options = "DENY"
+    # Verso l'esterno passa solo il dominio, non la pagina precisa da cui si
+    # arriva. Tra pagine interne il percorso completo resta disponibile.
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Il sito non usa fotocamera, microfono né posizione: negarli in partenza.
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+
 # I bundle in /assets/ hanno l'hash del contenuto nel nome: contenuto nuovo,
 # nome nuovo. Possono quindi restare in cache a tempo indeterminato.
 [[headers]]
