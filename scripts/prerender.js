@@ -8,7 +8,7 @@
  *   3. scrive title, meta description, canonical, Open Graph e dati strutturati
  *      specifici della pagina;
  *   4. salva il file HTML statico nel percorso giusto (es. dist/progetto/flue/index.html).
- * Infine genera sitemap.xml.
+ * Infine genera la pagina d'errore 404.html e la sitemap.xml.
  *
  * Risultato: Google e le anteprime dei link (WhatsApp, LinkedIn…) vedono subito
  * il contenuto, senza dover eseguire JavaScript.
@@ -39,7 +39,10 @@ const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
 /* Tag da inserire nell'<head> per una singola pagina. */
 function headTags(meta) {
   const tags = [
-    `<link rel="canonical" href="${meta.canonical}" />`,
+    // La 404 è l'unica pagina senza canonical: non ha un indirizzo proprio da
+    // dichiarare. In compenso chiede esplicitamente di non essere indicizzata.
+    ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
+    ...(meta.canonical ? [`<link rel="canonical" href="${meta.canonical}" />`] : []),
     // Immagine principale nota in anticipo (ritratto in "Chi sono", copertina
     // nelle schede): il preload la mette in coda leggendo l'head, senza
     // attendere che il layout ne riveli la necessità.
@@ -49,14 +52,18 @@ function headTags(meta) {
     `<meta property="og:locale" content="it_IT" />`,
     `<meta property="og:title" content="${esc(meta.title)}" />`,
     `<meta property="og:description" content="${esc(meta.description)}" />`,
-    `<meta property="og:url" content="${meta.canonical}" />`,
+    ...(meta.canonical ? [`<meta property="og:url" content="${meta.canonical}" />`] : []),
     `<meta property="og:image" content="${meta.image}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(meta.title)}" />`,
     `<meta name="twitter:description" content="${esc(meta.description)}" />`,
     `<meta name="twitter:image" content="${meta.image}" />`,
   ]
-  tags.push(`<script type="application/ld+json">${jsonLd(meta)}</script>`)
+  // Dati strutturati solo sulle pagine vere: descrivere un errore a un motore
+  // di ricerca non ha senso.
+  if (!meta.noindex) {
+    tags.push(`<script type="application/ld+json">${jsonLd(meta)}</script>`)
+  }
   return tags.join('\n    ')
 }
 
@@ -153,6 +160,15 @@ for (const pathname of routes) {
   fs.writeFileSync(file, buildPage(pathname), 'utf8')
   console.log(`  ✓ ${pathname}  →  ${path.relative(root, file)}`)
 }
+
+/*
+ * 404.html — pagina d'errore, generata a parte.
+ * Non è una rotta del sito: sta fuori da `allRoutes()` (quindi fuori dalla
+ * sitemap) e va scritta con questo nome esatto nella radice di dist, perché è
+ * il file che Netlify serve, con status 404, per ogni indirizzo inesistente.
+ */
+fs.writeFileSync(path.join(distDir, '404.html'), buildPage('/404'), 'utf8')
+console.log(`  ✓ 404  →  dist/404.html`)
 
 /* sitemap.xml */
 const today = new Date().toISOString().slice(0, 10)

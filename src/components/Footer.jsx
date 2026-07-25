@@ -75,7 +75,6 @@ export default function Footer() {
                   {r.href ? (
                     <a
                       href={r.href}
-                      {...(r.esterno ? { target: '_blank', rel: 'noreferrer' } : {})}
                       className="transition-colors hover:text-night-soft hover:underline"
                     >
                       {r.valore}

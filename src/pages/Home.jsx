@@ -1,7 +1,7 @@
 import Masthead from '../components/home/Masthead'
 import SelectedWorks from '../components/home/SelectedWorks'
 import FamilyBand from '../components/home/FamilyBand'
-import ContestsTicker from '../components/home/ContestsTicker'
+import SkillsTicker from '../components/home/SkillsTicker'
 
 /*
  * Homepage / Indice - riproduzione della "Direzione A".
@@ -14,7 +14,7 @@ export default function Home() {
       <Masthead />
       <SelectedWorks />
       <FamilyBand />
-      <ContestsTicker />
+      <SkillsTicker />
     </main>
   )
 }

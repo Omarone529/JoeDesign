@@ -2,13 +2,10 @@ import { focusItems } from '../../data/siteData'
 import { Link } from '../../router'
 
 /*
- * "Lavori selezionati" - griglia delle 5 schede in evidenza.
- * Mobile-first: 1 colonna → 2 (sm) → 3 (md), come il template originale
- * su desktop. L'immagine ha un delicato zoom in hover.
- * La linea spessa in testa separa dal masthead (prima la portava la striscia
- * di dati anagrafici, ora spostata tutta nella pagina "Chi sono").
- * Le card diventeranno cliccabili verso la scheda progetto quando
- * l'Archivio sarà pronto.
+ * "Lavori selezionati" - griglia delle schede in evidenza (la selezione è
+ * `focusSlugs` in siteData). Mobile-first: 1 colonna → 2 (sm) → 3 (lg).
+ * L'immagine ha un delicato zoom in hover; ogni scheda apre /progetto/<slug>.
+ * La linea spessa in testa separa dal masthead.
  */
 export default function SelectedWorks() {
   return (
@@ -27,7 +24,7 @@ export default function SelectedWorks() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
         {focusItems.map((p, i) => (
-          <Link key={p.id} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
+          <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 {/* La prima riga è già in viewport dopo il masthead: caricarla

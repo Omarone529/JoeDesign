@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { archive } from './data/siteData'
 
 /*
  * Router minimale basato sui path reali dell'URL (History API) - nessuna
@@ -8,22 +9,26 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
  *   /chi-sono         → Chi sono
  *   /archivio         → Archivio
  *   /progetto/<slug>  → Scheda progetto
+ *   qualsiasi altro   → 404
  *
  * Funziona sia nel browser sia in fase di build (SSR/pre-rendering): in SSR
  * riceve `initialPath` e non tocca mai `window`.
  */
 export function parsePath(pathname) {
   const p = (pathname || '/').replace(/\/+$/, '') || '/'
+  if (p === '/') return { name: 'home', path: '/' }
   if (p === '/chi-sono') return { name: 'about', path: '/chi-sono' }
   if (p === '/archivio') return { name: 'archive', path: '/archivio' }
   if (p.startsWith('/progetto/')) {
-    return {
-      name: 'project',
-      slug: decodeURIComponent(p.slice('/progetto/'.length)),
-      path: p,
+    const slug = decodeURIComponent(p.slice('/progetto/'.length))
+    // Solo gli slug presenti in archivio sono rotte vere: un progetto
+    // inventato deve dare 404, non una scheda vuota.
+    if (archive.some((item) => item.slug === slug)) {
+      return { name: 'project', slug, path: p }
     }
   }
-  return { name: 'home', path: '/' }
+  // Indirizzo inesistente: pagina 404 (servita da Netlify con lo status giusto).
+  return { name: 'notfound', path: p }
 }
 
 const RouterContext = createContext(null)
@@ -34,8 +39,12 @@ export function RouterProvider({ initialPath = '/', children }) {
   useEffect(() => {
     const onPop = () => setPath(window.location.pathname)
     window.addEventListener('popstate', onPop)
-    // Allinea lo stato al path reale dopo l'hydration.
-    setPath(window.location.pathname)
+    // Allinea lo stato al path reale dopo l'hydration. Aggiorna solo se
+    // differisce davvero: di norma coincide già con initialPath, e riscriverlo
+    // costerebbe un render in più a ogni caricamento di pagina.
+    setPath((corrente) =>
+      corrente === window.location.pathname ? corrente : window.location.pathname,
+    )
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
@@ -48,11 +57,15 @@ export function RouterProvider({ initialPath = '/', children }) {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
-  return (
-    <RouterContext.Provider value={{ route: parsePath(path), navigate }}>
-      {children}
-    </RouterContext.Provider>
-  )
+  /*
+   * Memoizzato per due motivi: parsePath scorre l'archivio per validare lo
+   * slug, e un valore nuovo a ogni render farebbe ri-renderizzare tutti i
+   * consumatori del contesto (ogni <Link> della pagina) anche quando la rotta
+   * non è cambiata. `navigate` è già stabile grazie a useCallback.
+   */
+  const value = useMemo(() => ({ route: parsePath(path), navigate }), [path, navigate])
+
+  return <RouterContext.Provider value={value}>{children}</RouterContext.Provider>
 }
 
 export function useRoute() {

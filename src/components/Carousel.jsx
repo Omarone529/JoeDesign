@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 /*
  * Carosello immagini con avanzamento automatico.
  * - crossfade tra le immagini (una visibile alla volta)
- * - autoplay ogni 4s, in pausa al passaggio del mouse / focus
+ * - autoplay ogni 2s, in pausa al passaggio del mouse / focus
  * - controlli manuali: frecce, puntini, contatore; frecce da tastiera
  * - rispetta prefers-reduced-motion (niente autoplay)
  * Pensato per stare accanto alla descrizione fissa nella scheda progetto.
@@ -14,7 +14,6 @@ export default function Carousel({ images, title }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const n = images.length
-  const timer = useRef(null)
 
   const go = (i) => setIndex((i + n) % n)
   const next = () => go(index + 1)
@@ -24,8 +23,8 @@ export default function Carousel({ images, title }) {
     if (n <= 1 || paused) return
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (reduce) return
-    timer.current = setTimeout(() => setIndex((i) => (i + 1) % n), INTERVAL)
-    return () => clearTimeout(timer.current)
+    const timer = setTimeout(() => setIndex((i) => (i + 1) % n), INTERVAL)
+    return () => clearTimeout(timer)
   }, [index, paused, n])
 
   if (n === 0) return null

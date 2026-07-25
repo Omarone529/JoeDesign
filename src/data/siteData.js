@@ -1,18 +1,15 @@
 /*
- * Contenuti della homepage - fonte di verità: template "Direzione A"
- * creato con Claude Design (Giovanni "Joe" Sarchiolla, 2026).
+ * Contenuti del sito - fonte di verità unica: tutti i testi e i dati stanno
+ * qui, non nel markup (Giovanni "Joe" Sarchiolla, 2026).
  *
  * NOTA sulle immagini
  * -------------------
  * Ogni progetto vive in una sua cartella dedicata sotto:
  *   public/images/products/<slug>/
- * dove per ora è presente `cover.webp`. Le pagine di dettaglio
- * dell'Archivio (che aggiungeremo in seguito) troveranno qui tutte
- * le foto del singolo prodotto, mantenendo un albero chiaro:
- *   public/images/products/flue/cover.webp
- *   public/images/products/flue/01.webp  ← future foto galleria
- *   public/images/products/flue/02.webp
- *   ...
+ *   ├── cover.webp        copertina: griglie home/archivio e prima diapositiva
+ *   └── 01.webp … NN.webp galleria, in ordine (NN = campo `photos`)
+ * I percorsi li costruisce `projectImages()` in fondo al file: non vanno mai
+ * scritti a mano nei componenti.
  */
 
 export const profile = {
@@ -70,20 +67,6 @@ export const about = {
     { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
     { anno: '2026', titolo: 'Accademia di Belle Arti di Bologna', luogo: 'ABABO' },
   ],
-  // "Bannerino" replica della card Instagram, sovrapposto alla foto.
-  instagram: {
-    handle: 'joesarchiolla.design',
-    role: 'Experimental Product Designer',
-    bio: 'Forme semplici trasformate in oggetti di design',
-    stats: [
-      ['68', 'post'],
-      ['2.765', 'follower'],
-      ['1.129', 'seguiti'],
-    ],
-    avatar: '/images/about/joe-avatar.webp',
-    qr: '/images/about/qr-instagram.png',
-    url: 'https://instagram.com/joesarchiolla.design',
-  },
   photos: {
     hero: { src: '/images/about/joe-cutout.webp', alt: 'Ritratto di Joe Sarchiolla a braccia conserte' },
     lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
@@ -112,7 +95,7 @@ const progetti = [
     title: 'FLUE',
     cat: 'Sistema di illuminazione',
     year: '2026',
-    photos: 8,
+    photos: 13,
     desc: 'FLUE nasce dall’osservazione del cambio di diametro nelle linee di estrusione, una fase produttiva che genera elementi fuori standard destinati allo smaltimento. Attraverso un approccio di upcycling strutturale, il progetto valorizza questi scarti preservandone forma, dimensione e identità industriale. I diametri standard diventano così il principio generativo di una collezione modulare di sistemi di illuminazione.',
     spec: {
       Oggetto: 'Lampade · Sistema di illuminazione',
@@ -126,7 +109,7 @@ const progetti = [
     title: 'ORBIT',
     cat: 'Servomuto · HIRO',
     year: '2026',
-    photos: 8,
+    photos: 10,
     desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
     spec: {
       Oggetto: 'Servomuto',
@@ -140,7 +123,7 @@ const progetti = [
     title: 'DADO LAMP',
     cat: 'Lampada da tavolo',
     year: '2026',
-    photos: 5,
+    photos: 9,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
       Oggetto: 'Lampada',
@@ -154,7 +137,7 @@ const progetti = [
     title: 'DIRECTIONAL ARROW',
     cat: 'Appendiabiti',
     year: '2026',
-    photos: 8,
+    photos: 9,
     desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
     spec: {
       Oggetto: 'Appendiabiti',
@@ -168,7 +151,7 @@ const progetti = [
     title: 'DOG LAMP',
     cat: 'Lampada da terra',
     year: '2024',
-    photos: 8,
+    photos: 10,
     desc: 'La Dog Lamp è pensata per essere molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
     spec: {
       Oggetto: 'Lampada per bambini',
@@ -182,7 +165,7 @@ const progetti = [
     title: 'TRAVE DESIGN',
     cat: 'Gioielli · Fashion',
     year: '2025',
-    photos: 7,
+    photos: 9,
     desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola “Structure” incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
     spec: {
       Oggetto: 'Orecchini',
@@ -196,7 +179,7 @@ const progetti = [
     title: 'NYMPHĒ',
     cat: 'Packaging · Davines',
     year: '2024',
-    photos: 3,
+    photos: 4,
     desc: 'Nymphē è un progetto di packaging e identità visiva sviluppato per Davines, ispirato al mondo mitologico delle ninfe e al loro legame con la natura. Le silhouette delle boccette prendono ispirazione dai flaconi delle essenze chimiche, reinterpretati in chiave elegante per evocare l’idea di formule naturali e ingredienti puri.',
     spec: {
       Oggetto: 'Packaging · Prodotti per capelli',
@@ -210,7 +193,7 @@ const progetti = [
     title: 'MARI CHAIR',
     cat: 'Seduta · Autoprogettazione',
     year: '2026',
-    photos: 2,
+    photos: 4,
     desc: 'La sedia Autoprogettazione di Enzo Mari è reinterpretata attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
     spec: {
       Oggetto: 'Sedia',
@@ -224,7 +207,7 @@ const progetti = [
     title: 'FUORI ASSE',
     cat: 'Sgabello · Legno',
     year: '2026',
-    photos: 3,
+    photos: 5,
     desc: 'Fuori asse è uno sgabello realizzato accostando tavole in legno recuperato, mantenute volutamente separate da una distanza funzionale di 30 mm. La fessura centrale diventa una presa integrata e, allo stesso tempo, il segno visibile dell’incontro tra elementi diversi: una condizione tipica del riuso trasformata in principio costruttivo e identitario.',
     spec: {
       Oggetto: 'Sgabello',
@@ -238,7 +221,7 @@ const progetti = [
     title: 'ZETA 3',
     cat: 'Postazione di lavoro',
     year: '2025',
-    photos: 2,
+    photos: 5,
     desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
     spec: {
       Oggetto: 'Postazione di lavoro',
@@ -266,7 +249,7 @@ const progetti = [
     title: 'SEDIA A TEMPO DETERMINATO',
     cat: 'Scultura design',
     year: '2026',
-    photos: 2,
+    photos: 3,
     desc: '“Sedia a tempo determinato” è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
     spec: {
       Oggetto: 'Scultura design',
@@ -293,7 +276,7 @@ const progetti = [
     title: 'PISTONE',
     cat: 'Coprivaso',
     year: '2024',
-    photos: 2,
+    photos: 3,
     desc: 'Pistone è un coprivaso in plastica realizzato tramite stampaggio a iniezione, progettato per unire funzionalità e carattere estetico. Il design prende ispirazione dalla forma dei pistoni dei motori, reinterpretata in chiave morbida e contemporanea per adattarsi agli ambienti domestici.',
     spec: {
       Oggetto: 'Coprivaso',
@@ -321,7 +304,7 @@ const progetti = [
     title: 'ANELLI',
     cat: 'Portariviste',
     year: '2024',
-    photos: 2,
+    photos: 4,
     desc: '“Anelli” è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
     spec: {
       Oggetto: 'Portariviste',
@@ -335,7 +318,7 @@ const progetti = [
     title: 'FOOD',
     cat: 'Lunch box',
     year: '2024',
-    photos: 2,
+    photos: 3,
     desc: 'Questa lunch box è progettata non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
     spec: {
       Oggetto: 'Lunch box',
@@ -349,7 +332,7 @@ const progetti = [
     title: 'PROGETTI GRAFICI',
     cat: 'Graphic Design',
     year: '2024 · 2026',
-    photos: 7,
+    photos: 9,
     desc: 'Progetti grafici presentati a concorsi e bandi nazionali e internazionali, dal 2024 a oggi. Manifesti e mascotte che uniscono un linguaggio essenziale e geometrico a un messaggio sociale.',
     spec: {
       Oggetto: 'Manifesti e identità visive',
@@ -415,14 +398,8 @@ const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'zeta-3',
 export const focusItems = focusSlugs.map((slug) => {
   const item = progetti.find((p) => p.slug === slug)
   if (!item) throw new Error(`focusItems: nessun progetto con slug "${slug}" nell'archivio`)
-  return { ...item, id: slug, cover: projectImages(item).cover }
+  // Solo i campi che la scheda mostra: descrizione, spec e lavori servono alla
+  // pagina di dettaglio, non alla griglia.
+  const { title, cat, year } = item
+  return { slug, title, cat, year, cover: projectImages(item).cover }
 })
-
-/* Ticker "Concorsi & partecipazioni" */
-export const contests = [
-  { name: 'Design Wanted' },
-  { name: 'HIRO Design' },
-  { name: 'Salone Satellite' },
-  { name: 'UIL Ravenna' },
-  { name: 'Rilegno · MasterWood' },
-]

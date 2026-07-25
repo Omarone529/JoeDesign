@@ -6,7 +6,6 @@ export default {
       colors: {
         // Palette "Direzione A" — carta / inchiostro
         paper: '#f4f3f1', // sfondo principale
-        accent: '#e5341f', // rosso di accento (barra "Chi sono", come nel portfolio)
         ink: '#14110f', // testo / nero caldo
         muted: '#8f8b86', // grigio testo secondario
         line: '#d7d4cf', // bordi chiari
@@ -25,9 +24,16 @@ export default {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        // Ticker: il nastro contiene due copie dell'elenco, quindi -50% = una
+        // copia esatta e il salto a fine ciclo non si vede.
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        },
       },
       animation: {
         viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
+        marquee: 'marquee 38s linear infinite',
       },
     },
   },

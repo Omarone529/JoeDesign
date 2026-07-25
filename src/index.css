@@ -28,14 +28,3 @@
     outline-offset: 2px;
   }
 }
-
-@layer utilities {
-  /* Nasconde le scrollbar dei caroselli mantenendo lo scroll */
-  .no-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-}

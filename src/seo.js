@@ -74,6 +74,19 @@ export function metaForRoute(route) {
     }
   }
 
+  // 404. `noindex` perché la pagina non deve finire nell'indice, e nessun
+  // canonical: l'URL che la mostra è per definizione sbagliato, indicarne uno
+  // "giusto" direbbe a Google che quell'indirizzo è un'altra pagina del sito.
+  if (route.name === 'notfound') {
+    return {
+      title: `Pagina non trovata · ${profile.name} “${profile.nick}”`,
+      description: `L'indirizzo non corrisponde a nessuna pagina del sito di ${profile.name} “${profile.nick}”.`,
+      image: abs('/images/home/family-band.webp'),
+      type: 'website',
+      noindex: true,
+    }
+  }
+
   // Home. Il title porta nome, ruolo e città: sono le chiavi delle ricerche
   // realistiche, sul nome e su base locale.
   return {

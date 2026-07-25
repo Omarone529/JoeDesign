@@ -54,7 +54,7 @@ Tutti i testi e i dati stanno qui, non nel markup:
 - `profile` — dati di Joe (nome, ruolo, contatti, manifesto)
 - `focusItems` — le schede "Lavori selezionati" in homepage
 - `archive` — TUTTI i progetti (slug, title, cat, year, photos, desc, spec, opzionale `works`)
-- `familyBand`, `contests` — altre sezioni home
+- `familyBand` — altra sezione home (il ticker "Skills" in home riusa `about.skills`)
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
 
 ## ⚠️ Regole da rispettare (per non rompere SEO/pre-rendering)
@@ -101,7 +101,19 @@ Le sorgenti stanno FUORI dal repo, in due cartelle sul disco:
   node scripts/remove-bg.js "<sorgente>" public/images/<dest>.webp [larghezzaMax] [qualità]
   ```
 
-  (segmentazione AI via `@imgly/background-removal-node` → WebP con canale alpha).
+  (segmentazione AI → WebP con canale alpha). ⚠️ La libreria
+  `@imgly/background-removal-node` **non è in `package.json`**: pesa 174 MB e Netlify
+  la scaricherebbe a ogni build senza che serva al sito. Va installata solo quando serve
+  davvero, senza salvarla: `npm i --no-save @imgly/background-removal-node`.
+
+- Per **scontornare un tratto su fondo bianco** (firme, schizzi, scansioni: il fondo
+  diventa trasparente e il tratto prende il nero `ink` del sito):
+
+  ```bash
+  node scripts/ink-alpha.js "<sorgente>" public/images/<dest>.webp [larghezzaMax] [colore]
+  ```
+
+  (solo `sharp`, nessuna dipendenza extra).
 
 ## Design system (`tailwind.config.js`)
 
@@ -139,7 +151,7 @@ src/
 │   ├── Footer.jsx
 │   ├── Carousel.jsx      # carosello immagini scheda progetto (autoplay + controlli)
 │   └── home/             # sezioni homepage: Masthead, MetaStrip, SelectedWorks,
-│                         #   FamilyBand, ContestsTicker
+│                         #   FamilyBand, SkillsTicker
 └── pages/
     ├── Home.jsx
     ├── About.jsx         # "Chi sono": ritratto, bio, foto di Joe
@@ -149,7 +161,8 @@ src/
 scripts/
 ├── prerender.js         # pre-rendering + sitemap + robots (parte di `npm run build`)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
-└── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
+├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
+└── ink-alpha.js         # tratto su fondo bianco → webp con alpha (firme, scansioni)
 ```
 
 ## Tono dei testi
@@ -176,8 +189,9 @@ con base a Reggio Emilia», «Si parte da un vincolo…». Mantenere questo regi
 
 Oltre alle immagini, in `C:\Generale\Lavori\Joe design\` ci sono due PDF che sono la
 **fonte di verità** per testi e progetti:
-- `PORTFOLIO GIOVANNI SARCHIOLLA 2026.pdf` — presentazione: la pagina "MI PRESENTO" ha
-  intro, EXPERIENCE, SKILLS, EDUCATION, la card Instagram e i QR replicati in "Chi sono".
+- `PORTFOLIO GIOVANNI SARCHIOLLA 2026.pdf` — presentazione: dalla pagina "MI PRESENTO"
+  arrivano intro, EXPERIENCE, SKILLS e EDUCATION di "Chi sono". La card Instagram e i QR
+  della stessa pagina erano stati replicati e poi tolti: non riproporli senza chiedere.
 - `ARCHIVE JOE SARCHIOLLA.pdf` — archivio progetti.
 
 Per leggerli senza poppler: estrai il testo con `pdfjs-dist` o rendi le pagine a PNG con
@@ -185,6 +199,3 @@ Per leggerli senza poppler: estrai il testo con `pdfjs-dist` o rendi le pagine a
 
 Nota nomi: `profile.name` = "Giovanni Sarchiolla" (formale, usato nei title SEO);
 `profile.displayName` = "Joe Sarchiolla" (mostrato in home e "Chi sono").
-
-> Nota: il `README.md` è più vecchio e descrive solo la homepage iniziale. Per il contesto
-> aggiornato fa fede questo `CLAUDE.md`.

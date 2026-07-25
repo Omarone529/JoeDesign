@@ -2,10 +2,15 @@
  * Rimuove lo sfondo da una foto (segmentazione AI) e salva un WebP con
  * trasparenza, ridimensionato per il web.
  *
+ * ⚠️ @imgly/background-removal-node NON è in package.json: pesa 174 MB e
+ * Netlify lo scaricherebbe a ogni build pur non servendo al sito. Serve solo
+ * qui, una tantum, quindi si installa al volo senza salvarlo:
+ *
+ *   npm i --no-save @imgly/background-removal-node
+ *
  * Uso:
  *   node scripts/remove-bg.js <sorgente> <destinazione.webp> [larghezzaMax] [qualità]
  */
-import { removeBackground } from '@imgly/background-removal-node'
 import sharp from 'sharp'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -14,6 +19,17 @@ import { pathToFileURL } from 'node:url'
 const [, , src, dest, maxWidth = '1600', quality = '90'] = process.argv
 if (!src || !dest) {
   console.error('Uso: node scripts/remove-bg.js <sorgente> <destinazione.webp> [larghezzaMax] [qualità]')
+  process.exit(1)
+}
+
+// Import dinamico: se la libreria non c'è, spiega come installarla invece di
+// morire con un errore di modulo non trovato.
+let removeBackground
+try {
+  ;({ removeBackground } = await import('@imgly/background-removal-node'))
+} catch {
+  console.error('Manca @imgly/background-removal-node (fuori da package.json apposta, pesa 174 MB).')
+  console.error('Installalo solo per questo giro:  npm i --no-save @imgly/background-removal-node')
   process.exit(1)
 }
 

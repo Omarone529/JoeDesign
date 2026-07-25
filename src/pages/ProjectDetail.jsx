@@ -8,24 +8,10 @@ import { Link } from '../router'
  * Testi e dati provengono dall'archivio/portfolio di Joe Sarchiolla.
  */
 export default function ProjectDetail({ slug }) {
+  // Lo slug è già stato validato dal router: qui l'elemento esiste sempre.
+  // Uno slug inesistente non arriva mai qui, viene instradato sulla 404.
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
-
-  if (!item) {
-    return (
-      <main className="animate-viewIn px-5 py-24 sm:px-8 lg:px-[72px]">
-        <p className="text-[13px] uppercase tracking-[0.2em] text-muted">
-          Progetto non trovato.
-        </p>
-        <Link
-          to="/archivio"
-          className="mt-4 inline-block border-b border-ink pb-[3px] text-[11px] uppercase tracking-[0.2em]"
-        >
-          ← Torna all'Archivio
-        </Link>
-      </main>
-    )
-  }
 
   const { cover, gallery } = projectImages(item)
   const slides = [cover, ...gallery]
