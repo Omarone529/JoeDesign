@@ -41,8 +41,11 @@ export default function Archive() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
-          {archive.map((p) => {
+          {archive.map((p, i) => {
             const { cover } = projectImages(p)
+            // Prime due righe della griglia a 4 colonne: sono in viewport
+            // all'apertura, quindi vanno richieste subito.
+            const subito = i < 8
             return (
               <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
                 <article>
@@ -50,7 +53,9 @@ export default function Archive() {
                     <img
                       src={cover}
                       alt={p.title}
-                      loading="lazy"
+                      loading={subito ? 'eager' : 'lazy'}
+                      fetchpriority={i < 4 ? 'high' : undefined}
+                      decoding="async"
                       className="h-full w-full object-cover contrast-[1.02] transition-transform duration-[800ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-105"
                     />
                   </div>

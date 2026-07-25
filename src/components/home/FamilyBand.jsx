@@ -1,10 +1,9 @@
 import { familyBand } from '../../data/siteData'
 
 /*
- * Fascia immagine a tutta larghezza tra i lavori e i concorsi.
- * Altezza naturale (niente `object-cover` con altezza imposta): la foto di
- * famiglia si vede intera, senza tagli sopra e sotto. `width`/`height`
- * riservano lo spazio in anticipo ed evitano il salto di layout al caricamento.
+ * Fascia a tutta larghezza fra i lavori selezionati e i concorsi.
+ * Altezza naturale, senza ritaglio: la foto mostra l'intera famiglia di
+ * prodotti. width/height dichiarati riservano lo spazio prima del caricamento.
  */
 export default function FamilyBand() {
   return (

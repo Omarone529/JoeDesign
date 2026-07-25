@@ -2,13 +2,11 @@ import { profile } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * Footer condiviso su sfondo notte. Fa anche da pagina contatti del sito:
- * raccoglie tutti i recapiti, quindi in navbar non c'è più la voce "Contatti".
- * Tre fasce separate da filetti sottili:
- *   1. la mail in grande + i recapiti + le pagine, su griglia a 12 colonne;
- *   2. la firma tipografica "SARCHIOLLA" distesa da bordo a bordo;
- *   3. la coda con copyright e ritorno in cima.
- * La mail sta solo nella chiamata grande, non anche in elenco: niente doppioni.
+ * Footer condiviso. Assolve anche la funzione di pagina contatti, che il sito
+ * non ha: qui stanno tutti i recapiti.
+ *
+ * Tre fasce separate da filetti: contatti e navigazione su griglia a 12 colonne,
+ * firma tipografica, coda legale. Ogni recapito compare una volta sola.
  */
 export default function Footer() {
   const anno = new Date().getFullYear()
@@ -31,19 +29,17 @@ export default function Footer() {
         <div className="md:col-span-6">
           <Occhiello>Scrivimi</Occhiello>
           {/*
-           * `flex w-fit`: riquadro di livello blocco (i due canali restano
-           * incolonnati anche quando la colonna è larga) ma stretto sul testo,
-           * così colore e freccia reagiscono solo sopra la scritta.
+           * flex w-fit e non inline-flex: serve un box di livello blocco perché
+           * i due canali restino incolonnati su colonne larghe, ma largo quanto
+           * il testo perché l'area sensibile all'hover non invada la colonna.
            */}
           <a
             href={`mailto:${profile.email}`}
             className="group mt-5 flex w-fit items-baseline gap-3 text-[clamp(20px,2.6vw,36px)] font-bold tracking-[-0.02em] transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-night-soft"
           >
             <span className="break-words">{profile.email}</span>
-            {/*
-             * U+FE0E in coda alla freccia: impone la resa testuale, altrimenti
-             * iOS e Android disegnano ↗ come emoji blu invece del segno nero.
-             */}
+            {/* U+FE0E: forza la resa testuale della freccia, che altrimenti su
+                iOS e Android esce come emoji a colori (vedi About.jsx) */}
             <span
               aria-hidden="true"
               className="text-[0.5em] transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-translate-y-1 group-hover:translate-x-1"
@@ -51,11 +47,8 @@ export default function Footer() {
               {'↗︎'}
             </span>
           </a>
-          {/*
-           * Secondo canale: su Instagram è raggiungibile quanto via mail, quindi
-           * su schermo grande cresce insieme alla mail invece di restare una
-           * postilla (16px sotto a 36px sembrava una nota a piè di pagina).
-           */}
+          {/* Secondo canale di contatto, non un recapito accessorio: da lg la
+              scala sale con quella della mail per non declassarlo a postilla */}
           <a
             href={profile.instagram}
             target="_blank"
@@ -71,7 +64,7 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Recapiti: stessa grammatica della scheda tecnica dei progetti */}
+        {/* Recapiti: stessa impaginazione della scheda tecnica in ProjectDetail */}
         <div className="md:col-span-3">
           <Occhiello>Recapiti</Occhiello>
           <dl className="m-0 mt-5 border-t border-paper/12">
@@ -115,9 +108,10 @@ export default function Footer() {
       </div>
 
       {/*
-       * 2. Firma: le lettere sono distribuite in flex, quindi la parola chiude
-       * esattamente sui due margini a qualunque larghezza. Decorativa: il nome
-       * per esteso è nella riga di copyright qui sotto.
+       * Firma. Le lettere sono elementi flex distribuiti con justify-between:
+       * la parola resta giustificata sui due margini a qualunque larghezza,
+       * senza calcolare il tracking. Decorativa, quindi aria-hidden: il nome
+       * per esteso è nella riga di copyright.
        */}
       <div className="border-t border-paper/12 px-5 py-8 sm:px-8 lg:px-[72px]">
         <div
@@ -153,16 +147,16 @@ export default function Footer() {
   )
 }
 
-/* Etichetta piccola in maiuscoletto spaziato, come nel resto del sito. */
+/* Etichetta di sezione: maiuscoletto spaziato, come negli occhielli del sito. */
 function Occhiello({ children }) {
   return <div className="text-[10px] uppercase tracking-[0.24em] text-muted">{children}</div>
 }
 
 /*
- * Marchio Instagram disegnato a filo, in SVG inline: nessuna libreria di icone
- * da installare e nessuna richiesta a un CDN esterno per un solo glifo.
- * `currentColor` e le misure in em lo tengono in accordo col testo accanto,
- * anche nelle transizioni di hover. Decorativo: la maniglia è scritta di fianco.
+ * Marchio Instagram in SVG inline, per non introdurre una libreria di icone o
+ * una richiesta esterna per un solo glifo. Lo stroke usa currentColor, quindi
+ * segue il colore del link anche durante la transizione di hover.
+ * Decorativo: la maniglia è nel testo accanto.
  */
 function LogoInstagram({ className = '' }) {
   return (

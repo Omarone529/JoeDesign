@@ -46,9 +46,9 @@ export default function Carousel({ images, title }) {
       }}
     >
       {/*
-       * Cornice immagini: misura fissa (non dipende dall'immagine mostrata) e
-       * stesso fondo della pagina, così non si stacca. Le foto stanno dentro
-       * con `object-contain`, qualunque sia il loro formato.
+       * Cornice a misura fissa: non dipende dal formato dell'immagine mostrata,
+       * quindi non si muove cambiando diapositiva. Le foto vi stanno dentro con
+       * object-contain, sul fondo carta della pagina.
        */}
       <div className="relative h-[400px] overflow-hidden bg-paper sm:h-[480px] lg:h-[560px]">
         {images.map((src, i) => (
@@ -57,6 +57,8 @@ export default function Carousel({ images, title }) {
             src={src}
             alt={`${title} · ${i + 1}`}
             loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+            decoding="async"
             aria-hidden={i !== index}
             className={`absolute inset-0 h-full w-full object-contain p-4 contrast-[1.02] transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] sm:p-6 ${
               i === index ? 'opacity-100' : 'opacity-0'

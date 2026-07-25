@@ -40,6 +40,10 @@ const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
 function headTags(meta) {
   const tags = [
     `<link rel="canonical" href="${meta.canonical}" />`,
+    // Immagine principale nota in anticipo (ritratto in "Chi sono", copertina
+    // nelle schede): il preload la mette in coda leggendo l'head, senza
+    // attendere che il layout ne riveli la necessità.
+    ...(meta.preload ? [`<link rel="preload" as="image" href="${meta.preload}" fetchpriority="high" />`] : []),
     `<meta property="og:type" content="${meta.type}" />`,
     `<meta property="og:site_name" content="Giovanni “Joe” Sarchiolla" />`,
     `<meta property="og:locale" content="it_IT" />`,
@@ -57,11 +61,10 @@ function headTags(meta) {
 }
 
 /*
- * Dati strutturati schema.org. Tutti i valori vengono da `profile` in
- * siteData.js: aggiornando lì i dati si aggiornano anche qui.
- *   - schede progetto → CreativeWork + BreadcrumbList (Google mostra il
- *     percorso Home › Archivio › Progetto al posto dell'URL nudo);
- *   - tutte le altre  → Person, con ruolo, città e recapiti.
+ * Dati strutturati schema.org, con i valori presi da `profile`.
+ *   schede progetto  CreativeWork + BreadcrumbList (in SERP il percorso
+ *                    sostituisce l'URL nudo)
+ *   altre pagine     Person, con ruolo, sede e recapiti
  */
 function jsonLd(meta) {
   const persona = {
@@ -74,7 +77,7 @@ function jsonLd(meta) {
 
   if (meta.project) {
     const p = meta.project
-    // `year` può essere un intervallo ("2024 · 2026"): come data tiene il più recente.
+    // dateCreated vuole un anno singolo: da un intervallo si prende l'ultimo.
     const anni = String(p.year || '').match(/\d{4}/g)
 
     return JSON.stringify([

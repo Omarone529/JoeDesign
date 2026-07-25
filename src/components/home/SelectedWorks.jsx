@@ -26,14 +26,18 @@ export default function SelectedWorks() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-        {focusItems.map((p) => (
+        {focusItems.map((p, i) => (
           <Link key={p.id} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
+                {/* La prima riga è già in viewport dopo il masthead: caricarla
+                    pigramente ne ritarderebbe la richiesta */}
                 <img
                   src={p.cover}
                   alt={p.title}
-                  loading="lazy"
+                  loading={i < 3 ? 'eager' : 'lazy'}
+                  fetchpriority={i === 0 ? 'high' : undefined}
+                  decoding="async"
                   className="h-full w-full object-cover contrast-[1.02] transition-transform duration-[800ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-105"
                 />
               </div>

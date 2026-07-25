@@ -11,6 +11,21 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# I bundle in /assets/ hanno l'hash del contenuto nel nome: contenuto nuovo,
+# nome nuovo. Possono quindi restare in cache a tempo indeterminato.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Le immagini conservano il nome anche quando vengono sostituite (cover.webp
+# resta cover.webp), quindi la cache è a termine. Con stale-while-revalidate il
+# browser mostra la copia scaduta e scarica la nuova in sottofondo.
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
 # Fallback di sicurezza: le pagine pre-renderizzate (es. /progetto/flue) sono
 # file reali e vengono servite direttamente da Netlify. Questa regola cattura
 # solo gli indirizzi inesistenti (link vecchi, refusi) e li porta al sito

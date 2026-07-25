@@ -20,10 +20,7 @@ export const SITE = (ENV_SITE || 'https://joedesign.netlify.app').replace(/\/+$/
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
-/*
- * Periodo coperto dall'archivio, per le description: si aggiorna da solo
- * aggiungendo progetti (es. "2024 · 2026", oppure il solo anno se coincidono).
- */
+/* Periodo dell'archivio in forma leggibile: "2024 · 2026", o il solo anno. */
 const PERIODO = periodoArchivio
   ? periodoArchivio.primo === periodoArchivio.ultimo
     ? `${periodoArchivio.primo}`
@@ -53,9 +50,10 @@ export function metaForRoute(route) {
       title: `Chi sono · ${profile.displayName} · ${profile.role}`,
       description: clip(about.intro),
       canonical: `${SITE}/chi-sono`,
-      // Non il ritratto ritagliato: ha il fondo trasparente, che nelle anteprime
-      // dei link diventa nero. Serve un'immagine piena e orizzontale.
+      // Non il ritratto scontornato: le anteprime social non gestiscono la
+      // trasparenza e la rendono su fondo nero. Serve un'immagine piena.
       image: abs(about.photos.lab.src),
+      preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
     }
   }
@@ -69,14 +67,15 @@ export function metaForRoute(route) {
         description: clip(item.desc),
         canonical: `${SITE}/progetto/${item.slug}`,
         image: abs(cover),
+        preload: cover, // prima diapositiva del carosello
         type: 'article',
         project: item,
       }
     }
   }
 
-  // Home (default). Il title porta nome, ruolo e città: sono le tre chiavi con
-  // cui ha senso farsi trovare (ricerche sul nome e ricerche locali).
+  // Home. Il title porta nome, ruolo e città: sono le chiavi delle ricerche
+  // realistiche, sul nome e su base locale.
   return {
     title: `${profile.name} “${profile.nick}” · ${profile.role} a Reggio Emilia`,
     description: `${profile.name} “${profile.nick}”, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,

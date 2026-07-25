@@ -103,8 +103,8 @@ export const about = {
  * inseriti come miglior stima. Dove l'anno non è certo è omesso.
  * Le foto sono curate a partire da "ARCHIVIO WEBP".
  *
- * L'ordine qui sotto è quello curato a parità di anno: l'ordinamento vero
- * (dal più recente) lo fa `archive`, subito dopo l'elenco.
+ * Questo elenco non è l'ordine di pubblicazione: vale solo a parità di anno.
+ * L'ordinamento cronologico lo applica `archive`, definito sotto.
  */
 const progetti = [
   {
@@ -367,8 +367,8 @@ const progetti = [
 ]
 
 /*
- * Anni citati in una voce. `year` è una stringa e può contenere più anni
- * (es. "2024 · 2026" della raccolta grafica) o mancare del tutto.
+ * Anni citati in una voce. `year` è testo libero: può contenere un intervallo
+ * ("2024 · 2026", la raccolta grafica) o mancare.
  */
 export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
@@ -378,16 +378,16 @@ export function anniDi(item) {
 const annoRecente = (item) => Math.max(0, ...anniDi(item))
 
 /*
- * ARCHIVIO ordinato dal progetto più recente. L'ordine vale ovunque: griglia
- * dell'archivio, navigazione precedente/successivo nella scheda progetto,
- * sitemap e pre-rendering. A parità di anno resta l'ordine curato nell'elenco
- * qui sopra, perché Array.sort è stabile. Le voci senza anno finiscono in coda.
+ * Archivio ordinato dal più recente. È l'ordine usato ovunque: griglia,
+ * navigazione precedente/successivo, sitemap, pre-rendering.
+ * Array.sort è stabile, quindi a parità di anno vale l'ordine curato in
+ * `progetti`; le voci senza anno finiscono in coda.
  */
 export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
 
 /*
- * Estremi temporali coperti dall'archivio, per l'intestazione della pagina.
- * `null` se nessuna voce ha un anno. Si aggiorna da sé aggiungendo progetti.
+ * Estremi temporali dell'archivio, usati nell'intestazione della pagina e nelle
+ * meta description. `null` se nessuna voce ha un anno.
  */
 export const periodoArchivio = (() => {
   const anni = archive.flatMap(anniDi)
@@ -405,11 +405,10 @@ export function projectImages(item) {
 }
 
 /*
- * "Lavori selezionati" - le schede in evidenza in homepage.
- * Qui si sceglie solo QUALI progetti mostrare e in che ordine: titolo,
- * categoria, anno e copertina arrivano dall'archivio, quindi restano allineati
- * da soli se li modifichi lassù. Sei voci = due righe piene nella griglia a 3
- * colonne, senza buchi.
+ * "Lavori selezionati" in homepage: la selezione è solo l'elenco di slug qui
+ * sotto, il resto della scheda viene dall'archivio per non duplicare i dati.
+ * Tenere un multiplo di 3: la griglia arriva a 3 colonne e i resti lasciano
+ * buchi in fondo. Uno slug inesistente interrompe la build.
  */
 const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'zeta-3', 'dog-lamp']
 

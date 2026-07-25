@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from '../router'
 
-const SOGLIA = 96 // px oltre i quali la barra può nascondersi
-const MOVIMENTO_MINIMO = 6 // px: ignora i micro-scostamenti e il rimbalzo elastico
+const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
+const MOVIMENTO_MINIMO = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
 
 /*
- * Nasconde la barra quando si scorre verso il basso e la fa ricomparire appena
- * si torna su. Lo stato si aggiorna dentro un requestAnimationFrame, così lo
- * scroll non paga il costo del render a ogni evento.
+ * Nasconde la barra scorrendo verso il basso, la ripristina scorrendo in su.
+ *
+ * Lo stato parte da "visibile" perché è quello che finisce nell'HTML statico:
+ * un valore diverso creerebbe un disallineamento in idratazione. Gli eventi di
+ * scroll sono passivi e accorpati in un requestAnimationFrame, così un render
+ * al massimo per frame.
  */
 function useNavbarNascosta(route) {
   const [nascosta, setNascosta] = useState(false)
@@ -36,7 +39,7 @@ function useNavbarNascosta(route) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Cambio pagina: il router riporta in cima, la barra deve tornare visibile.
+  // Il router riporta in cima a ogni navigazione: la barra va riesposta.
   useEffect(() => setNascosta(false), [route])
 
   return [nascosta, setNascosta]
@@ -66,11 +69,9 @@ function NavLink({ to, active = false, children }) {
 }
 
 /*
- * Barra di navigazione condivisa.
- * Sticky con sfondo semi-trasparente e blur, bordo inferiore inchiostro.
- * Scorrendo verso il basso scompare verso l'alto, tornando su ricompare.
- * La voce attiva è evidenziata in base alla rotta corrente.
- * "Studio" verrà collegata quando la pagina sarà pronta.
+ * Barra di navigazione condivisa. Sticky: resta nel flusso e occupa i suoi 4rem
+ * anche da nascosta, misura su cui è tarata l'altezza della hero in About.
+ * La voce attiva deriva dalla rotta corrente.
  */
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
@@ -83,7 +84,7 @@ export default function Navbar({ route }) {
 
   return (
     <header
-      // Il focus da tastiera deve poter richiamare la barra anche da nascosta.
+      // Navigazione da tastiera: il focus su una voce deve poter riesporre la barra.
       onFocusCapture={() => setNascosta(false)}
       className={`sticky top-0 z-50 border-b border-ink bg-paper/90 backdrop-blur-md transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] motion-reduce:transition-none ${
         nascosta ? '-translate-y-full' : 'translate-y-0'
@@ -92,7 +93,8 @@ export default function Navbar({ route }) {
       <div className="flex h-16 items-center justify-between px-5 sm:px-8 lg:px-[72px]">
         {/* Brand */}
         <Link to="/" className="flex shrink-0 items-baseline gap-3">
-          {/* Da telefono corpo e spaziatura ridotti: sennò il marchio arriva addosso alle voci */}
+          {/* Sotto sm corpo e tracking ridotti: a piena misura marchio e voci
+              non stanno nella larghezza di un telefono */}
           <span className="whitespace-nowrap text-[15px] font-bold tracking-[0.08em] sm:text-[19px] sm:tracking-[0.14em]">
             SARCHIOLLA
           </span>

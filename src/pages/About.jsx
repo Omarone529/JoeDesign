@@ -2,11 +2,9 @@ import { about, profile } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * "Chi sono" - impostata sulla pagina "MI PRESENTO" del portfolio Direzione A.
- * Hero su fondo intonaco: intro in nero bold in alto a sinistra, nome enorme in
- * basso a sinistra, figura ritagliata a destra; una linea nera chiude la testata
- * sul fondo della foto. Sotto: EXPERIENCE · EDUCATION · SKILLS · CONTACTS su due
- * colonne. Tono impersonale.
+ * "Chi sono" - deriva dalla pagina "MI PRESENTO" del portfolio.
+ * Hero a due colonne (testo / ritratto scontornato), poi manifesto, galleria e
+ * CV su due colonne. Contenuti in siteData.about, tono impersonale.
  */
 export default function About() {
   const { hero, lab, flue, dado } = about.photos
@@ -14,12 +12,9 @@ export default function About() {
   return (
     <main className="animate-viewIn">
       {/*
-       * Hero su fondo carta. Due colonne: a sinistra occhiello e descrizione in
-       * alto e il nome enorme allineato a sinistra in basso, a destra la figura
-       * ritagliata che parte attaccata alla navbar. La foto è l'elemento più
-       * alto, quindi la linea nera chiude la sezione esattamente sul suo fondo.
-       * Il padding alto sta sulla colonna di sinistra, non sulla sezione: così
-       * la foto tocca il bordo superiore senza margini negativi.
+       * Hero alta quanto la finestra meno la navbar (4rem).
+       * Il padding superiore sta sulla colonna di testo e non sulla sezione,
+       * così la foto parte a filo del bordo alto senza margini negativi.
        */}
       <section className="grid grid-cols-1 gap-y-10 border-b-2 border-ink px-5 sm:px-8 md:min-h-[calc(100vh-4rem)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
         <div className="flex flex-col pt-10 sm:pt-14 md:col-start-1 md:row-start-1 lg:pt-16">
@@ -28,26 +23,28 @@ export default function About() {
             {about.intro}
           </p>
           {/*
-           * Corpo tarato sulla larghezza della colonna: "SARCHIOLLA" (6.355em
-           * col tracking applicato) la riempie quasi tutta, "JOE" chiude dove
-           * finisce. Se cambi griglia, padding o tracking, ricalcola i coefficienti.
+           * Corpo derivato dalla larghezza della colonna, non dal viewport:
+           * "SARCHIOLLA" misura 6.355em col tracking applicato, quindi
+           * corpo = larghezza colonna / 6.355 (i coefficienti includono padding
+           * e gutter di ogni breakpoint). Da ricalcolare se cambiano griglia,
+           * padding o tracking.
            */}
           <h1
             aria-label={profile.displayName}
             className="m-0 mt-12 font-bold uppercase leading-[0.85] tracking-[-0.03em] text-[min(calc((100vw_-_40px)*0.1526),300px)] sm:text-[min(calc((100vw_-_64px)*0.1526),300px)] md:mt-auto md:text-[min(calc((100vw_-_104px)*0.0954),300px)] lg:text-[min(calc((100vw_-_208px)*0.0954),300px)]"
           >
-            {/* Lo spazio fra le due righe serve al testo estratto dai crawler:
-                senza, il contenuto dell'h1 sarebbe "JoeSarchiolla" attaccato. */}
+            {/* Lo spazio separa le due parole nel testo estratto dai crawler,
+                che leggono "JoeSarchiolla" se i due span si toccano. */}
             <span className="block">Joe</span>{' '}
             <span className="block">Sarchiolla</span>
           </h1>
         </div>
 
         {/*
-         * Foto: attaccata alla navbar, chiude in basso sulla linea. Da md in su
-         * riempie in altezza la cella (che la sezione stira fino alla piega):
-         * `object-cover` rifila i margini trasparenti ai lati, `object-top`
-         * tiene la testa ancorata in alto.
+         * Da md la foto riempie in altezza la cella, così il suo fondo coincide
+         * col bordo inferiore della sezione. object-cover ritaglia sui lati, dove
+         * il ritaglio ha margini trasparenti; object-top protegge la testa quando
+         * la finestra è più bassa del rapporto naturale.
          */}
         <div className="mx-auto w-full max-w-[440px] md:col-start-2 md:row-start-1 md:max-w-none">
           <img
@@ -55,15 +52,15 @@ export default function About() {
             alt={hero.alt}
             width="1600"
             height="2132"
+            fetchpriority="high"
             className="block w-full md:h-full md:object-cover md:object-top"
           />
         </div>
       </section>
 
       {/*
-       * Sotto la linea: CV su due colonne. Da lg in su corpi e spaziature
-       * crescono e le colonne si distanziano: con la stessa scala del mobile il
-       * testo risultava minuto e sperduto nella larghezza dello schermo.
+       * CV su due colonne. Da lg la scala tipografica sale (14→17 px) e le
+       * spaziature si aprono: la scala mobile su colonne larghe risulta minuta.
        */}
       <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
         <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
@@ -120,7 +117,7 @@ export default function About() {
         </blockquote>
       </section>
 
-      {/* Galleria. Altezza naturale: la foto si vede intera, senza tagli. */}
+      {/* Fascia a piena larghezza: altezza naturale, nessun ritaglio */}
       <section className="bg-night">
         <img
           src={lab.src}
@@ -170,11 +167,11 @@ export default function About() {
 }
 
 /*
- * Blocco con etichetta e freccia ↘ (stile portfolio).
- * La freccia porta in coda U+FE0E (variation selector-15), che impone la resa
- * TESTUALE: senza, iOS e Android disegnano ↘ come emoji blu al posto del segno
- * nero. Vale per le frecce diagonali (↖ ↗ ↘ ↙) e per ↔ ↕, che hanno una
- * variante emoji; ← → ↑ ↓ non ce l'hanno e restano sempre testo.
+ * Sezione del CV con etichetta e freccia, come nel portfolio stampato.
+ *
+ * La freccia è seguita da U+FE0E (variation selector-15), che forza la resa
+ * testuale: le diagonali ↖ ↗ ↘ ↙ e le bidirezionali ↔ ↕ hanno una variante
+ * emoji e su iOS/Android verrebbero disegnate a colori. ← → ↑ ↓ non ce l'hanno.
  */
 function ArrowBlock({ label, children }) {
   return (
