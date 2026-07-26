@@ -111,29 +111,24 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Al posto del nome, il profilo Instagram: marchio e nome utente, che
-            è il recapito pubblico di Joe. Tiene il posto che aveva il nome —
-            centrato sulla pagina da md in su; sotto, logo + profilo + tre voci
-            non entrano nella metà utile, quindi resta in linea nel flusso
+        {/* Il nome, e attaccato il marchio Instagram che porta al profilo.
+            Centrato sulla pagina solo da md: sotto, logo + nome + tre voci non
+            entrano nella metà utile, quindi il blocco resta in linea nel flusso
             (spinto dal justify-between) invece di finire sotto le voci. */}
-        <a
-          href={profile.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${profile.handle} su Instagram`}
-          className="group flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[10px] font-normal tracking-[0.04em] sm:gap-2 sm:text-[13px] sm:tracking-[0.06em] md:absolute md:left-1/2 md:-translate-x-1/2 lg:text-[15px] lg:tracking-[0.1em]"
-        >
-          <LogoInstagram className="h-[13px] w-[13px] shrink-0 sm:h-4 sm:w-4 lg:h-[18px] lg:w-[18px]" />
-          <span className="relative">
-            {profile.handle}
-            {/* Stessa sottolineatura delle voci di navigazione, ancorata al
-                testo: compare in hover senza spostare nulla. */}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 -bottom-1 h-0.5 origin-left scale-x-0 bg-ink transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-x-100"
-            />
+        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
+          <span className="whitespace-nowrap text-[11px] font-normal uppercase tracking-[0.1em] sm:text-[13px] sm:tracking-[0.14em] lg:text-[15px] lg:tracking-[0.18em]">
+            {profile.displayName}
           </span>
-        </a>
+          <a
+            href={profile.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${profile.handle} su Instagram`}
+            className="flex shrink-0 items-center text-ink transition-colors hover:text-muted"
+          >
+            <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
+          </a>
+        </div>
 
         {/* Navigazione */}
         <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
@@ -152,8 +147,8 @@ export default function Navbar({ route }) {
  * Marchio Instagram disegnato al tratto, come la freccia obliqua della hero:
  * il quadrato con gli angoli tondi, l'obiettivo e il puntino in alto a destra.
  * Tratto in `currentColor`, quindi segue il colore del testo accanto, e spessore
- * leggero perché alle misure della barra (13–18px) un tratto pieno annerirebbe
- * il segno. Decorativo: il nome utente di fianco dice già dove porta.
+ * leggero perché alle misure della barra (15–19px) un tratto pieno annerirebbe
+ * il segno. Decorativo: a dire dove porta è l'`aria-label` del link.
  */
 function LogoInstagram({ className = '' }) {
   return (
