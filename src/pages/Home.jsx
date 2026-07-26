@@ -1,4 +1,4 @@
-import Masthead from '../components/home/Masthead'
+import Hero from '../components/home/Hero'
 import SelectedWorks from '../components/home/SelectedWorks'
 import FamilyBand from '../components/home/FamilyBand'
 import SkillsTicker from '../components/home/SkillsTicker'
@@ -11,7 +11,7 @@ import SkillsTicker from '../components/home/SkillsTicker'
 export default function Home() {
   return (
     <main className="animate-viewIn">
-      <Masthead />
+      <Hero />
       <SelectedWorks />
       <FamilyBand />
       <SkillsTicker />

@@ -30,10 +30,23 @@ export default {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-50%)' },
         },
+        // Ingresso delle lettere del nome in home. Lo scostamento è in em, così
+        // resta proporzionato a qualunque corpo assuma il titolo.
+        letterIn: {
+          from: { opacity: '0', transform: 'translateY(.26em)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Respiro della freccia in fondo alla hero.
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(6px)' },
+        },
       },
       animation: {
         viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
         marquee: 'marquee 38s linear infinite',
+        letterIn: 'letterIn .9s cubic-bezier(.2,.7,.2,1) both',
+        float: 'float 2.6s ease-in-out infinite',
       },
     },
   },

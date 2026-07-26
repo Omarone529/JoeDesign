@@ -28,6 +28,19 @@ export const profile = {
     'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
 }
 
+/*
+ * Sfondo della hero in home: ritratto di Joe, sfocato via CSS sotto al nome.
+ * È decorativo (il nome accanto dice già di chi si tratta), quindi `alt` vuoto.
+ * Sorgente: media/FOTO JOE.../joe.jpg, ottimizzata con
+ * `node scripts/optimize-image.js`.
+ */
+export const homeHero = {
+  src: '/images/home/joe-hero.webp',
+  alt: '',
+  width: 1080,
+  height: 1351,
+}
+
 /* Fascia immagine a tutta larghezza - "La famiglia di prodotti" */
 export const familyBand = {
   src: '/images/home/family-band.webp',
