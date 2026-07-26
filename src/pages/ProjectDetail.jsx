@@ -2,14 +2,7 @@ import { archive, projectImages } from '../data/siteData'
 import Carousel from '../components/Carousel'
 import { Link } from '../router'
 
-/*
- * Scheda progetto - testata con descrizione e scheda tecnica, galleria
- * completa, ed eventuale elenco dei lavori (per la raccolta grafica).
- * Testi e dati provengono dall'archivio/portfolio di Joe Sarchiolla.
- */
 export default function ProjectDetail({ slug }) {
-  // Lo slug è già stato validato dal router: qui l'elemento esiste sempre.
-  // Uno slug inesistente non arriva mai qui, viene instradato sulla 404.
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
@@ -27,7 +20,6 @@ export default function ProjectDetail({ slug }) {
 
   return (
     <main className="animate-viewIn">
-      {/* Testata */}
       <section className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-20">
         <Link
           to="/archivio"
@@ -40,13 +32,18 @@ export default function ProjectDetail({ slug }) {
           {item.title}
         </h1>
 
-        <div className="mt-8 grid grid-cols-1 gap-8 border-t border-line pt-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:items-start lg:mt-12 lg:gap-16 lg:pt-12">
+        {/*
+         * Testo a sinistra, foto a destra. La colonna del testo è stretta e a
+         * misura fissa: tutto lo spazio che avanza va al carosello, perché le
+         * immagini sono il punto forte della scheda.
+         */}
+        <div className="mt-8 grid grid-cols-1 gap-8 border-t border-line pt-8 md:grid-cols-[minmax(0,270px)_minmax(0,1fr)] md:items-start md:gap-10 lg:mt-12 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-14 lg:pt-12">
           {/* Colonna sinistra: descrizione + scheda tecnica (fissa su desktop) */}
           <div className="md:sticky md:top-24">
             <div className="mb-4 text-[10px] uppercase tracking-[0.24em] text-muted">
               {item.cat}
             </div>
-            <p className="m-0 max-w-[52ch] text-[clamp(16px,1.6vw,22px)] leading-[1.5]">
+            <p className="m-0 max-w-[52ch] text-[clamp(16px,1.35vw,19px)] leading-[1.5]">
               {item.desc}
             </p>
 
