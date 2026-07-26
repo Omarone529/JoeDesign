@@ -10,25 +10,27 @@ import { animazioniRidotte } from '../motion'
  *   da desktop, in hover, per non appesantire la foto sul piccolo schermo
  * - controlli manuali: frecce, puntini, contatore; frecce da tastiera
  * - rispetta prefers-reduced-motion (niente autoplay)
- * Occupa tutta la larghezza della scheda progetto: le foto sono il contenuto
- * principale, quindi la cornice è la più grande che lo schermo consente.
+ * Occupa tutta la colonna immagini della scheda progetto: le foto sono il
+ * contenuto principale, quindi la cornice è la più grande che lo schermo
+ * consente e ogni foto la riempie per intero, senza margini vuoti
+ * (vedi `object-cover` più sotto).
  */
 const INTERVAL = 2000
 
 // Spostamento minimo del dito perché valga come cambio foto e non come tocco.
 const SWIPE = 45
 
-// Le foto d'archivio arrivano dal PDF con risoluzioni molto diverse (alcune
-// sotto i 600px). Nella cornice grande verrebbero ingrandite troppo e
-// uscirebbero sgranate: si consente al massimo questo ingrandimento rispetto
-// alla dimensione nativa. Le foto grandi non ne risentono, riempiono comunque.
-const MAX_SCALE = 1.8
+// Formati oltre i quali riempire la cornice taglierebbe via il soggetto: le
+// strisce orizzontali (campionature di colore) e le foto altissime. Solo
+// queste si mostrano intere; tutte le altre riempiono.
+const LARGA = 1.6
+const STRETTA = 0.45
 
 export default function Carousel({ images, title }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
-  // Dimensioni native, misurate al caricamento: { src: [larghezza, altezza] }
-  const [sizes, setSizes] = useState({})
+  // Proporzioni reali delle foto, note solo a caricamento avvenuto.
+  const [formati, setFormati] = useState({})
   const n = images.length
 
   // Tocco in corso: punto di partenza del dito e se è diventato un trascinamento.
@@ -56,14 +58,6 @@ export default function Carousel({ images, title }) {
     else prev()
   }
 
-  // Misura l'immagine appena è disponibile. Serve sia l'onLoad sia il controllo
-  // su `complete` via ref: in hydration le foto dell'HTML statico possono
-  // essere già caricate prima che React agganci gli handler.
-  const misura = (el, src) => {
-    if (!el || !el.naturalWidth) return
-    setSizes((s) => (s[src] ? s : { ...s, [src]: [el.naturalWidth, el.naturalHeight] }))
-  }
-
   useEffect(() => {
     if (n <= 1 || paused || animazioniRidotte()) return
     const timer = setTimeout(() => setIndex((i) => (i + 1) % n), INTERVAL)
@@ -87,10 +81,12 @@ export default function Carousel({ images, title }) {
        * Cornice a misura fissa: non dipende dal formato dell'immagine mostrata,
        * quindi non si muove cambiando diapositiva. L'altezza segue il viewport
        * (con minimo e massimo) così la foto è grande su ogni schermo senza mai
-       * costringere a scorrere per vederla intera.
+       * costringere a scorrere per vederla intera. Da desktop si ferma poco
+       * oltre metà schermo: sopra c'è la testata della scheda e sotto il
+       * disegno tecnico, che deve restare a portata di un colpo di rotella.
        */}
       <div
-        className="relative h-[clamp(320px,58vh,540px)] cursor-pointer select-none overflow-hidden bg-paper sm:h-[clamp(420px,68vh,720px)] lg:h-[clamp(540px,76vh,860px)]"
+        className="relative h-[clamp(320px,54vh,480px)] cursor-pointer select-none overflow-hidden bg-placeholder sm:h-[clamp(400px,62vh,620px)] lg:h-[clamp(360px,58vh,700px)]"
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
         // Clic sulla foto = ferma / riprende lo scorrimento. I clic sui
@@ -101,34 +97,35 @@ export default function Carousel({ images, title }) {
           setPaused((p) => !p)
         }}
       >
+        {/*
+         * Ogni foto riempie la cornice (`object-cover`): i formati d'archivio
+         * sono disparati e mostrandole intere si vedrebbero tutte di una
+         * dimensione diversa, con la cornice che si svuota ai lati. Qui invece
+         * si susseguono tutte della stessa misura, al prezzo di un ritaglio.
+         * Fanno eccezione i formati estremi (vedi `LARGA` / `STRETTA`), dove il
+         * ritaglio mangerebbe quasi tutto: quelli si mostrano interi.
+         */}
         {images.map((src, i) => {
-          const nat = sizes[src]
+          const r = formati[src]
+          const intera = r !== undefined && (r > LARGA || r < STRETTA)
           return (
-            <div
+            <img
               key={src}
+              src={src}
+              alt={`${title} · ${i + 1}`}
               aria-hidden={i !== index}
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] sm:p-2 lg:p-4 ${
-                i === index ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <img
-                ref={(el) => misura(el, src)}
-                src={src}
-                alt={`${title} · ${i + 1}`}
-                loading={i === 0 ? 'eager' : 'lazy'}
-                fetchpriority={i === 0 ? 'high' : undefined}
-                decoding="async"
-                onLoad={(e) => misura(e.currentTarget, src)}
-                // Finché non si conoscono le dimensioni native la foto riempie
-                // la cornice; dopo la misura viene limitata a MAX_SCALE.
-                style={
-                  nat
-                    ? { width: nat[0] * MAX_SCALE, height: nat[1] * MAX_SCALE }
-                    : { width: '100%', height: '100%' }
-                }
-                className="max-h-full max-w-full object-contain contrast-[1.02]"
-              />
-            </div>
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              decoding="async"
+              onLoad={(e) => {
+                const { naturalWidth: w, naturalHeight: h } = e.currentTarget
+                if (!h) return
+                setFormati((f) => (src in f ? f : { ...f, [src]: w / h }))
+              }}
+              className={`absolute inset-0 h-full w-full contrast-[1.02] transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
+                intera ? 'object-contain' : 'object-cover'
+              } ${i === index ? 'opacity-100' : 'opacity-0'}`}
+            />
           )
         })}
 

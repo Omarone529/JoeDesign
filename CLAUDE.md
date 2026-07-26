@@ -95,6 +95,10 @@ Organizzazione:
 - Prodotti: una cartella per progetto `public/images/products/<slug>/`
   - `cover.webp` → copertina (griglia + testata dettaglio)
   - `01.webp … NN.webp` → galleria (in ordine). `photos` in `siteData` = quante foto galleria ci sono.
+  - `disegno.webp` → disegno tecnico quotato, mostrato nella scheda sotto al carosello.
+    Non viene da `ARCHIVIO WEBP`: nell'archivio PDF è vettoriale, quindi si estrae
+    rendendo la pagina della scheda (`node scripts/pdf-disegno.js <slug>`, vedi sotto).
+    In `siteData` il progetto che ce l'ha porta `disegno: true`.
 - Home: `public/images/home/` · Chi sono: `public/images/about/`
 
 ### ⚠️ Da dove arrivano le immagini (workflow)
@@ -178,6 +182,7 @@ scripts/
 ├── prerender.js         # pre-rendering + sitemap + robots (parte di `npm run build`)
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
+├── pdf-disegno.js       # disegni tecnici dall'archivio PDF → products/<slug>/disegno.webp (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
 ├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
 └── ink-alpha.js         # tratto su fondo bianco → webp con alpha (firme, scansioni)

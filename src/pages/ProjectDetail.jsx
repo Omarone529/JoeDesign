@@ -6,7 +6,7 @@ export default function ProjectDetail({ slug }) {
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
-  const { cover, gallery } = projectImages(item)
+  const { cover, gallery, drawing } = projectImages(item)
   const slides = [cover, ...gallery]
   const prev = archive[(index - 1 + archive.length) % archive.length]
   const next = archive[(index + 1) % archive.length]
@@ -20,7 +20,7 @@ export default function ProjectDetail({ slug }) {
 
   return (
     <main className="animate-viewIn">
-      <section className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-20">
+      <section className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
         <Link
           to="/archivio"
           className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
@@ -28,40 +28,76 @@ export default function ProjectDetail({ slug }) {
           ← Archivio
         </Link>
 
-        <h1 className="mt-6 text-[clamp(40px,8vw,120px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-10">
+        {/* Più contenuto dei titoli di Home e Archivio: qui sotto il titolo deve
+            entrare tutta la scheda — foto e disegno — nella prima schermata. */}
+        <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
           {item.title}
         </h1>
 
         {/*
-         * Testo a sinistra, foto a destra. La colonna del testo è stretta e a
-         * misura fissa: tutto lo spazio che avanza va al carosello, perché le
-         * immagini sono il punto forte della scheda.
+         * Impianto della scheda d'archivio, a filetti come la pagina stampata:
+         * a sinistra il testo, a destra le immagini, su due fasce. In alto la
+         * descrizione accanto al carosello, in basso i dati tecnici accanto al
+         * disegno quotato.
+         * La colonna del testo è la più larga delle due: quella delle immagini
+         * resta stretta abbastanza da tenere le celle quasi quadrate, vicine al
+         * formato verticale dell'archivio (circa 3:4), così le foto la riempiono
+         * senza grossi ritagli. Il testo non ci perde: la descrizione è comunque
+         * fermata a 52 caratteri di riga.
+         * Su telefono le quattro celle si incolonnano nell'ordine di lettura:
+         * descrizione, foto, dati, disegno.
          */}
-        <div className="mt-8 grid grid-cols-1 gap-8 border-t border-line pt-8 md:grid-cols-[minmax(0,270px)_minmax(0,1fr)] md:items-start md:gap-10 lg:mt-12 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-14 lg:pt-12">
-          {/* Colonna sinistra: descrizione + scheda tecnica (fissa su desktop) */}
-          <div className="md:sticky md:top-24">
+        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 border-t border-line pt-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start md:gap-y-14 lg:mt-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12 lg:pt-8">
+          {/* Fascia 1 · descrizione */}
+          <div>
             <div className="mb-4 text-[10px] uppercase tracking-[0.24em] text-muted">
               {item.cat}
             </div>
             <p className="m-0 max-w-[52ch] text-[clamp(16px,1.35vw,19px)] leading-[1.5]">
               {item.desc}
             </p>
+          </div>
 
-            <dl className="mt-8 grid grid-cols-1 gap-0 border-t border-line-soft lg:mt-10">
+          {/* Fascia 1 · carosello con avanzamento automatico */}
+          <Carousel images={slides} title={item.title} />
+
+          {/* Fascia 2 · scheda tecnica */}
+          <div className="border-t border-line pt-6">
+            <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Progetto</div>
+            {/* Voce a sinistra, valore allineato a destra: la riga tiene la
+                colonna anche quando è larga, senza vuoti in mezzo. */}
+            <dl className="mt-6 grid grid-cols-1 gap-0 border-t border-line-soft">
               {specRows.map(([k, v]) => (
                 <div
                   key={k}
-                  className="grid grid-cols-[92px_1fr] gap-3 border-b border-line-soft py-3"
+                  className="flex items-baseline justify-between gap-6 border-b border-line-soft py-3"
                 >
                   <dt className="text-[10px] uppercase tracking-[0.2em] text-muted">{k}</dt>
-                  <dd className="m-0 text-[13px] leading-[1.4]">{v}</dd>
+                  <dd className="m-0 text-right text-[13px] leading-[1.4]">{v}</dd>
                 </div>
               ))}
             </dl>
           </div>
 
-          {/* Colonna destra: carosello con avanzamento automatico */}
-          <Carousel images={slides} title={item.title} />
+          {/*
+           * Fascia 2 · disegno tecnico, sotto al carosello. Il tratto è su fondo
+           * trasparente (`scripts/pdf-disegno.js`), quindi si appoggia alla
+           * carta senza riquadro: si riconosce da sé, senza didascalia.
+           * Cornice di altezza fissa: i disegni hanno proporzioni diverse e
+           * senza un'altezza data la pagina si assesterebbe a caricamento
+           * avvenuto.
+           */}
+          {drawing && (
+            <figure className="m-0 border-t border-line pt-6">
+              <img
+                src={drawing}
+                alt={`Disegno tecnico quotato di ${item.title}`}
+                loading="lazy"
+                decoding="async"
+                className="mt-6 h-[clamp(260px,38vh,420px)] w-full object-contain lg:h-[clamp(300px,46vh,560px)]"
+              />
+            </figure>
+          )}
         </div>
       </section>
 

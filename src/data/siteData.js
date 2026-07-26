@@ -93,7 +93,10 @@ export const about = {
  * Ogni voce punta a public/images/products/<slug>/ dove:
  *   cover.webp           → copertina (griglia + testata dettaglio)
  *   01.webp … NN.webp    → galleria del progetto (in ordine)
+ *   disegno.webp         → disegno tecnico con le quote (dove c'è)
  * `photos` = numero di foto galleria presenti (NN.webp).
+ * `disegno: true` = esiste disegno.webp, prodotto da `scripts/pdf-disegno.js`
+ * a partire dalla scheda del progetto nell'archivio PDF.
  *
  * NOTA metadata: `cat` (categoria) e `year` sono da confermare -
  * inseriti come miglior stima. Dove l'anno non è certo è omesso.
@@ -109,6 +112,7 @@ const progetti = [
     cat: 'Sistema di illuminazione',
     year: '2026',
     photos: 13,
+    disegno: true,
     desc: 'FLUE nasce dall’osservazione del cambio di diametro nelle linee di estrusione, una fase produttiva che genera elementi fuori standard destinati allo smaltimento. Attraverso un approccio di upcycling strutturale, il progetto valorizza questi scarti preservandone forma, dimensione e identità industriale. I diametri standard diventano così il principio generativo di una collezione modulare di sistemi di illuminazione.',
     spec: {
       Oggetto: 'Lampade · Sistema di illuminazione',
@@ -123,6 +127,7 @@ const progetti = [
     cat: 'Servomuto · HIRO',
     year: '2026',
     photos: 10,
+    disegno: true,
     desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
     spec: {
       Oggetto: 'Servomuto',
@@ -137,6 +142,7 @@ const progetti = [
     cat: 'Lampada da tavolo',
     year: '2026',
     photos: 9,
+    disegno: true,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
       Oggetto: 'Lampada',
@@ -151,6 +157,7 @@ const progetti = [
     cat: 'Appendiabiti',
     year: '2026',
     photos: 9,
+    disegno: true,
     desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
     spec: {
       Oggetto: 'Appendiabiti',
@@ -165,6 +172,7 @@ const progetti = [
     cat: 'Lampada da terra',
     year: '2024',
     photos: 10,
+    disegno: true,
     desc: 'La Dog Lamp è pensata per essere molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
     spec: {
       Oggetto: 'Lampada per bambini',
@@ -179,6 +187,7 @@ const progetti = [
     cat: 'Gioielli · Fashion',
     year: '2025',
     photos: 9,
+    disegno: true,
     desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola “Structure” incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
     spec: {
       Oggetto: 'Orecchini',
@@ -193,6 +202,7 @@ const progetti = [
     cat: 'Packaging · Davines',
     year: '2024',
     photos: 4,
+    disegno: true,
     desc: 'Nymphē è un progetto di packaging e identità visiva sviluppato per Davines, ispirato al mondo mitologico delle ninfe e al loro legame con la natura. Le silhouette delle boccette prendono ispirazione dai flaconi delle essenze chimiche, reinterpretati in chiave elegante per evocare l’idea di formule naturali e ingredienti puri.',
     spec: {
       Oggetto: 'Packaging · Prodotti per capelli',
@@ -207,6 +217,7 @@ const progetti = [
     cat: 'Seduta · Autoprogettazione',
     year: '2026',
     photos: 4,
+    disegno: true,
     desc: 'La sedia Autoprogettazione di Enzo Mari è reinterpretata attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
     spec: {
       Oggetto: 'Sedia',
@@ -221,6 +232,7 @@ const progetti = [
     cat: 'Sgabello · Legno',
     year: '2026',
     photos: 5,
+    disegno: true,
     desc: 'Fuori asse è uno sgabello realizzato accostando tavole in legno recuperato, mantenute volutamente separate da una distanza funzionale di 30 mm. La fessura centrale diventa una presa integrata e, allo stesso tempo, il segno visibile dell’incontro tra elementi diversi: una condizione tipica del riuso trasformata in principio costruttivo e identitario.',
     spec: {
       Oggetto: 'Sgabello',
@@ -235,6 +247,7 @@ const progetti = [
     cat: 'Postazione di lavoro',
     year: '2025',
     photos: 5,
+    disegno: true,
     desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
     spec: {
       Oggetto: 'Postazione di lavoro',
@@ -249,6 +262,7 @@ const progetti = [
     cat: 'Seduta · Eco design',
     year: '2025',
     photos: 2,
+    disegno: true,
     desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Conta l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
     spec: {
       Oggetto: 'Seduta',
@@ -263,6 +277,7 @@ const progetti = [
     cat: 'Scultura design',
     year: '2026',
     photos: 3,
+    disegno: true,
     desc: '“Sedia a tempo determinato” è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
     spec: {
       Oggetto: 'Scultura design',
@@ -277,6 +292,7 @@ const progetti = [
     cat: 'Architettura · Interior',
     year: '2025',
     photos: 3,
+    disegno: true,
     desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
     spec: {
       Oggetto: 'Architettura / Interior',
@@ -290,6 +306,7 @@ const progetti = [
     cat: 'Coprivaso',
     year: '2024',
     photos: 3,
+    disegno: true,
     desc: 'Pistone è un coprivaso in plastica realizzato tramite stampaggio a iniezione, progettato per unire funzionalità e carattere estetico. Il design prende ispirazione dalla forma dei pistoni dei motori, reinterpretata in chiave morbida e contemporanea per adattarsi agli ambienti domestici.',
     spec: {
       Oggetto: 'Coprivaso',
@@ -304,6 +321,7 @@ const progetti = [
     cat: 'Portapenne · Desk',
     year: '2025',
     photos: 3,
+    disegno: true,
     desc: 'Bullone è un portapenne ispirato alla forma iconica del bullone industriale, reinterpretato in chiave contemporanea per portare alla luce quegli oggetti nascosti ma essenziali che spesso passano inosservati. Molti oggetti funzionali restano dietro le quinte: Bullone vuole dare loro voce, trasformandoli in protagonisti dello spazio quotidiano.',
     spec: {
       Oggetto: 'Portapenne',
@@ -318,6 +336,7 @@ const progetti = [
     cat: 'Portariviste',
     year: '2024',
     photos: 4,
+    disegno: true,
     desc: '“Anelli” è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
     spec: {
       Oggetto: 'Portariviste',
@@ -332,6 +351,7 @@ const progetti = [
     cat: 'Lunch box',
     year: '2024',
     photos: 3,
+    disegno: true,
     desc: 'Questa lunch box è progettata non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
     spec: {
       Oggetto: 'Lunch box',
@@ -390,14 +410,22 @@ export const periodoArchivio = (() => {
   return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
 })()
 
-/* Percorsi immagine di un progetto d'archivio. */
+/*
+ * Percorsi immagine di un progetto d'archivio.
+ * `drawing` è il disegno tecnico, che non tutti i progetti hanno: `null` dove
+ * manca, così la scheda salta il blocco invece di chiedere un file inesistente.
+ */
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
   const gallery = Array.from(
     { length: item.photos },
     (_, i) => `${base}/${String(i + 1).padStart(2, '0')}.webp`,
   )
-  return { cover: `${base}/cover.webp`, gallery }
+  return {
+    cover: `${base}/cover.webp`,
+    gallery,
+    drawing: item.disegno ? `${base}/disegno.webp` : null,
+  }
 }
 
 /*
