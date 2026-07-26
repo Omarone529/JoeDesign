@@ -91,18 +91,23 @@ export default function Hero() {
       />
 
       {/*
-       * Corpo derivato dalla larghezza disponibile, non dal viewport: in
-       * Helvetica di peso normale, con tracking -0.02em, "SARCHIOLLA" misura
-       * 6.19em e "JOE SARCHIOLLA" 8.39em. Il corpo è quindi larghezza / quella
-       * misura, meno un margine perché il nome respiri ai lati e per le
-       * differenze fra Helvetica Neue, Helvetica e Arial (i coefficienti
-       * tengono conto del padding di ogni breakpoint). Da ricalcolare se
-       * cambiano padding, tracking o peso. Sotto md il nome va a capo e si
-       * dimensiona sulla parola più lunga, altrimenti resterebbe minuto.
+       * Peso medio (500): su macOS e iOS lo prende Helvetica Neue Medium, su
+       * Windows - dove Helvetica non c'è - Arial ha solo chiaro e nero e
+       * ricade sul chiaro. Tracking -50 della crenatura tipografica, cioè
+       * -0.05em.
+       *
+       * Corpo derivato dalla larghezza disponibile, non dal viewport: con
+       * questo peso e questo tracking "SARCHIOLLA" misura 5.99em e
+       * "JOE SARCHIOLLA" 8.10em. Il corpo è quindi larghezza / quella misura,
+       * meno un margine perché il nome respiri ai lati e per le differenze fra
+       * Helvetica Neue, Helvetica e Arial (i coefficienti tengono conto del
+       * padding di ogni breakpoint). Da ricalcolare se cambiano padding,
+       * tracking o peso. Sotto md il nome va a capo e si dimensiona sulla
+       * parola più lunga, altrimenti resterebbe minuto.
        */}
       <h1
         aria-label={profile.displayName}
-        className="relative m-0 font-normal uppercase leading-[0.9] tracking-[-0.02em] text-[calc((100vw_-_40px)*0.15)] sm:text-[calc((100vw_-_64px)*0.15)] md:text-[calc((100vw_-_64px)*0.11)] lg:text-[min(calc((100vw_-_144px)*0.11),300px)]"
+        className="relative m-0 font-medium uppercase leading-[0.9] tracking-[-0.05em] text-[calc((100vw_-_40px)*0.155)] sm:text-[calc((100vw_-_64px)*0.155)] md:text-[calc((100vw_-_64px)*0.114)] lg:text-[min(calc((100vw_-_144px)*0.114),300px)]"
       >
         {parole.map(({ parola, lettere }, i) => (
           <Fragment key={parola}>
