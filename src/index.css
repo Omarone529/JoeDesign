@@ -27,4 +27,13 @@
     outline: 2px solid theme('colors.ink');
     outline-offset: 2px;
   }
+
+  /*
+   * Sulle fasce a fondo notte (il footer) l'inchiostro è quasi invisibile:
+   * lì il contorno del focus passa al colore carta. Senza questa regola chi
+   * naviga da tastiera attraversa tutti i recapiti senza vedere dov'è.
+   */
+  .bg-night :focus-visible {
+    outline-color: theme('colors.paper');
+  }
 }

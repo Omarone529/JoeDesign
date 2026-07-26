@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { animazioniRidotte } from '../motion'
 
 /*
  * Carosello immagini con avanzamento automatico.
@@ -64,9 +65,7 @@ export default function Carousel({ images, title }) {
   }
 
   useEffect(() => {
-    if (n <= 1 || paused) return
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return
+    if (n <= 1 || paused || animazioniRidotte()) return
     const timer = setTimeout(() => setIndex((i) => (i + 1) % n), INTERVAL)
     return () => clearTimeout(timer)
   }, [index, paused, n])
