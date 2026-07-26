@@ -5,11 +5,15 @@ import { Link } from '../../router'
  * "Lavori selezionati" - griglia delle schede in evidenza (la selezione è
  * `focusSlugs` in siteData). Mobile-first: 1 colonna → 2 (sm) → 3 (lg).
  * L'immagine ha un delicato zoom in hover; ogni scheda apre /progetto/<slug>.
- * La linea spessa in testa separa dal masthead.
+ * La linea di separazione dalla hero la disegna la hero stessa (bordo inferiore),
+ * dove chiude la foto; qui punta la sua freccia "Scorri".
  */
 export default function SelectedWorks() {
   return (
-    <section className="border-t-2 border-ink px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20">
+    <section
+      id="lavori"
+      className="px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20"
+    >
       <div className="mb-6 flex items-baseline justify-between sm:mb-8 lg:mb-12">
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
           Lavori selezionati
