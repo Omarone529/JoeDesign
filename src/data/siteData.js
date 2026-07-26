@@ -431,10 +431,14 @@ export function projectImages(item) {
 /*
  * "Lavori selezionati" in homepage: la selezione è solo l'elenco di slug qui
  * sotto, il resto della scheda viene dall'archivio per non duplicare i dati.
- * Tenere un multiplo di 3: la griglia arriva a 3 colonne e i resti lasciano
- * buchi in fondo. Uno slug inesistente interrompe la build.
+ * Uno slug inesistente interrompe la build.
+ *
+ * Sono i cinque progetti focus del portfolio 2026 (la pagina "5 PROGETTI
+ * FOCUS"), nello stesso ordine e con la stessa numerazione, che la home mostra
+ * da 01 a 05. Cambiando questo elenco cambia anche la numerazione: è l'indice
+ * della posizione, non un dato a parte.
  */
-const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'zeta-3', 'dog-lamp']
+const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'dog-lamp']
 
 export const focusItems = focusSlugs.map((slug) => {
   const item = progetti.find((p) => p.slug === slug)
