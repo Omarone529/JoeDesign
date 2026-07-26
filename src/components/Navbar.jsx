@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { scorrimento } from '../motion'
 import { Link } from '../router'
 
 const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
@@ -52,12 +53,13 @@ function useNavbarNascosta(route) {
  * scendere in fondo all'area cliccabile. È in assoluto e non occupa spazio nel
  * flusso: compare sulla pagina attiva e in hover, senza mai spostare il testo.
  */
-function NavLink({ to, active = false, children }) {
+function NavLink({ to, active = false, onClick, className = '', children }) {
   return (
     <Link
       to={to}
+      onClick={onClick}
       aria-current={active ? 'page' : undefined}
-      className="group whitespace-nowrap py-2 text-[9px] uppercase tracking-[0.06em] text-ink transition-colors sm:text-[10px] sm:tracking-[0.14em] md:tracking-[0.16em] lg:text-[11px] lg:tracking-[0.2em]"
+      className={`group whitespace-nowrap py-2 text-[9px] uppercase tracking-[0.06em] text-ink transition-colors sm:text-[10px] sm:tracking-[0.14em] md:tracking-[0.16em] lg:text-[11px] lg:tracking-[0.2em] ${className}`}
     >
       <span className="relative">
         {children}
@@ -80,10 +82,29 @@ function NavLink({ to, active = false, children }) {
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const [nascosta, setNascosta] = useNavbarNascosta(name)
+
+  /*
+   * "Contatti" non è una rotta: i recapiti stanno nel footer, presente su ogni
+   * pagina, quindi la voce è un'ancora interna. Il salto è gestito a mano per
+   * rispettare la preferenza sulle animazioni e per portare il focus nel
+   * footer; l'href resta valido per il tasto centrale e il "copia indirizzo".
+   */
+  const vaiAiContatti = (e) => {
+    const contatti = document.getElementById('contatti')
+    if (!contatti) return // senza footer in pagina resta il salto nativo
+    e.preventDefault()
+    contatti.scrollIntoView({ behavior: scorrimento(), block: 'start' })
+    contatti.focus({ preventScroll: true })
+  }
+
   const links = [
     { label: 'Home', to: '/', active: name === 'home' },
     { label: 'Archivio', to: '/archivio', active: name === 'archive' || name === 'project' },
     { label: 'Chi sono', to: '/chi-sono', active: name === 'about' },
+    // Sotto i 640px le quattro voci più il nome escono dalla barra e
+    // spingerebbero la pagina in scorrimento orizzontale: lì la voce sparisce,
+    // e i recapiti restano comunque in fondo alla pagina.
+    { label: 'Contatti', to: '#contatti', onClick: vaiAiContatti, className: 'hidden sm:block' },
   ]
 
   return (
@@ -115,7 +136,13 @@ export default function Navbar({ route }) {
         {/* Navigazione */}
         <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
           {links.map((l) => (
-            <NavLink key={l.label} to={l.to} active={l.active}>
+            <NavLink
+              key={l.label}
+              to={l.to}
+              active={l.active}
+              onClick={l.onClick}
+              className={l.className}
+            >
               {l.label}
             </NavLink>
           ))}
