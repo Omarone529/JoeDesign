@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { fotoFit } from '../data/fotoFit'
 import { animazioniRidotte } from '../motion'
 
 /*
@@ -20,17 +21,9 @@ const INTERVAL = 2000
 // Spostamento minimo del dito perché valga come cambio foto e non come tocco.
 const SWIPE = 45
 
-// Formati oltre i quali riempire la cornice taglierebbe via il soggetto: le
-// strisce orizzontali (campionature di colore) e le foto altissime. Solo
-// queste si mostrano intere; tutte le altre riempiono.
-const LARGA = 1.6
-const STRETTA = 0.45
-
 export default function Carousel({ images, title }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
-  // Proporzioni reali delle foto, note solo a caricamento avvenuto.
-  const [formati, setFormati] = useState({})
   const n = images.length
 
   // Tocco in corso: punto di partenza del dito e se è diventato un trascinamento.
@@ -102,12 +95,13 @@ export default function Carousel({ images, title }) {
          * sono disparati e mostrandole intere si vedrebbero tutte di una
          * dimensione diversa, con la cornice che si svuota ai lati. Qui invece
          * si susseguono tutte della stessa misura, al prezzo di un ritaglio.
-         * Fanno eccezione i formati estremi (vedi `LARGA` / `STRETTA`), dove il
-         * ritaglio mangerebbe quasi tutto: quelli si mostrano interi.
+         * Dove il ritaglio farebbe danno — una grafica mozzata, un formato
+         * fuori scala — `fotoFit` dice di mostrarla intera, o dove puntare il
+         * taglio perché il prodotto ci stia tutto. Quel file lo scrive
+         * `node scripts/fit-foto.js` misurando le immagini una per una.
          */}
         {images.map((src, i) => {
-          const r = formati[src]
-          const intera = r !== undefined && (r > LARGA || r < STRETTA)
+          const fit = fotoFit[src]
           return (
             <img
               key={src}
@@ -117,13 +111,9 @@ export default function Carousel({ images, title }) {
               loading={i === 0 ? 'eager' : 'lazy'}
               fetchpriority={i === 0 ? 'high' : undefined}
               decoding="async"
-              onLoad={(e) => {
-                const { naturalWidth: w, naturalHeight: h } = e.currentTarget
-                if (!h) return
-                setFormati((f) => (src in f ? f : { ...f, [src]: w / h }))
-              }}
+              style={fit?.pos ? { objectPosition: fit.pos } : undefined}
               className={`absolute inset-0 h-full w-full contrast-[1.02] transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
-                intera ? 'object-contain' : 'object-cover'
+                fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
               } ${i === index ? 'opacity-100' : 'opacity-0'}`}
             />
           )

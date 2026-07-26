@@ -101,6 +101,20 @@ Organizzazione:
     In `siteData` il progetto che ce l'ha porta `disegno: true`.
 - Home: `public/images/home/` · Chi sono: `public/images/about/`
 
+**Dopo aver aggiunto o sostituito foto di prodotto va rilanciato:**
+
+```bash
+node scripts/fit-foto.js   # → src/data/fotoFit.js
+```
+
+Misura ogni immagine e decide come entra nella cornice fissa del carosello:
+riempie (`object-cover`, il caso normale), riempie puntando il ritaglio sul
+prodotto (`object-position`), oppure si mostra intera. Le fotografie si tagliano
+senza danno; le grafiche piatte (manifesti, disegni al tratto, piante quotate,
+render su fondo bianco) e i formati fuori scala no, e vanno mostrate intere.
+Il file generato non si modifica a mano; i pochi casi che la misura non prende
+si elencano in `SEMPRE_INTERE`, in testa allo script.
+
 ### ⚠️ Da dove arrivano le immagini (workflow)
 Le sorgenti stanno FUORI dal repo, in due cartelle sul disco:
 - `C:\Generale\Lavori\Joe design\ARCHIVIO WEBP` — archivio dei progetti, **già in WebP**.
@@ -166,6 +180,7 @@ src/
 ├── entry-server.jsx      # render(path) per la build SSR (mai spedito al browser)
 ├── index.css             # Tailwind + stili base
 ├── data/siteData.js      # TUTTI i contenuti (fonte di verità)
+├── data/fotoFit.js       # generato: come ogni foto entra nel carosello
 ├── components/
 │   ├── Navbar.jsx        # nav sticky (Home · Chi sono · Archivio · Contatti)
 │   ├── Footer.jsx
@@ -183,6 +198,7 @@ scripts/
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
 ├── pdf-disegno.js       # disegni tecnici dall'archivio PDF → products/<slug>/disegno.webp (a mano)
+├── fit-foto.js          # come ogni foto entra nel carosello → src/data/fotoFit.js (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
 ├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
 └── ink-alpha.js         # tratto su fondo bianco → webp con alpha (firme, scansioni)
