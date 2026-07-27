@@ -28,24 +28,17 @@ export default function ProjectDetail({ slug }) {
           ← Archivio
         </Link>
 
-        {/* Più contenuto dei titoli di Home e Archivio: qui sotto il titolo deve
-            entrare tutta la scheda — foto e disegno — nella prima schermata. */}
+        {/* Titolo più contenuto: sotto deve entrare tutta la scheda nella prima schermata. */}
         <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
           {item.title}
         </h1>
 
         {/*
-         * Impianto della scheda d'archivio, a filetti come la pagina stampata:
-         * a sinistra il testo, a destra le immagini, su due fasce. In alto la
-         * descrizione accanto al carosello, in basso i dati tecnici accanto al
-         * disegno quotato.
-         * La colonna del testo è la più larga delle due: quella delle immagini
-         * resta stretta abbastanza da tenere le celle quasi quadrate, vicine al
-         * formato verticale dell'archivio (circa 3:4), così le foto la riempiono
-         * senza grossi ritagli. Il testo non ci perde: la descrizione è comunque
-         * fermata a 52 caratteri di riga.
-         * Su telefono le quattro celle si incolonnano nell'ordine di lettura:
-         * descrizione, foto, dati, disegno.
+         * Scheda a due fasce: testo a sinistra, immagini a destra. In alto
+         * descrizione + carosello, in basso dati tecnici + disegno. La colonna
+         * immagini resta stretta (celle ~3:4, come l'archivio, poco ritaglio);
+         * il testo è fermato a 52 caratteri. Su telefono le 4 celle si
+         * incolonnano: descrizione, foto, dati, disegno.
          */}
         <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 border-t border-line pt-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start md:gap-y-14 lg:mt-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12 lg:pt-8">
           {/* Fascia 1 · descrizione */}
@@ -64,8 +57,7 @@ export default function ProjectDetail({ slug }) {
           {/* Fascia 2 · scheda tecnica */}
           <div className="border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Progetto</div>
-            {/* Voce a sinistra, valore allineato a destra: la riga tiene la
-                colonna anche quando è larga, senza vuoti in mezzo. */}
+            {/* Voce a sinistra, valore a destra: tiene la colonna anche larga. */}
             <dl className="mt-6 grid grid-cols-1 gap-0 border-t border-line-soft">
               {specRows.map(([k, v]) => (
                 <div
@@ -80,12 +72,10 @@ export default function ProjectDetail({ slug }) {
           </div>
 
           {/*
-           * Fascia 2 · disegno tecnico, sotto al carosello. Il tratto è su fondo
-           * trasparente (`scripts/pdf-disegno.js`), quindi si appoggia alla
-           * carta senza riquadro: si riconosce da sé, senza didascalia.
-           * Cornice di altezza fissa: i disegni hanno proporzioni diverse e
-           * senza un'altezza data la pagina si assesterebbe a caricamento
-           * avvenuto.
+           * Fascia 2 · disegno tecnico. Fondo trasparente
+           * (`scripts/pdf-disegno.js`), si appoggia alla carta senza riquadro.
+           * Altezza fissa: proporzioni diverse, senza altezza la pagina si
+           * assesterebbe a caricamento avvenuto.
            */}
           {drawing && (
             <figure className="m-0 border-t border-line pt-6">

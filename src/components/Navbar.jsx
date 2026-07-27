@@ -6,12 +6,9 @@ const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque vis
 const MOVIMENTO_MINIMO = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
 
 /*
- * Nasconde la barra scorrendo verso il basso, la ripristina scorrendo in su.
- *
- * Lo stato parte da "visibile" perché è quello che finisce nell'HTML statico:
- * un valore diverso creerebbe un disallineamento in idratazione. Gli eventi di
- * scroll sono passivi e accorpati in un requestAnimationFrame, così un render
- * al massimo per frame.
+ * Nasconde la barra scorrendo giù, la ripristina scorrendo su. Parte visibile
+ * (è ciò che c'è nell'HTML statico: evita un mismatch in hydration). Scroll
+ * passivo accorpato in rAF: un render al massimo per frame.
  */
 function useNavbarNascosta(route) {
   const [nascosta, setNascosta] = useState(false)
@@ -47,11 +44,9 @@ function useNavbarNascosta(route) {
 }
 
 /*
- * Voce di navigazione. Il padding verticale sta sul link (area di tocco più
- * generosa del solo testo, che su mobile è di 9px), mentre la sottolineatura
- * è ancorata allo span interno: così resta attaccata alla parola invece di
- * scendere in fondo all'area cliccabile. È in assoluto e non occupa spazio nel
- * flusso: compare sulla pagina attiva e in hover, senza mai spostare il testo.
+ * Voce di navigazione. Padding sul link (area di tocco più ampia del testo);
+ * sottolineatura ancorata allo span interno per restare attaccata alla parola,
+ * in assoluto così non sposta il testo. Compare su pagina attiva e in hover.
  */
 function NavLink({ to, active = false, children }) {
   return (
@@ -74,18 +69,14 @@ function NavLink({ to, active = false, children }) {
 }
 
 /*
- * Barra di navigazione condivisa. Sticky: resta nel flusso e occupa i suoi 4rem
- * anche da nascosta, misura su cui è tarata l'altezza della hero in About.
- * La voce attiva deriva dalla rotta corrente.
+ * Barra sticky condivisa: occupa i suoi 4rem anche da nascosta (misura su cui
+ * è tarata la hero in About). La voce attiva deriva dalla rotta.
  */
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const [nascosta, setNascosta] = useNavbarNascosta(name)
 
-  /*
-   * Solo le tre rotte del sito: i recapiti stanno in fondo a ogni pagina, nel
-   * footer, e non hanno più una voce qui.
-   */
+  // Solo le tre rotte: i recapiti stanno nel footer.
   const links = [
     { label: 'Home', to: '/', active: name === 'home' },
     { label: 'Archivio', to: '/archivio', active: name === 'archive' || name === 'project' },
@@ -100,7 +91,6 @@ export default function Navbar({ route }) {
       }`}
     >
       <div className="relative flex h-16 items-center justify-between gap-2 px-5 sm:px-8 lg:px-[72px]">
-        {/* Logo */}
         <Link to="/" aria-label="Joe Sarchiolla — home" className="flex shrink-0 items-center">
           <img
             src="/images/navbar/logo.webp"
@@ -111,10 +101,8 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Il nome, e attaccato il marchio Instagram che porta al profilo.
-            Centrato sulla pagina solo da md: sotto, logo + nome + tre voci non
-            entrano nella metà utile, quindi il blocco resta in linea nel flusso
-            (spinto dal justify-between) invece di finire sotto le voci. */}
+        {/* Nome + marchio Instagram. Centrato solo da md: sotto non ci starebbe
+            e resta in linea nel flusso (justify-between). */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="whitespace-nowrap text-[11px] font-normal uppercase tracking-[0.1em] sm:text-[13px] sm:tracking-[0.14em] lg:text-[15px] lg:tracking-[0.18em]">
             {profile.displayName}
@@ -130,7 +118,6 @@ export default function Navbar({ route }) {
           </a>
         </div>
 
-        {/* Navigazione */}
         <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
           {links.map((l) => (
             <NavLink key={l.label} to={l.to} active={l.active}>
@@ -144,11 +131,9 @@ export default function Navbar({ route }) {
 }
 
 /*
- * Marchio Instagram disegnato al tratto, come la freccia obliqua della hero:
- * il quadrato con gli angoli tondi, l'obiettivo e il puntino in alto a destra.
- * Tratto in `currentColor`, quindi segue il colore del testo accanto, e spessore
- * leggero perché alle misure della barra (15–19px) un tratto pieno annerirebbe
- * il segno. Decorativo: a dire dove porta è l'`aria-label` del link.
+ * Marchio Instagram al tratto in `currentColor` (segue il testo accanto),
+ * spessore leggero perché a 15–19px un tratto pieno annerirebbe il segno.
+ * Decorativo: dove porta lo dice l'`aria-label` del link.
  */
 function LogoInstagram({ className = '' }) {
   return (

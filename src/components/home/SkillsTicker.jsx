@@ -1,19 +1,11 @@
 import { about } from '../../data/siteData'
 
 /*
- * "Skills" - ticker a scorrimento continuo, stessi strumenti elencati in
- * "Chi sono" (fonte unica: about.skills).
- *
- * Il nastro contiene due copie identiche dell'elenco e trasla del 50%: quando
- * l'animazione riparte la seconda copia si trova esattamente dove stava la
- * prima, quindi il giro è impercettibile. La seconda copia è aria-hidden,
- * altrimenti i lettori di schermo annuncerebbero ogni voce due volte.
- *
- * Lo scorrimento non si interrompe mai: nessuna pausa all'hover e nessuna resa
- * statica con "riduci animazioni" di sistema (scelta esplicita: su Windows
- * quell'impostazione è spesso spenta per prestazioni e bloccava il nastro).
- * Velocità costante (linear); will-change manda la traslazione sul compositore,
- * così resta fluida anche mentre si scrolla la pagina.
+ * Ticker "Skills" a scorrimento continuo (fonte: about.skills). Due copie
+ * identiche che traslano del 50%: al riavvio la seconda è dov'era la prima,
+ * il giro è impercettibile; la seconda è aria-hidden (niente doppio annuncio).
+ * Non si ferma mai, nemmeno con "riduci animazioni" (su Windows spesso spenta,
+ * bloccava il nastro). `will-change` manda la transform sul compositore.
  */
 export default function SkillsTicker() {
   return (

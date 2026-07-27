@@ -1,9 +1,8 @@
 import { familyBand } from '../../data/siteData'
 
 /*
- * Fascia a tutta larghezza fra i lavori selezionati e il ticker delle skills.
- * Altezza naturale, senza ritaglio: la foto mostra l'intera famiglia di
- * prodotti. width/height dichiarati riservano lo spazio prima del caricamento.
+ * Fascia a tutta larghezza, altezza naturale (mostra l'intera famiglia di
+ * prodotti). width/height riservano lo spazio prima del caricamento.
  */
 export default function FamilyBand() {
   return (

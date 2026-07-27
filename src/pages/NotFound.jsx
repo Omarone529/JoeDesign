@@ -1,16 +1,12 @@
 import { Link } from '../router'
 
 /*
- * 404 - indirizzo inesistente.
- * Viene mostrata sia in navigazione client-side (link rotto interno) sia come
- * pagina statica dist/404.html, che Netlify serve con lo status 404 vero.
- * Stessa impaginazione delle altre pagine: testata a due colonne e celle di
- * uscita a piena larghezza, come il precedente/successivo della scheda progetto.
+ * 404. Mostrata sia in navigazione client-side sia come dist/404.html, che
+ * Netlify serve con lo status 404 vero. Testata a due colonne + celle di uscita.
  */
 export default function NotFound() {
   return (
     <main className="animate-viewIn">
-      {/* Testata */}
       <section className="px-5 pb-10 pt-12 sm:px-8 sm:pb-16 sm:pt-20 lg:px-[72px] lg:pt-[120px]">
         <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Errore 404</div>
 
@@ -28,7 +24,6 @@ export default function NotFound() {
         </div>
       </section>
 
-      {/* Uscite */}
       <section className="mt-4 grid grid-cols-2 border-t border-line sm:mt-8">
         <Link
           to="/"

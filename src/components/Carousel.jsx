@@ -3,18 +3,9 @@ import { fotoFit } from '../data/fotoFit'
 import { animazioniRidotte } from '../motion'
 
 /*
- * Carosello immagini con avanzamento automatico.
- * - crossfade tra le immagini (una visibile alla volta)
- * - autoplay ogni 2s; si mette in pausa (e riparte) con un clic sulla foto,
- *   non al semplice passaggio del mouse
- * - da telefono si cambia foto trascinando il dito; le frecce compaiono solo
- *   da desktop, in hover, per non appesantire la foto sul piccolo schermo
- * - controlli manuali: frecce, puntini, contatore; frecce da tastiera
- * - rispetta prefers-reduced-motion (niente autoplay)
- * Occupa tutta la colonna immagini della scheda progetto: le foto sono il
- * contenuto principale, quindi la cornice è la più grande che lo schermo
- * consente e ogni foto la riempie per intero, senza margini vuoti
- * (vedi `object-cover` più sotto).
+ * Carosello immagini della scheda progetto. Crossfade, autoplay 2s in pausa
+ * al clic (non all'hover), swipe su mobile, frecce/puntini/contatore/tastiera
+ * da desktop. Rispetta prefers-reduced-motion (niente autoplay).
  */
 const INTERVAL = 2000
 
@@ -38,8 +29,7 @@ export default function Carousel({ images, title }) {
     tocco.current = { x: t.clientX, y: t.clientY, trascinato: false }
   }
 
-  // Cambia foto solo se il movimento è chiaramente orizzontale: così lo
-  // scorrimento verticale della pagina resta libero.
+  // Cambia foto solo se il movimento è chiaramente orizzontale (lo scroll verticale resta libero).
   const fineTocco = (e) => {
     if (!tocco.current) return
     const t = e.changedTouches[0]
@@ -71,34 +61,25 @@ export default function Carousel({ images, title }) {
       }}
     >
       {/*
-       * Cornice a misura fissa: non dipende dal formato dell'immagine mostrata,
-       * quindi non si muove cambiando diapositiva. L'altezza segue il viewport
-       * (con minimo e massimo) così la foto è grande su ogni schermo senza mai
-       * costringere a scorrere per vederla intera. Da desktop si ferma poco
-       * oltre metà schermo: sopra c'è la testata della scheda e sotto il
-       * disegno tecnico, che deve restare a portata di un colpo di rotella.
+       * Cornice a misura fissa (non dipende dal formato mostrato, così non si
+       * muove cambiando foto). Altezza legata al viewport ma limitata: lascia
+       * spazio a testata sopra e disegno tecnico sotto.
        */}
       <div
         className="relative h-[clamp(320px,54vh,480px)] cursor-pointer select-none overflow-hidden bg-placeholder sm:h-[clamp(400px,62vh,620px)] lg:h-[clamp(360px,58vh,700px)]"
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
-        // Clic sulla foto = ferma / riprende lo scorrimento. I clic sui
-        // comandi (frecce, contatore) restano solo navigazione, e un
-        // trascinamento del dito non deve valere come tocco.
+        // Clic sulla foto = pausa/ripresa; i clic sui comandi e gli swipe non contano.
         onClick={(e) => {
           if (e.target.closest('button') || tocco.current?.trascinato) return
           setPaused((p) => !p)
         }}
       >
         {/*
-         * Ogni foto riempie la cornice (`object-cover`): i formati d'archivio
-         * sono disparati e mostrandole intere si vedrebbero tutte di una
-         * dimensione diversa, con la cornice che si svuota ai lati. Qui invece
-         * si susseguono tutte della stessa misura, al prezzo di un ritaglio.
-         * Dove il ritaglio farebbe danno — una grafica mozzata, un formato
-         * fuori scala — `fotoFit` dice di mostrarla intera, o dove puntare il
-         * taglio perché il prodotto ci stia tutto. Quel file lo scrive
-         * `node scripts/fit-foto.js` misurando le immagini una per una.
+         * `object-cover`: ogni foto riempie la cornice, così i formati
+         * disparati dell'archivio si susseguono uguali, al prezzo di un
+         * ritaglio. Dove il ritaglio farebbe danno `fotoFit` dice di mostrarla
+         * intera o dove puntare il taglio (lo genera `scripts/fit-foto.js`).
          */}
         {images.map((src, i) => {
           const fit = fotoFit[src]
@@ -150,7 +131,6 @@ export default function Carousel({ images, title }) {
         )}
       </div>
 
-      {/* Puntini - centrati sotto la cornice */}
       {n > 1 && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           {images.map((_, i) => (

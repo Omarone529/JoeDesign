@@ -14,8 +14,7 @@ const app = (
   </React.StrictMode>
 )
 
-// Se il markup è già presente (pagina pre-renderizzata) React si "aggancia"
-// tramite hydration; altrimenti (dev) monta da zero.
+// Markup già presente (pre-render) → hydration; altrimenti (dev) monta da zero.
 if (root.hasChildNodes()) {
   hydrateRoot(root, app)
 } else {

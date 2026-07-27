@@ -3,30 +3,21 @@ import { scorrimento } from '../motion'
 import { Link } from '../router'
 
 /*
- * Footer condiviso. Assolve anche la funzione di pagina contatti, che il sito
- * non ha: qui stanno tutti i recapiti, ognuno una volta sola.
- *
- * Impianto convenzionale: a sinistra il nome con i due canali di contatto, a
- * destra due colonne di collegamenti, in fondo la riga legale. Un solo filetto
- * in tutto il blocco, quello sopra la coda: la separazione tra le colonne la
- * fanno gli spazi bianchi, non i bordi.
+ * Footer condiviso, che fa anche da pagina contatti (assente): qui i recapiti,
+ * ognuno una volta sola. A sinistra i due canali, a destra i link, in fondo la
+ * riga legale. Le colonne le separano gli spazi, non i bordi.
  */
 /*
- * Anno del copyright, fissato al momento della build.
- *
- * Non `new Date().getFullYear()` durante il render: le pagine sono statiche e
- * l'anno resterebbe cucito nell'HTML generato: al primo gennaio il browser
- * calcolerebbe l'anno nuovo su un HTML che dice quello vecchio, React
- * troverebbe due testi diversi e l'aggancio (hydration) fallirebbe su tutte le
- * pagine. Vite sostituisce questa costante con il valore letterale in fase di
- * compilazione, così HTML e browser dicono sempre la stessa cosa.
+ * Anno del copyright fissato a build-time (Vite lo inlinea). Non
+ * `getFullYear()` al render: le pagine sono statiche e al primo gennaio
+ * browser e HTML direbbero anni diversi, rompendo l'hydration.
  */
 const ANNO = __ANNO_BUILD__
 
 /*
- * Il filetto della coda. `/10` e non `/12`: la scala di opacità di Tailwind va
- * di cinque in cinque, un valore fuori scala non genera alcuna classe e il
- * bordo ricadrebbe sul grigio chiaro di default, vistoso sul fondo notte.
+ * Filetto della coda. `/10` e non `/12`: l'opacità Tailwind va di cinque in
+ * cinque; un valore fuori scala non genera classe e il bordo diventerebbe
+ * vistoso sul fondo notte.
  */
 const FILETTO = 'border-paper/10'
 
@@ -39,11 +30,9 @@ export default function Footer() {
 
   return (
     /*
-     * `id` e `tabIndex` fanno del footer la destinazione della voce "Contatti"
-     * in barra: dopo il salto il focus si sposta qui, così da tastiera si
-     * continua dai recapiti e non dall'inizio della pagina. Il contorno del
-     * focus è tolto perché su un elemento largo quanto il footer sarebbe una
-     * cornice enorme; `scroll-mt-16` tiene conto della barra sticky (4rem).
+     * `id`/`tabIndex`: destinazione del salto "Contatti", il focus si sposta
+     * qui. Contorno tolto (su un elemento così largo sarebbe enorme);
+     * `scroll-mt-16` tiene conto della barra sticky (4rem).
      */
     <footer
       id="contatti"
@@ -52,22 +41,17 @@ export default function Footer() {
     >
       <div className="grid grid-cols-2 gap-x-8 gap-y-12 px-5 py-14 sm:px-8 sm:py-16 md:grid-cols-12 md:gap-x-10 lg:px-[72px] lg:py-20">
         {/*
-         * Contatti diretti. La colonna si apre con un occhiello come le altre
-         * due: le tre teste stanno sulla stessa quota e con lo stesso peso,
-         * altrimenti questa partirebbe con un grassetto e le altre con un
-         * maiuscoletto, e le colonne non si leggerebbero come pari grado.
-         * Il nome per esteso non si ripete qui: è già in barra e in fondo,
-         * nella riga di copyright.
+         * Contatti diretti. Occhiello come le altre due colonne, così le tre
+         * teste sono pari grado. Il nome per esteso non si ripete: è già in
+         * barra e nella riga di copyright.
          */}
         <div className="col-span-2 md:col-span-6 md:pr-10">
           <Occhiello>Contatti</Occhiello>
 
           {/*
-           * L'unico elemento di primo livello del footer, che di fatto è la
-           * pagina contatti del sito: tutto il resto sta sotto, a 15px.
-           * flex w-fit e non inline-flex: serve un box di livello blocco perché
-           * i due canali restino incolonnati su colonne larghe, ma largo quanto
-           * il testo perché l'area sensibile all'hover non invada la colonna.
+           * Elemento di primo livello del footer (il resto sta sotto, a 15px).
+           * `flex w-fit`: box di blocco perché i due canali restino incolonnati,
+           * ma largo quanto il testo così l'hover non invade la colonna.
            */}
           <a
             href={`mailto:${profile.email}`}
@@ -100,14 +84,12 @@ export default function Footer() {
             </span>
           </a>
 
-          {/* Riga di chiusura: descrive, non è un recapito, quindi sta in coda
-              alla colonna e un gradino sotto ai due canali. */}
+          {/* Riga di chiusura: descrive, non è un recapito. */}
           <p className="m-0 mt-7 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
             {profile.role}, con base a {profile.place}.
           </p>
         </div>
 
-        {/* Pagine */}
         <nav aria-label="Pagine del sito" className="md:col-span-3">
           <Occhiello>Pagine</Occhiello>
           <ul className="m-0 mt-5 list-none space-y-3 p-0">
@@ -125,11 +107,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        {/*
-         * Recapiti: solo il telefono. La sede sta già nella riga di chiusura
-         * qui accanto, e ripeterla a due colonne di distanza la farebbe
-         * sembrare un'altra informazione invece della stessa.
-         */}
+        {/* Recapiti: solo il telefono. La sede è già nella riga di chiusura accanto. */}
         <div className="md:col-span-3">
           <Occhiello>Recapiti</Occhiello>
           <ul className="m-0 mt-5 list-none p-0">
@@ -146,7 +124,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Coda */}
       <div
         className={`flex flex-col gap-4 border-t ${FILETTO} px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-[72px]`}
       >
@@ -177,12 +154,9 @@ function Occhiello({ children }) {
 }
 
 /*
- * Sottolineatura animata, stesso gesto delle voci in Navbar: cresce da sinistra
- * al passaggio del mouse e all'arrivo del focus da tastiera - il solo hover
- * lascerebbe chi naviga col tab senza alcun segnale. In assoluto, quindi non
- * occupa spazio nel flusso e non sposta il testo. Va dentro un contenitore
- * `relative` in un elemento `group`. Usa currentColor, così accompagna la
- * transizione di colore del link.
+ * Sottolineatura animata (come in Navbar): cresce da sinistra su hover e su
+ * focus da tastiera. In assoluto (non sposta il testo), in currentColor.
+ * Va in un contenitore `relative` dentro un elemento `group`.
  */
 function Sottolineatura() {
   return (
@@ -194,10 +168,9 @@ function Sottolineatura() {
 }
 
 /*
- * Marchio Instagram in SVG inline, per non introdurre una libreria di icone o
- * una richiesta esterna per un solo glifo. Lo stroke usa currentColor, quindi
- * segue il colore del link anche durante la transizione di hover.
- * Decorativo: la maniglia è nel testo accanto.
+ * Marchio Instagram SVG inline (no libreria di icone per un glifo). Stroke in
+ * currentColor, segue il link anche in hover. Decorativo: la maniglia è nel
+ * testo accanto.
  */
 function LogoInstagram({ className = '' }) {
   return (

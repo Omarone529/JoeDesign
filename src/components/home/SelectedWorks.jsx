@@ -2,15 +2,9 @@ import { focusItems } from '../../data/siteData'
 import { Link } from '../../router'
 
 /*
- * "Lavori selezionati" - i cinque progetti focus del portfolio 2026, nello
- * stesso ordine e numerati come lì, da 01 a 05 (la selezione è `focusSlugs` in
- * siteData). Mobile-first: 1 colonna → 2 (sm) → 3 (md) → 5 (lg), cioè in fila
- * su schermo largo, come l'indice del portfolio. Sotto i 1024px l'ultima riga
- * resta spaiata: è la stessa griglia dell'archivio, dove i resti lasciano un
- * vuoto in fondo invece di allargare una scheda.
- * L'immagine ha un delicato zoom in hover; ogni scheda apre /progetto/<slug>.
- * La linea di separazione dalla hero la disegna la hero stessa (bordo inferiore),
- * dove chiude la foto; qui punta la sua freccia "Scorri".
+ * "Lavori selezionati": i cinque progetti focus del portfolio 2026, numerati
+ * 01–05 (selezione in `focusSlugs`). Griglia 1→2→3→5 colonne, zoom in hover,
+ * ogni scheda apre /progetto/<slug>. La linea dalla hero la disegna la hero.
  */
 export default function SelectedWorks() {
   return (
@@ -34,8 +28,7 @@ export default function SelectedWorks() {
         {focusItems.map((p, i) => (
           <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
             <article>
-              {/* Numero e anno sopra la foto, divisi da un filetto: la
-                  numerazione del portfolio, nella riga a filetti del sito. */}
+              {/* Numero e anno sopra la foto: la numerazione del portfolio. */}
               <div className="mb-3 flex items-baseline justify-between gap-3 border-t border-line pt-2">
                 <span className="text-[11px] tracking-[0.2em] text-muted">
                   {String(i + 1).padStart(2, '0')}
@@ -45,8 +38,7 @@ export default function SelectedWorks() {
                 </span>
               </div>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
-                {/* La prima riga è già in viewport dopo il masthead: caricarla
-                    pigramente ne ritarderebbe la richiesta */}
+                {/* Prima riga in viewport: niente lazy per non ritardarla. */}
                 <img
                   src={p.cover}
                   alt={p.title}

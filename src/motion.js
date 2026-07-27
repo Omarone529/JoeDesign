@@ -1,10 +1,7 @@
 /*
- * Preferenza di sistema "riduci le animazioni".
- *
- * Va interrogata al momento dell'uso e non durante il render: in fase di
- * pre-rendering `window` non esiste, e il valore può comunque cambiare mentre
- * la pagina è aperta. Fuori dal browser risponde `false`, che è innocuo perché
- * lì non si anima nulla.
+ * Preferenza "riduci animazioni". Da leggere all'uso, non al render: in
+ * pre-rendering `window` non esiste (risponde `false`, innocuo) e il valore
+ * può cambiare a pagina aperta.
  */
 export function animazioniRidotte() {
   if (typeof window === 'undefined') return false

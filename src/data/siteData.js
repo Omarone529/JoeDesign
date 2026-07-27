@@ -1,15 +1,7 @@
 /*
- * Contenuti del sito - fonte di verità unica: tutti i testi e i dati stanno
- * qui, non nel markup (Giovanni "Joe" Sarchiolla, 2026).
- *
- * NOTA sulle immagini
- * -------------------
- * Ogni progetto vive in una sua cartella dedicata sotto:
- *   public/images/products/<slug>/
- *   ├── cover.webp        copertina: griglie home/archivio e prima diapositiva
- *   └── 01.webp … NN.webp galleria, in ordine (NN = campo `photos`)
- * I percorsi li costruisce `projectImages()` in fondo al file: non vanno mai
- * scritti a mano nei componenti.
+ * Contenuti del sito - fonte di verità unica: testi e dati stanno qui, non nel
+ * markup. Le immagini di ogni progetto vivono in public/images/products/<slug>/
+ * (cover.webp + 01.webp…NN.webp); i percorsi li costruisce `projectImages()`.
  */
 
 export const profile = {
@@ -29,10 +21,8 @@ export const profile = {
 }
 
 /*
- * Sfondo della hero in home: ritratto di Joe, sfocato via CSS sotto al nome.
- * È decorativo (il nome accanto dice già di chi si tratta), quindi `alt` vuoto.
- * Sorgente: media/FOTO JOE.../joe.jpg, ottimizzata con
- * `node scripts/optimize-image.js`.
+ * Sfondo hero home: ritratto sfocato via CSS sotto al nome. Decorativo (`alt`
+ * vuoto). Sorgente: media/FOTO JOE.../joe.jpg, ottimizzata con optimize-image.js.
  */
 export const homeHero = {
   src: '/images/home/joe-hero.webp',
@@ -47,10 +37,7 @@ export const familyBand = {
   alt: 'La famiglia di prodotti',
 }
 
-/*
- * "Chi sono" - testi e foto della pagina about.
- * Foto ottimizzate in public/images/about/ (sorgenti in media/FOTO JOE...).
- */
+/* "Chi sono": testi e foto (public/images/about/, sorgenti in media/FOTO JOE...). */
 export const about = {
   // Intro impersonale (dal portfolio "MI PRESENTO").
   intro:
@@ -89,21 +76,10 @@ export const about = {
 }
 
 /*
- * ARCHIVIO - tutti i progetti.
- * Ogni voce punta a public/images/products/<slug>/ dove:
- *   cover.webp           → copertina (griglia + testata dettaglio)
- *   01.webp … NN.webp    → galleria del progetto (in ordine)
- *   disegno.webp         → disegno tecnico con le quote (dove c'è)
- * `photos` = numero di foto galleria presenti (NN.webp).
- * `disegno: true` = esiste disegno.webp, prodotto da `scripts/pdf-disegno.js`
- * a partire dalla scheda del progetto nell'archivio PDF.
- *
- * NOTA metadata: `cat` (categoria) e `year` sono da confermare -
- * inseriti come miglior stima. Dove l'anno non è certo è omesso.
- * Le foto sono curate a partire da "ARCHIVIO WEBP".
- *
- * Questo elenco non è l'ordine di pubblicazione: vale solo a parità di anno.
- * L'ordinamento cronologico lo applica `archive`, definito sotto.
+ * Archivio: tutti i progetti. `photos` = numero di foto galleria (NN.webp);
+ * `disegno: true` = esiste disegno.webp (da `scripts/pdf-disegno.js`).
+ * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
+ * Questo ordine vale solo a parità di anno: l'ordinamento lo applica `archive`.
  */
 const progetti = [
   {
@@ -382,10 +358,7 @@ const progetti = [
   },
 ]
 
-/*
- * Anni citati in una voce. `year` è testo libero: può contenere un intervallo
- * ("2024 · 2026", la raccolta grafica) o mancare.
- */
+/* Anni citati in `year` (testo libero: può essere un intervallo o mancare). */
 export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
 }
@@ -394,26 +367,21 @@ export function anniDi(item) {
 const annoRecente = (item) => Math.max(0, ...anniDi(item))
 
 /*
- * Archivio ordinato dal più recente. È l'ordine usato ovunque: griglia,
- * navigazione precedente/successivo, sitemap, pre-rendering.
- * Array.sort è stabile, quindi a parità di anno vale l'ordine curato in
- * `progetti`; le voci senza anno finiscono in coda.
+ * Archivio ordinato dal più recente, usato ovunque (griglia, prev/next,
+ * sitemap, pre-rendering). sort è stabile: a parità d'anno vale l'ordine di
+ * `progetti`, le voci senza anno vanno in coda.
  */
 export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
 
-/*
- * Estremi temporali dell'archivio, usati nell'intestazione della pagina e nelle
- * meta description. `null` se nessuna voce ha un anno.
- */
+/* Estremi temporali dell'archivio (testata pagina + meta). `null` se nessun anno. */
 export const periodoArchivio = (() => {
   const anni = archive.flatMap(anniDi)
   return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
 })()
 
 /*
- * Percorsi immagine di un progetto d'archivio.
- * `drawing` è il disegno tecnico, che non tutti i progetti hanno: `null` dove
- * manca, così la scheda salta il blocco invece di chiedere un file inesistente.
+ * Percorsi immagine di un progetto. `drawing` è `null` dove il disegno manca,
+ * così la scheda salta il blocco invece di chiedere un file inesistente.
  */
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
@@ -429,22 +397,16 @@ export function projectImages(item) {
 }
 
 /*
- * "Lavori selezionati" in homepage: la selezione è solo l'elenco di slug qui
- * sotto, il resto della scheda viene dall'archivio per non duplicare i dati.
- * Uno slug inesistente interrompe la build.
- *
- * Sono i cinque progetti focus del portfolio 2026 (la pagina "5 PROGETTI
- * FOCUS"), nello stesso ordine e con la stessa numerazione, che la home mostra
- * da 01 a 05. Cambiando questo elenco cambia anche la numerazione: è l'indice
- * della posizione, non un dato a parte.
+ * "Lavori selezionati" in home: solo l'elenco di slug, il resto viene
+ * dall'archivio (no duplicati; uno slug errato rompe la build). Sono i cinque
+ * focus del portfolio 2026; l'ordine qui è la numerazione 01–05 mostrata.
  */
 const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'dog-lamp']
 
 export const focusItems = focusSlugs.map((slug) => {
   const item = progetti.find((p) => p.slug === slug)
   if (!item) throw new Error(`focusItems: nessun progetto con slug "${slug}" nell'archivio`)
-  // Solo i campi che la scheda mostra: descrizione, spec e lavori servono alla
-  // pagina di dettaglio, non alla griglia.
+  // Solo i campi che la griglia mostra (desc/spec/works servono al dettaglio).
   const { title, cat, year } = item
   return { slug, title, cat, year, cover: projectImages(item).cover }
 })

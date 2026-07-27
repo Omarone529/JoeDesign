@@ -8,21 +8,16 @@ const PASSO_LETTERA = 0.045 // scarto fra una lettera e la successiva
 const DOPO_NOME = 1.1 // pausa fra la fine del nome e l'invito a scorrere
 
 /*
- * Hero della homepage: il ritratto di Joe sfocato a tutto schermo, il nome in
- * sovrimpressione e la linea nera in fondo - la stessa su cui si appoggia la
- * foto in "Chi sono" - che chiude insieme l'immagine e la sezione.
- *
- * L'ingresso è scaglionato: il nome entra lettera per lettera, poi compare
- * l'invito a scorrere. Alta quanto la finestra meno la navbar
- * (4rem), in `svh` e non `vh` perché su mobile è l'altezza col browser a barre
- * aperte: la linea resta a filo dello schermo invece di finire sotto la barra
- * degli indirizzi.
+ * Hero della homepage: ritratto sfocato a tutto schermo, nome in
+ * sovrimpressione, linea nera in fondo. Ingresso scaglionato (nome lettera per
+ * lettera, poi l'invito a scorrere). Alta 100svh meno la navbar (4rem): `svh`
+ * e non `vh` così su mobile la linea resta a filo, non sotto la barra indirizzi.
  */
 export default function Hero() {
   /*
-   * "Lavori selezionati" è la sezione successiva, non una rotta: salto interno
-   * gestito a mano per rispettare la preferenza sulle animazioni. L'href resta
-   * valido per il tasto centrale e il "copia indirizzo".
+   * "Lavori selezionati" è una sezione, non una rotta: salto interno a mano per
+   * rispettare la preferenza animazioni. L'href resta valido per tasto centrale
+   * e "copia indirizzo".
    */
   const vaiAiLavori = (e) => {
     const lavori = document.getElementById('lavori')
@@ -31,8 +26,7 @@ export default function Hero() {
     lavori.scrollIntoView({ behavior: scorrimento(), block: 'start' })
   }
 
-  // Ritardo progressivo lettera per lettera, contato sull'intero nome e non
-  // sulla singola parola: le lettere entrano in fila da J a A.
+  // Ritardo progressivo contato sull'intero nome (non sulla parola): le lettere entrano in fila.
   let lettereContate = 0
   const parole = profile.displayName.split(' ').map((parola) => ({
     parola,
@@ -44,27 +38,17 @@ export default function Hero() {
 
   const ritardoScorri = PRIMA_LETTERA + lettereContate * PASSO_LETTERA + DOPO_NOME
 
-  // Padding verticale simmetrico: ora che il nome è l'unico contenuto,
-  // `justify-center` lo lascia esattamente al centro della sezione.
+  // Nome unico contenuto: `justify-center` lo centra nella sezione.
   return (
     <section className="relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center overflow-hidden border-b-2 border-ink px-5 py-24 text-center sm:px-8 lg:px-[72px]">
       {/*
-       * Sfondo. `object-contain` tiene la figura intera dentro l'altezza della
-       * sezione - ritagliandola (`cover`) su schermo largo resterebbe solo la
-       * testa - e `object-bottom` la appoggia alla linea in fondo.
-       *
-       * `mix-blend-multiply` fa sparire il riquadro della foto: il fondo dello
-       * scatto è bianco pieno (#fff) e sulla carta del sito, più calda, si
-       * vedeva come una toppa più chiara. Moltiplicato sul fondo carta del
-       * contenitore, il bianco diventa esattamente la carta - qualunque colore
-       * abbia in palette - mentre la figura si scurisce del 4%, che non si nota.
-       * Per questo il fondo `bg-paper` sta sul contenitore e non sulla sezione:
-       * la fusione avviene con ciò che è dipinto sotto, nello stesso strato.
-       *
-       * La sfocatura è in CSS e non nel file, così resta regolabile. Il velo di
-       * carta sopra tiene il contrasto del testo costante anche dove la foto è
-       * scura (il cappello) e mantiene la dominante del sito; essendo carta su
-       * carta, non reintroduce alcuno stacco.
+       * Sfondo. `object-contain` + `object-bottom`: figura intera appoggiata
+       * alla linea in fondo (`cover` mostrerebbe solo la testa). Il fondo dello
+       * scatto è bianco (#fff): `mix-blend-multiply` sul `bg-paper` del
+       * contenitore lo fonde con la carta e fa sparire il riquadro (la figura
+       * si scurisce del 4%, impercettibile) - per questo il fondo sta sul
+       * contenitore. Sfocatura in CSS (regolabile); il velo carta sopra tiene
+       * il contrasto del testo costante dov'è scura.
        */}
       <div aria-hidden="true" className="absolute inset-0 bg-paper">
         <img
@@ -80,10 +64,8 @@ export default function Hero() {
       </div>
 
       {/*
-       * Segno grafico in alto a destra: la freccia obliqua che in footer segue
-       * l'indirizzo email, qui in grande come accento della hero. Allineata al
-       * margine della sezione, entra insieme all'invito a scorrere così i due
-       * segni incorniciano il nome.
+       * Freccia obliqua in alto a destra (la stessa del footer, qui in grande).
+       * Entra con l'invito a scorrere, così i due segni incorniciano il nome.
        */}
       <FrecciaObliqua
         style={{ animationDelay: `${ritardoScorri}s` }}
@@ -91,19 +73,12 @@ export default function Hero() {
       />
 
       {/*
-       * Peso medio (500): su macOS e iOS lo prende Helvetica Neue Medium, su
-       * Windows - dove Helvetica non c'è - Arial ha solo chiaro e nero e
-       * ricade sul chiaro. Tracking -50 della crenatura tipografica, cioè
-       * -0.05em.
-       *
-       * Corpo derivato dalla larghezza disponibile, non dal viewport: con
-       * questo peso e questo tracking "SARCHIOLLA" misura 5.99em e
-       * "JOE SARCHIOLLA" 8.10em. Il corpo è quindi larghezza / quella misura,
-       * meno un margine perché il nome respiri ai lati e per le differenze fra
-       * Helvetica Neue, Helvetica e Arial (i coefficienti tengono conto del
-       * padding di ogni breakpoint). Da ricalcolare se cambiano padding,
-       * tracking o peso. Sotto md il nome va a capo e si dimensiona sulla
-       * parola più lunga, altrimenti resterebbe minuto.
+       * Peso medio (500; su Windows senza Helvetica, Arial ricade sul chiaro),
+       * tracking -0.05em. Corpo derivato dalla larghezza, non dal viewport:
+       * "SARCHIOLLA" misura 5.99em e "JOE SARCHIOLLA" 8.10em, quindi corpo =
+       * larghezza / quella misura, meno un margine (i coefficienti includono il
+       * padding di ogni breakpoint). Ricalcolare se cambiano padding, tracking
+       * o peso. Sotto md il nome va a capo, dimensionato sulla parola più lunga.
        */}
       <h1
         aria-label={profile.displayName}
@@ -111,9 +86,7 @@ export default function Hero() {
       >
         {parole.map(({ parola, lettere }, i) => (
           <Fragment key={parola}>
-            {/* Lo spazio separa le parole nel testo estratto dai crawler, che
-                leggono "JoeSarchiolla" se i due span si toccano. Fra i due
-                blocchi impilati (sotto md) non produce nulla. */}
+            {/* Spazio per i crawler: senza, leggono "JoeSarchiolla". */}
             {i > 0 && ' '}
             <span className="block md:inline-block">
               {lettere.map(({ lettera, ritardo }, j) => (
@@ -130,10 +103,9 @@ export default function Hero() {
         ))}
       </h1>
 
-      {/* Fuori dal blocco centrato per restare appoggiato alla linea. Il
-          contenitore porta il centraggio e il link l'animazione: sullo stesso
-          elemento la trasformazione dell'ingresso cancellerebbe quella del
-          centraggio. */}
+      {/* Fuori dal blocco centrato per restare sulla linea. Contenitore =
+          centraggio, link = animazione: sullo stesso elemento le due transform
+          si annullerebbero. */}
       <div className="absolute inset-x-0 bottom-7 flex justify-center">
         <a
           href="#lavori"
@@ -155,11 +127,8 @@ export default function Hero() {
 }
 
 /*
- * Freccia obliqua disegnata, non il carattere ↗: il glifo di sistema ha l'asta
- * corta e la punta minuta, e ingrandito non regge come segno grafico. Qui
- * l'asta attraversa quasi tutta la cornice e le due stanghette della punta sono
- * lunghe metà dell'asta. Tratto in `currentColor`, quindi segue il colore del
- * testo. Decorativa.
+ * Freccia obliqua disegnata, non il carattere ↗ (ingrandito non regge come
+ * segno grafico). Tratto in `currentColor`, segue il testo. Decorativa.
  */
 function FrecciaObliqua({ className = '', style }) {
   return (

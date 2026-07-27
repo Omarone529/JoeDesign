@@ -2,9 +2,8 @@ import { about, profile } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * "Chi sono" - deriva dalla pagina "MI PRESENTO" del portfolio.
- * Hero a due colonne (testo / ritratto scontornato), poi manifesto, galleria e
- * CV su due colonne. Contenuti in siteData.about, tono impersonale.
+ * "Chi sono" (dalla pagina "MI PRESENTO" del portfolio): hero a due colonne,
+ * manifesto, galleria, CV. Contenuti in siteData.about, tono impersonale.
  */
 export default function About() {
   const { hero, lab, flue, dado } = about.photos
@@ -12,9 +11,8 @@ export default function About() {
   return (
     <main className="animate-viewIn">
       {/*
-       * Hero alta quanto la finestra meno la navbar (4rem).
-       * Il padding superiore sta sulla colonna di testo e non sulla sezione,
-       * così la foto parte a filo del bordo alto senza margini negativi.
+       * Hero alta quanto la finestra meno la navbar (4rem). Il padding alto sta
+       * sulla colonna di testo, così la foto parte a filo del bordo.
        */}
       <section className="grid grid-cols-1 gap-y-10 border-b-2 border-ink px-5 sm:px-8 md:min-h-[calc(100vh-4rem)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
         <div className="flex flex-col pt-10 sm:pt-14 md:col-start-1 md:row-start-1 lg:pt-16">
@@ -23,11 +21,10 @@ export default function About() {
             {about.intro}
           </p>
           {/*
-           * Corpo derivato dalla larghezza della colonna, non dal viewport:
-           * "SARCHIOLLA" misura 6.355em col tracking applicato, quindi
-           * corpo = larghezza colonna / 6.355 (i coefficienti includono padding
-           * e gutter di ogni breakpoint). Da ricalcolare se cambiano griglia,
-           * padding o tracking.
+           * Corpo derivato dalla larghezza colonna (non dal viewport):
+           * = larghezza / 6.355 (misura di "SARCHIOLLA" col tracking; i
+           * coefficienti includono padding e gutter). Ricalcolare se cambiano
+           * griglia, padding o tracking.
            */}
           <h1
             aria-label={profile.displayName}
@@ -41,10 +38,9 @@ export default function About() {
         </div>
 
         {/*
-         * Da md la foto riempie in altezza la cella, così il suo fondo coincide
-         * col bordo inferiore della sezione. object-cover ritaglia sui lati, dove
-         * il ritaglio ha margini trasparenti; object-top protegge la testa quando
-         * la finestra è più bassa del rapporto naturale.
+         * Da md la foto riempie la cella in altezza (fondo a filo della
+         * sezione). `object-cover` ritaglia sui lati, `object-top` protegge la
+         * testa su finestre basse.
          */}
         <div className="mx-auto w-full max-w-[440px] md:col-start-2 md:row-start-1 md:max-w-none">
           <img
@@ -58,10 +54,8 @@ export default function About() {
         </div>
       </section>
 
-      {/*
-       * CV su due colonne. Da lg la scala tipografica sale (14→17 px) e le
-       * spaziature si aprono: la scala mobile su colonne larghe risulta minuta.
-       */}
+      {/* CV su due colonne. Da lg la scala sale (14→17px): su colonne larghe
+          quella mobile risulta minuta. */}
       <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
         <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
           <div className="space-y-12 lg:space-y-16">
@@ -110,7 +104,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Citazione / manifesto */}
       <section className="border-t-2 border-ink px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
         <blockquote className="m-0 max-w-[24ch] text-[clamp(26px,4vw,56px)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
           “{profile.manifesto}”
@@ -141,7 +134,6 @@ export default function About() {
         ))}
       </section>
 
-      {/* Navigazione */}
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link
           to="/archivio"
@@ -167,11 +159,9 @@ export default function About() {
 }
 
 /*
- * Sezione del CV con etichetta e freccia, come nel portfolio stampato.
- *
- * La freccia è seguita da U+FE0E (variation selector-15), che forza la resa
- * testuale: le diagonali ↖ ↗ ↘ ↙ e le bidirezionali ↔ ↕ hanno una variante
- * emoji e su iOS/Android verrebbero disegnate a colori. ← → ↑ ↓ non ce l'hanno.
+ * Sezione CV con etichetta e freccia. La freccia porta U+FE0E (VS-15) che
+ * forza la resa testuale: le diagonali ↖↗↘↙ e le bidirezionali ↔↕ hanno una
+ * variante emoji e su iOS/Android uscirebbero a colori (← → ↑ ↓ no).
  */
 function ArrowBlock({ label, children }) {
   return (
