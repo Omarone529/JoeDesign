@@ -12,7 +12,7 @@ export default function SelectedWorks() {
       id="lavori"
       className="px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20"
     >
-      <div className="mb-6 flex items-baseline justify-between sm:mb-8 lg:mb-12">
+      <div className="mb-5 flex items-baseline justify-between sm:mb-6 lg:mb-8">
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
           Lavori selezionati
         </h2>
@@ -28,15 +28,6 @@ export default function SelectedWorks() {
         {focusItems.map((p, i) => (
           <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
             <article>
-              {/* Numero e anno sopra la foto: la numerazione del portfolio. */}
-              <div className="mb-3 flex items-baseline justify-between gap-3 border-t border-line pt-2">
-                <span className="text-[11px] tracking-[0.2em] text-muted">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="whitespace-nowrap text-[11px] tracking-[0.12em] text-muted">
-                  {p.year}
-                </span>
-              </div>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 {/* Prima riga in viewport: niente lazy per non ritardarla. */}
                 <img
