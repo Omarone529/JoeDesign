@@ -54,7 +54,9 @@ export default function Footer() {
            * ma largo quanto il testo così l'hover non invade la colonna.
            */}
           <a
-            href={`mailto:${profile.email}`}
+            href={profile.emailHref}
+            target="_blank"
+            rel="noreferrer"
             className="group mt-5 flex w-fit items-baseline gap-2.5 text-[clamp(20px,2.2vw,29px)] font-bold tracking-[-0.015em] transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-night-soft"
           >
             <span className="relative break-words">
@@ -90,7 +92,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <nav aria-label="Pagine del sito" className="md:col-span-3">
+        <nav aria-label="Pagine del sito" className="col-span-2 md:col-span-6">
           <Occhiello>Pagine</Occhiello>
           <ul className="m-0 mt-5 list-none space-y-3 p-0">
             {pagine.map((p) => (
@@ -106,22 +108,6 @@ export default function Footer() {
             ))}
           </ul>
         </nav>
-
-        {/* Recapiti: solo il telefono. La sede è già nella riga di chiusura accanto. */}
-        <div className="md:col-span-3">
-          <Occhiello>Recapiti</Occhiello>
-          <ul className="m-0 mt-5 list-none p-0">
-            <li>
-              <a
-                href={profile.phoneHref}
-                className="group relative inline-block whitespace-nowrap text-[15px] text-night-soft transition-colors duration-300 hover:text-paper"
-              >
-                {profile.phone}
-                <Sottolineatura />
-              </a>
-            </li>
-          </ul>
-        </div>
       </div>
 
       <div

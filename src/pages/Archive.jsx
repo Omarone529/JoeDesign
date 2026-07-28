@@ -9,16 +9,10 @@ import { Link } from '../router'
 export default function Archive() {
   return (
     <main className="animate-viewIn">
-      <section className="px-5 pb-8 pt-12 sm:px-8 sm:pb-12 sm:pt-20 lg:px-[72px] lg:pt-[120px]">
-        <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[1.35fr_.65fr] lg:gap-16">
-          <h1 className="m-0 text-[clamp(48px,10.5vw,168px)] font-bold uppercase leading-[0.9] tracking-[-0.02em]">
-            Archivio
-          </h1>
-          <p className="pb-2 text-[clamp(15px,1.4vw,19px)] leading-[1.5]">
-            Tutti i progetti: prodotto, arredo, packaging e grafica.
-            Ogni scheda raccoglie la galleria completa del lavoro.
-          </p>
-        </div>
+      <section className="px-5 pb-8 pt-12 text-center sm:px-8 sm:pb-12 sm:pt-20 lg:px-[72px] lg:pt-[120px]">
+        <h1 className="m-0 text-[clamp(48px,10.5vw,168px)] font-bold uppercase leading-[0.9] tracking-[-0.02em]">
+          Archivio
+        </h1>
       </section>
 
       <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-[72px] lg:pb-28">
@@ -43,7 +37,7 @@ export default function Archive() {
             return (
               <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
                 <article>
-                  <div className="aspect-[4/5] overflow-hidden bg-placeholder">
+                  <div className="aspect-square overflow-hidden bg-placeholder">
                     <img
                       src={cover}
                       alt={p.title}

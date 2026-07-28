@@ -14,8 +14,8 @@ export const profile = {
   handle: 'joesarchiolla.design',
   instagram: 'https://instagram.com/joesarchiolla.design',
   email: 'joe.artedesign@gmail.com',
-  phone: '+39 333 8238671',
-  phoneHref: 'tel:+393338238671',
+  // Apre la compose di Gmail (web) invece dell'app di posta predefinita del sistema.
+  emailHref: 'https://mail.google.com/mail/?view=cm&fs=1&to=joe.artedesign@gmail.com',
   manifesto:
     'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
 }

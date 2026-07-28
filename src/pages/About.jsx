@@ -92,10 +92,12 @@ export default function About() {
 
             <ArrowBlock label="Contacts">
               <div className="space-y-1 text-[15px] lg:space-y-2 lg:text-[17px]">
-                <a href={profile.phoneHref} className="block hover:underline">
-                  {profile.phone}
-                </a>
-                <a href={`mailto:${profile.email}`} className="block break-all hover:underline">
+                <a
+                  href={profile.emailHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block break-all hover:underline"
+                >
                   {profile.email}
                 </a>
               </div>
@@ -145,7 +147,9 @@ export default function About() {
           </div>
         </Link>
         <a
-          href={`mailto:${profile.email}`}
+          href={profile.emailHref}
+          target="_blank"
+          rel="noreferrer"
           className="group px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
         >
           <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Scrivimi</div>

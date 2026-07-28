@@ -104,7 +104,7 @@ export default function Navbar({ route }) {
         {/* Nome + marchio Instagram. Centrato solo da md: sotto non ci starebbe
             e resta in linea nel flusso (justify-between). */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
-          <span className="whitespace-nowrap text-[11px] font-normal uppercase tracking-[0.1em] sm:text-[13px] sm:tracking-[0.14em] lg:text-[15px] lg:tracking-[0.18em]">
+          <span className="whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
           </span>
           <a
