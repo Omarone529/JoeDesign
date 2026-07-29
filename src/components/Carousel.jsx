@@ -51,7 +51,7 @@ export default function Carousel({ images, title }) {
 
   return (
     <div
-      className="group relative mx-auto w-full max-w-[1500px]"
+      className="group relative mx-auto w-full max-w-[1500px] md:mx-0 md:max-w-none"
       role="group"
       aria-roledescription="carosello"
       aria-label={`Immagini di ${title}`}
@@ -62,11 +62,14 @@ export default function Carousel({ images, title }) {
     >
       {/*
        * Cornice a misura fissa (non dipende dal formato mostrato, così non si
-       * muove cambiando foto). Altezza legata al viewport ma limitata: lascia
-       * spazio a testata sopra e disegno tecnico sotto.
+       * muove cambiando foto). Su mobile/tablet altezza legata al viewport ma
+       * limitata: lascia spazio a testata sopra e disegno tecnico sotto. Da
+       * desktop (md, colonna a piena larghezza fino al bordo destro dello
+       * schermo) l'altezza sale molto: la foto occupa davvero il quadrante
+       * destro della pagina, grande.
        */}
       <div
-        className="relative h-[clamp(320px,54vh,480px)] cursor-pointer select-none overflow-hidden bg-placeholder sm:h-[clamp(400px,62vh,620px)] lg:h-[clamp(360px,58vh,700px)]"
+        className="relative h-[clamp(320px,54vh,480px)] cursor-pointer select-none overflow-hidden bg-placeholder sm:h-[clamp(400px,62vh,620px)] md:h-[clamp(480px,72vh,880px)]"
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
         // Clic sulla foto = pausa/ripresa; i clic sui comandi e gli swipe non contano.
@@ -100,7 +103,6 @@ export default function Carousel({ images, title }) {
           )
         })}
 
-        {/* Frecce - solo da desktop e in hover: da telefono si trascina il dito */}
         {n > 1 && (
           <>
             <button

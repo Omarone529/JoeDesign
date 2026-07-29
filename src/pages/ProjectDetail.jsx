@@ -20,29 +20,30 @@ export default function ProjectDetail({ slug }) {
 
   return (
     <main className="animate-viewIn">
-      <section className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
-        <Link
-          to="/archivio"
-          className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
-        >
-          ← Archivio
-        </Link>
+      {/*
+       * Fascia 1 · titolo + descrizione a sinistra, foto a destra, allineati
+       * in cima (stessa riga della griglia, stesso padding-top): la foto
+       * parte dall'altezza del titolo, non da quella della descrizione. Da
+       * desktop la colonna foto esce dal contenitore e arriva al bordo destro
+       * dello schermo (nessun padding, nessun max-width): occupa il
+       * quadrante destro della pagina, grande. Su telefono resta impaginata
+       * come prima (colonna unica, titolo e descrizione sopra, foto sotto).
+       */}
+      <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12">
+        <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
+          <Link
+            to="/archivio"
+            className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
+          >
+            ← Archivio
+          </Link>
 
-        {/* Titolo più contenuto: sotto deve entrare tutta la scheda nella prima schermata. */}
-        <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
-          {item.title}
-        </h1>
+          {/* Titolo più contenuto: sotto deve entrare tutta la scheda nella prima schermata. */}
+          <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
+            {item.title}
+          </h1>
 
-        {/*
-         * Scheda a due fasce: testo a sinistra, immagini a destra. In alto
-         * descrizione + carosello, in basso dati tecnici + disegno. La colonna
-         * immagini resta stretta (celle ~3:4, come l'archivio, poco ritaglio);
-         * il testo è fermato a 52 caratteri. Su telefono le 4 celle si
-         * incolonnano: descrizione, foto, dati, disegno.
-         */}
-        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 border-t border-line pt-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start md:gap-y-14 lg:mt-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12 lg:pt-8">
-          {/* Fascia 1 · descrizione */}
-          <div>
+          <div className="mt-8 border-t border-line pt-8">
             <div className="mb-4 text-[10px] uppercase tracking-[0.24em] text-muted">
               {item.cat}
             </div>
@@ -50,11 +51,20 @@ export default function ProjectDetail({ slug }) {
               {item.desc}
             </p>
           </div>
+        </div>
 
-          {/* Fascia 1 · carosello con avanzamento automatico */}
+        <div className="px-5 pt-8 sm:px-8 sm:pt-12 md:px-0 lg:pt-12">
           <Carousel images={slides} title={item.title} />
+        </div>
+      </div>
 
-          {/* Fascia 2 · scheda tecnica */}
+      <section className="px-5 sm:px-8 lg:px-[72px]">
+        {/*
+         * Fascia 2 · dati tecnici + disegno. Torna nel contenitore standard
+         * (niente bleed qui): stessa larghezza colonne di prima dell'ultima
+         * modifica.
+         */}
+        <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 md:mt-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-y-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12">
           <div className="border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Progetto</div>
             {/* Voce a sinistra, valore a destra: tiene la colonna anche larga. */}
