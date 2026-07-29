@@ -103,7 +103,7 @@ export default function Footer() {
 
         {/* Riga di chiusura: descrive, non è un recapito. */}
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
-          {profile.role}, con base a {profile.place}.
+          {profile.role}, di {profile.place}.
         </p>
       </div>
 

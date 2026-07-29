@@ -208,7 +208,7 @@ scripts/
 
 I testi delle pagine sono in **tono impersonale** (no prima persona "io", no terza
 persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product designer,
-con base a Reggio Emilia», «Si parte da un vincolo…». Mantenere questo registro ovunque.
+ di Reggio Emilia», «Si parte da un vincolo…». Mantenere questo registro ovunque.
 
 ## Deploy (Netlify)
 
