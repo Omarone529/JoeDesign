@@ -29,7 +29,6 @@ export default function Carousel({ images, title }) {
     tocco.current = { x: t.clientX, y: t.clientY, trascinato: false }
   }
 
-  // Cambia foto solo se il movimento è chiaramente orizzontale (lo scroll verticale resta libero).
   const fineTocco = (e) => {
     if (!tocco.current) return
     const t = e.changedTouches[0]
