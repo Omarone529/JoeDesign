@@ -50,27 +50,20 @@ export default function Footer() {
           <Occhiello>Contatti</Occhiello>
 
           {/*
-           * Elemento di primo livello del footer (il resto sta sotto, a 15px).
-           * `flex w-fit`: box di blocco perché i due canali restino incolonnati,
+           * `flex w-fit`: box di blocco perché i canali restino incolonnati,
            * ma largo quanto il testo così l'hover non invade la colonna.
+           * Stessa resa di Instagram/YouTube/TikTok qui sotto: icona + testo.
            */}
           <a
             href={profile.emailHref}
             target="_blank"
             rel="noreferrer"
-            className="group mt-5 flex w-fit items-baseline gap-2.5 text-[clamp(20px,2.2vw,29px)] font-bold tracking-[-0.015em] transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-night-soft"
+            className="group mt-5 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
           >
+            <LogoGmail className="h-[18px] w-[18px] shrink-0" />
             <span className="relative break-words">
               {profile.email}
               <Sottolineatura />
-            </span>
-            {/* U+FE0E: forza la resa testuale della freccia, che altrimenti su
-                iOS e Android esce come emoji a colori (vedi About.jsx) */}
-            <span
-              aria-hidden="true"
-              className="text-[0.55em] transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-translate-y-1 group-hover:translate-x-1"
-            >
-              {'↗︎'}
             </span>
           </a>
 
@@ -177,6 +170,29 @@ function Sottolineatura() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-current transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-x-100 group-focus-visible:scale-x-100"
     />
+  )
+}
+
+/*
+ * Icona busta (email) SVG inline, stesso trattamento delle altre icone del
+ * footer (stroke in currentColor, decorativo: l'indirizzo è nel testo accanto).
+ */
+function LogoGmail({ className = '' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2.75" y="5.75" width="18.5" height="12.5" rx="2.5" />
+      <path d="M3.5 6.75l8.5 6.5 8.5-6.5" />
+    </svg>
   )
 }
 

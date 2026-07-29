@@ -72,8 +72,6 @@ export const about = {
   photos: {
     hero: { src: '/images/about/joe-cutout.webp', alt: 'Ritratto di Joe Sarchiolla a braccia conserte' },
     lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
-    flue: { src: '/images/about/joe-flue.webp', alt: 'La lampada FLUE osservata durante la lavorazione' },
-    dado: { src: '/images/about/joe-dado.webp', alt: 'Un prototipo di lampada in stampa 3D' },
   },
 }
 

@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import FloatingMailButton from './components/FloatingMailButton'
 import Home from './pages/Home'
 import About from './pages/About'
 import Archive from './pages/Archive'
@@ -19,6 +20,7 @@ export default function App() {
       {route.name === 'notfound' && <NotFound />}
       {route.name === 'home' && <Home />}
       <Footer />
+      <FloatingMailButton />
     </div>
   )
 }
