@@ -78,6 +78,8 @@ export const about = {
 /*
  * Archivio: tutti i progetti. `photos` = numero di foto galleria (NN.webp);
  * `disegno: true` = esiste disegno.webp (da `scripts/pdf-disegno.js`).
+ * `sfondo: true` = esiste sfondo.webp, immagine di sfondo mostrata in fondo
+ * alla scheda progetto (sopra la navigazione prev/next).
  * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
  * Questo ordine vale solo a parità di anno: l'ordinamento lo applica `archive`.
  */
@@ -119,6 +121,7 @@ const progetti = [
     year: '2026',
     photos: 9,
     disegno: true,
+    sfondo: true,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
       Oggetto: 'Lampada',
@@ -224,6 +227,7 @@ const progetti = [
     year: '2025',
     photos: 5,
     disegno: true,
+    sfondo: true,
     desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
     spec: {
       Oggetto: 'Postazione di lavoro',
@@ -393,6 +397,7 @@ export function projectImages(item) {
     cover: `${base}/cover.webp`,
     gallery,
     drawing: item.disegno ? `${base}/disegno.webp` : null,
+    sfondo: item.sfondo ? `${base}/sfondo.webp` : null,
   }
 }
 

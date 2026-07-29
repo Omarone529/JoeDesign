@@ -6,7 +6,7 @@ export default function ProjectDetail({ slug }) {
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
-  const { cover, gallery, drawing } = projectImages(item)
+  const { cover, gallery, drawing, sfondo } = projectImages(item)
   const slides = [cover, ...gallery]
   const prev = archive[(index - 1 + archive.length) % archive.length]
   const next = archive[(index + 1) % archive.length]
@@ -122,6 +122,21 @@ export default function ProjectDetail({ slug }) {
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Immagine di sfondo del progetto */}
+      {sfondo && (
+        <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
+          <figure className="m-0 border-t border-line pt-6">
+            <img
+              src={sfondo}
+              alt={`Immagine di sfondo di ${item.title}`}
+              loading="lazy"
+              decoding="async"
+              className="w-full object-cover"
+            />
+          </figure>
         </section>
       )}
 
