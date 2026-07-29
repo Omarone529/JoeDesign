@@ -6,7 +6,7 @@ import { Link } from '../router'
  * manifesto, galleria, CV. Contenuti in siteData.about, tono impersonale.
  */
 export default function About() {
-  const { hero, lab, flue, dado } = about.photos
+  const { hero, lab } = about.photos
 
   return (
     <main className="animate-viewIn">
@@ -112,7 +112,7 @@ export default function About() {
         </blockquote>
       </section>
 
-      {/* Fascia a piena larghezza: altezza naturale, nessun ritaglio */}
+      {/* Fascia a piena larghezza: altezza ridotta ritagliando solo il fondo */}
       <section className="bg-night">
         <img
           src={lab.src}
@@ -120,22 +120,9 @@ export default function About() {
           loading="lazy"
           width="1900"
           height="1425"
-          className="block h-auto w-full"
+          className="block aspect-[16/9] w-full object-cover object-top"
         />
       </section>
-      <section className="grid grid-cols-1 sm:grid-cols-2">
-        {[flue, dado].map((ph) => (
-          <div key={ph.src} className="bg-placeholder">
-            <img
-              src={ph.src}
-              alt={ph.alt}
-              loading="lazy"
-              className="aspect-[3/4] w-full object-cover contrast-[1.02]"
-            />
-          </div>
-        ))}
-      </section>
-
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link
           to="/archivio"
