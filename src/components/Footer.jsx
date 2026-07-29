@@ -3,10 +3,10 @@ import { scorrimento } from '../motion'
 import { Link } from '../router'
 
 /*
- * Footer condiviso, che fa anche da pagina contatti (assente): qui i recapiti,
- * ognuno una volta sola. A sinistra i canali (email, Instagram, YouTube,
- * TikTok), a destra i link, in fondo la riga legale. Le colonne le separano
- * gli spazi, non i bordi.
+ * Footer condiviso, che fa anche da pagina contatti (assente): qui i
+ * recapiti, ognuno una volta sola. Struttura centrata a blocco unico (canali,
+ * pagine, riga descrittiva, poi la coda legale) invece delle due colonne
+ * precedenti: stessi link, disposizione ispirata a omarbayadi.com.
  */
 /*
  * Anno del copyright fissato a build-time (Vite lo inlinea). Non
@@ -40,86 +40,15 @@ export default function Footer() {
       tabIndex={-1}
       className="scroll-mt-16 bg-night text-paper focus:outline-none"
     >
-      <div className="grid grid-cols-2 gap-x-8 gap-y-12 px-5 py-14 sm:px-8 sm:py-16 md:grid-cols-12 md:gap-x-10 lg:px-[72px] lg:py-20">
-        {/*
-         * Contatti diretti. Occhiello come le altre due colonne, così le tre
-         * teste sono pari grado. Il nome per esteso non si ripete: è già in
-         * barra e nella riga di copyright.
-         */}
-        <div className="col-span-2 md:col-span-6 md:pr-10">
-          <Occhiello>Contatti</Occhiello>
-
-          {/*
-           * `flex w-fit`: box di blocco perché i canali restino incolonnati,
-           * ma largo quanto il testo così l'hover non invade la colonna.
-           * Stessa resa di Instagram/YouTube/TikTok qui sotto: icona + testo.
-           */}
-          <a
-            href={profile.emailHref}
-            target="_blank"
-            rel="noreferrer"
-            className="group mt-5 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
-          >
-            <LogoGmail className="h-[18px] w-[18px] shrink-0" />
-            <span className="relative break-words">
-              {profile.email}
-              <Sottolineatura />
-            </span>
-          </a>
-
-          <a
-            href={profile.instagram}
-            target="_blank"
-            rel="noreferrer"
-            className="group mt-4 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
-          >
-            <LogoInstagram className="h-[18px] w-[18px] shrink-0" />
-            <span className="relative">
-              @{profile.handle}
-              <Sottolineatura />
-            </span>
-          </a>
-
-          <a
-            href={profile.youtube}
-            target="_blank"
-            rel="noreferrer"
-            className="group mt-4 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
-          >
-            <LogoYoutube className="h-[18px] w-[18px] shrink-0" />
-            <span className="relative">
-              Joe Sarchiolla
-              <Sottolineatura />
-            </span>
-          </a>
-
-          <a
-            href={profile.tiktok}
-            target="_blank"
-            rel="noreferrer"
-            className="group mt-4 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
-          >
-            <LogoTiktok className="h-[18px] w-[18px] shrink-0" />
-            <span className="relative">
-              @design.by.joesarchiolla
-              <Sottolineatura />
-            </span>
-          </a>
-
-          {/* Riga di chiusura: descrive, non è un recapito. */}
-          <p className="m-0 mt-7 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
-            {profile.role}, con base a {profile.place}.
-          </p>
-        </div>
-
-        <nav aria-label="Pagine del sito" className="col-span-2 md:col-span-6">
-          <Occhiello>Pagine</Occhiello>
-          <ul className="m-0 mt-5 list-none space-y-3 p-0">
+      <div className="flex flex-col items-center px-5 py-14 text-center sm:px-8 sm:py-16 lg:px-[72px] lg:py-20">
+        {/* Pagine, in cima. */}
+        <nav aria-label="Pagine del sito">
+          <ul className="m-0 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 p-0 list-none">
             {pagine.map((p) => (
               <li key={p.to}>
                 <Link
                   to={p.to}
-                  className="group relative inline-block text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 hover:text-paper"
+                  className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-paper"
                 >
                   {p.label}
                   <Sottolineatura />
@@ -128,10 +57,58 @@ export default function Footer() {
             ))}
           </ul>
         </nav>
+
+        {/* Canali, solo icona: l'indirizzo/handle non si ripete, c'è già nel target del link. */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
+          <a
+            href={profile.emailHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Scrivi a ${profile.email}`}
+            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+          >
+            <LogoGmail className="h-5 w-5" />
+          </a>
+
+          <a
+            href={profile.instagram}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`@${profile.handle} su Instagram`}
+            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+          >
+            <LogoInstagram className="h-5 w-5" />
+          </a>
+
+          <a
+            href={profile.youtube}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Joe Sarchiolla su YouTube"
+            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+          >
+            <LogoYoutube className="h-5 w-5" />
+          </a>
+
+          <a
+            href={profile.tiktok}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Joe Sarchiolla su TikTok"
+            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+          >
+            <LogoTiktok className="h-5 w-5" />
+          </a>
+        </div>
+
+        {/* Riga di chiusura: descrive, non è un recapito. */}
+        <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
+          {profile.role}, con base a {profile.place}.
+        </p>
       </div>
 
       <div
-        className={`flex flex-col gap-4 border-t ${FILETTO} px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-[72px]`}
+        className={`flex flex-col items-center gap-3 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
         <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
           © {ANNO} {profile.name} · Tutti i diritti riservati
@@ -139,7 +116,7 @@ export default function Footer() {
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scorrimento() })}
-          className="group flex items-center gap-2 self-start text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-paper sm:self-auto"
+          className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-paper"
         >
           Torna su
           <span
@@ -152,11 +129,6 @@ export default function Footer() {
       </div>
     </footer>
   )
-}
-
-/* Etichetta di colonna: maiuscoletto spaziato, come negli occhielli del sito. */
-function Occhiello({ children }) {
-  return <div className="text-[10px] uppercase tracking-[0.24em] text-muted">{children}</div>
 }
 
 /*
