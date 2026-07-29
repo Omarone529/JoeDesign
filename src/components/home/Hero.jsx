@@ -98,6 +98,17 @@ export default function Hero() {
                   {lettera}
                 </span>
               ))}
+              {/* ™ solo dopo l'ultima parola (il cognome): fuori da `lettere`,
+                  così non conta per la cadenza né per il calcolo del corpo. */}
+              {i === parole.length - 1 && (
+                <sup
+                  aria-hidden="true"
+                  style={{ animationDelay: `${lettere[lettere.length - 1].ritardo + PASSO_LETTERA}s` }}
+                  className="ml-[0.08em] inline-block animate-letterIn align-super text-[0.32em] font-normal tracking-normal motion-reduce:animate-none"
+                >
+                  ™
+                </sup>
+              )}
             </span>
           </Fragment>
         ))}

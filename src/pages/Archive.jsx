@@ -2,9 +2,9 @@ import { archive, periodoArchivio, projectImages } from '../data/siteData'
 import { Link } from '../router'
 
 /*
- * Archivio: griglia completa dei progetti, dal più recente. Immagine 4:5 con
- * zoom in hover, ogni scheda apre /progetto/<slug>. Conteggio e periodo in
- * testa sono calcolati dai dati.
+ * Archivio: griglia completa dei progetti, dal più recente. Scheda intera che
+ * si ingrandisce leggermente in hover, ogni scheda apre /progetto/<slug>.
+ * Conteggio e periodo in testa sono calcolati dai dati.
  */
 export default function Archive() {
   return (
@@ -35,7 +35,11 @@ export default function Archive() {
             // Prime due righe (8 celle): in viewport all'apertura, richieste subito.
             const subito = i < 8
             return (
-              <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
+              <Link
+                key={p.slug}
+                to={`/progetto/${p.slug}`}
+                className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
+              >
                 <article>
                   <div className="aspect-square overflow-hidden bg-placeholder">
                     <img
@@ -44,7 +48,7 @@ export default function Archive() {
                       loading={subito ? 'eager' : 'lazy'}
                       fetchpriority={i < 4 ? 'high' : undefined}
                       decoding="async"
-                      className="h-full w-full object-cover contrast-[1.02] transition-transform duration-[800ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-105"
+                      className="h-full w-full object-cover contrast-[1.02]"
                     />
                   </div>
                   <div className="mt-3 flex items-baseline justify-between gap-3">

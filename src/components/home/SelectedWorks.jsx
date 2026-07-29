@@ -3,8 +3,9 @@ import { Link } from '../../router'
 
 /*
  * "Lavori selezionati": i cinque progetti focus del portfolio 2026, numerati
- * 01–05 (selezione in `focusSlugs`). Griglia 1→2→3→5 colonne, zoom in hover,
- * ogni scheda apre /progetto/<slug>. La linea dalla hero la disegna la hero.
+ * 01–05 (selezione in `focusSlugs`). Griglia 1→2→3→5 colonne, la scheda intera
+ * si ingrandisce leggermente in hover, ogni scheda apre /progetto/<slug>.
+ * La linea dalla hero la disegna la hero.
  */
 export default function SelectedWorks() {
   return (
@@ -26,7 +27,11 @@ export default function SelectedWorks() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-5">
         {focusItems.map((p, i) => (
-          <Link key={p.slug} to={`/progetto/${p.slug}`} className="group block cursor-pointer">
+          <Link
+            key={p.slug}
+            to={`/progetto/${p.slug}`}
+            className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
+          >
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 {/* Prima riga in viewport: niente lazy per non ritardarla. */}
@@ -36,7 +41,7 @@ export default function SelectedWorks() {
                   loading={i < 3 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}
                   decoding="async"
-                  className="h-full w-full object-cover contrast-[1.02] transition-transform duration-[800ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-105"
+                  className="h-full w-full object-cover contrast-[1.02]"
                 />
               </div>
               <div className="mt-3">

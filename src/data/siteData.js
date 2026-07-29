@@ -13,6 +13,8 @@ export const profile = {
   formazione: 'Accademia di Belle Arti, Bologna',
   handle: 'joesarchiolla.design',
   instagram: 'https://instagram.com/joesarchiolla.design',
+  youtube: 'https://www.youtube.com/@design.by.joesarchiolla',
+  tiktok: 'https://www.tiktok.com/@design.by.joesarchiolla',
   email: 'joe.artedesign@gmail.com',
   // Apre la compose di Gmail (web) invece dell'app di posta predefinita del sistema.
   emailHref: 'https://mail.google.com/mail/?view=cm&fs=1&to=joe.artedesign@gmail.com',

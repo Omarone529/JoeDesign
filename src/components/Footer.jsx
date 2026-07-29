@@ -4,8 +4,9 @@ import { Link } from '../router'
 
 /*
  * Footer condiviso, che fa anche da pagina contatti (assente): qui i recapiti,
- * ognuno una volta sola. A sinistra i due canali, a destra i link, in fondo la
- * riga legale. Le colonne le separano gli spazi, non i bordi.
+ * ognuno una volta sola. A sinistra i canali (email, Instagram, YouTube,
+ * TikTok), a destra i link, in fondo la riga legale. Le colonne le separano
+ * gli spazi, non i bordi.
  */
 /*
  * Anno del copyright fissato a build-time (Vite lo inlinea). Non
@@ -82,6 +83,32 @@ export default function Footer() {
             <LogoInstagram className="h-[18px] w-[18px] shrink-0" />
             <span className="relative">
               @{profile.handle}
+              <Sottolineatura />
+            </span>
+          </a>
+
+          <a
+            href={profile.youtube}
+            target="_blank"
+            rel="noreferrer"
+            className="group mt-4 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
+          >
+            <LogoYoutube className="h-[18px] w-[18px] shrink-0" />
+            <span className="relative">
+              Joe Sarchiolla
+              <Sottolineatura />
+            </span>
+          </a>
+
+          <a
+            href={profile.tiktok}
+            target="_blank"
+            rel="noreferrer"
+            className="group mt-4 flex w-fit items-center gap-2.5 text-[15px] tracking-[0.01em] text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper lg:text-[16px]"
+          >
+            <LogoTiktok className="h-[18px] w-[18px] shrink-0" />
+            <span className="relative">
+              @design.by.joesarchiolla
               <Sottolineatura />
             </span>
           </a>
@@ -174,6 +201,52 @@ function LogoInstagram({ className = '' }) {
       <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="5.25" />
       <circle cx="12" cy="12" r="4.15" />
       <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/*
+ * Marchio YouTube SVG inline, stesso trattamento della Instagram accanto
+ * (stroke in currentColor, decorativo).
+ */
+function LogoYoutube({ className = '' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2.75" y="5.75" width="18.5" height="12.5" rx="4" />
+      <path d="M10.5 9.25l4.5 2.75-4.5 2.75z" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/*
+ * Marchio TikTok SVG inline, stesso trattamento delle altre due icone
+ * (stroke in currentColor, decorativo).
+ */
+function LogoTiktok({ className = '' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M14 3v10.5a3.25 3.25 0 1 1-3.25-3.25c.36 0 .7.05 1.02.15" />
+      <path d="M14 3c.3 2.35 1.9 3.9 4.25 4.1" strokeLinejoin="round" />
     </svg>
   )
 }
