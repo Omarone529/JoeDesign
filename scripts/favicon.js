@@ -1,19 +1,22 @@
 /*
- * Genera l'icona del sito in tutti i formati che servono ai browser.
+ * Genera l'icona del sito in tutti i formati che servono ai browser, a
+ * partire dal marchio usato nella navbar (public/images/navbar/logo.webp).
  *
  *   node scripts/favicon.js
  *
  * Produce in public/:
- *   favicon.svg           browser moderni (nitida a ogni dimensione)
+ *   favicon.svg           browser moderni (il marchio incapsulato in un SVG)
  *   favicon.ico           32×32, richiesto in automatico dalla radice del sito
  *   apple-touch-icon.png  180×180, iPhone/iPad "aggiungi a schermata Home"
  *   icon-192.png          Android / manifest
  *   icon-512.png          Android / manifest, splash screen
  *   site.webmanifest      nome e colori dell'app installata
  *
- * Il segno è la "S" di SARCHIOLLA, la stessa lettera con cui apre la testata:
- * inchiostro pieno e lettera color carta, perché a 16 pixel in una scheda del
- * browser un fondo scuro si distingue, un fondo chiaro sparisce.
+ * Il marchio non esiste in vettoriale: `favicon.svg` incapsula lo stesso
+ * raster (nitido alle dimensioni ridotte a cui viene mostrato). Per la
+ * scheda del browser resta trasparente, come nella navbar; per le icone da
+ * schermata Home (Apple/Android, che non gestiscono bene la trasparenza)
+ * viene appoggiato sul fondo `paper` del sito.
  *
  * Va rilanciato solo se cambia il marchio: i file finiti stanno nel repo.
  */
@@ -25,29 +28,17 @@ import { profile } from '../src/data/siteData.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicDir = path.resolve(__dirname, '..', 'public')
+const logoPath = path.join(publicDir, 'images', 'navbar', 'logo.webp')
 
-const INK = '#14110f'
 const PAPER = '#f4f3f1'
-const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 
-/*
- * La "S" su tela quadrata. Il corpo è tarato perché l'altezza della maiuscola
- * occupi circa il 56% del lato: più grande tocca i bordi, più piccola si perde.
- * `y` è la linea di base, quindi va abbassata di mezza altezza-maiuscola per
- * centrare la lettera otticamente.
- */
-function marchio(lato) {
-  const corpo = lato * 0.78
-  const altezzaMaiuscola = corpo * 0.717
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${lato}" height="${lato}" viewBox="0 0 ${lato} ${lato}">
-  <rect width="${lato}" height="${lato}" fill="${INK}"/>
-  <text x="${lato / 2}" y="${lato / 2 + altezzaMaiuscola / 2}" text-anchor="middle"
-    font-family="${FONT}" font-size="${corpo}" font-weight="700"
-    letter-spacing="${(-0.02 * corpo).toFixed(2)}" fill="${PAPER}">S</text>
-</svg>`
-}
+const iconTrasparente = (lato) => sharp(logoPath).resize(lato, lato).png({ compressionLevel: 9 })
 
-const png = (lato) => sharp(Buffer.from(marchio(lato))).png({ compressionLevel: 9 })
+const iconOpaca = (lato) =>
+  sharp(logoPath)
+    .resize(lato, lato)
+    .flatten({ background: PAPER })
+    .png({ compressionLevel: 9 })
 
 /*
  * Contenitore ICO. Dal 2007 un .ico può contenere direttamente un PNG, quindi
@@ -73,14 +64,22 @@ function ico(pngBuffer, lato) {
   return Buffer.concat([testata, voce, pngBuffer])
 }
 
-/* SVG: unico file vettoriale, resta nitido a qualsiasi ingrandimento. */
-fs.writeFileSync(path.join(publicDir, 'favicon.svg'), marchio(512), 'utf8')
+/* SVG: incapsula il raster del marchio (trasparente, come in navbar). */
+const logoBase64 = fs.readFileSync(logoPath).toString('base64')
+fs.writeFileSync(
+  path.join(publicDir, 'favicon.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144"><image width="144" height="144" href="data:image/webp;base64,${logoBase64}"/></svg>\n`,
+  'utf8',
+)
 
-await png(180).toFile(path.join(publicDir, 'apple-touch-icon.png'))
-await png(192).toFile(path.join(publicDir, 'icon-192.png'))
-await png(512).toFile(path.join(publicDir, 'icon-512.png'))
+await (await iconOpaca(180)).toFile(path.join(publicDir, 'apple-touch-icon.png'))
+await (await iconOpaca(192)).toFile(path.join(publicDir, 'icon-192.png'))
+await (await iconOpaca(512)).toFile(path.join(publicDir, 'icon-512.png'))
 
-fs.writeFileSync(path.join(publicDir, 'favicon.ico'), ico(await png(32).toBuffer(), 32))
+fs.writeFileSync(
+  path.join(publicDir, 'favicon.ico'),
+  ico(await (await iconTrasparente(32)).toBuffer(), 32),
+)
 
 /*
  * Manifest: come si chiama e di che colore è il sito quando viene aggiunto
