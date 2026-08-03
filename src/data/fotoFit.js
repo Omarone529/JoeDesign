@@ -14,7 +14,7 @@ export const fotoFit = {
     "pos": "50% 40%"
   },
   "/images/products/anelli/cover.webp": {
-    "pos": "78% 68%"
+    "pos": "52% 55%"
   },
   "/images/products/bullone/01.webp": {
     "pos": "50% 74%"
@@ -23,7 +23,7 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/bullone/cover.webp": {
-    "pos": "60% 46%"
+    "pos": "51% 50%"
   },
   "/images/products/dado-lamp/04.webp": {
     "pos": "0% 76%"
@@ -37,8 +37,11 @@ export const fotoFit = {
   "/images/products/dado-lamp/08.webp": {
     "pos": "41% 50%"
   },
-  "/images/products/dado-lamp/cover.webp": {
+  "/images/products/dado-lamp/cover-home.webp": {
     "pos": "50% 63%"
+  },
+  "/images/products/dado-lamp/cover.webp": {
+    "pos": "50% 51%"
   },
   "/images/products/directional-arrow/01.webp": {
     "pos": "0% 70%"
@@ -64,8 +67,11 @@ export const fotoFit = {
   "/images/products/directional-arrow/09.webp": {
     "fit": "contain"
   },
-  "/images/products/directional-arrow/cover.webp": {
+  "/images/products/directional-arrow/cover-home.webp": {
     "pos": "39% 73%"
+  },
+  "/images/products/directional-arrow/cover.webp": {
+    "fit": "contain"
   },
   "/images/products/dog-lamp/02.webp": {
     "pos": "17% 14%"
@@ -112,8 +118,11 @@ export const fotoFit = {
   "/images/products/flue/11.webp": {
     "pos": "61% 50%"
   },
-  "/images/products/flue/cover.webp": {
+  "/images/products/flue/cover-home.webp": {
     "pos": "50% 76%"
+  },
+  "/images/products/flue/cover.webp": {
+    "pos": "38% 86%"
   },
   "/images/products/food/01.webp": {
     "pos": "50% 74%"
@@ -122,9 +131,6 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/food/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/food/cover.webp": {
     "fit": "contain"
   },
   "/images/products/fuori-asse/01.webp": {
@@ -143,7 +149,7 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/fuori-asse/cover.webp": {
-    "pos": "46% 72%"
+    "fit": "contain"
   },
   "/images/products/grafica/01.webp": {
     "fit": "contain"
@@ -185,7 +191,7 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/mari-chair/cover.webp": {
-    "pos": "44% 83%"
+    "pos": "47% 56%"
   },
   "/images/products/nymphe/03.webp": {
     "fit": "contain"
@@ -194,7 +200,7 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/nymphe/cover.webp": {
-    "pos": "50% 39%"
+    "pos": "45% 69%"
   },
   "/images/products/orbit/01.webp": {
     "pos": "0% 55%"
@@ -214,14 +220,14 @@ export const fotoFit = {
   "/images/products/orbit/10.webp": {
     "pos": "99% 50%"
   },
-  "/images/products/orbit/cover.webp": {
+  "/images/products/orbit/cover-home.webp": {
     "pos": "0% 47%"
+  },
+  "/images/products/orbit/cover.webp": {
+    "fit": "contain"
   },
   "/images/products/pistone/03.webp": {
     "fit": "contain"
-  },
-  "/images/products/pistone/cover.webp": {
-    "pos": "84% 44%"
   },
   "/images/products/sedia-tempo-determinato/01.webp": {
     "pos": "87% 66%"
@@ -257,13 +263,13 @@ export const fotoFit = {
     "pos": "50% 38%"
   },
   "/images/products/trave/cover.webp": {
-    "pos": "100% 79%"
+    "pos": "48% 65%"
   },
   "/images/products/zero-sfrido/02.webp": {
     "pos": "72% 50%"
   },
   "/images/products/zero-sfrido/cover.webp": {
-    "pos": "49% 96%"
+    "pos": "51% 50%"
   },
   "/images/products/zeta-3/01.webp": {
     "pos": "14% 41%"
@@ -273,8 +279,5 @@ export const fotoFit = {
   },
   "/images/products/zeta-3/05.webp": {
     "pos": "50% 98%"
-  },
-  "/images/products/zeta-3/cover.webp": {
-    "pos": "23% 52%"
   }
 }

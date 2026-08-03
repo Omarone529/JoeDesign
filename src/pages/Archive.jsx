@@ -41,7 +41,12 @@ export default function Archive() {
                 className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
               >
                 <article>
-                  <div className="aspect-square overflow-hidden bg-placeholder">
+                  {/*
+                   * 16:9: le copertine (tavole dell'archivio PDF) sono quasi tutte
+                   * in questo formato, quindi riempiono la cella senza ritaglio
+                   * percepibile e senza bordi vuoti attorno.
+                   */}
+                  <div className="aspect-[16/9] overflow-hidden bg-placeholder">
                     <img
                       src={cover}
                       alt={p.title}

@@ -6,8 +6,7 @@ export default function ProjectDetail({ slug }) {
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
-  const { cover, gallery, drawing, sfondo } = projectImages(item)
-  const slides = [cover, ...gallery]
+  const { gallery, drawing, sfondo } = projectImages(item)
   const prev = archive[(index - 1 + archive.length) % archive.length]
   const next = archive[(index + 1) % archive.length]
 
@@ -54,7 +53,7 @@ export default function ProjectDetail({ slug }) {
         </div>
 
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 md:px-0 lg:pt-12">
-          <Carousel images={slides} title={item.title} />
+          <Carousel images={gallery} title={item.title} />
         </div>
       </div>
 
