@@ -6,8 +6,9 @@ export default function ProjectDetail({ slug }) {
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
-  const { cover, gallery, drawing, sfondo } = projectImages(item)
-  const slides = [cover, ...gallery]
+  // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
+  const { gallery, drawing, sfondo } = projectImages(item)
+  const slides = gallery
   const prev = archive[(index - 1 + archive.length) % archive.length]
   const next = archive[(index + 1) % archive.length]
 

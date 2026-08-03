@@ -85,14 +85,14 @@ export function metaForRoute(route) {
   if (route.name === 'project') {
     const item = archive.find((p) => p.slug === route.slug)
     if (item) {
-      const { cover } = projectImages(item)
+      const { gallery } = projectImages(item)
       return {
         title: titoloProgetto(item),
         description: clip(item.desc),
         canonical: `${SITE}/progetto/${item.slug}`,
         image: ogImage(item.slug),
         imageAlt: `${item.title} · ${item.cat}`,
-        preload: cover, // prima diapositiva del carosello
+        preload: gallery[0], // prima diapositiva del carosello
         type: 'article',
         project: item,
       }

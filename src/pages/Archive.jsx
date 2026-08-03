@@ -41,7 +41,7 @@ export default function Archive() {
                 className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
               >
                 <article>
-                  <div className="aspect-square overflow-hidden bg-placeholder">
+                  <div className="relative aspect-square overflow-hidden bg-placeholder">
                     <img
                       src={cover}
                       alt={p.title}
@@ -50,6 +50,13 @@ export default function Archive() {
                       decoding="async"
                       className="h-full w-full object-cover contrast-[1.02]"
                     />
+                    {p.tavola && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/35 group-hover:opacity-100">
+                        <span className="text-[clamp(28px,5vw,52px)] font-bold uppercase leading-none tracking-[-0.02em] text-paper">
+                          {String(p.tavola).padStart(2, '0')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="mt-3 flex items-baseline justify-between gap-3">
                     <div>
