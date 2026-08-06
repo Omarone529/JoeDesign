@@ -107,7 +107,7 @@ Organizzazione:
 node scripts/fit-foto.js   # → src/data/fotoFit.js
 ```
 
-Misura ogni immagine e decide come entra nella cornice fissa del carosello:
+Misura ogni immagine e decide come entra nella cornice quadrata del carosello:
 riempie (`object-cover`, il caso normale), riempie puntando il ritaglio sul
 prodotto (`object-position`), oppure si mostra intera. Le fotografie si tagliano
 senza danno; le grafiche piatte (manifesti, disegni al tratto, piante quotate,

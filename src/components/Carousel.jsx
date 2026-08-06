@@ -50,7 +50,7 @@ export default function Carousel({ images, title }) {
 
   return (
     <div
-      className="group relative mx-auto w-full max-w-[1500px] md:mx-0 md:max-w-none"
+      className="group relative mx-auto w-full max-w-[calc(100vh-9rem)] md:ml-auto md:mr-0"
       role="group"
       aria-roledescription="carosello"
       aria-label={`Immagini di ${title}`}
@@ -60,15 +60,24 @@ export default function Carousel({ images, title }) {
       }}
     >
       {/*
-       * Cornice a misura fissa (non dipende dal formato mostrato, così non si
-       * muove cambiando foto). Su mobile/tablet altezza legata al viewport ma
-       * limitata: lascia spazio a testata sopra e disegno tecnico sotto. Da
-       * desktop (md, colonna a piena larghezza fino al bordo destro dello
-       * schermo) l'altezza sale molto: la foto occupa davvero il quadrante
-       * destro della pagina, grande.
+       * Cornice quadrata (non dipende dal formato mostrato, così non si muove
+       * cambiando foto). Il quadrato è la forma delle foto d'archivio, che
+       * quindi ci entrano esatte; sui pochi formati diversi il ritaglio è
+       * sempre lo stesso, su qualsiasi schermo. Prima l'altezza era fissa in px
+       * e la larghezza fluida: il rapporto passava da 0.49 su tablet a 1.5 su
+       * desktop largo e il taglio mangiava fino a mezza foto.
+       *
+       * Il tetto sta sul contenitore qui sopra ed è sulla LARGHEZZA, non
+       * sull'altezza: con `aspect-square` l'altezza segue la larghezza, quindi
+       * limitare quella tiene il quadrato quadrato e insieme la scheda dentro
+       * la prima schermata. Il valore è `100vh` meno lo spazio che sta sopra e
+       * sotto la foto (testata, padding, pallini): così il quadrato cresce fino
+       * a riempire l'altezza disponibile invece di fermarsi a una percentuale a
+       * occhio. Sta sul contenitore e non sulla cornice perché i pallini sotto
+       * restino allineati alla foto.
        */}
       <div
-        className="relative h-[clamp(320px,54vh,480px)] cursor-pointer select-none overflow-hidden bg-placeholder sm:h-[clamp(400px,62vh,620px)] md:h-[clamp(480px,72vh,880px)]"
+        className="relative aspect-square w-full cursor-pointer select-none overflow-hidden bg-placeholder"
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
         // Clic sulla foto = pausa/ripresa; i clic sui comandi e gli swipe non contano.

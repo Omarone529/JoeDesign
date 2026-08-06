@@ -8,15 +8,15 @@
  * `public/images/products/`. Come og-image.js e pdf-disegno.js: si lancia a
  * mano, il risultato è un file versionato, la build non ricalcola niente.
  *
- * Perché serve: la cornice del carosello è a misura fissa (le immagini si
- * susseguono tutte uguali) mentre i formati d'archivio vanno dal 2.4:1 delle
- * campionature al 1:3 delle foto verticali. Riempiendo la cornice, su qualche
- * scheda il ritaglio mangiava il prodotto. Qui ogni immagine viene misurata:
+ * Perché serve: la cornice del carosello è quadrata (le immagini si susseguono
+ * tutte uguali) mentre i formati d'archivio vanno dal 2.4:1 delle campionature
+ * al 1:3 delle foto verticali. Riempiendo la cornice, su qualche scheda il
+ * ritaglio mangiava il prodotto. Qui ogni immagine viene misurata:
  *
  * 1. si stima il colore del fondo dai pixel di bordo e si trova il riquadro di
  *    ciò che sta sopra il fondo, cioè il soggetto;
  * 2. si calcola dove puntare il ritaglio (`object-position`) perché il soggetto
- *    ci stia tutto, sia nella cornice più larga sia nella più stretta;
+ *    ci stia tutto;
  * 3. se non ci sta comunque, decide che tipo di immagine è: una fotografia si
  *    lascia riempire — tagliarla è quello che farebbe un fotografo — mentre una
  *    grafica piatta (manifesto, disegno al tratto, pianta quotata, render su
@@ -36,11 +36,9 @@ import path from 'node:path'
 const RADICE = path.join('public', 'images', 'products')
 const USCITA = path.join('src', 'data', 'fotoFit.js')
 
-// Rapporti estremi che la cornice assume tra telefono e desktop: la più larga
-// taglia in altezza, la più stretta in larghezza. Tenere allineati a
-// `src/components/Carousel.jsx` se cambiano le altezze.
-const R_LARGA = 1.05
-const R_STRETTA = 0.75
+// Rapporto della cornice: quadrata, uguale su ogni schermo (`aspect-square` in
+// `src/components/Carousel.jsx`). Tenerlo allineato se la cornice cambia forma.
+const R_CORNICE = 1
 
 // Oltre questi formati il ritaglio lascerebbe una fetta: si mostra intera.
 const ESTREMO_LARGO = 2
@@ -53,7 +51,7 @@ const FOTOGRAFIA = 0.13 // quota di pixel sfumati sopra cui è uno scatto
  * una fotografia, che alla conta dei pixel sembrano scatti mentre tagliarli
  * mozzerebbe il testo. Si aggiunge qui `<progetto>/<file>` quando capita.
  */
-const SEMPRE_INTERE = new Set(['grafica/06.webp', 'grafica/07.webp', 'trave/04.webp'])
+const SEMPRE_INTERE = new Set(['grafica/06.webp', 'grafica/07.webp'])
 const TOLLERANZA = 0.04 // quanto il soggetto può debordare dalla finestra
 const CAMPIONE = 200 // lato massimo su cui si misura: basta e avanza
 const DIFF = 26 // distanza dal fondo oltre cui il pixel è soggetto
@@ -141,13 +139,22 @@ async function quotaSfumati(file) {
 }
 
 /*
- * Finestra che resta visibile riempiendo una cornice di rapporto R, e punto in
- * cui centrarla (0–100) perché contenga il soggetto. `ok` è falso quando il
- * soggetto è più grande della finestra: lì non c'è posizione che tenga.
+ * Quanta parte dell'immagine resta visibile riempiendo la cornice, per asse:
+ * un'immagine più stretta della cornice si taglia in altezza e si vede tutta in
+ * larghezza, una più larga il contrario. Quadrata come la cornice = tutta.
  */
-function inquadra(rapporto, R, da, a) {
-  const verticale = rapporto < R
-  const visibile = verticale ? rapporto / R : R / rapporto
+function finestra(rapporto) {
+  return rapporto < R_CORNICE
+    ? { x: 1, y: rapporto / R_CORNICE }
+    : { x: R_CORNICE / rapporto, y: 1 }
+}
+
+/*
+ * Dove centrare la finestra lungo un asse (0–100) perché contenga il soggetto,
+ * che sull'immagine va da `da` ad `a`. `ok` è falso quando il soggetto è più
+ * grande della finestra: lì non c'è posizione che tenga.
+ */
+function punta(visibile, da, a) {
   if (visibile >= 1) return { ok: true, pos: 50 }
   const largo = a - da
   const centro = (da + a) / 2
@@ -163,8 +170,9 @@ function decidi({ rapporto, sfumati, box }) {
     return { fit: 'contain', motivo: 'formato fuori scala' }
   }
 
-  const y = inquadra(rapporto, R_LARGA, box.y0, box.y1)
-  const x = inquadra(rapporto, R_STRETTA, box.x0, box.x1)
+  const visibile = finestra(rapporto)
+  const y = punta(visibile.y, box.y0, box.y1)
+  const x = punta(visibile.x, box.x0, box.x1)
 
   // Il soggetto non entra nella finestra: una foto regge lo stesso il taglio,
   // una grafica no.
