@@ -1,10 +1,7 @@
 import { about, profile } from '../data/siteData'
 import { Link } from '../router'
+import Sketchbook from '../components/about/Sketchbook'
 
-/*
- * "Chi sono" (dalla pagina "MI PRESENTO" del portfolio): hero a due colonne,
- * manifesto, galleria, CV. Contenuti in siteData.about, tono impersonale.
- */
 export default function About() {
   const { hero, lab } = about.photos
 
@@ -123,6 +120,9 @@ export default function About() {
           className="block aspect-[16/9] w-full object-cover object-top"
         />
       </section>
+
+      <Sketchbook />
+
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link
           to="/archivio"

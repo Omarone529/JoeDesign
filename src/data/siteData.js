@@ -73,6 +73,37 @@ export const about = {
     hero: { src: '/images/about/joe-cutout.webp', alt: 'Ritratto di Joe Sarchiolla a braccia conserte' },
     lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
   },
+  /*
+   * Pagine dello sketchbook personale (da "ARCHIVE JOE SARCHIOLLA.pdf", vedi
+   * scripts/sketchbook-pages.js), mostrato come libro sfogliabile in 3D sotto
+   * la fascia "lab". Ogni voce è una pagina fisica con fronte e retro (le
+   * tavole 01-08 sono accoppiate due a due, così come stanno nel PDF
+   * originale, es. indice/griglia miniature); la 09 chiude lo sketchbook da
+   * sola, col retro bianco. Stessa proporzione per tutte le tavole
+   * (1000×1415, ~A4).
+   */
+  sketchbook: [
+    {
+      front: { src: '/images/about/sketchbook/01.webp', alt: 'Copertina dello sketchbook personale di Joe Sarchiolla' },
+      back: { src: '/images/about/sketchbook/02.webp', alt: 'Frontespizio “Vol.1 Archivio”' },
+    },
+    {
+      front: { src: '/images/about/sketchbook/03.webp', alt: 'Indice dei progetti del 2024, con miniature' },
+      back: { src: '/images/about/sketchbook/04.webp', alt: 'Griglia di prodotti in miniatura' },
+    },
+    {
+      front: { src: '/images/about/sketchbook/05.webp', alt: 'Joe con alcuni dei suoi oggetti in mano' },
+      back: { src: '/images/about/sketchbook/06.webp', alt: 'Dettaglio del progetto Bullone, un portapenne' },
+    },
+    {
+      front: { src: '/images/about/sketchbook/07.webp', alt: 'Foto scenografica del progetto Flue' },
+      back: { src: '/images/about/sketchbook/08.webp', alt: 'Scheda del progetto Mari Chair CAD, disegno tecnico e foto' },
+    },
+    {
+      front: { src: '/images/about/sketchbook/09.webp', alt: 'Scultura “Sedia a tempo determinato”, contest In-sicurezza' },
+      back: null,
+    },
+  ],
 }
 
 /*

@@ -1,11 +1,6 @@
 import { archive, periodoArchivio, projectImages } from '../data/siteData'
 import { Link } from '../router'
 
-/*
- * Archivio: griglia completa dei progetti, dal più recente. Scheda intera che
- * si ingrandisce leggermente in hover, ogni scheda apre /progetto/<slug>.
- * Conteggio e periodo in testa sono calcolati dai dati.
- */
 export default function Archive() {
   return (
     <main className="animate-viewIn">
