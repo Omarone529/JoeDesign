@@ -7,116 +7,41 @@
  *   pos: '<x>% <y>%' → riempie, ma il ritaglio è puntato sul prodotto
  */
 export const fotoFit = {
-  "/images/products/anelli/03.webp": {
-    "pos": "53% 0%"
+  "/images/products/anelli/sfondo.webp": {
+    "pos": "52% 50%"
   },
-  "/images/products/anelli/04.webp": {
-    "pos": "50% 40%"
+  "/images/products/bullone/sfondo.webp": {
+    "pos": "51% 50%"
   },
-  "/images/products/anelli/cover.webp": {
-    "pos": "78% 68%"
-  },
-  "/images/products/bullone/01.webp": {
-    "pos": "50% 74%"
-  },
-  "/images/products/bullone/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/bullone/cover.webp": {
-    "pos": "60% 46%"
-  },
-  "/images/products/dado-lamp/04.webp": {
-    "pos": "0% 76%"
-  },
-  "/images/products/dado-lamp/06.webp": {
-    "pos": "50% 62%"
-  },
-  "/images/products/dado-lamp/07.webp": {
-    "fit": "contain"
-  },
-  "/images/products/dado-lamp/08.webp": {
-    "pos": "41% 50%"
-  },
-  "/images/products/dado-lamp/cover.webp": {
-    "pos": "50% 63%"
-  },
-  "/images/products/directional-arrow/01.webp": {
-    "pos": "0% 70%"
-  },
-  "/images/products/directional-arrow/02.webp": {
-    "pos": "50% 26%"
-  },
-  "/images/products/directional-arrow/03.webp": {
-    "pos": "50% 26%"
-  },
-  "/images/products/directional-arrow/04.webp": {
-    "fit": "contain"
-  },
-  "/images/products/directional-arrow/06.webp": {
-    "pos": "13% 51%"
-  },
-  "/images/products/directional-arrow/07.webp": {
-    "pos": "100% 62%"
-  },
-  "/images/products/directional-arrow/08.webp": {
-    "pos": "50% 33%"
-  },
-  "/images/products/directional-arrow/09.webp": {
-    "fit": "contain"
-  },
-  "/images/products/directional-arrow/cover.webp": {
-    "pos": "39% 73%"
-  },
-  "/images/products/dog-lamp/02.webp": {
-    "pos": "17% 14%"
-  },
-  "/images/products/dog-lamp/04.webp": {
-    "pos": "32% 89%"
-  },
-  "/images/products/dog-lamp/07.webp": {
-    "fit": "contain"
-  },
-  "/images/products/dog-lamp/08.webp": {
-    "fit": "contain"
-  },
-  "/images/products/dog-lamp/09.webp": {
-    "pos": "67% 0%"
-  },
-  "/images/products/dog-lamp/10.webp": {
-    "pos": "0% 50%"
-  },
-  "/images/products/flue/01.webp": {
-    "pos": "71% 0%"
+  "/images/products/directional-arrow/sfondo.webp": {
+    "pos": "40% 50%"
   },
   "/images/products/flue/03.webp": {
-    "pos": "15% 90%"
+    "pos": "50% 94%"
   },
   "/images/products/flue/05.webp": {
-    "pos": "28% 50%"
+    "pos": "14% 50%"
   },
   "/images/products/flue/06.webp": {
-    "pos": "23% 85%"
+    "pos": "50% 93%"
   },
   "/images/products/flue/07.webp": {
-    "pos": "95% 79%"
+    "pos": "50% 86%"
   },
   "/images/products/flue/08.webp": {
-    "pos": "50% 66%"
+    "pos": "50% 67%"
   },
   "/images/products/flue/09.webp": {
-    "pos": "47% 54%"
-  },
-  "/images/products/flue/10.webp": {
-    "pos": "100% 50%"
+    "pos": "50% 55%"
   },
   "/images/products/flue/11.webp": {
-    "pos": "61% 50%"
+    "pos": "80% 50%"
   },
-  "/images/products/flue/cover.webp": {
-    "pos": "50% 76%"
+  "/images/products/flue/sfondo.webp": {
+    "pos": "34% 50%"
   },
   "/images/products/food/01.webp": {
-    "pos": "50% 74%"
+    "pos": "50% 76%"
   },
   "/images/products/food/02.webp": {
     "fit": "contain"
@@ -124,26 +49,17 @@ export const fotoFit = {
   "/images/products/food/03.webp": {
     "fit": "contain"
   },
-  "/images/products/food/cover.webp": {
-    "fit": "contain"
-  },
   "/images/products/fuori-asse/01.webp": {
-    "pos": "78% 61%"
+    "pos": "50% 62%"
   },
   "/images/products/fuori-asse/02.webp": {
-    "pos": "100% 91%"
+    "pos": "50% 98%"
   },
   "/images/products/fuori-asse/03.webp": {
     "fit": "contain"
   },
-  "/images/products/fuori-asse/04.webp": {
-    "pos": "54% 82%"
-  },
   "/images/products/fuori-asse/05.webp": {
     "fit": "contain"
-  },
-  "/images/products/fuori-asse/cover.webp": {
-    "pos": "46% 72%"
   },
   "/images/products/grafica/01.webp": {
     "fit": "contain"
@@ -158,7 +74,7 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/grafica/05.webp": {
-    "fit": "contain"
+    "pos": "2% 50%"
   },
   "/images/products/grafica/06.webp": {
     "fit": "contain"
@@ -170,111 +86,69 @@ export const fotoFit = {
     "fit": "contain"
   },
   "/images/products/grafica/09.webp": {
-    "pos": "65% 46%"
+    "pos": "50% 45%"
   },
   "/images/products/grafica/cover.webp": {
     "fit": "contain"
   },
   "/images/products/mari-chair/02.webp": {
-    "pos": "50% 59%"
+    "pos": "50% 60%"
   },
   "/images/products/mari-chair/03.webp": {
-    "pos": "57% 100%"
+    "pos": "72% 50%"
   },
   "/images/products/mari-chair/04.webp": {
     "fit": "contain"
   },
-  "/images/products/mari-chair/cover.webp": {
-    "pos": "44% 83%"
+  "/images/products/mari-chair/sfondo.webp": {
+    "pos": "45% 50%"
   },
   "/images/products/nymphe/03.webp": {
-    "fit": "contain"
+    "pos": "63% 50%"
   },
   "/images/products/nymphe/04.webp": {
     "fit": "contain"
   },
-  "/images/products/nymphe/cover.webp": {
-    "pos": "50% 39%"
+  "/images/products/nymphe/sfondo.webp": {
+    "pos": "44% 50%"
   },
-  "/images/products/orbit/01.webp": {
-    "pos": "0% 55%"
-  },
-  "/images/products/orbit/02.webp": {
-    "fit": "contain"
-  },
-  "/images/products/orbit/04.webp": {
-    "pos": "50% 100%"
-  },
-  "/images/products/orbit/05.webp": {
-    "fit": "contain"
-  },
-  "/images/products/orbit/06.webp": {
-    "fit": "contain"
-  },
-  "/images/products/orbit/10.webp": {
-    "pos": "99% 50%"
-  },
-  "/images/products/orbit/cover.webp": {
-    "pos": "0% 47%"
+  "/images/products/orbit/sfondo.webp": {
+    "pos": "44% 50%"
   },
   "/images/products/pistone/03.webp": {
     "fit": "contain"
   },
-  "/images/products/pistone/cover.webp": {
-    "pos": "84% 44%"
-  },
   "/images/products/sedia-tempo-determinato/01.webp": {
-    "pos": "87% 66%"
+    "pos": "50% 67%"
   },
   "/images/products/sedia-tempo-determinato/02.webp": {
-    "pos": "43% 49%"
+    "pos": "50% 49%"
   },
   "/images/products/sedia-tempo-determinato/03.webp": {
     "fit": "contain"
   },
-  "/images/products/sedia-tempo-determinato/cover.webp": {
+  "/images/products/sedia-tempo-determinato/sfondo.webp": {
     "fit": "contain"
   },
   "/images/products/stanza-nella-stanza/02.webp": {
-    "pos": "52% 49%"
+    "pos": "52% 50%"
   },
   "/images/products/stanza-nella-stanza/03.webp": {
     "fit": "contain"
   },
-  "/images/products/trave/01.webp": {
-    "pos": "50% 24%"
+  "/images/products/trave/sfondo.webp": {
+    "pos": "47% 50%"
   },
-  "/images/products/trave/03.webp": {
-    "pos": "100% 76%"
-  },
-  "/images/products/trave/04.webp": {
-    "fit": "contain"
-  },
-  "/images/products/trave/05.webp": {
-    "pos": "69% 89%"
-  },
-  "/images/products/trave/06.webp": {
-    "pos": "50% 38%"
-  },
-  "/images/products/trave/cover.webp": {
-    "pos": "100% 79%"
-  },
-  "/images/products/zero-sfrido/02.webp": {
-    "pos": "72% 50%"
-  },
-  "/images/products/zero-sfrido/cover.webp": {
-    "pos": "49% 96%"
+  "/images/products/zero-sfrido/sfondo.webp": {
+    "pos": "52% 50%"
   },
   "/images/products/zeta-3/01.webp": {
-    "pos": "14% 41%"
+    "pos": "50% 40%"
   },
   "/images/products/zeta-3/03.webp": {
-    "pos": "50% 38%"
+    "pos": "50% 35%"
   },
   "/images/products/zeta-3/05.webp": {
-    "pos": "50% 98%"
-  },
-  "/images/products/zeta-3/cover.webp": {
-    "pos": "23% 52%"
+    "pos": "50% 100%"
   }
 }

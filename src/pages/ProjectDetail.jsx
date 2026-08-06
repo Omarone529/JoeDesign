@@ -30,7 +30,13 @@ export default function ProjectDetail({ slug }) {
        * quadrante destro della pagina, grande. Su telefono resta impaginata
        * come prima (colonna unica, titolo e descrizione sopra, foto sotto).
        */}
-      <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12">
+      {/*
+       * Da xl la colonna foto pesa più di quella del testo: la foto è
+       * l'elemento portante della scheda e lì c'è larghezza da darle senza
+       * strozzare la descrizione (che ha comunque il suo `max-w-[52ch]`).
+       * Sotto xl resta metà e metà, altrimenti il testo diventa una colonnina.
+       */}
+      <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
           <Link
             to="/archivio"
