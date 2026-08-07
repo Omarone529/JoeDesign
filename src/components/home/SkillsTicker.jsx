@@ -1,11 +1,10 @@
 import { about } from '../../data/siteData'
 
 /*
- * Ticker "Skills" a scorrimento continuo (fonte: about.skills). Due copie
- * identiche che traslano del 50%: al riavvio la seconda è dov'era la prima,
- * il giro è impercettibile; la seconda è aria-hidden (niente doppio annuncio).
- * Non si ferma mai, nemmeno con "riduci animazioni" (su Windows spesso spenta,
- * bloccava il nastro). `will-change` manda la transform sul compositore.
+ * Nastro continuo: due copie identiche che traslano del 50%, così al riavvio la
+ * seconda è dov'era la prima e il giro non si vede. Non si ferma con "riduci
+ * animazioni" — su Windows è spesso attiva a insaputa dell'utente e bloccava
+ * il nastro per tutti.
  */
 export default function SkillsTicker() {
   return (
@@ -21,8 +20,7 @@ export default function SkillsTicker() {
   )
 }
 
-/* Una copia dell'elenco. Il punto chiude anche l'ultima voce: nel nastro
-   continuo non esiste una "fine", ogni voce ha sempre un seguito. */
+/* Il punto chiude anche l'ultima voce: nel nastro non esiste una fine. */
 function SkillList({ 'aria-hidden': ariaHidden }) {
   return (
     <ul

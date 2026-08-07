@@ -1,13 +1,9 @@
 /*
- * Converte un'immagine (jpg/png/…) in WebP ottimizzato per il web.
- * Utile per le foto che arrivano dalla cartella `media` in formato pesante.
- * (Le immagini in `ARCHIVIO WEBP` sono già webp: quelle si copiano e basta.)
+ * jpg/png → WebP, per le foto che arrivano da `media`. Quelle di ARCHIVIO WEBP
+ * sono già convertite e si copiano e basta.
  *
  * Uso:
- *   node scripts/optimize-image.js <sorgente> <destinazione.webp> [larghezzaMax] [qualità]
- *
- * Esempio:
- *   node scripts/optimize-image.js "C:/.../media/.../joe.jpg" public/images/about/joe-hero.webp 1100 82
+ *   node scripts/optimize-image.js <sorgente> <dest.webp> [larghezzaMax] [qualità]
  */
 import sharp from 'sharp'
 import fs from 'node:fs'

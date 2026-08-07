@@ -2,27 +2,23 @@ import { about, profile } from '../data/siteData'
 import { Link } from '../router'
 import Sketchbook from '../components/about/Sketchbook'
 
+/*
+ * Il padding alto sta sulla colonna di testo, così la foto parte a filo del
+ * bordo. Il corpo del nome deriva dalla larghezza della colonna: = larghezza /
+ * 6.355, la misura di "SARCHIOLLA" col tracking in uso. Da ricalcolare se
+ * cambiano griglia, padding o tracking.
+ */
 export default function About() {
   const { hero, lab } = about.photos
 
   return (
     <main className="animate-viewIn">
-      {/*
-       * Hero alta quanto la finestra meno la navbar (4rem). Il padding alto sta
-       * sulla colonna di testo, così la foto parte a filo del bordo.
-       */}
       <section className="grid grid-cols-1 gap-y-10 border-b-2 border-ink px-5 sm:px-8 md:min-h-[calc(100vh-4rem)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
         <div className="flex flex-col pt-10 sm:pt-14 md:col-start-1 md:row-start-1 lg:pt-16">
           <div className="mb-6 text-[11px] uppercase tracking-[0.24em] text-muted">Chi sono</div>
           <p className="m-0 max-w-[42ch] text-[clamp(15px,1.15vw,18px)] leading-[1.5]">
             {about.intro}
           </p>
-          {/*
-           * Corpo derivato dalla larghezza colonna (non dal viewport):
-           * = larghezza / 6.355 (misura di "SARCHIOLLA" col tracking; i
-           * coefficienti includono padding e gutter). Ricalcolare se cambiano
-           * griglia, padding o tracking.
-           */}
           <h1
             aria-label={profile.displayName}
             className="m-0 mt-12 font-bold uppercase leading-[0.85] tracking-[-0.03em] text-[min(calc((100vw_-_40px)*0.1526),300px)] sm:text-[min(calc((100vw_-_64px)*0.1526),300px)] md:mt-auto md:text-[min(calc((100vw_-_104px)*0.0954),300px)] lg:text-[min(calc((100vw_-_208px)*0.0954),300px)]"
@@ -34,11 +30,7 @@ export default function About() {
           </h1>
         </div>
 
-        {/*
-         * Da md la foto riempie la cella in altezza (fondo a filo della
-         * sezione). `object-cover` ritaglia sui lati, `object-top` protegge la
-         * testa su finestre basse.
-         */}
+        {/* `object-top`: protegge la testa su finestre basse. */}
         <div className="mx-auto w-full max-w-[440px] md:col-start-2 md:row-start-1 md:max-w-none">
           <img
             src={hero.src}
@@ -51,8 +43,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* CV su due colonne. Da lg la scala sale (14→17px): su colonne larghe
-          quella mobile risulta minuta. */}
       <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
         <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
           <div className="space-y-12 lg:space-y-16">
@@ -109,7 +99,6 @@ export default function About() {
         </blockquote>
       </section>
 
-      {/* Fascia a piena larghezza: altezza ridotta ritagliando solo il fondo */}
       <section className="bg-night">
         <img
           src={lab.src}
@@ -150,9 +139,8 @@ export default function About() {
 }
 
 /*
- * Sezione CV con etichetta e freccia. La freccia porta U+FE0E (VS-15) che
- * forza la resa testuale: le diagonali ↖↗↘↙ e le bidirezionali ↔↕ hanno una
- * variante emoji e su iOS/Android uscirebbero a colori (← → ↑ ↓ no).
+ * La freccia porta U+FE0E (VS-15), che forza la resa testuale: le diagonali
+ * ↖↗↘↙ hanno una variante emoji e su iOS/Android uscirebbero a colori.
  */
 function ArrowBlock({ label, children }) {
   return (
@@ -168,7 +156,6 @@ function ArrowBlock({ label, children }) {
   )
 }
 
-/* Riga anno · titolo · luogo per experience/education. */
 function Row({ anno, titolo, luogo }) {
   return (
     <div className="grid grid-cols-[96px_1fr] gap-4 border-t border-line-soft py-3 lg:grid-cols-[132px_1fr] lg:gap-6 lg:py-4">

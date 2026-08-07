@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
 
-/*
- * Pulsante flottante che duplica il contatto email del footer (stesso
- * `emailHref`): sempre visibile, sparisce solo quando il footer entra nello
- * schermo, dove il contatto è già in vista.
- */
+/* Duplica il contatto del footer; sparisce quando il footer entra in schermo. */
 export default function FloatingMailButton() {
   const [sopraFooter, setSopraFooter] = useState(true)
 
@@ -36,7 +32,6 @@ export default function FloatingMailButton() {
   )
 }
 
-/* Icona busta identica a quella del footer (stesso trattamento, stroke in currentColor). */
 function LogoGmail({ className = '' }) {
   return (
     <svg

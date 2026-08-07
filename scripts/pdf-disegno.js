@@ -1,21 +1,10 @@
 /*
- * Disegni tecnici dei progetti, estratti da "ARCHIVE JOE SARCHIOLLA.pdf".
+ * Disegni tecnici da "ARCHIVE JOE SARCHIOLLA.pdf". Sono vettoriali, quindi non
+ * stanno fra le immagini incorporate e vanno ripresi rendendo la pagina: si
+ * rasterizza, si ritaglia sul riquadro del disegno e si passa a `ink-alpha.js`,
+ * che toglie il fondo bianco.
  *
- * Nell'archivio ogni progetto ha una pagina scheda con lo stesso impianto:
- * in alto a sinistra il disegno tecnico con le quote, a destra la tabella dati.
- * Il disegno è vettoriale, quindi non si trova fra le immagini incorporate
- * (quelle stanno in "ARCHIVIO WEBP"): va ripreso rendendo la pagina.
- *
- * Qui la pagina viene rasterizzata ad alta risoluzione, ritagliata sul riquadro
- * del disegno e passata a `ink-alpha.js`, che rende trasparente il fondo bianco
- * e porta il tratto sul nero del sito: così il disegno si appoggia alla carta
- * senza il suo rettangolo bianco.
- *
- * Va lanciato a mano, come og-image.js e favicon.js: i WebP prodotti stanno in
- * `public/` insieme alle altre immagini e non si rigenerano a ogni build.
- * `pdf-to-img` non è in package.json - serve solo qui - quindi:
- *
- *   npm i --no-save pdf-to-img
+ *   npm i --no-save pdf-to-img     (fuori da package.json: serve solo qui)
  *   node scripts/pdf-disegno.js [slug…]
  *
  * Senza argomenti rifà tutti i progetti elencati sotto.
@@ -29,21 +18,16 @@ import { pdf } from 'pdf-to-img'
 
 const PDF = 'C:/Generale/Lavori/Joe design/ARCHIVE JOE SARCHIOLLA.pdf'
 
-// Risoluzione di rendering: il disegno è un tratto sottile, sotto questa scala
-// si impasta una volta ridotto alla larghezza finale.
+// Il tratto è sottile: sotto questa scala si impasta una volta ridotto.
 const SCALA = 3
 
-// Larghezza del WebP finale. I disegni sono segni semplici: oltre questa misura
-// il file cresce senza che si veda.
+// Oltre questa misura il file cresce senza che si veda.
 const LARGHEZZA = 900
 
 /*
- * Riquadro del disegno nella pagina, in frazioni di larghezza e altezza (lo
- * stesso su tutte le schede, che condividono l'impianto).
- * Il margine destro si ferma prima del filetto verticale che divide le colonne,
- * quello inferiore prima della freccia ↙ che chiude il blocco: sono segni della
- * pagina, non del disegno. Il ritaglio è largo, i bianchi intorno li toglie
- * `ink-alpha.js`.
+ * Riquadro del disegno, in frazioni di pagina (uguale su tutte le schede). Si
+ * ferma prima del filetto verticale e della freccia ↙, che sono segni della
+ * pagina e non del disegno. Largo: i bianchi li toglie `ink-alpha.js`.
  */
 const RIQUADRO = { sinistra: 0.06, destra: 0.425, alto: 0.19, basso: 0.448 }
 

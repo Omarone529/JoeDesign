@@ -1,17 +1,10 @@
 /*
- * Pre-rendering statico del sito.
+ * Pre-rendering statico. Per ogni rotta renderizza la pagina React, la inietta
+ * nel template di dist/index.html con i suoi meta tag, e la salva al percorso
+ * giusto (dist/progetto/flue/index.html). Poi la 404 e la sitemap.
  *
- * Dopo `vite build` (bundle client) e `vite build --ssr` (bundle server),
- * questo script per ogni rotta:
- *   1. renderizza la pagina React in HTML già completo;
- *   2. lo inietta nel template dist/index.html;
- *   3. scrive title, meta description, canonical, Open Graph e dati strutturati
- *      specifici della pagina;
- *   4. salva il file HTML statico nel percorso giusto (es. dist/progetto/flue/index.html).
- * Infine genera la pagina d'errore 404.html e la sitemap.xml.
- *
- * Risultato: Google e le anteprime dei link (WhatsApp, LinkedIn…) vedono subito
- * il contenuto, senza dover eseguire JavaScript.
+ * Così Google e le anteprime dei link vedono il contenuto senza eseguire JS.
+ * I meta e i dati strutturati vengono da `src/seo.js`: qui non si decide nulla.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -21,11 +14,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 const distDir = path.join(root, 'dist')
 
-// Import del bundle SSR compilato da Vite.
 const server = await import(
   pathToFileURL(path.join(root, 'dist-ssr', 'entry-server.js')).href
 )
-const { render, allRoutes, metaForRoute, parsePath, SITE, profile } = server
+const {
+  render,
+  allRoutes,
+  metaForRoute,
+  schemaForRoute,
+  immaginiPerRotta,
+  parsePath,
+  SITE,
+  profile,
+} = server
 
 const esc = (s) =>
   String(s)
@@ -36,16 +37,14 @@ const esc = (s) =>
 
 const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
 
-/* Tag da inserire nell'<head> per una singola pagina. */
-function headTags(meta) {
+function headTags(meta, route) {
   const tags = [
-    // La 404 è l'unica pagina senza canonical: non ha un indirizzo proprio da
-    // dichiarare. In compenso chiede esplicitamente di non essere indicizzata.
+    `<meta name="author" content="${esc(profile.name)}" />`,
+    // La 404 è l'unica senza canonical: non ha un indirizzo proprio.
     ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
     ...(meta.canonical ? [`<link rel="canonical" href="${meta.canonical}" />`] : []),
-    // Immagine principale nota in anticipo (ritratto in "Chi sono", copertina
-    // nelle schede): il preload la mette in coda leggendo l'head, senza
-    // attendere che il layout ne riveli la necessità.
+    // Immagine principale nota in anticipo: il preload la mette in coda leggendo
+    // l'head, senza aspettare che il layout ne riveli la necessità.
     ...(meta.preload ? [`<link rel="preload" as="image" href="${meta.preload}" fetchpriority="high" />`] : []),
     `<meta property="og:type" content="${meta.type}" />`,
     `<meta property="og:site_name" content="Giovanni “Joe” Sarchiolla" />`,
@@ -54,9 +53,8 @@ function headTags(meta) {
     `<meta property="og:description" content="${esc(meta.description)}" />`,
     ...(meta.canonical ? [`<meta property="og:url" content="${meta.canonical}" />`] : []),
     `<meta property="og:image" content="${meta.image}" />`,
-    // Dimensioni dichiarate: senza, alla prima condivisione la piattaforma
-    // deve scaricare il file per sapere come impaginarlo, e spesso mostra
-    // l'anteprima senza immagine proprio la prima volta - quella che conta.
+    // Senza le dimensioni, alla prima condivisione la piattaforma deve scaricare
+    // il file per impaginarlo, e spesso mostra l'anteprima vuota proprio allora.
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
     `<meta property="og:image:type" content="image/jpeg" />`,
@@ -67,78 +65,20 @@ function headTags(meta) {
     `<meta name="twitter:image" content="${meta.image}" />`,
     ...(meta.imageAlt ? [`<meta name="twitter:image:alt" content="${esc(meta.imageAlt)}" />`] : []),
   ]
-  // Dati strutturati solo sulle pagine vere: descrivere un errore a un motore
-  // di ricerca non ha senso.
+  // Non sulla 404: descrivere un errore a un motore di ricerca non ha senso.
   if (!meta.noindex) {
-    tags.push(`<script type="application/ld+json">${jsonLd(meta)}</script>`)
+    const schema = JSON.stringify(schemaForRoute(route, meta))
+    // `</script>` dentro una stringa chiuderebbe il tag: va spezzato.
+    tags.push(
+      `<script type="application/ld+json">${schema.replace(/<\//g, '<\\/')}</script>`
+    )
   }
   return tags.join('\n    ')
 }
 
-/*
- * Dati strutturati schema.org, con i valori presi da `profile`.
- *   schede progetto  CreativeWork + BreadcrumbList (in SERP il percorso
- *                    sostituisce l'URL nudo)
- *   altre pagine     Person, con ruolo, sede e recapiti
- */
-function jsonLd(meta) {
-  const persona = {
-    '@type': 'Person',
-    name: profile.name,
-    alternateName: profile.displayName,
-    jobTitle: profile.role,
-    url: `${SITE}/`,
-  }
-
-  if (meta.project) {
-    const p = meta.project
-    // dateCreated vuole un anno singolo: da un intervallo si prende l'ultimo.
-    const anni = String(p.year || '').match(/\d{4}/g)
-
-    return JSON.stringify([
-      {
-        '@context': 'https://schema.org',
-        '@type': 'CreativeWork',
-        name: p.title,
-        description: meta.description,
-        image: meta.image,
-        url: meta.canonical,
-        ...(anni ? { dateCreated: anni[anni.length - 1] } : {}),
-        creator: persona,
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-          { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
-          { '@type': 'ListItem', position: 3, name: p.title, item: meta.canonical },
-        ],
-      },
-    ])
-  }
-
-  return JSON.stringify({
-    '@context': 'https://schema.org',
-    ...persona,
-    description: `${profile.role} a ${profile.place}.`,
-    email: `mailto:${profile.email}`,
-    telephone: profile.phone,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: profile.place.split(',')[0].trim(),
-      addressRegion: 'Emilia-Romagna',
-      addressCountry: 'IT',
-    },
-    alumniOf: { '@type': 'CollegeOrUniversity', name: profile.formazione },
-    knowsAbout: ['Product design', 'Industrial design', 'Packaging design', 'Graphic design'],
-    sameAs: [profile.instagram],
-  })
-}
-
-/* Costruisce l'HTML finale di una pagina a partire dal template. */
 function buildPage(pathname) {
-  const meta = metaForRoute(parsePath(pathname))
+  const route = parsePath(pathname)
+  const meta = metaForRoute(route)
   const { html } = render(pathname)
 
   return template
@@ -150,11 +90,10 @@ function buildPage(pathname) {
       /<meta\s+name="description"[\s\S]*?\/?>/,
       `<meta name="description" content="${esc(meta.description)}" />`,
     )
-    .replace('</head>', `    ${headTags(meta)}\n  </head>`)
+    .replace('</head>', `    ${headTags(meta, route)}\n  </head>`)
     .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
 }
 
-/* Percorso su disco per una rotta: "/" → index.html, "/x" → x/index.html. */
 function outFile(pathname) {
   if (pathname === '/') return path.join(distDir, 'index.html')
   return path.join(distDir, pathname.replace(/^\//, ''), 'index.html')
@@ -170,29 +109,36 @@ for (const pathname of routes) {
 }
 
 /*
- * 404.html — pagina d'errore, generata a parte.
- * Non è una rotta del sito: sta fuori da `allRoutes()` (quindi fuori dalla
- * sitemap) e va scritta con questo nome esatto nella radice di dist, perché è
- * il file che Netlify serve, con status 404, per ogni indirizzo inesistente.
+ * Fuori da `allRoutes()`, quindi fuori dalla sitemap. Il nome dev'essere questo
+ * e stare nella radice: è il file che Netlify serve con status 404.
  */
 fs.writeFileSync(path.join(distDir, '404.html'), buildPage('/404'), 'utf8')
 console.log(`  ✓ 404  →  dist/404.html`)
 
 /*
- * sitemap.xml — il solo elenco degli indirizzi.
+ * Niente `changefreq` né `priority`, che Google ignora da anni. Niente
+ * `lastmod`: qui varrebbe la data della build, che cambia a ogni deploy anche
+ * a contenuti identici, e un "modificato oggi" su tutte le pagine fa scartare
+ * il campo per l'intero sito. Quando l'archivio avrà date vere, allora sì.
  *
- * Niente `changefreq` né `priority`: Google li ignora da anni, dichiarati o no.
- * Niente `lastmod`: qui potrebbe valere solo la data della build, che cambia a
- * ogni deploy anche quando i contenuti sono identici. Un "modificato oggi"
- * ripetuto su tutte le pagine viene riconosciuto come falso e fa scartare il
- * campo per l'intero sito - meglio non dichiararlo che dichiararlo a caso.
- * (Se un giorno le voci dell'archivio avranno una data di aggiornamento vera,
- * quella sì che varrà la pena di scriverla qui.)
+ * Dentro `<image:image>` va il solo `<image:loc>`: `image:title` e compagnia
+ * sono deprecati dal 2022 e ignorati. La descrizione Google la prende dall'alt
+ * nella pagina, ed è per questo che gli alt sono scritti bene in `siteData`.
  */
+const IMG_NS = 'http://www.google.com/schemas/sitemap-image/1.1'
+
+const voceSitemap = (r) => {
+  const loc = `${SITE}${r === '/' ? '/' : r}`
+  const immagini = immaginiPerRotta(r)
+    .map((src) => `\n    <image:image><image:loc>${esc(src)}</image:loc></image:image>`)
+    .join('')
+  return `  <url><loc>${loc}</loc>${immagini}${immagini ? '\n  ' : ''}</url>`
+}
+
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
-  `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  routes.map((r) => `  <url><loc>${SITE}${r === '/' ? '/' : r}</loc></url>`).join('\n') +
+  `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="${IMG_NS}">\n` +
+  routes.map(voceSitemap).join('\n') +
   `\n</urlset>\n`
 fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8')
 console.log(`  ✓ sitemap.xml (${routes.length} URL)`)

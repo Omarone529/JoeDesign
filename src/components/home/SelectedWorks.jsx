@@ -1,12 +1,7 @@
-import { focusItems } from '../../data/siteData'
+import { altCopertina, focusItems } from '../../data/siteData'
 import { Link } from '../../router'
 
-/*
- * "Lavori selezionati": i cinque progetti focus del portfolio 2026, numerati
- * 01–05 (selezione in `focusSlugs`). Griglia 1→2→3→5 colonne, la scheda intera
- * si ingrandisce leggermente in hover, ogni scheda apre /progetto/<slug>.
- * La linea dalla hero la disegna la hero.
- */
+/* I cinque progetti focus del portfolio 2026 (selezione in `focusSlugs`). */
 export default function SelectedWorks() {
   return (
     <section
@@ -34,10 +29,9 @@ export default function SelectedWorks() {
           >
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
-                {/* Prima riga in viewport: niente lazy per non ritardarla. */}
                 <img
                   src={p.cover}
-                  alt={p.title}
+                  alt={altCopertina(p)}
                   loading={i < 3 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}
                   decoding="async"

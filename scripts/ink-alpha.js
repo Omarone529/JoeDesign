@@ -1,21 +1,12 @@
 /*
- * Tratto su fondo bianco → WebP con canale alpha (firme, schizzi, scansioni).
+ * Tratto su fondo bianco → WebP con canale alpha (firme, schizzi, scansioni):
+ * il fondo diventa trasparenza e il tratto prende il nero del sito.
  *
- * Le scansioni arrivano come inchiostro nero su carta bianca: sovrapposte a una
- * foto mostrerebbero il loro rettangolo. Qui il fondo diventa trasparenza e il
- * tratto viene ricolorato nel nero caldo del sito, così il segno si appoggia su
- * qualsiasi immagine restando coerente con la palette.
- *
- * Il chiaro-scuro dell'originale non diventa colore ma opacità: i bordi morbidi
- * del pennarello restano morbidi, invece di seghettarsi come farebbe una soglia
- * netta. `sogliaChiaro`/`sogliaScuro` tagliano il grigio sporco della scansione
- * (sotto il primo = trasparente, sopra il secondo = pieno).
+ * Il chiaro-scuro dell'originale diventa opacità e non colore, così i bordi
+ * morbidi del pennarello non si seghettano come con una soglia netta.
  *
  * Uso:
  *   node scripts/ink-alpha.js <sorgente> <destinazione.webp> [larghezzaMax] [colore]
- *
- * Esempio:
- *   node scripts/ink-alpha.js "C:/.../schizzo.webp" public/images/about/schizzo.webp 900
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -35,17 +26,15 @@ const rgb = colore.replace('#', '').match(/../g).map((h) => parseInt(h, 16))
 
 fs.mkdirSync(path.dirname(dest), { recursive: true })
 
-// 1. Pixel grezzi RGBA su fondo bianco (un eventuale alpha di partenza va
-//    appiattito, altrimenti la carta trasparente conterebbe come tratto).
+// L'alpha di partenza va appiattito, o la carta trasparente conta come tratto.
 const { data, info } = await sharp(src)
   .flatten({ background: '#ffffff' })
   .ensureAlpha()
   .raw()
   .toBuffer({ resolveWithObject: true })
 
-// 2. Ogni pixel diventa tinta unita + opacità ricavata dal suo scuro:
-//    inchiostro nero → opaco, carta bianca → trasparente. Le due soglie
-//    tagliano il grigio sporco della scansione e stirano il resto su 0…255.
+// Tinta unita + opacità ricavata dallo scuro. Le soglie tagliano il grigio
+// sporco della scansione e stirano il resto su 0…255.
 const scala = 255 / (sogliaScuro - sogliaChiaro)
 const out = Buffer.alloc(info.width * info.height * 4)
 
@@ -58,8 +47,8 @@ for (let i = 0, o = 0; i < data.length; i += info.channels, o += 4) {
   out[o + 3] = alpha
 }
 
-// 3. Margini trasparenti ritagliati (la firma resta senz'aria intorno: così la
-//    si posiziona dal CSS senza compensare a occhio) e larghezza finale.
+// Margini ritagliati: il segno resta senz'aria intorno, così lo si posiziona
+// dal CSS senza compensare a occhio.
 const finale = sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } })
   .trim()
   .resize({ width: Number(maxWidth), withoutEnlargement: true })

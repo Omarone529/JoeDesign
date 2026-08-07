@@ -1,11 +1,10 @@
 /*
- * Riduce le immagini di public/images alla massima misura in cui vengono
- * effettivamente mostrate. Le foto di "ARCHIVIO WEBP" sono da stampa (fino a
- * 4600x6200 px, 6 MB l'una) e vanno rimpicciolite prima della pubblicazione.
+ * Riduce le immagini di public/images alla misura in cui vengono mostrate: le
+ * foto di ARCHIVIO WEBP sono da stampa, fino a 4600x6200 px. Idempotente, e
+ * gli originali restano nell'archivio.
  *
- * Idempotente: chi è già sotto il limite non viene riscritto, quindi si può
- * rilanciare senza perdita di qualità progressiva. Gli originali restano in
- * "ARCHIVIO WEBP".
+ * Superato da `comprimi-foto.js`, che fa lo stesso distinguendo foto e
+ * grafiche piatte. Resta perché taglia per destinazione d'uso.
  *
  * Uso:
  *   node scripts/optimize-public-images.js            elenca gli interventi
@@ -21,11 +20,8 @@ const RADICE = path.resolve(__dirname, '..', 'public', 'images')
 const APPLICA = process.argv.includes('--applica')
 
 /*
- * Larghezza massima per destinazione d'uso: ingombro reale a schermo x2, per
- * gli schermi a densità doppia. Il primo criterio che corrisponde vince.
- *   copertine  griglie home/archivio, riquadro max ~440 px
- *   galleria   cornice del carosello, 560 px
- *   resto      fasce a tutta larghezza (home, chi sono)
+ * Ingombro reale a schermo x2, per gli schermi a densità doppia. Il primo
+ * criterio che corrisponde vince.
  */
 const LIMITI = [
   { prova: (p) => /products[\\/][^\\/]+[\\/]cover\.webp$/.test(p), max: 900 },
@@ -53,7 +49,7 @@ for (const file of files) {
   const pesoPrima = fs.statSync(file).size
   primaTot += pesoPrima
 
-  // Su Windows sharp tiene il file agganciato: va letto in memoria, altrimenti
+  // Su Windows sharp tiene il file agganciato: senza leggerlo prima in memoria,
   // la riscrittura in place fallisce con EBUSY.
   const originale = fs.readFileSync(file)
   const meta = await sharp(originale).metadata()
@@ -64,8 +60,7 @@ for (const file of files) {
     continue
   }
 
-  // alphaQuality 100 preserva il canale alpha del ritratto scontornato.
-  const buffer = await sharp(originale)
+    const buffer = await sharp(originale)
     .resize({ width: max, withoutEnlargement: true })
     .webp({ quality: 80, alphaQuality: 100 })
     .toBuffer()

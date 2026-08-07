@@ -5,11 +5,8 @@ import { Link } from '../router'
 const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
 const MOVIMENTO_MINIMO = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
 
-/*
- * Nasconde la barra scorrendo giù, la ripristina scorrendo su. Parte visibile
- * (è ciò che c'è nell'HTML statico: evita un mismatch in hydration). Scroll
- * passivo accorpato in rAF: un render al massimo per frame.
- */
+// Parte visibile perché è così nell'HTML statico: altrimenti mismatch in
+// hydration. Lo scroll è accorpato in rAF, un render al massimo per frame.
 function useNavbarNascosta(route) {
   const [nascosta, setNascosta] = useState(false)
 
@@ -37,17 +34,19 @@ function useNavbarNascosta(route) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Il router riporta in cima a ogni navigazione: la barra va riesposta.
-  useEffect(() => setNascosta(false), [route])
+  // Riesposta a ogni navigazione. Corretta durante il render e non in un
+  // effetto, o si vedrebbe un frame con la pagina nuova e la barra nascosta.
+  const [rottaPrec, setRottaPrec] = useState(route)
+  if (route !== rottaPrec) {
+    setRottaPrec(route)
+    setNascosta(false)
+  }
 
   return [nascosta, setNascosta]
 }
 
-/*
- * Voce di navigazione. Padding sul link (area di tocco più ampia del testo);
- * sottolineatura ancorata allo span interno per restare attaccata alla parola,
- * in assoluto così non sposta il testo. Compare su pagina attiva e in hover.
- */
+// Sottolineatura ancorata allo span interno per restare attaccata alla parola,
+// e in assoluto per non spostare il testo.
 function NavLink({ to, active = false, children }) {
   return (
     <Link
@@ -68,10 +67,7 @@ function NavLink({ to, active = false, children }) {
   )
 }
 
-/*
- * Barra sticky condivisa: occupa i suoi 4rem anche da nascosta (misura su cui
- * è tarata la hero in About). La voce attiva deriva dalla rotta.
- */
+// Occupa i suoi 4rem anche da nascosta: su quella misura è tarata la hero in About.
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const [nascosta, setNascosta] = useNavbarNascosta(name)
@@ -101,8 +97,7 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Nome + marchio Instagram. Centrato solo da md: sotto non ci starebbe
-            e resta in linea nel flusso (justify-between). */}
+        {/* Centrato solo da md: sotto non ci starebbe. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
@@ -130,11 +125,7 @@ export default function Navbar({ route }) {
   )
 }
 
-/*
- * Marchio Instagram al tratto in `currentColor` (segue il testo accanto),
- * spessore leggero perché a 15–19px un tratto pieno annerirebbe il segno.
- * Decorativo: dove porta lo dice l'`aria-label` del link.
- */
+/* Tratto leggero: a 15–19px uno pieno annerirebbe il segno. */
 function LogoInstagram({ className = '' }) {
   return (
     <svg

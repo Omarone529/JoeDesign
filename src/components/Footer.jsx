@@ -2,26 +2,15 @@ import { profile } from '../data/siteData'
 import { scorrimento } from '../motion'
 import { Link } from '../router'
 
-/*
- * Footer condiviso, che fa anche da pagina contatti (assente): qui i
- * recapiti, ognuno una volta sola. Struttura centrata a blocco unico (canali,
- * pagine, riga descrittiva, poi la coda legale) invece delle due colonne
- * precedenti: stessi link, disposizione ispirata a omarbayadi.com.
- */
-/*
- * Anno del copyright fissato a build-time (Vite lo inlinea). Non
- * `getFullYear()` al render: le pagine sono statiche e al primo gennaio
- * browser e HTML direbbero anni diversi, rompendo l'hydration.
- */
+// Fissato a build-time. Con `getFullYear()` al render, il primo gennaio l'HTML
+// statico e il browser direbbero anni diversi e l'hydration si romperebbe.
 const ANNO = __ANNO_BUILD__
 
-/*
- * Filetto della coda. `/10` e non `/12`: l'opacità Tailwind va di cinque in
- * cinque; un valore fuori scala non genera classe e il bordo diventerebbe
- * vistoso sul fondo notte.
- */
+// `/10` e non `/12`: l'opacità Tailwind va di cinque in cinque, e un valore
+// fuori scala non genera la classe — il bordo resterebbe pieno.
 const FILETTO = 'border-paper/10'
 
+/* Fa anche da pagina contatti, che come rotta non esiste. */
 export default function Footer() {
   const pagine = [
     { label: 'Home', to: '/' },
@@ -30,18 +19,14 @@ export default function Footer() {
   ]
 
   return (
-    /*
-     * `id`/`tabIndex`: destinazione del salto "Contatti", il focus si sposta
-     * qui. Contorno tolto (su un elemento così largo sarebbe enorme);
-     * `scroll-mt-16` tiene conto della barra sticky (4rem).
-     */
+    /* Destinazione del salto "Contatti": il focus arriva qui, senza contorno
+       (su un elemento così largo sarebbe enorme). */
     <footer
       id="contatti"
       tabIndex={-1}
       className="scroll-mt-16 bg-night text-paper focus:outline-none"
     >
       <div className="flex flex-col items-center px-5 py-14 text-center sm:px-8 sm:py-16 lg:px-[72px] lg:py-20">
-        {/* Pagine, in cima. */}
         <nav aria-label="Pagine del sito">
           <ul className="m-0 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 p-0 list-none">
             {pagine.map((p) => (
@@ -58,7 +43,6 @@ export default function Footer() {
           </ul>
         </nav>
 
-        {/* Canali, solo icona: l'indirizzo/handle non si ripete, c'è già nel target del link. */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
           <a
             href={profile.emailHref}
@@ -101,7 +85,6 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Riga di chiusura: descrive, non è un recapito. */}
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
           {profile.role}, di {profile.place}.
         </p>
@@ -131,11 +114,7 @@ export default function Footer() {
   )
 }
 
-/*
- * Sottolineatura animata (come in Navbar): cresce da sinistra su hover e su
- * focus da tastiera. In assoluto (non sposta il testo), in currentColor.
- * Va in un contenitore `relative` dentro un elemento `group`.
- */
+/* Va in un contenitore `relative` dentro un elemento `group`. */
 function Sottolineatura() {
   return (
     <span
@@ -145,10 +124,6 @@ function Sottolineatura() {
   )
 }
 
-/*
- * Icona busta (email) SVG inline, stesso trattamento delle altre icone del
- * footer (stroke in currentColor, decorativo: l'indirizzo è nel testo accanto).
- */
 function LogoGmail({ className = '' }) {
   return (
     <svg
@@ -168,11 +143,6 @@ function LogoGmail({ className = '' }) {
   )
 }
 
-/*
- * Marchio Instagram SVG inline (no libreria di icone per un glifo). Stroke in
- * currentColor, segue il link anche in hover. Decorativo: la maniglia è nel
- * testo accanto.
- */
 function LogoInstagram({ className = '' }) {
   return (
     <svg
@@ -193,10 +163,6 @@ function LogoInstagram({ className = '' }) {
   )
 }
 
-/*
- * Marchio YouTube SVG inline, stesso trattamento della Instagram accanto
- * (stroke in currentColor, decorativo).
- */
 function LogoYoutube({ className = '' }) {
   return (
     <svg
@@ -216,10 +182,6 @@ function LogoYoutube({ className = '' }) {
   )
 }
 
-/*
- * Marchio TikTok SVG inline, stesso trattamento delle altre due icone
- * (stroke in currentColor, decorativo).
- */
 function LogoTiktok({ className = '' }) {
   return (
     <svg

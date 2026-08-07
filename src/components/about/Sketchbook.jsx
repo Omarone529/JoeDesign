@@ -11,52 +11,36 @@ const VELOCITA_STANTIA_MS = 90 // dito fermo da più di così al rilascio → ni
 const CEDIMENTO_LIBRO = (3 * Math.PI) / 180 // oltre le copertine cede tutto il libro, non la pagina
 const M_COLONNE = 48
 const CURVA_MAX = (22 * Math.PI) / 180 // arco sobrio: una pagina vera non si piega a tubo
-// Segno base dell'arco: col ventre verso +z locale, che a metà giro (pagina in
-// piedi verso la camera) punta a sinistra. È il verso giusto per un giro
-// ALL'INDIETRO; andando avanti il verso lo ribalta — vedi `versoArco` in
-// applicaAngolo.
+// Verso giusto per un giro all'indietro; andando avanti lo ribalta `versoArco`.
 const CURVA_SEGNO = -1
 const LARGHEZZA_MONDO = 2
 const ALTEZZA_MONDO = LARGHEZZA_MONDO * (1415 / 1000)
 const SCARTO_PILA = 0.02
 const RIGIDITA_COPERTINA = 0.35 // le copertine sono cartone: si flettono molto meno della carta
-// Quanto il CORPO della pagina si alza a metà giro (0 agli estremi). È nella
-// geometria, con una rampa che parte da zero alla cerniera (vedi
-// calcolaColonne): la radice resta incollata alla costa — la pagina non si
-// stacca mai dal libro — e si alza solo quel che serve a scavalcare le pile.
+// Quanto il corpo della pagina si alza a metà giro, per scavalcare le pile.
 const SOLLEVAMENTO_VOLO = 0.28
 const FOV_VERTICALE = 18 // obiettivo leggermente tele: meno "bombatura" prospettica della pagina in volo
 const ROT_X_LIBRO = -0.1
 const ROT_Y_LIBRO = 0.07
-// Piega dinamica: la carta non è rigida, quindi oltre alla campana geometrica
-// del giro la pagina si flette in proporzione alla velocità angolare del
-// gesto (il corpo del foglio "resta indietro"), e quando atterra la flessione
-// residua si scarica da sola con una vibrazione smorzata (vedi avviaFlutter).
-// Ha lo stesso segno della campana — entrambi seguono la direzione del moto —
-// quindi la rinforza sempre, in tutti e due i versi.
+// Piega dinamica: il foglio si flette in proporzione alla velocità del gesto,
+// oltre alla campana geometrica del giro, e con lo stesso segno.
 const PIEGA_GUADAGNO = 0.2 // flessione extra per (grado/ms) di velocità
 const PIEGA_MAX = 0.32
 const PIEGA_TOTALE_MAX = 1.15
 const PIEGA_INERZIA_MS = 40 // costante di tempo con cui la flessione insegue la velocità
 const GUTTER_OPACITA = 0.2 // ombra d'incavo lungo la costa, solo a libro aperto
-// La camera è FISSA sulla costa e inquadra sempre il libro aperto per intero
-// (2 larghezze di pagina + margine): il libro non si sposta né cambia scala,
-// come un libro vero appoggiato sul tavolo. Deve combaciare con
-// l'aspect-ratio CSS del widget (2000/1415, la doppia pagina).
+// Deve combaciare con l'aspect-ratio CSS del widget: la camera è fissa e il
+// libro non cambia mai scala.
 const ASPETTO_LIBRO = 2000 / 1415
 const K_LARGHEZZA = 2 * Math.tan((FOV_VERTICALE * Math.PI) / 360) * ASPETTO_LIBRO
 const MARGINE_CAMERA = 1.12
-// Il canvas SBORDA oltre il riquadro del libro (-inset-[12%] nel JSX → scala
-// 1.24): la pagina a metà giro punta verso la camera e in prospettiva si
-// proietta più grande del libro — senza sbordo la sua parte alta e bassa
-// verrebbe tagliata dal bordo del canvas mentre si sfoglia. Lo sbordo è
-// invisibile (canvas trasparente); il libro resta esattamente nel riquadro.
+// Il canvas sborda (-inset-[12%] nel JSX): a metà giro la pagina si proietta
+// più grande del libro e senza sbordo verrebbe tagliata sopra e sotto.
 const MARGINE_TELA = 1.24
 const DISTANZA_CAMERA = (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA) / K_LARGHEZZA
 
-// `curvaAmp` è la flessione totale (campana del giro + piega dinamica, può
-// essere negativa: piega nell'altro verso). `alzata` è il sollevamento di
-// volo in unità mondo, applicato con una rampa lungo la pagina.
+// `curvaAmp`: flessione totale, negativa se piega nell'altro verso.
+// `alzata`: sollevamento di volo in unità mondo, a rampa lungo la pagina.
 function calcolaColonne(curvaAmp, alzata = 0) {
   const posX = new Float32Array(M_COLONNE + 1)
   const posZ = new Float32Array(M_COLONNE + 1)
@@ -65,10 +49,8 @@ function calcolaColonne(curvaAmp, alzata = 0) {
   let z = 0
   for (let s = 0; s < M_COLONNE; s += 1) {
     const uMetà = (s + 0.5) / M_COLONNE
-    // Antisimmetrica (si apre nella prima metà, si richiude nella seconda):
-    // se fosse a gobba singola, la profondità accumulata non tornerebbe mai
-    // a zero e il bordo libero "andrebbe alla deriva" invece di richiudersi
-    // sul bordo giusto.
+    // Antisimmetrica: a gobba singola la profondità accumulata non tornerebbe
+    // a zero e il bordo libero andrebbe alla deriva invece di richiudersi.
     const curvaLocale = CURVA_MAX * curvaAmp * Math.sin(2 * Math.PI * uMetà) * CURVA_SEGNO
     angoliSegmento[s] = curvaLocale
     x += (1 / M_COLONNE) * Math.cos(curvaLocale)
@@ -76,10 +58,8 @@ function calcolaColonne(curvaAmp, alzata = 0) {
     posX[s + 1] = x
     posZ[s + 1] = z
   }
-  // Sollevamento nella GEOMETRIA, non sul gruppo: rampa da zero alla
-  // cerniera fino al pieno verso il bordo libero, così la radice resta
-  // incollata alla costa e ad alzarsi è solo il corpo della pagina.
-  // (posZ è in unità normalizzate: si divide per la larghezza mondo.)
+  // Nella geometria e non sul gruppo: a rampa dalla cerniera, così la radice
+  // resta incollata alla costa e si alza solo il corpo della pagina.
   if (alzata !== 0) {
     for (let v = 1; v <= M_COLONNE; v += 1) {
       posZ[v] += (alzata / LARGHEZZA_MONDO) * Math.min(1, (v / M_COLONNE) * 2.2)
@@ -87,8 +67,7 @@ function calcolaColonne(curvaAmp, alzata = 0) {
   }
   return { posX, posZ, angoliSegmento }
 }
-// Le copertine (primo e ultimo foglio) sono cartone: ogni flessione — quella
-// geometrica del giro e quella dinamica — gli arriva molto ridotta.
+/* Primo e ultimo foglio sono cartone: ogni flessione gli arriva ridotta. */
 function rigidita(indice) {
   return indice === 0 || indice === N - 1 ? RIGIDITA_COPERTINA : 1
 }
@@ -103,12 +82,20 @@ function angoliVertici(angoliSegmento) {
   return out
 }
 
+/*
+ * Libro sfogliabile in 3D. Three.js e Anime.js (~190 kB gzip) si caricano solo
+ * quando il widget si avvicina al viewport; finché la scena non è pronta — e
+ * per sempre, se manca WebGL — resta la copertina statica.
+ *
+ * Ogni pagina è una striscia di M_COLONNE quadrilateri che ruota attorno alla
+ * costa; al rilascio assesta una molla vera innescata dalla velocità del dito.
+ */
 export default function Sketchbook() {
   const [pagina, setPagina] = useState(0) // quante pagine sono già girate a sinistra
   const [pronto, setPronto] = useState(false) // scena 3D montata: si può nascondere la copertina di scorta
   const animateRef = useRef(null)
   const springRef = useRef(null)
-  const treRef = useRef(null) // { THREE, renderer, scena, camera, libroGruppo, pagine, gutterMat, applicaGeometria, richiediRender, fermaRender }
+  const treRef = useRef(null) // tutta la scena Three.js, montata da avvia()
   const angoli = useRef(Array(N).fill(0)) // angolo rotateY corrente di ogni pagina
   const inCorso = useRef(false) // un assestamento (molla) è in corso
   const trascinamento = useRef(null) // { indice, verso, startX, mosso, velocita, ... }
@@ -116,6 +103,27 @@ export default function Sketchbook() {
   const flutter = useRef(null) // { anim, stato, indice }: la vibrazione di assestamento in corso
   const wrapperRef = useRef(null)
   const mountRef = useRef(null) // div in cui Three.js monta il proprio <canvas>
+
+  /*
+   * Libro a riposo per una data apertura (0 = chiuso davanti, N = chiuso
+   * dietro); `salta` è la pagina in volo, che posiziona applicaAngolo. Tutto è
+   * funzione continua dell'apertura, così niente scatta a fine giro.
+   */
+  const posizionaLibro = (apertura, salta = null) => {
+    const tre = treRef.current
+    if (!tre) return
+    // L'alone segue l'impronta del libro: mezza pagina da chiuso, due da aperto.
+    const apriSx = Math.min(1, apertura)
+    const apriDx = Math.min(1, N - apertura)
+    tre.alone.scale.set((apriSx + apriDx) * LARGHEZZA_MONDO * 1.25, ALTEZZA_MONDO * 1.3, 1)
+    tre.alone.position.x = -LARGHEZZA_MONDO / 2 + (apriDx - apriSx) * (LARGHEZZA_MONDO / 2) - 0.12
+    tre.pagine.forEach((p, i) => {
+      if (i === salta) return
+      const girata = angoli.current[i] < -90
+      p.gruppo.position.z = (girata ? i + 1 : N - i) * SCARTO_PILA
+    })
+    tre.gutterMat.opacity = GUTTER_OPACITA * Math.min(1, Math.max(0, Math.min(apertura, N - apertura) / 0.9))
+  }
 
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return
@@ -158,10 +166,8 @@ export default function Sketchbook() {
       renderer.setClearColor(0x000000, 0)
       mountRef.current.appendChild(renderer.domElement)
 
-      // Più eventi (pointermove ad alta frequenza, molla, resize) possono
-      // chiedere un ridisegno nello stesso frame: si coalizza tutto in UN
-      // render per frame via requestAnimationFrame, altrimenti col mouse
-      // (125–1000 Hz di eventi) si renderizza più volte a frame e scatta.
+      // Un render per frame: col mouse arrivano 125–1000 eventi al secondo, e
+      // senza coalescenza si renderizza più volte per frame e scatta.
       let frameRichiesto = 0
       const richiediRender = () => {
         if (frameRichiesto) return
@@ -174,28 +180,21 @@ export default function Sketchbook() {
 
       scena.add(new THREE.AmbientLight(0xffffff, 0.55))
       scena.add(new THREE.HemisphereLight(0xfff7ee, 0xd7d4cf, 0.4))
-      // Luce QUASI frontale: l'offset di un'ombra proiettata cresce con
-      // l'altezza del corpo che la getta per la pendenza della luce — con una
-      // luce molto angolata la pagina a metà giro (che si alza parecchio
-      // verso la camera) getterebbe ombre che "sparano" lontano dal libro,
-      // dove non ci si aspetta nulla. Quasi frontale, le ombre interne
-      // (pagina su pila, pagina su pagina) restano attaccate a chi le fa.
+      // Quasi frontale: angolata, la pagina a metà giro sparerebbe un'ombra
+      // lontano dal libro.
       const direzionale = new THREE.DirectionalLight(0xfff9f0, 1.35)
       direzionale.position.set(0.9, 1.4, 4.0)
       direzionale.castShadow = true
       direzionale.shadow.mapSize.set(2048, 2048)
-      // Il frustum deve contenere anche la pila girata a sinistra (fino a
-      // x = -1.5 larghezze pagina) e la pagina in volo. Più stretto di così
-      // le ombre spariscono di colpo ai bordi; molto più largo si sprecano
-      // texel.
+      // Deve contenere la pila girata a sinistra e la pagina in volo: più
+      // stretto e le ombre spariscono ai bordi, più largo e si sprecano texel.
       direzionale.shadow.camera.left = -LARGHEZZA_MONDO * 1.8
       direzionale.shadow.camera.right = LARGHEZZA_MONDO * 1.1
       direzionale.shadow.camera.top = ALTEZZA_MONDO * 0.8
       direzionale.shadow.camera.bottom = -ALTEZZA_MONDO * 0.95
       direzionale.shadow.camera.near = 0.5
       direzionale.shadow.camera.far = 12
-      // normalBias (e un bias minimo): niente acne né ombre "trapelate" tra
-      // superfici sottili e ravvicinate come i fogli della pila.
+      // Contro l'acne e le ombre "trapelate" tra fogli sottili e ravvicinati.
       direzionale.shadow.bias = -0.0002
       direzionale.shadow.normalBias = 0.02
       scena.add(direzionale)
@@ -205,13 +204,9 @@ export default function Sketchbook() {
       libroGruppo.rotation.y = ROT_Y_LIBRO
       scena.add(libroGruppo)
 
-      // L'"appoggio" del libro è un alone morbido pre-sfumato che segue
-      // l'impronta del volume (lo posiziona posizionaLibro: metà destra a
-      // libro chiuso, doppia pagina da aperto). NON è un piano che riceve le
-      // ombre vere: la pagina in volo si alza parecchio e la sua ombra
-      // proiettata finirebbe lontano dal libro, dove non ci si aspetta
-      // nulla. E niente drop-shadow CSS sul canvas: quel filtro andrebbe
-      // ricalcolato a ogni frame ed è una causa classica di scatti su mobile.
+      // Alone pre-sfumato e non un piano che riceve le ombre vere: quella della
+      // pagina in volo finirebbe lontano dal libro. Nemmeno un drop-shadow CSS,
+      // che va ricalcolato a ogni frame e su mobile scatta.
       const telaAlone = document.createElement('canvas')
       telaAlone.width = 256
       telaAlone.height = 256
@@ -232,16 +227,11 @@ export default function Sketchbook() {
           opacity: 0.55,
         })
       )
-      // Spostato verso il basso-sinistra, opposto alla luce, come una vera
-      // ombra di contatto (la x la aggiorna posizionaLibro col travaso).
+      // Opposto alla luce, come una vera ombra di contatto.
       alone.position.set(-LARGHEZZA_MONDO / 2 - 0.12, -0.16, -0.05)
       libroGruppo.add(alone)
 
-      // Ombra d'incavo lungo la costa: in un libro vero aperto le pagine si
-      // incurvano verso la rilegatura e lì la luce non arriva. Una striscia
-      // sfumata sopra le pile, visibile solo quando il libro è aperto
-      // (opacità aggiornata in applicaAngolo/effetto pagina: 0 sulle
-      // copertine, piena a libro aperto).
+      // Incavo lungo la costa: a libro aperto la luce lì non arriva.
       const telaGutter = document.createElement('canvas')
       telaGutter.width = 256
       telaGutter.height = 4
@@ -314,8 +304,7 @@ export default function Sketchbook() {
         return geo
       }
 
-      // Riempie posizione e normali di UNA geometria (fronte o retro,
-      // condividono la stessa forma) con la catena calcolata per `curvaAmp`.
+      // Fronte e retro condividono la forma: questa riempie una faccia sola.
       const applicaGeometria = (geo, posX, posZ, angoliVert) => {
         const pos = geo.attributes.position.array
         const norm = geo.attributes.normal.array
@@ -381,8 +370,7 @@ export default function Sketchbook() {
           retroMesh.receiveShadow = true
           gruppo.add(retroMesh)
 
-          // Stato a riposo: piatta (curva=0), applicata subito così non c'è
-          // un frame vuoto prima della prima interazione.
+          // Applicato subito: niente frame vuoto prima della prima interazione.
           const { posX, posZ, angoliSegmento } = calcolaColonne(0)
           const angoliVert = angoliVertici(angoliSegmento)
           applicaGeometria(fronteGeo, posX, posZ, angoliVert)
@@ -421,8 +409,8 @@ export default function Sketchbook() {
       flutter.current?.anim?.cancel?.()
       flutter.current = null
       const tre = treRef.current
-      // Azzerato PRIMA del dispose: eventuali onUpdate di molle ancora vive
-      // trovano treRef nullo e non toccano più il renderer smaltito.
+      // Azzerato prima del dispose: gli onUpdate ancora vivi trovano treRef
+      // nullo e non toccano il renderer smaltito.
       treRef.current = null
       if (tre) {
         tre.fermaRender()
@@ -443,33 +431,7 @@ export default function Sketchbook() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Dispone il libro a riposo per una data apertura (0 = chiuso sulla
-  // copertina, N = chiuso sul retro): pagine ferme appoggiate sulla propria
-  // pila (il lato lo dice il loro angolo), alone d'appoggio, ombra d'incavo.
-  // `salta` è la pagina in volo, che posiziona applicaAngolo. Tutto è
-  // funzione continua dell'apertura: nessun valore salta quando lo stato
-  // React si aggiorna a fine giro.
-  const posizionaLibro = (apertura, salta = null) => {
-    const tre = treRef.current
-    if (!tre) return
-    // L'alone d'appoggio segue l'impronta del libro: solo la metà destra a
-    // libro chiuso, tutta la doppia pagina da aperto, solo la sinistra alla
-    // fine — con continuità.
-    const apriSx = Math.min(1, apertura)
-    const apriDx = Math.min(1, N - apertura)
-    tre.alone.scale.set((apriSx + apriDx) * LARGHEZZA_MONDO * 1.25, ALTEZZA_MONDO * 1.3, 1)
-    tre.alone.position.x = -LARGHEZZA_MONDO / 2 + (apriDx - apriSx) * (LARGHEZZA_MONDO / 2) - 0.12
-    tre.pagine.forEach((p, i) => {
-      if (i === salta) return
-      const girata = angoli.current[i] < -90
-      p.gruppo.position.z = (girata ? i + 1 : N - i) * SCARTO_PILA
-    })
-    tre.gutterMat.opacity = GUTTER_OPACITA * Math.min(1, Math.max(0, Math.min(apertura, N - apertura) / 0.9))
-  }
-
-  // Ogni volta che cambia quante pagine sono già girate, si rinormalizza lo
-  // stato di riposo. La pagina appena girata è già alla z giusta (vedi
-  // applicaAngolo): qui non c'è nessuno scatto.
+  // La pagina appena girata è già alla z giusta: non scatta niente.
   useEffect(() => {
     const tre = treRef.current
     if (!tre) return
@@ -478,15 +440,12 @@ export default function Sketchbook() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagina])
 
-  // Applica l'angolo alla pagina `indice`: ruota il suo gruppo (come un vero
-  // libro), ridisegna la sua geometria piegata e chiede un ridisegno.
-  // La camera NON si tocca: è fissa sulla costa.
-  // `verso` (1 avanti, -1 indietro) serve a inarcare la pagina dalla parte
-  // giusta: andare avanti e tornare indietro non sono lo stesso giro.
+  /*
+   * Ruota la pagina e ne ridisegna la geometria piegata. `verso` (1 avanti, -1
+   * indietro) la inarca dalla parte giusta: i due giri non sono lo stesso.
+   */
   const applicaAngolo = (indice, angolo, verso) => {
-    // Fine corsa fisico: oltre 0° e -180° ci sono le pile di pagine — la
-    // rotazione si ferma lì anche se la molla in overshoot chiede di più,
-    // altrimenti la pagina attraverserebbe quelle sotto.
+    // Oltre 0° e -180° ci sono le pile: la molla in overshoot le attraverserebbe.
     const rotazione = Math.min(0, Math.max(-180, angolo))
     const tre = treRef.current
     if (!tre) {
@@ -496,12 +455,8 @@ export default function Sketchbook() {
     const progresso = -rotazione / 180
     const pieno = Math.sin(progresso * Math.PI) // 0→1→0: quanto si è "a metà giro" ora
 
-    // Flessione dinamica: quanto più veloce gira, tanto più il corpo del
-    // foglio resta indietro. Insegue la velocità con un po' di inerzia (la
-    // carta non scatta). Il segno è quello della velocità istantanea, la
-    // stessa convenzione di `versoArco` qui sotto: girando nel verso del
-    // gesto rinforza l'arco, e se a metà giro si torna indietro col dito lo
-    // contrasta — come la carta vera, che cambia imbarcatura.
+    // Con un po' di inerzia, la carta non scatta. Prende il segno della
+    // velocità istantanea: tornando indietro col dito, l'imbarcatura si inverte.
     const ora = performance.now()
     const dt = ora - piega.current.ultimoTempo
     if (dt > 0 && dt < 200) {
@@ -522,18 +477,13 @@ export default function Sketchbook() {
     const p = tre.pagine[indice]
     if (p) {
       p.gruppo.rotation.y = (rotazione * Math.PI) / 180
-      // Quota del volo: interpola tra il riposo sulla pila destra e quello
-      // sulla sinistra — la cerniera non si alza mai (il sollevamento è
-      // nella geometria, a rampa), quindi decollo e atterraggio sono esatti
-      // e la radice della pagina resta sempre attaccata alla rilegatura.
+      // Interpola tra le due pile. La cerniera non si alza mai, quindi decollo
+      // e atterraggio cadono esatti.
       const zDestra = (N - indice) * SCARTO_PILA
       const zSinistra = (indice + 1) * SCARTO_PILA
       p.gruppo.position.z = zDestra + (zSinistra - zDestra) * progresso
-      // Da che parte si imbarca il foglio: la carta è floscia e il suo corpo
-      // resta sempre indietro rispetto al bordo che tira, quindi il ventre
-      // punta dalla parte OPPOSTA a dove la pagina sta andando. A metà giro,
-      // andando avanti gonfia a destra (da dove viene), tornando indietro a
-      // sinistra. Senza questo, i due giri sono la stessa animazione.
+      // Il corpo resta indietro rispetto al bordo che tira, quindi il ventre
+      // punta dalla parte opposta al moto. Senza, i due giri sono uguali.
       const versoArco = -verso
       const curvaAmp =
         Math.max(-PIEGA_TOTALE_MAX, Math.min(PIEGA_TOTALE_MAX, versoArco * pieno + piega.current.extra)) *
@@ -548,9 +498,10 @@ export default function Sketchbook() {
     tre.richiediRender()
   }
 
-  // Applica SOLO la flessione residua alla pagina `indice` ferma a fine
-  // corsa: usata dalla vibrazione di assestamento (flutter), quando angolo e
-  // profondità sono già quelli di riposo.
+  /*
+   * Applica SOLO la flessione residua a una pagina ferma a fine corsa: la usa
+   * il flutter, quando angolo e profondità sono già quelli di riposo.
+   */
   const applicaPiegaResidua = (indice, extra) => {
     const tre = treRef.current
     if (!tre) return
@@ -563,11 +514,10 @@ export default function Sketchbook() {
     tre.richiediRender()
   }
 
-  // All'atterraggio la pagina arriva con la flessione dell'ultimo istante di
-  // volo: la scarica con una molla poco smorzata — il fruscio della carta
-  // che si assesta. Non blocca l'interazione (inCorso resta falso): chi
-  // riprende subito la pagina la trova dove sta, senza scatti (vedi
-  // iniziaTrascinamento, che eredita la flessione corrente del flutter).
+  /*
+   * Scarica la flessione residua dell'atterraggio con una molla poco smorzata:
+   * il fruscio della carta. Non blocca l'interazione, `inCorso` resta falso.
+   */
   const avviaFlutter = (indice) => {
     const daExtra = piega.current.extra
     piega.current.extra = 0
@@ -588,9 +538,10 @@ export default function Sketchbook() {
     flutter.current = { anim, stato, indice }
   }
 
-  // Ferma un eventuale flutter prima di una nuova interazione; se riguardava
-  // proprio la pagina che si sta per muovere, la sua flessione corrente
-  // viene ereditata così la geometria non salta.
+  /*
+   * Ferma un flutter prima di una nuova interazione. Se riguardava la pagina
+   * che si sta per muovere ne eredita la flessione, o la geometria salterebbe.
+   */
   const fermaFlutter = (indice) => {
     const f = flutter.current
     if (!f) return
@@ -599,9 +550,11 @@ export default function Sketchbook() {
     flutter.current = null
   }
 
-  // Cedimento elastico di TUTTO il libro quando si prova a sfogliare oltre le
-  // copertine: un libro vero non fa ruotare la copertina attraverso la pila,
-  // al massimo si sposta un po' tutto insieme.
+  /*
+   * Cedimento elastico di TUTTO il libro quando si sfoglia oltre le copertine:
+   * un libro vero non ruota la copertina attraverso la pila, al massimo si
+   * sposta un po' tutto insieme.
+   */
   const applicaCedimentoLibro = (rad) => {
     const tre = treRef.current
     if (!tre) return
@@ -628,10 +581,11 @@ export default function Sketchbook() {
     })
   }
 
-  // Assesta la pagina `indice` fino ad `aAngolo` con una molla fisica reale
-  // (Anime.js `spring`), innescata dalla velocità del gesto (0 se non c'è,
-  // es. tastiera o clic): parte di slancio se il gesto era veloce, e la
-  // durata dell'assestamento la decide la molla stessa, non un tempo fisso.
+  /*
+   * Assesta la pagina `indice` fino ad `aAngolo` con una molla fisica reale
+   * (Anime.js `spring`), innescata dalla velocità del gesto — 0 da tastiera o
+   * da clic. La durata la decide la molla, non un tempo fisso.
+   */
   const assesta = (indice, verso, aAngolo, cambiaPagina, velocita = 0) => {
     const da = angoli.current[indice]
     const chiudi = () => {
@@ -645,11 +599,8 @@ export default function Sketchbook() {
       return
     }
     inCorso.current = true
-    // La molla di Anime.js (solver WebKit) lavora sul progresso normalizzato
-    // 0→1 della corsa: la velocità del gesto (gradi/ms) va convertita in
-    // unità di corsa al secondo, positiva se il gesto andava VERSO il target.
-    // Passarla grezza (come unità diverse e col segno dell'asse dei gradi)
-    // farebbe partire la molla all'indietro per un istante a ogni rilascio.
+    // La molla lavora sul progresso 0→1: la velocità in gradi/ms va convertita
+    // in unità di corsa al secondo, o parte all'indietro a ogni rilascio.
     const velocitaNormalizzata = Math.max(-20, Math.min(20, (velocita * 1000) / (aAngolo - da)))
     const stato = { angolo: da }
     animateRef.current(stato, {
@@ -663,13 +614,12 @@ export default function Sketchbook() {
     })
   }
 
-  // Giro completo (tastiera, o clic senza trascinamento).
+  /*
+   * Giro completo, da tastiera o da clic. Il controllo su `treRef`: Anime.js
+   * carica prima delle texture, e in quella finestra la molla animerebbe
+   * `pagina` a vuoto — lo stato avanza, la rotazione non si applica.
+   */
   const gira = (verso) => {
-    // Anime.js può essere pronto (dinamicamente importato) qualche istante
-    // prima che le texture della scena 3D finiscano di caricare: senza
-    // questo controllo, in quella finestra partirebbe comunque una molla
-    // che anima `pagina` a vuoto — lo stato avanza ma la rotazione 3D non
-    // si applica mai, perché la pagina non esiste ancora in scena.
     if (!treRef.current) return
     if (inCorso.current || trascinamento.current) return
     const indice = verso === 1 ? pagina : pagina - 1
@@ -689,9 +639,8 @@ export default function Sketchbook() {
     const indice = verso === 1 ? pagina : pagina - 1
     e.currentTarget.setPointerCapture?.(e.pointerId)
     if (indice < 0 || indice >= N) {
-      // Si prova a sfogliare oltre la copertina o l'ultima pagina: nessun
-      // vero giro, ma un piccolo cedimento elastico di tutto il libro
-      // (assestato in fineTrascinamento/annullaTrascinamento), non il nulla.
+      // Oltre la copertina o l'ultima pagina: nessun giro, ma un cedimento
+      // elastico di tutto il libro invece del nulla.
       trascinamento.current = {
         pointerId: e.pointerId,
         limite: true,
@@ -710,11 +659,8 @@ export default function Sketchbook() {
       verso,
       startX: e.clientX,
       larghezza: rect.width,
-      // Presa diretta: il bordo libero della pagina segue il dito 1:1.
-      // Si converte lo spostamento del puntatore in unità mondo (il piano
-      // del libro riempie 1/MARGINE_CAMERA del widget) e si ricava l'angolo
-      // dalla posizione orizzontale del bordo: x = L·cos(angolo), quindi
-      // angolo = -acos(x/L) — la cinematica vera di un lembo incernierato.
+      // Presa diretta, il bordo segue il dito 1:1: x = L·cos(angolo), quindi
+      // angolo = -acos(x/L).
       mondoPerPx: (2 * LARGHEZZA_MONDO * MARGINE_CAMERA) / rect.width,
       bordoXIniziale: LARGHEZZA_MONDO * Math.cos((Math.abs(angoli.current[indice]) * Math.PI) / 180),
       progresso: 0,
@@ -725,7 +671,7 @@ export default function Sketchbook() {
     }
   }
 
-  // Progresso 0→1 del gesto ai limiti del libro (solo caso `limite`).
+  /* Progresso 0→1 del gesto ai limiti del libro (solo caso `limite`). */
   const progressoTrascinamento = (t, clientX) => {
     const dx = clientX - t.startX
     const grezzo = t.verso === 1 ? -dx : dx
@@ -736,9 +682,8 @@ export default function Sketchbook() {
     const t = trascinamento.current
     if (!t || e.pointerId !== t.pointerId) return
     if (t.limite) {
-      // Resistenza che si esaurisce (tanh): tanta cedevolezza all'inizio,
-      // poi sempre meno — come spingere un libro chiuso, che accompagna
-      // appena e poi non va più in là.
+      // Resistenza che si esaurisce (tanh): cede all'inizio, poi sempre meno,
+      // come spingere un libro chiuso.
       const cedimento = CEDIMENTO_LIBRO * Math.tanh(progressoTrascinamento(t, e.clientX) * 2.2)
       applicaCedimentoLibro(t.verso === 1 ? -cedimento : cedimento)
       return
@@ -748,8 +693,8 @@ export default function Sketchbook() {
     const bordoX = Math.max(-LARGHEZZA_MONDO, Math.min(LARGHEZZA_MONDO, t.bordoXIniziale + dx * t.mondoPerPx))
     const angolo = (-Math.acos(bordoX / LARGHEZZA_MONDO) * 180) / Math.PI
     t.progresso = t.verso === 1 ? -angolo / 180 : 1 + angolo / 180
-    // Velocità reale del gesto, per il rilascio "al volo" — campionata non più
-    // spesso di ~60fps per non farla saltare tra due eventi troppo vicini.
+    // Velocità reale del gesto, per il rilascio "al volo". Campionata al
+    // massimo a ~60fps, o salterebbe tra due eventi troppo vicini.
     const ora = performance.now()
     const dt = ora - t.ultimoTempo
     if (dt > 8) {
@@ -768,14 +713,12 @@ export default function Sketchbook() {
       assestaLibro()
       return
     }
-    // Lo slancio vale solo se il dito si muoveva davvero al rilascio: se ci
-    // si ferma un attimo e POI si lascia, la velocità di prima non conta più.
+    // Lo slancio vale solo se il dito si muoveva davvero al rilascio.
     if (performance.now() - t.ultimoTempo > VELOCITA_STANTIA_MS) t.velocita = 0
     const alVolo = t.verso === 1 ? t.velocita < -SOGLIA_VOLO : t.velocita > SOGLIA_VOLO
     const controVolo = t.verso === 1 ? t.velocita > SOGLIA_VOLO : t.velocita < -SOGLIA_VOLO
-    // Poco trascinamento = vale come clic: gira comunque per intero. Un flick
-    // nella direzione opposta invece annulla il giro anche oltre la soglia,
-    // come una pagina vera rilanciata indietro.
+    // Poco trascinamento vale come clic e gira comunque. Un flick opposto
+    // annulla il giro anche oltre la soglia, come una pagina rilanciata.
     const completa = !t.mosso || (!controVolo && (t.progresso > SOGLIA_COMPLETAMENTO || alVolo))
     const aAngolo = completa ? (t.verso === 1 ? -180 : 0) : (t.verso === 1 ? 0 : -180)
     assesta(t.indice, t.verso, aAngolo, completa, t.velocita)
@@ -797,6 +740,9 @@ export default function Sketchbook() {
       <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">Sketchbook</div>
 
       <div className="flex flex-col items-center">
+        {/* `tabIndex` e frecce sono l'unico modo di sfogliare senza mouse: il
+            libro si gira trascinando. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
           ref={wrapperRef}
           className="relative w-full max-w-[560px] touch-pan-y select-none sm:max-w-[780px] lg:max-w-[1000px] xl:max-w-[1120px]"
@@ -810,16 +756,12 @@ export default function Sketchbook() {
           }}
         >
           <div className="relative aspect-[2000/1415] w-full">
-            {/* Copertina di scorta: sempre nel markup (corretta senza JS e
-                nel pre-rendering — senza JS la pagina non si è mai potuta
-                sfogliare, quindi si vede comunque solo la copertina, chiusa
-                sulla metà destra della doppia pagina, dove sta anche nella
-                scena 3D). Sparisce quando la scena 3D è pronta; resta se
-                WebGL non è disponibile. Posizione e misure derivano da
-                MARGINE_CAMERA (1/1.12 ≈ 89.3% del riquadro per il libro),
-                corrette per la prospettiva: la copertina chiusa sta in cima
-                alla pila, un filo più vicina alla camera, e si proietta
-                ~1% più grande. */}
+            {/* Copertina di scorta, sempre nel markup: senza JS il libro non
+                si sfoglia comunque, quindi mostrarla chiusa sulla metà destra
+                — dov'è anche nella scena 3D — è corretto. Sparisce quando la
+                scena è pronta, resta se manca WebGL. Misure derivate da
+                MARGINE_CAMERA (≈89.3% del riquadro) più l'1% di prospettiva:
+                sta in cima alla pila, un filo più vicina alla camera. */}
             <img
               src={sketchbook[0].front.src}
               alt={sketchbook[0].front.alt}
@@ -832,20 +774,16 @@ export default function Sketchbook() {
               }`}
             />
 
-            {/* La scena 3D vera: Three.js monta qui il proprio <canvas>.
-                Sborda del 12% per lato (vedi MARGINE_TELA): la pagina in volo
-                si proietta più grande del libro e ha bisogno di aria per non
-                venire tagliata dal bordo del canvas. Non riceve eventi: sotto
-                c'è il livello di interazione, grande quanto il libro. */}
+            {/* Three.js monta qui il suo <canvas>. Sborda del 12% per lato
+                (vedi MARGINE_TELA) e non riceve eventi: quelli li prende il
+                livello sotto, grande quanto il libro. */}
             <div
               ref={mountRef}
               className={`pointer-events-none absolute -inset-[12%] ${pronto ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
             />
 
-            {/* Livello di interazione, allineato al riquadro del libro.
-                touch-pan-y (non touch-none): lo scroll verticale della pagina
-                resta possibile anche partendo dal libro; il trascinamento
-                orizzontale sfoglia. */}
+            {/* `touch-pan-y` e non `touch-none`: lo scroll verticale resta
+                possibile anche partendo dal libro, l'orizzontale sfoglia. */}
             <div
               className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
               onPointerDown={iniziaTrascinamento}

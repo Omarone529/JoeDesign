@@ -1,8 +1,8 @@
 import { Link } from '../router'
 
 /*
- * 404. Mostrata sia in navigazione client-side sia come dist/404.html, che
- * Netlify serve con lo status 404 vero. Testata a due colonne + celle di uscita.
+ * Serve sia alla navigazione client-side sia a dist/404.html, che Netlify
+ * restituisce con lo status 404 vero.
  */
 export default function NotFound() {
   return (

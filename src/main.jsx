@@ -14,7 +14,7 @@ const app = (
   </React.StrictMode>
 )
 
-// Markup già presente (pre-render) → hydration; altrimenti (dev) monta da zero.
+// Markup già presente (pre-render) → hydration; in dev monta da zero.
 if (root.hasChildNodes()) {
   hydrateRoot(root, app)
 } else {

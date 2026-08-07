@@ -1,27 +1,17 @@
 /*
- * Tavole dello "sketchbook" personale di Joe per il widget 3D in "Chi sono",
- * estratte da "ARCHIVE JOE SARCHIOLLA.pdf" (lo stesso archivio che
- * pdf-disegno.js usa per i disegni tecnici).
+ * Tavole dello sketchbook per il widget 3D in "Chi sono", da "ARCHIVE JOE
+ * SARCHIOLLA.pdf". A differenza di pdf-disegno.js si tiene la pagina intera,
+ * come sfogliando il libro vero.
  *
- * A differenza di pdf-disegno.js qui non serve ritagliare nulla: si vuole
- * la pagina intera, come si vedrebbe sfogliando il libro vero. Si rasterizza
- * ogni pagina scelta e si converte in WebP via sharp.
- *
- * Va lanciato a mano, come gli altri script sul PDF:
- *
- *   npm i --no-save pdf-to-img
+ *   npm i --no-save pdf-to-img     (fuori da package.json: serve solo qui)
  *   node scripts/sketchbook-pages.js
- *
- * `pdf-to-img` non è in package.json - serve solo qui, come in pdf-disegno.js.
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
 import path from 'node:path'
 import { pdf } from 'pdf-to-img'
 
-// Percorso dell'archivio: sul Mac sta sul Desktop, su Windows nella cartella
-// di rete (stesso file di pdf-disegno.js). Si prova prima un eventuale
-// override, poi le due posizioni note.
+// Override, poi le due posizioni note (Mac e Windows).
 const candidati = [
   process.env.SKETCHBOOK_PDF,
   '/Users/omar/Desktop/ARCHIVE JOE SARCHIOLLA.pdf',
@@ -33,18 +23,13 @@ if (!PDF_PATH) {
   process.exit(1)
 }
 
-// Risoluzione di rendering: pagine intere con foto e testo piccolo (le
-// specifiche in stile macchina da scrivere), serve nitidezza.
+// Le pagine hanno testo piccolo: serve nitidezza.
 const SCALA = 2.2
 const LARGHEZZA = 1000
 
 const OUT_DIR = 'public/images/about/sketchbook'
 
-/*
- * Pagine scelte (numerazione di rendering: 1 = prima pagina del PDF, non il
- * numero di folio stampato) e nome del file d'uscita. L'ordine qui è
- * l'ordine di lettura dello sketchbook nel sito.
- */
+/* Numerazione di rendering (1 = prima pagina del PDF, non il folio stampato). */
 const TAVOLE = [
   { pagina: 1, nome: '01' }, // Copertina "Personal Archive 2024-2026"
   { pagina: 3, nome: '02' }, // Frontespizio "Vol.1 Archivio"

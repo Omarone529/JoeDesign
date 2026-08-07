@@ -1,33 +1,17 @@
 /*
- * Genera le immagini per le anteprime social (Open Graph), in
- * public/images/og/, una per ogni pagina del sito.
+ * Anteprime social (Open Graph) in public/images/og/, una per pagina.
  *
- * PERCHÉ ESISTE
- * -------------
- * Il sito usa WebP ovunque, ma LinkedIn e WhatsApp non lo leggono come
- * immagine di anteprima: chi condivide il link vedrebbe un riquadro vuoto.
- * Le anteprime vogliono JPEG, 1200×630, con l'indirizzo assoluto. Questo
- * script prepara quei file una volta sola, partendo dalle stesse copertine
- * WebP già presenti in public/images/.
+ * Servono in JPEG: il sito è tutto WebP, che LinkedIn e WhatsApp non leggono
+ * come anteprima, e il link condiviso uscirebbe con un riquadro vuoto.
  *
- * QUANDO RILANCIARLO
- * ------------------
- * Dopo aver aggiunto un progetto all'archivio o sostituito una copertina:
+ * Da rilanciare dopo aver aggiunto un progetto o cambiato una copertina:
  *
  *   node scripts/og-image.js
  *
- * Rigenera tutto in pochi secondi; i file finiscono nel repo come le altre
- * immagini (nessun costo sulla build di Netlify).
- *
- * IMPAGINAZIONE
- * -------------
- * Stessa grammatica del sito: fondo carta, inchiostro, maiuscolo stretto,
- * filetti sottili. Due impianti:
- *   - schede progetto e "Chi sono" → testo a sinistra, immagine a destra
- *     CONTENUTA (mai ritagliata: i manifesti di "PROGETTI GRAFICI" e le foto
- *     con figure intere perderebbero la parte che conta);
- *   - home e archivio → la famiglia di prodotti a tutta pagina, con il testo
- *     nello spazio vuoto in alto a sinistra.
+ * Due impianti, nella grammatica del sito: schede e "Chi sono" con testo a
+ * sinistra e immagine a destra sempre CONTENUTA (ritagliata, i manifesti e le
+ * figure intere perderebbero la parte che conta); home e archivio con la
+ * famiglia di prodotti a tutta pagina.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -39,8 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 const outDir = path.join(root, 'public', 'images', 'og')
 
-/* Misure obbligate: 1200×630 è il formato che tutte le piattaforme ritagliano
- * senza sorprese (rapporto 1.91:1). */
+/* 1200×630 (1.91:1): il formato che tutte le piattaforme trattano uguale. */
 const W = 1200
 const H = 630
 
@@ -54,10 +37,9 @@ const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 /*
- * Larghezza stimata di una stringa in maiuscolo grassetto.
- * Serve a mandare a capo il titolo e a scegliere il corpo: sharp disegna l'SVG
- * ma non sa dire quanto misura il testo, quindi le larghezze dei caratteri
- * (millesimi di em, metriche Helvetica Bold) stanno qui.
+ * sharp disegna l'SVG ma non sa dire quanto misura il testo, e serve per
+ * mandare a capo: le larghezze dei caratteri (millesimi di em, Helvetica Bold)
+ * stanno qui.
  */
 const ADV = {
   A: 722, B: 722, C: 722, D: 722, E: 667, F: 611, G: 778, H: 722, I: 278,
@@ -74,7 +56,6 @@ function larghezza(testo, fontSize, tracking = 0) {
   return em * fontSize
 }
 
-/* Manda a capo sulle parole, rispettando una larghezza massima. */
 function aCapo(testo, fontSize, maxW, tracking) {
   const righe = []
   let corrente = ''
@@ -107,7 +88,6 @@ function titoloAdattato(testo, { maxW, maxRighe = 3, max = 78, min = 34 }) {
   return { size: min, righe: aCapo(testo, min, maxW, tracking), tracking }
 }
 
-/* Occhiello: minuscolo, maiuscolo, molto spaziato (come nel sito). */
 function occhiello(testo, x, y, colore = MUTED) {
   return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="15" font-weight="400"
     letter-spacing="3.4" fill="${colore}">${esc(String(testo).toUpperCase())}</text>`

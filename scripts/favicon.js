@@ -1,24 +1,15 @@
 /*
- * Genera l'icona del sito in tutti i formati che servono ai browser, a
- * partire dal marchio usato nella navbar (public/images/navbar/logo.webp).
+ * Icona del sito in tutti i formati, dal marchio della navbar. Da rilanciare
+ * solo se il marchio cambia: i file finiti stanno nel repo.
  *
  *   node scripts/favicon.js
  *
- * Produce in public/:
- *   favicon.svg           browser moderni (il marchio incapsulato in un SVG)
- *   favicon.ico           32×32, richiesto in automatico dalla radice del sito
- *   apple-touch-icon.png  180×180, iPhone/iPad "aggiungi a schermata Home"
- *   icon-192.png          Android / manifest
- *   icon-512.png          Android / manifest, splash screen
- *   site.webmanifest      nome e colori dell'app installata
+ * Produce in public/: favicon.svg, favicon.ico, apple-touch-icon.png,
+ * icon-192.png, icon-512.png, site.webmanifest.
  *
- * Il marchio non esiste in vettoriale: `favicon.svg` incapsula lo stesso
- * raster (nitido alle dimensioni ridotte a cui viene mostrato). Per la
- * scheda del browser resta trasparente, come nella navbar; per le icone da
- * schermata Home (Apple/Android, che non gestiscono bene la trasparenza)
- * viene appoggiato sul fondo `paper` del sito.
- *
- * Va rilanciato solo se cambia il marchio: i file finiti stanno nel repo.
+ * Il marchio non esiste in vettoriale, quindi l'SVG incapsula il raster. Nella
+ * scheda del browser resta trasparente; le icone da schermata Home vanno sul
+ * fondo `paper`, perché Apple e Android la trasparenza la gestiscono male.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -41,9 +32,8 @@ const iconOpaca = (lato) =>
     .png({ compressionLevel: 9 })
 
 /*
- * Contenitore ICO. Dal 2007 un .ico può contenere direttamente un PNG, quindi
- * bastano due intestazioni davanti ai byte dell'immagine: 6 byte di testata
- * (tipo "icona", una sola dimensione) e 16 che descrivono quell'unica voce.
+ * Un .ico può contenere un PNG così com'è: bastano 6 byte di testata e 16 che
+ * descrivono l'unica voce, davanti ai byte dell'immagine.
  */
 function ico(pngBuffer, lato) {
   const testata = Buffer.alloc(6)
@@ -64,7 +54,6 @@ function ico(pngBuffer, lato) {
   return Buffer.concat([testata, voce, pngBuffer])
 }
 
-/* SVG: incapsula il raster del marchio (trasparente, come in navbar). */
 const logoBase64 = fs.readFileSync(logoPath).toString('base64')
 fs.writeFileSync(
   path.join(publicDir, 'favicon.svg'),
@@ -82,10 +71,8 @@ fs.writeFileSync(
 )
 
 /*
- * Manifest: come si chiama e di che colore è il sito quando viene aggiunto
- * alla schermata Home. `display: browser` perché è un sito da leggere, non
- * un'applicazione: nascondere la barra dell'indirizzo toglierebbe all'utente
- * il modo di condividere la pagina.
+ * `display: browser` perché è un sito da leggere, non un'applicazione:
+ * nascondere la barra toglierebbe il modo di condividere la pagina.
  */
 fs.writeFileSync(
   path.join(publicDir, 'site.webmanifest'),

@@ -1,9 +1,5 @@
 import { familyBand } from '../../data/siteData'
 
-/*
- * Fascia a tutta larghezza, altezza naturale (mostra l'intera famiglia di
- * prodotti). width/height riservano lo spazio prima del caricamento.
- */
 export default function FamilyBand() {
   return (
     <section className="bg-placeholder">

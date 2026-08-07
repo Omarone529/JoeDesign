@@ -1,18 +1,34 @@
-import { archive, projectImages } from '../data/siteData'
+import {
+  altDisegno,
+  altGalleria,
+  altSfondo,
+  archive,
+  projectImages,
+} from '../data/siteData'
 import Carousel from '../components/Carousel'
 import { Link } from '../router'
 
+// Formato comune a tutti gli sfondo.webp: dichiararlo riserva lo spazio e la
+// navigazione sotto non salta a caricamento avvenuto.
+const SFONDO_W = 1672
+const SFONDO_H = 941
+
+/*
+ * Testo e carosello allineati in cima alla stessa riga di griglia, così la foto
+ * parte dall'altezza del titolo e non da quella della descrizione. Da xl la
+ * colonna foto pesa più di quella del testo; sotto, metà e metà, o il testo si
+ * strozza.
+ */
 export default function ProjectDetail({ slug }) {
   const index = archive.findIndex((p) => p.slug === slug)
   const item = archive[index]
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
   const { gallery, drawing, sfondo } = projectImages(item)
-  const slides = gallery
+  const slides = gallery.map((src, i) => ({ src, alt: altGalleria(item, i, gallery.length) }))
   const prev = archive[(index - 1 + archive.length) % archive.length]
   const next = archive[(index + 1) % archive.length]
 
-  // Righe della scheda tecnica: Anno + eventuali campi in `spec`.
   const specRows = [
     ...(item.year ? [['Anno', item.year]] : []),
     ...Object.entries(item.spec || {}),
@@ -21,21 +37,6 @@ export default function ProjectDetail({ slug }) {
 
   return (
     <main className="animate-viewIn">
-      {/*
-       * Fascia 1 · titolo + descrizione a sinistra, foto a destra, allineati
-       * in cima (stessa riga della griglia, stesso padding-top): la foto
-       * parte dall'altezza del titolo, non da quella della descrizione. Da
-       * desktop la colonna foto esce dal contenitore e arriva al bordo destro
-       * dello schermo (nessun padding, nessun max-width): occupa il
-       * quadrante destro della pagina, grande. Su telefono resta impaginata
-       * come prima (colonna unica, titolo e descrizione sopra, foto sotto).
-       */}
-      {/*
-       * Da xl la colonna foto pesa più di quella del testo: la foto è
-       * l'elemento portante della scheda e lì c'è larghezza da darle senza
-       * strozzare la descrizione (che ha comunque il suo `max-w-[52ch]`).
-       * Sotto xl resta metà e metà, altrimenti il testo diventa una colonnina.
-       */}
       <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
           <Link
@@ -45,7 +46,6 @@ export default function ProjectDetail({ slug }) {
             ← Archivio
           </Link>
 
-          {/* Titolo più contenuto: sotto deve entrare tutta la scheda nella prima schermata. */}
           <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
             {item.title}
           </h1>
@@ -61,21 +61,16 @@ export default function ProjectDetail({ slug }) {
         </div>
 
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 md:px-0 lg:pt-12">
-          <Carousel images={slides} title={item.title} />
+          {/* `key`: rimonta il carosello cambiando scheda (vedi Carousel). */}
+          <Carousel key={item.slug} images={slides} title={item.title} />
         </div>
       </div>
 
       <section className="px-5 sm:px-8 lg:px-[72px]">
-        {/*
-         * Fascia 2 · dati tecnici + disegno. Torna nel contenitore standard
-         * (niente bleed qui): stessa larghezza colonne di prima dell'ultima
-         * modifica.
-         */}
         <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 md:mt-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-y-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12">
           <div className="border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Progetto</div>
-            {/* Voce a sinistra, valore a destra: tiene la colonna anche larga. */}
-            <dl className="mt-6 grid grid-cols-1 gap-0 border-t border-line-soft">
+              <dl className="mt-6 grid grid-cols-1 gap-0 border-t border-line-soft">
               {specRows.map(([k, v]) => (
                 <div
                   key={k}
@@ -88,17 +83,13 @@ export default function ProjectDetail({ slug }) {
             </dl>
           </div>
 
-          {/*
-           * Fascia 2 · disegno tecnico. Fondo trasparente
-           * (`scripts/pdf-disegno.js`), si appoggia alla carta senza riquadro.
-           * Altezza fissa: proporzioni diverse, senza altezza la pagina si
-           * assesterebbe a caricamento avvenuto.
-           */}
+          {/* Altezza fissa: le proporzioni variano da un disegno all'altro, e
+              senza, la pagina si assesta a caricamento avvenuto. */}
           {drawing && (
             <figure className="m-0 border-t border-line pt-6">
               <img
                 src={drawing}
-                alt={`Disegno tecnico quotato di ${item.title}`}
+                alt={altDisegno(item)}
                 loading="lazy"
                 decoding="async"
                 className="mt-6 h-[clamp(260px,38vh,420px)] w-full object-contain lg:h-[clamp(300px,46vh,560px)]"
@@ -108,7 +99,6 @@ export default function ProjectDetail({ slug }) {
         </div>
       </section>
 
-      {/* Lavori (raccolta grafica) */}
       {item.works && item.works.length > 0 && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <h2 className="mb-8 border-t border-line pt-6 text-[clamp(18px,2.2vw,28px)] font-bold uppercase tracking-[-0.01em]">
@@ -123,31 +113,29 @@ export default function ProjectDetail({ slug }) {
                 <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted">
                   {w.meta}
                 </div>
-                <p className="mt-3 max-w-[46ch] text-[14px] leading-[1.5] text-ink/80">
-                  {w.note}
-                </p>
+                <p className="mt-3 max-w-[46ch] text-[14px] leading-[1.5] text-ink/80">{w.note}</p>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Immagine di sfondo del progetto */}
       {sfondo && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <figure className="m-0 border-t border-line pt-6">
             <img
               src={sfondo}
-              alt={`Immagine di sfondo di ${item.title}`}
+              alt={altSfondo(item)}
               loading="lazy"
               decoding="async"
-              className="w-full object-cover"
+              width={SFONDO_W}
+              height={SFONDO_H}
+              className="h-auto w-full object-cover"
             />
           </figure>
         </section>
       )}
 
-      {/* Navigazione progetto precedente / successivo */}
       <section className="mt-14 grid grid-cols-2 border-t border-line sm:mt-20 lg:mt-28">
         <Link
           to={`/progetto/${prev.slug}`}

@@ -25,7 +25,13 @@ npm run dev        # sviluppo → http://localhost:5173
 npm run build      # build client + build SSR + pre-rendering di tutte le pagine → dist/
 npm run preview    # anteprima della build di produzione
 npm run prerender  # solo lo step di pre-rendering (dopo una build)
+npm run lint       # ESLint (react, react-hooks, jsx-a11y). Deve restare a zero.
 ```
+
+⚠️ **`npm run preview` va usato con lo slash finale** (`/progetto/anelli/`, non
+`/progetto/anelli`): senza, Vite fa il fallback SPA e serve la home al posto
+della pagina pre-renderizzata, con conseguenti falsi errori di hydration in
+console. Netlify risolve le directory da sé e non ha il problema.
 
 `npm run build` fa tre cose in sequenza: `vite build` (bundle client) → `vite build --ssr`
 (bundle server in `dist-ssr/`) → `node scripts/prerender.js` (scrive gli HTML statici + sitemap + robots).
@@ -59,10 +65,27 @@ node scripts/favicon.js    # favicon.ico/.svg, apple-touch-icon, icon-192/512, s
 
 ### Pre-rendering / SEO (`scripts/prerender.js` + `src/seo.js` + `src/entry-server.jsx`)
 Ogni rotta viene renderizzata in un **HTML statico già completo** (es. `dist/progetto/flue/index.html`),
-con title, meta description, Open Graph, Twitter card e JSON-LD schema.org **per pagina**.
+con title, meta description, author, Open Graph, Twitter card e JSON-LD schema.org **per pagina**.
 Vengono generati anche `sitemap.xml` e `robots.txt`. Google e le anteprime dei link vedono
 il contenuto senza eseguire JS. Nel browser React si "aggancia" via hydration (`src/main.jsx`).
-`src/seo.js` definisce title/description/immagine per ogni rotta e l'elenco delle rotte da generare.
+
+`src/seo.js` è il posto dei metadati: title/description/immagine per rotta, l'elenco
+delle rotte da generare, **i dati strutturati** e **le immagini da mettere in sitemap**.
+`prerender.js` non decide niente, li serializza soltanto.
+
+**Dati strutturati** — un `@graph` per pagina, non frammenti sciolti. Sito e persona
+hanno un `@id` fisso (`#sito`, `#persona`) e le altre entità li richiamano invece di
+ridescriverli: così le 18 schede risultano di *una* persona, non di 18 omonimi.
+Per rotta: home `WebSite`+`Person`, `/archivio` `CollectionPage`+`ItemList`,
+`/chi-sono` `ProfilePage`, scheda `CreativeWork`+`BreadcrumbList`. La 404 non ne ha
+(è `noindex`: descrivere un errore a un motore non ha senso).
+
+**Sitemap immagini** — ogni URL dichiara le immagini che contiene (174 in tutto).
+Per un portfolio Google Immagini pesa quanto la ricerca per testo. Dentro
+`<image:image>` va **solo** `<image:loc>`: `image:title`, `image:caption`,
+`image:license` e `image:geo_location` sono deprecati da Google dal 2022 e ignorati —
+la descrizione la prende dall'`alt` nella pagina, ed è per questo che gli `alt` sono
+scritti per bene in `siteData` (`altCopertina`, `altGalleria`, `altDisegno`, `altSfondo`).
 
 ### Contenuti (`src/data/siteData.js`) — FONTE DI VERITÀ
 Tutti i testi e i dati stanno qui, non nel markup:
@@ -71,6 +94,11 @@ Tutti i testi e i dati stanno qui, non nel markup:
 - `archive` — TUTTI i progetti (slug, title, cat, year, photos, desc, spec, opzionale `works`)
 - `familyBand` — altra sezione home (il ticker "Skills" in home riusa `about.skills`)
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
+- `titoloLeggibile(t)` — i titoli sono scritti in maiuscolo e il CSS li mostra così;
+  fuori dal markup (alt, `<title>`, dati strutturati) serve la forma leggibile.
+  Maiuscola solo all'iniziale, come l'italiano vuole
+- `altCopertina/altGalleria/altDisegno/altSfondo` — i testi alternativi, usati sia
+  dalle pagine sia dalla sitemap immagini: una foto si descrive in un posto solo
 
 ## ⚠️ Regole da rispettare (per non rompere SEO/pre-rendering)
 
@@ -101,11 +129,19 @@ Organizzazione:
     In `siteData` il progetto che ce l'ha porta `disegno: true`.
 - Home: `public/images/home/` · Chi sono: `public/images/about/`
 
-**Dopo aver aggiunto o sostituito foto di prodotto va rilanciato:**
+**Dopo aver aggiunto o sostituito foto di prodotto vanno rilanciati, in quest'ordine:**
 
 ```bash
-node scripts/fit-foto.js   # → src/data/fotoFit.js
+node scripts/comprimi-foto.js   # riduce a 1600px e ricomprime (--prova per vedere e basta)
+node scripts/fit-foto.js        # → src/data/fotoFit.js
 ```
+
+`comprimi-foto.js` porta le immagini alla misura che il sito usa davvero:
+l'archivio arriva a 2000×2000 ma il carosello mostra al massimo ~800px CSS,
+1600 anche su schermo retina. Tiene più alte le grafiche piatte (quelle che
+`fit-foto` marca `contain`) e quelle con trasparenza, che si sgranano prima.
+Converge: rilanciarlo non rimastica l'archivio. Va **prima** di `fit-foto.js`,
+che misura i file per decidere i ritagli.
 
 Misura ogni immagine e decide come entra nella cornice quadrata del carosello:
 riempie (`object-cover`, il caso normale), riempie puntando il ritaglio sul
@@ -182,10 +218,14 @@ src/
 ├── data/siteData.js      # TUTTI i contenuti (fonte di verità)
 ├── data/fotoFit.js       # generato: come ogni foto entra nel carosello
 ├── components/
-│   ├── Navbar.jsx        # nav sticky (Home · Chi sono · Archivio · Contatti)
-│   ├── Footer.jsx
-│   ├── Carousel.jsx      # carosello immagini scheda progetto (autoplay + controlli)
-│   └── home/             # sezioni homepage: Masthead, MetaStrip, SelectedWorks,
+│   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono)
+│   ├── Footer.jsx        # fa anche da pagina contatti
+│   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
+│   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
+│   ├── FloatingMailButton.jsx
+│   ├── about/
+│   │   └── Sketchbook.jsx  # libro sfogliabile 3D (three + animejs, caricati a vista)
+│   └── home/             # sezioni homepage: Hero, SelectedWorks,
 │                         #   FamilyBand, SkillsTicker
 └── pages/
     ├── Home.jsx
@@ -198,6 +238,7 @@ scripts/
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
 ├── pdf-disegno.js       # disegni tecnici dall'archivio PDF → products/<slug>/disegno.webp (a mano)
+├── comprimi-foto.js     # riduce a 1600px e ricomprime public/images/ (a mano)
 ├── fit-foto.js          # come ogni foto entra nel carosello → src/data/fotoFit.js (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
 ├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)

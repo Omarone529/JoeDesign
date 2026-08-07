@@ -22,10 +22,7 @@ export const profile = {
     'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
 }
 
-/*
- * Sfondo hero home: ritratto sfocato via CSS sotto al nome. Decorativo (`alt`
- * vuoto). Sorgente: media/FOTO JOE.../joe.jpg, ottimizzata con optimize-image.js.
- */
+/* Decorativo, quindi `alt` vuoto: la sfocatura la mette il CSS. */
 export const homeHero = {
   src: '/images/home/joe-hero.webp',
   alt: '',
@@ -33,15 +30,12 @@ export const homeHero = {
   height: 1351,
 }
 
-/* Fascia immagine a tutta larghezza - "La famiglia di prodotti" */
 export const familyBand = {
   src: '/images/home/family-band.webp',
   alt: 'La famiglia di prodotti',
 }
 
-/* "Chi sono": testi e foto (public/images/about/, sorgenti in media/FOTO JOE...). */
 export const about = {
-  // Intro impersonale (dal portfolio "MI PRESENTO").
   intro:
     'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
   experience: [
@@ -430,31 +424,25 @@ const progetti = [
   },
 ]
 
-/* Anni citati in `year` (testo libero: può essere un intervallo o mancare). */
+/* `year` è testo libero: può essere un intervallo o mancare. */
 export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
 }
 
-/* Anno di riferimento per l'ordinamento: il più recente citato, 0 se assente. */
 const annoRecente = (item) => Math.max(0, ...anniDi(item))
 
 /*
- * Archivio ordinato dal più recente, usato ovunque (griglia, prev/next,
- * sitemap, pre-rendering). sort è stabile: a parità d'anno vale l'ordine di
- * `progetti`, le voci senza anno vanno in coda.
+ * Ordinato dal più recente. `sort` è stabile: a parità d'anno vale l'ordine di
+ * `progetti`, e le voci senza anno vanno in coda.
  */
 export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
 
-/* Estremi temporali dell'archivio (testata pagina + meta). `null` se nessun anno. */
 export const periodoArchivio = (() => {
   const anni = archive.flatMap(anniDi)
   return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
 })()
 
-/*
- * Percorsi immagine di un progetto. `drawing` è `null` dove il disegno manca,
- * così la scheda salta il blocco invece di chiedere un file inesistente.
- */
+/* `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il blocco. */
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
   const gallery = Array.from(
@@ -470,16 +458,50 @@ export function projectImages(item) {
 }
 
 /*
- * "Lavori selezionati" in home: solo l'elenco di slug, il resto viene
- * dall'archivio (no duplicati; uno slug errato rompe la build). Sono i cinque
- * focus del portfolio 2026; l'ordine qui è la numerazione 01–05 mostrata.
+ * I titoli sono scritti in maiuscolo e il CSS li mostra così; fuori dal markup
+ * (alt, `<title>`, dati strutturati) serve la forma leggibile. Maiuscola solo
+ * all'iniziale, come l'italiano vuole: il Title Case inglese darebbe "Sedia A
+ * Tempo Determinato". Per rimettere il maiuscolo pieno ovunque basta far
+ * restituire `titolo` da qui.
+ */
+export function titoloLeggibile(titolo) {
+  const t = titolo.toLocaleLowerCase('it')
+  return t.charAt(0).toLocaleUpperCase('it') + t.slice(1)
+}
+
+/*
+ * Testi alternativi delle immagini di prodotto. Stanno qui perché li usano sia
+ * le pagine sia la sitemap immagini: una foto si descrive in un posto solo.
+ *
+ * Dicono oggetto e categoria invece del solo titolo. Descrizioni per singola
+ * foto non ce ne sono, e inventarle sarebbe peggio del generico: la posizione
+ * nella serie è quanto si può dire di vero.
+ */
+export function altCopertina(item) {
+  return `${titoloLeggibile(item.title)}, ${item.cat} — progetto di ${profile.name}`
+}
+
+export function altGalleria(item, i, totale) {
+  return `${titoloLeggibile(item.title)}, ${item.cat} — immagine ${i + 1} di ${totale}`
+}
+
+export function altDisegno(item) {
+  return `Disegno tecnico quotato di ${titoloLeggibile(item.title)}, ${item.cat}`
+}
+
+export function altSfondo(item) {
+  return `${titoloLeggibile(item.title)} — ambientazione`
+}
+
+/*
+ * Solo gli slug: il resto viene dall'archivio, così non si duplica niente e uno
+ * slug errato rompe la build. L'ordine qui è la numerazione 01–05 mostrata.
  */
 const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'dog-lamp']
 
 export const focusItems = focusSlugs.map((slug) => {
   const item = progetti.find((p) => p.slug === slug)
   if (!item) throw new Error(`focusItems: nessun progetto con slug "${slug}" nell'archivio`)
-  // Solo i campi che la griglia mostra (desc/spec/works servono al dettaglio).
   const { title, cat, year } = item
   return { slug, title, cat, year, cover: projectImages(item).cover }
 })

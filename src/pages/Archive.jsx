@@ -1,4 +1,4 @@
-import { archive, periodoArchivio, projectImages } from '../data/siteData'
+import { altCopertina, archive, periodoArchivio, projectImages } from '../data/siteData'
 import { Link } from '../router'
 
 export default function Archive() {
@@ -39,7 +39,7 @@ export default function Archive() {
                   <div className="relative aspect-square overflow-hidden bg-placeholder">
                     <img
                       src={cover}
-                      alt={p.title}
+                      alt={altCopertina(p)}
                       loading={subito ? 'eager' : 'lazy'}
                       fetchpriority={i < 4 ? 'high' : undefined}
                       decoding="async"

@@ -2,23 +2,34 @@ import { useEffect, useRef, useState } from 'react'
 import { fotoFit } from '../data/fotoFit'
 import { animazioniRidotte } from '../motion'
 
-/*
- * Carosello immagini della scheda progetto. Crossfade, autoplay 2s in pausa
- * al clic (non all'hover), swipe su mobile, frecce/puntini/contatore/tastiera
- * da desktop. Rispetta prefers-reduced-motion (niente autoplay).
- */
 const INTERVAL = 2000
+const SWIPE = 45 // spostamento minimo del dito perché valga come cambio foto
 
-// Spostamento minimo del dito perché valga come cambio foto e non come tocco.
-const SWIPE = 45
-
+/*
+ * Carosello della scheda progetto. `images` è una lista di `{ src, alt }`.
+ *
+ * Il tetto di dimensione sta sulla LARGHEZZA: con `aspect-square` l'altezza la
+ * segue, quindi limitare quella tiene il quadrato dentro la prima schermata.
+ *
+ * Le slide sono impilate nello stesso riquadro, quindi per il browser sono
+ * tutte nel viewport e `loading="lazy"` non ne rimanda nessuna: il `src` va
+ * dato a mano (vedi `caricate`), o parte l'intera galleria al primo paint.
+ *
+ * Va montato con `key` sullo slug: senza, cambiando scheda React riusa
+ * l'istanza e `index` resta quello di prima — su una galleria più corta non
+ * corrisponde a nessuna slide, e il riquadro resta vuoto.
+ */
 export default function Carousel({ images, title }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
+  // Slide con il `src` assegnato. Parte dalla sola prima, l'unica che ce l'ha
+  // anche nell'HTML pre-renderizzato: nessun mismatch in hydration. Chi entra
+  // non esce più, così tornare indietro non riscarica.
+  const [caricate, setCaricate] = useState(() => new Set([0]))
   const n = images.length
 
-  // Tocco in corso: punto di partenza del dito e se è diventato un trascinamento.
-  const tocco = useRef(null)
+  const tocco = useRef(null) // { x, y, trascinato } del tocco in corso
+  const primoGiro = useRef(true)
 
   const go = (i) => setIndex((i + n) % n)
   const next = () => go(index + 1)
@@ -40,6 +51,28 @@ export default function Carousel({ images, title }) {
     else prev()
   }
 
+  // Slide corrente più le due vicine. Al primo giro aspetta il `load`: la prima
+  // è l'elemento LCP della scheda e le vicine le toglierebbero banda.
+  useEffect(() => {
+    const espandi = () =>
+      setCaricate((prec) => {
+        const vicine = [index, (index + 1) % n, (index - 1 + n) % n]
+        if (vicine.every((i) => prec.has(i))) return prec // stesso riferimento: niente render in più
+        const succ = new Set(prec)
+        vicine.forEach((i) => succ.add(i))
+        return succ
+      })
+
+    const subito = !primoGiro.current || document.readyState === 'complete'
+    primoGiro.current = false
+    if (subito) {
+      espandi()
+      return
+    }
+    window.addEventListener('load', espandi, { once: true })
+    return () => window.removeEventListener('load', espandi)
+  }, [index, n])
+
   useEffect(() => {
     if (n <= 1 || paused || animazioniRidotte()) return
     const timer = setTimeout(() => setIndex((i) => (i + 1) % n), INTERVAL)
@@ -49,6 +82,9 @@ export default function Carousel({ images, title }) {
   if (n === 0) return null
 
   return (
+    // Le frecce da tastiera raccolgono gli eventi in risalita dai comandi veri,
+    // che sono tutti <button>. Il contenitore non è focusabile di suo.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className="group relative mx-auto w-full max-w-[calc(100vh-9rem)] md:ml-auto md:mr-0"
       role="group"
@@ -59,48 +95,28 @@ export default function Carousel({ images, title }) {
         if (e.key === 'ArrowLeft') prev()
       }}
     >
-      {/*
-       * Cornice quadrata (non dipende dal formato mostrato, così non si muove
-       * cambiando foto). Il quadrato è la forma delle foto d'archivio, che
-       * quindi ci entrano esatte; sui pochi formati diversi il ritaglio è
-       * sempre lo stesso, su qualsiasi schermo. Prima l'altezza era fissa in px
-       * e la larghezza fluida: il rapporto passava da 0.49 su tablet a 1.5 su
-       * desktop largo e il taglio mangiava fino a mezza foto.
-       *
-       * Il tetto sta sul contenitore qui sopra ed è sulla LARGHEZZA, non
-       * sull'altezza: con `aspect-square` l'altezza segue la larghezza, quindi
-       * limitare quella tiene il quadrato quadrato e insieme la scheda dentro
-       * la prima schermata. Il valore è `100vh` meno lo spazio che sta sopra e
-       * sotto la foto (testata, padding, pallini): così il quadrato cresce fino
-       * a riempire l'altezza disponibile invece di fermarsi a una percentuale a
-       * occhio. Sta sul contenitore e non sulla cornice perché i pallini sotto
-       * restino allineati alla foto.
-       */}
+      {/* Clic sulla foto = pausa: scorciatoia col mouse. L'equivalente da
+          tastiera è il pulsante contatore qui sotto. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         className="relative aspect-square w-full cursor-pointer select-none overflow-hidden bg-placeholder"
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
-        // Clic sulla foto = pausa/ripresa; i clic sui comandi e gli swipe non contano.
         onClick={(e) => {
           if (e.target.closest('button') || tocco.current?.trascinato) return
           setPaused((p) => !p)
         }}
       >
-        {/*
-         * `object-cover`: ogni foto riempie la cornice, così i formati
-         * disparati dell'archivio si susseguono uguali, al prezzo di un
-         * ritaglio. Dove il ritaglio farebbe danno `fotoFit` dice di mostrarla
-         * intera o dove puntare il taglio (lo genera `scripts/fit-foto.js`).
-         */}
-        {images.map((src, i) => {
+        {/* I formati d'archivio sono disparati: riempiono tutti la cornice, e
+            dove il ritaglio farebbe danno `fotoFit` dice come rimediare. */}
+        {images.map(({ src, alt }, i) => {
           const fit = fotoFit[src]
           return (
             <img
               key={src}
-              src={src}
-              alt={`${title} · ${i + 1}`}
+              src={caricate.has(i) ? src : undefined}
+              alt={alt}
               aria-hidden={i !== index}
-              loading={i === 0 ? 'eager' : 'lazy'}
               fetchpriority={i === 0 ? 'high' : undefined}
               decoding="async"
               style={fit?.pos ? { objectPosition: fit.pos } : undefined}
@@ -130,13 +146,21 @@ export default function Carousel({ images, title }) {
               →
             </button>
 
-            {/* Contatore - segnala anche quando lo scorrimento è in pausa */}
-            <div className="absolute right-2 top-2 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper sm:right-4 sm:top-4">
+            {/* Il contatore è anche il comando di pausa, e dev'essere un
+                controllo vero: lo scorrimento parte da solo, e la WCAG 2.2.2
+                chiede di poterlo fermare da tastiera. */}
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              aria-pressed={paused}
+              aria-label={paused ? 'Riprendi lo scorrimento' : 'Metti in pausa lo scorrimento'}
+              className="absolute right-2 top-2 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
+            >
               {paused && <span aria-hidden="true">▌▌</span>}
               <span>
                 {String(index + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
               </span>
-            </div>
+            </button>
           </>
         )}
       </div>

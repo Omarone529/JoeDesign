@@ -1,33 +1,19 @@
 /*
- * fit-foto.js — decide come ogni foto d'archivio entra nella cornice del
- * carosello, e scrive il risultato in `src/data/fotoFit.js`.
+ * Decide come ogni foto entra nella cornice quadrata del carosello e scrive
+ * `src/data/fotoFit.js`. Da rilanciare quando cambiano le foto di
+ * `public/images/products/`; il risultato è versionato.
  *
  *   node scripts/fit-foto.js
  *
- * Va rilanciato quando si aggiungono o si sostituiscono foto in
- * `public/images/products/`. Come og-image.js e pdf-disegno.js: si lancia a
- * mano, il risultato è un file versionato, la build non ricalcola niente.
+ * I formati d'archivio vanno dal 2.4:1 al 1:3, e riempiendo la cornice su
+ * qualche scheda il ritaglio mangiava il prodotto. Per ogni immagine: si stima
+ * il fondo dai pixel di bordo, si trova il riquadro del soggetto e si punta lì
+ * il ritaglio. Se il soggetto non ci sta comunque, una fotografia si lascia
+ * tagliare — è quello che farebbe un fotografo — mentre una grafica piatta si
+ * mostra intera, o il taglio le mozza il testo.
  *
- * Perché serve: la cornice del carosello è quadrata (le immagini si susseguono
- * tutte uguali) mentre i formati d'archivio vanno dal 2.4:1 delle campionature
- * al 1:3 delle foto verticali. Riempiendo la cornice, su qualche scheda il
- * ritaglio mangiava il prodotto. Qui ogni immagine viene misurata:
- *
- * 1. si stima il colore del fondo dai pixel di bordo e si trova il riquadro di
- *    ciò che sta sopra il fondo, cioè il soggetto;
- * 2. si calcola dove puntare il ritaglio (`object-position`) perché il soggetto
- *    ci stia tutto;
- * 3. se non ci sta comunque, decide che tipo di immagine è: una fotografia si
- *    lascia riempire — tagliarla è quello che farebbe un fotografo — mentre una
- *    grafica piatta (manifesto, disegno al tratto, pianta quotata, render su
- *    fondo bianco) si mostra intera, perché il taglio le mozzerebbe il testo o
- *    il pezzo;
- * 4. i formati fuori scala (le strisce di campionature, i montaggi altissimi)
- *    si mostrano interi comunque: riempiendo se ne vedrebbe una fetta.
- *
- * Fotografia o grafica si distinguono dai pixel "sfumati": in una foto la luce
- * degrada e un pixel su cinque sta su una transizione morbida, in una grafica
- * ci sono campiture piatte e bordi netti, e quei pixel sono pochi.
+ * Le due si distinguono dai pixel sfumati: in una foto la luce degrada e uno su
+ * cinque sta su una transizione morbida, in una grafica i bordi sono netti.
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -36,8 +22,7 @@ import path from 'node:path'
 const RADICE = path.join('public', 'images', 'products')
 const USCITA = path.join('src', 'data', 'fotoFit.js')
 
-// Rapporto della cornice: quadrata, uguale su ogni schermo (`aspect-square` in
-// `src/components/Carousel.jsx`). Tenerlo allineato se la cornice cambia forma.
+// Da tenere allineato ad `aspect-square` in `src/components/Carousel.jsx`.
 const R_CORNICE = 1
 
 // Oltre questi formati il ritaglio lascerebbe una fetta: si mostra intera.
@@ -47,9 +32,8 @@ const ESTREMO_STRETTO = 0.4
 const FOTOGRAFIA = 0.13 // quota di pixel sfumati sopra cui è uno scatto
 
 /*
- * Quello che la misura non prende: manifesti con il fondo sfumato o con dentro
- * una fotografia, che alla conta dei pixel sembrano scatti mentre tagliarli
- * mozzerebbe il testo. Si aggiunge qui `<progetto>/<file>` quando capita.
+ * Quello che la misura non prende: manifesti col fondo sfumato o con dentro una
+ * foto, che alla conta dei pixel sembrano scatti. Si aggiunge a mano.
  */
 const SEMPRE_INTERE = new Set(['grafica/06.webp', 'grafica/07.webp'])
 const TOLLERANZA = 0.04 // quanto il soggetto può debordare dalla finestra
@@ -184,7 +168,7 @@ function decidi({ rapporto, sfumati, box }) {
   return { fit: 'cover', pos, motivo: y.ok && x.ok ? 'soggetto salvo' : 'scatto, taglio libero' }
 }
 
-;(async () => {
+(async () => {
   const voci = {}
   const conto = { cover: 0, spostate: 0, contain: 0 }
 

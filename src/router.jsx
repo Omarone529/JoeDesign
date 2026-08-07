@@ -31,7 +31,10 @@ export function RouterProvider({ initialPath = '/', children }) {
   useEffect(() => {
     const onPop = () => setPath(window.location.pathname)
     window.addEventListener('popstate', onPop)
-    // Allinea al path reale dopo l'hydration, solo se differisce (evita un render in più).
+    // Fra il primo render e l'attacco del listener un popstate passerebbe
+    // inosservato (indietro premuto prima dell'hydration): qui si recupera.
+    // Restituire lo stesso valore quando coincide evita un render in più.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPath((corrente) =>
       corrente === window.location.pathname ? corrente : window.location.pathname,
     )
@@ -47,7 +50,7 @@ export function RouterProvider({ initialPath = '/', children }) {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
 
-  // Memoizzato: parsePath scorre l'archivio, e un value nuovo ri-renderizzerebbe ogni <Link>.
+  // parsePath scorre l'archivio, e un value nuovo ri-renderizzerebbe ogni <Link>.
   const value = useMemo(() => ({ route: parsePath(path), navigate }), [path, navigate])
 
   return <RouterContext.Provider value={value}>{children}</RouterContext.Provider>
@@ -61,12 +64,11 @@ export function useNavigate() {
   return useContext(RouterContext).navigate
 }
 
-/* Un link è "esterno" (anchor normale) se non è un path interno. */
 function isExternal(to) {
   return typeof to !== 'string' || !to.startsWith('/')
 }
 
-/* Navigazione client-side per i path interni; <a> normale per mailto/tel/#/esterni. */
+/* Client-side per i path interni, <a> normale per mailto/tel/esterni. */
 export function Link({ to, children, onClick, target, ...props }) {
   const ctx = useContext(RouterContext)
 
