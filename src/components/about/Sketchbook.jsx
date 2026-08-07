@@ -11,6 +11,10 @@ const VELOCITA_STANTIA_MS = 90 // dito fermo da più di così al rilascio → ni
 const CEDIMENTO_LIBRO = (3 * Math.PI) / 180 // oltre le copertine cede tutto il libro, non la pagina
 const M_COLONNE = 48
 const CURVA_MAX = (22 * Math.PI) / 180 // arco sobrio: una pagina vera non si piega a tubo
+// Segno base dell'arco: col ventre verso +z locale, che a metà giro (pagina in
+// piedi verso la camera) punta a sinistra. È il verso giusto per un giro
+// ALL'INDIETRO; andando avanti il verso lo ribalta — vedi `versoArco` in
+// applicaAngolo.
 const CURVA_SEGNO = -1
 const LARGHEZZA_MONDO = 2
 const ALTEZZA_MONDO = LARGHEZZA_MONDO * (1415 / 1000)
@@ -26,8 +30,10 @@ const ROT_X_LIBRO = -0.1
 const ROT_Y_LIBRO = 0.07
 // Piega dinamica: la carta non è rigida, quindi oltre alla campana geometrica
 // del giro la pagina si flette in proporzione alla velocità angolare del
-// gesto (il bordo libero "resta indietro"), e quando atterra la flessione
+// gesto (il corpo del foglio "resta indietro"), e quando atterra la flessione
 // residua si scarica da sola con una vibrazione smorzata (vedi avviaFlutter).
+// Ha lo stesso segno della campana — entrambi seguono la direzione del moto —
+// quindi la rinforza sempre, in tutti e due i versi.
 const PIEGA_GUADAGNO = 0.2 // flessione extra per (grado/ms) di velocità
 const PIEGA_MAX = 0.32
 const PIEGA_TOTALE_MAX = 1.15
@@ -475,7 +481,9 @@ export default function Sketchbook() {
   // Applica l'angolo alla pagina `indice`: ruota il suo gruppo (come un vero
   // libro), ridisegna la sua geometria piegata e chiede un ridisegno.
   // La camera NON si tocca: è fissa sulla costa.
-  const applicaAngolo = (indice, angolo) => {
+  // `verso` (1 avanti, -1 indietro) serve a inarcare la pagina dalla parte
+  // giusta: andare avanti e tornare indietro non sono lo stesso giro.
+  const applicaAngolo = (indice, angolo, verso) => {
     // Fine corsa fisico: oltre 0° e -180° ci sono le pile di pagine — la
     // rotazione si ferma lì anche se la molla in overshoot chiede di più,
     // altrimenti la pagina attraverserebbe quelle sotto.
@@ -488,14 +496,17 @@ export default function Sketchbook() {
     const progresso = -rotazione / 180
     const pieno = Math.sin(progresso * Math.PI) // 0→1→0: quanto si è "a metà giro" ora
 
-    // Flessione dinamica: quanto più veloce gira, tanto più il bordo libero
-    // resta indietro. Insegue la velocità con un po' di inerzia (la carta
-    // non scatta), e il segno si inverte da solo girando all'indietro.
+    // Flessione dinamica: quanto più veloce gira, tanto più il corpo del
+    // foglio resta indietro. Insegue la velocità con un po' di inerzia (la
+    // carta non scatta). Il segno è quello della velocità istantanea, la
+    // stessa convenzione di `versoArco` qui sotto: girando nel verso del
+    // gesto rinforza l'arco, e se a metà giro si torna indietro col dito lo
+    // contrasta — come la carta vera, che cambia imbarcatura.
     const ora = performance.now()
     const dt = ora - piega.current.ultimoTempo
     if (dt > 0 && dt < 200) {
       const velocitaAngolare = (rotazione - piega.current.ultimoAngolo) / dt
-      const obiettivo = Math.max(-PIEGA_MAX, Math.min(PIEGA_MAX, -velocitaAngolare * PIEGA_GUADAGNO))
+      const obiettivo = Math.max(-PIEGA_MAX, Math.min(PIEGA_MAX, velocitaAngolare * PIEGA_GUADAGNO))
       piega.current.extra += (obiettivo - piega.current.extra) * Math.min(1, dt / PIEGA_INERZIA_MS)
     }
     piega.current.ultimoAngolo = rotazione
@@ -518,8 +529,15 @@ export default function Sketchbook() {
       const zDestra = (N - indice) * SCARTO_PILA
       const zSinistra = (indice + 1) * SCARTO_PILA
       p.gruppo.position.z = zDestra + (zSinistra - zDestra) * progresso
+      // Da che parte si imbarca il foglio: la carta è floscia e il suo corpo
+      // resta sempre indietro rispetto al bordo che tira, quindi il ventre
+      // punta dalla parte OPPOSTA a dove la pagina sta andando. A metà giro,
+      // andando avanti gonfia a destra (da dove viene), tornando indietro a
+      // sinistra. Senza questo, i due giri sono la stessa animazione.
+      const versoArco = -verso
       const curvaAmp =
-        Math.max(-PIEGA_TOTALE_MAX, Math.min(PIEGA_TOTALE_MAX, pieno + piega.current.extra)) * rigidita(indice)
+        Math.max(-PIEGA_TOTALE_MAX, Math.min(PIEGA_TOTALE_MAX, versoArco * pieno + piega.current.extra)) *
+        rigidita(indice)
       const alzata = SOLLEVAMENTO_VOLO * Math.sin(progresso * Math.PI) * rigidita(indice)
       const { posX, posZ, angoliSegmento } = calcolaColonne(curvaAmp, alzata)
       const angoliVert = angoliVertici(angoliSegmento)
@@ -622,7 +640,7 @@ export default function Sketchbook() {
     }
     if (!animateRef.current || !springRef.current || animazioniRidotte() || da === aAngolo) {
       piega.current.extra = 0
-      applicaAngolo(indice, aAngolo)
+      applicaAngolo(indice, aAngolo, verso)
       chiudi()
       return
     }
@@ -637,7 +655,7 @@ export default function Sketchbook() {
     animateRef.current(stato, {
       angolo: aAngolo,
       ease: springRef.current({ mass: 1, stiffness: 280, damping: 32, velocity: velocitaNormalizzata }),
-      onUpdate: () => applicaAngolo(indice, stato.angolo),
+      onUpdate: () => applicaAngolo(indice, stato.angolo, verso),
       onComplete: () => {
         chiudi()
         avviaFlutter(indice)
@@ -739,7 +757,7 @@ export default function Sketchbook() {
       t.ultimoAngolo = angolo
       t.ultimoTempo = ora
     }
-    applicaAngolo(t.indice, angolo)
+    applicaAngolo(t.indice, angolo, t.verso)
   }
 
   const fineTrascinamento = (e) => {
@@ -781,7 +799,7 @@ export default function Sketchbook() {
       <div className="flex flex-col items-center">
         <div
           ref={wrapperRef}
-          className="relative w-full max-w-[520px] touch-pan-y select-none sm:max-w-[680px] lg:max-w-[840px]"
+          className="relative w-full max-w-[560px] touch-pan-y select-none sm:max-w-[780px] lg:max-w-[1000px] xl:max-w-[1120px]"
           role="group"
           tabIndex={0}
           aria-roledescription="sketchbook sfogliabile"
