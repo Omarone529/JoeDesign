@@ -38,6 +38,15 @@ const MARGINE_CAMERA = 1.12
 // più grande del libro e senza sbordo verrebbe tagliata sopra e sotto.
 const MARGINE_TELA = 1.24
 const DISTANZA_CAMERA = (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA) / K_LARGHEZZA
+// Nitidezza delle tavole. Una pagina occupa sempre questa frazione della
+// larghezza del canvas (la camera è fissa): da qui si ricava in quanti pixel
+// reali viene disegnata, e quindi come conviene filtrarne la texture.
+const QUOTA_PAGINA = LARGHEZZA_MONDO / (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA)
+const LARGHEZZA_TAVOLA = 1000 // px di NN.webp (vedi scripts/sketchbook-pages.js)
+// Rapporto texture/schermo sotto il quale i mipmap tolgono solo dettaglio:
+// il livello scelto cade tra 0 e 1 e il trilineare ci mescola dentro una copia
+// a metà risoluzione. Vicino all'1:1 conviene campionare la texture piena.
+const SOGLIA_MIPMAP = 1.4
 
 // `curvaAmp`: flessione totale, negativa se piega nell'altro verso.
 // `alzata`: sollevamento di volo in unità mondo, a rampa lungo la pagina.
@@ -159,7 +168,12 @@ export default function Sketchbook() {
       camera.position.set(-LARGHEZZA_MONDO / 2, 0, DISTANZA_CAMERA)
       camera.lookAt(-LARGHEZZA_MONDO / 2, 0, 0)
 
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+      // Almeno 1.5 anche sugli schermi non retina: il libro è pieno di testo
+      // piccolo e renderizzarlo più grande del canvas CSS (che poi il browser
+      // rimpicciolisce) lo tiene leggibile. La scena è leggera, se lo può
+      // permettere. Sopra 2 non si guadagna più niente di visibile.
+      const rapportoPixel = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2)
+      renderer.setPixelRatio(rapportoPixel)
       renderer.outputColorSpace = THREE.SRGBColorSpace
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -262,6 +276,13 @@ export default function Sketchbook() {
       spinaGruppo.position.x = -LARGHEZZA_MONDO / 2
       libroGruppo.add(spinaGruppo)
 
+      // In quanti pixel reali finisce una pagina su questo schermo: al massimo
+      // ~1000, cioè quanto è larga la tavola, quindi la texture non va quasi
+      // mai ingrandita. Misurato una volta all'avvio: ridimensionare la
+      // finestra non cambia il filtro.
+      const pxPagina = (mountRef.current.getBoundingClientRect().width || 0) * rapportoPixel * QUOTA_PAGINA
+      const senzaMipmap = pxPagina > 0 && LARGHEZZA_TAVOLA < pxPagina * SOGLIA_MIPMAP
+
       const caricatore = new THREE.TextureLoader()
       const caricaTexture = (src) =>
         new Promise((risolvi) => {
@@ -270,6 +291,12 @@ export default function Sketchbook() {
             (tex) => {
               tex.colorSpace = THREE.SRGBColorSpace
               tex.anisotropy = renderer.capabilities.getMaxAnisotropy()
+              if (senzaMipmap) {
+                // Vicino all'1:1 il mipmap è solo una copia sfocata in più:
+                // meglio campionare la tavola piena.
+                tex.generateMipmaps = false
+                tex.minFilter = THREE.LinearFilter
+              }
               risolvi(tex)
             },
             undefined,

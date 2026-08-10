@@ -23,9 +23,20 @@ if (!PDF_PATH) {
   process.exit(1)
 }
 
-// Le pagine hanno testo piccolo: serve nitidezza.
-const SCALA = 2.2
+// Le pagine hanno testo piccolo: serve nitidezza. Si rende molto più grande del
+// necessario e si rimpicciolisce con sharp (lanczos): il downsampling di un
+// render abbondante tiene i bordi delle lettere più definiti di un render già
+// vicino alla misura finale.
+const SCALA = 4
+// 1000 px è la misura giusta, non un compromesso: nel widget 3D una pagina
+// occupa al massimo ~1000 pixel reali (widget largo 1120 CSS, pixel ratio 2),
+// quindi la texture non viene mai ingrandita e tutto ciò che sta sopra a questa
+// larghezza sarebbe peso scaricato per niente.
 const LARGHEZZA = 1000
+// Ogni rimpicciolimento ammorbidisce: una maschera di contrasto leggera
+// restituisce il filo alle lettere senza gli aloni dello sharpen aggressivo.
+const NITIDEZZA = { sigma: 0.6, m1: 0.4, m2: 0.9 }
+const QUALITA = 88
 
 const OUT_DIR = 'public/images/about/sketchbook'
 
@@ -54,7 +65,7 @@ for await (const pagina of await pdf(PDF_PATH, { scale: SCALA })) {
   const tavola = daPagina.get(n)
   if (tavola) {
     const dest = path.join(OUT_DIR, `${tavola.nome}.webp`)
-    await sharp(pagina).resize({ width: LARGHEZZA }).webp({ quality: 82 }).toFile(dest)
+    await sharp(pagina).resize({ width: LARGHEZZA }).sharpen(NITIDEZZA).webp({ quality: QUALITA }).toFile(dest)
     const { width, height } = await sharp(dest).metadata()
     console.log(`✓ ${tavola.nome}.webp (pagina ${n}, ${width}×${height})`)
   }
