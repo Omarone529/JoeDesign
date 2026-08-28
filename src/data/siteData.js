@@ -15,6 +15,7 @@ export const profile = {
   instagram: 'https://instagram.com/joesarchiolla.design',
   youtube: 'https://www.youtube.com/@design.by.joesarchiolla',
   tiktok: 'https://www.tiktok.com/@design.by.joesarchiolla',
+  linkedin: 'https://www.linkedin.com/in/giovanni-sarchiolla-a80659232/',
   email: 'joe.artedesign@gmail.com',
   // Apre la compose di Gmail (web) invece dell'app di posta predefinita del sistema.
   emailHref: 'https://mail.google.com/mail/?view=cm&fs=1&to=joe.artedesign@gmail.com',
@@ -231,6 +232,34 @@ const progetti = [
       Contesto: 'Tesi di Laurea · Accademia di Belle Arti di Bologna',
       Materiale: 'PVC / PLA',
       Colore: 'Arancione / Bianco / Nero',
+    },
+  },
+  {
+    slug: 'exit-tie',
+    title: 'EXIT TIE',
+    cat: 'Cravatta',
+    year: '2026',
+    photos: 1,
+    disegno: true,
+    tavola: 18,
+    desc: '',
+    spec: {
+      Oggetto: 'Cravatta',
+      Colore: 'Nero / Bianco',
+    },
+  },
+  {
+    slug: 'bloom',
+    title: 'BLOOM',
+    cat: 'Portafiori',
+    year: '2026',
+    photos: 7,
+    tavola: 19,
+    desc: '',
+    spec: {
+      Oggetto: 'Portafiori',
+      Materiale: 'Laterizio',
+      Colore: 'Terracotta / Nero',
     },
   },
   {
