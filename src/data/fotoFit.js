@@ -40,27 +40,6 @@ export const fotoFit = {
   "/images/products/flue/sfondo.webp": {
     "pos": "34% 50%"
   },
-  "/images/products/food/01.webp": {
-    "pos": "50% 76%"
-  },
-  "/images/products/food/02.webp": {
-    "fit": "contain"
-  },
-  "/images/products/food/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/fuori-asse/01.webp": {
-    "pos": "50% 62%"
-  },
-  "/images/products/fuori-asse/02.webp": {
-    "pos": "50% 98%"
-  },
-  "/images/products/fuori-asse/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/fuori-asse/05.webp": {
-    "fit": "contain"
-  },
   "/images/products/grafica/01.webp": {
     "fit": "contain"
   },
@@ -103,29 +82,11 @@ export const fotoFit = {
   "/images/products/mari-chair/sfondo.webp": {
     "pos": "45% 50%"
   },
-  "/images/products/nymphe/03.webp": {
-    "pos": "63% 50%"
-  },
-  "/images/products/nymphe/04.webp": {
-    "fit": "contain"
-  },
   "/images/products/nymphe/sfondo.webp": {
     "pos": "44% 50%"
   },
   "/images/products/orbit/sfondo.webp": {
     "pos": "44% 50%"
-  },
-  "/images/products/pistone/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/sedia-tempo-determinato/01.webp": {
-    "pos": "50% 67%"
-  },
-  "/images/products/sedia-tempo-determinato/02.webp": {
-    "pos": "50% 49%"
-  },
-  "/images/products/sedia-tempo-determinato/03.webp": {
-    "fit": "contain"
   },
   "/images/products/sedia-tempo-determinato/sfondo.webp": {
     "fit": "contain"
@@ -141,14 +102,5 @@ export const fotoFit = {
   },
   "/images/products/zero-sfrido/sfondo.webp": {
     "pos": "52% 50%"
-  },
-  "/images/products/zeta-3/01.webp": {
-    "pos": "50% 40%"
-  },
-  "/images/products/zeta-3/03.webp": {
-    "pos": "50% 35%"
-  },
-  "/images/products/zeta-3/05.webp": {
-    "pos": "50% 100%"
   }
 }

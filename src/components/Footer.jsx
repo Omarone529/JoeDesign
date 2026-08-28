@@ -83,6 +83,16 @@ export default function Footer() {
           >
             <LogoTiktok className="h-5 w-5" />
           </a>
+
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Giovanni Sarchiolla su LinkedIn"
+            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+          >
+            <LogoLinkedin className="h-5 w-5" />
+          </a>
         </div>
 
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
@@ -197,6 +207,28 @@ function LogoTiktok({ className = '' }) {
     >
       <path d="M14 3v10.5a3.25 3.25 0 1 1-3.25-3.25c.36 0 .7.05 1.02.15" />
       <path d="M14 3c.3 2.35 1.9 3.9 4.25 4.1" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function LogoLinkedin({ className = '' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="5.25" />
+      <circle cx="7.7" cy="7.6" r="1.05" fill="currentColor" stroke="none" />
+      <path d="M7.7 10.6v6" />
+      <path d="M11.7 16.6v-6" />
+      <path d="M11.7 13.4a2.65 2.65 0 0 1 5.3 0v3.2" />
     </svg>
   )
 }

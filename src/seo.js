@@ -31,6 +31,17 @@ const PERIODO = periodoArchivio
     : `${periodoArchivio.primo} · ${periodoArchivio.ultimo}`
   : ''
 
+/*
+ * Le schede ancora senza testo (`desc: ''`) avrebbero una meta description
+ * vuota, che vale meno di niente: qui il ripiego dice almeno oggetto, anno e
+ * autore. Appena la descrizione c'è, vince quella.
+ */
+function descrizioneProgetto(item) {
+  if (item.desc?.trim()) return item.desc
+  const anno = item.year ? `, ${item.year}` : ''
+  return `${titoloLeggibile(item.title)} — ${item.cat}${anno}. Progetto di ${profile.name}, ${profile.role} a ${profile.place}.`
+}
+
 function clip(text, max = 155) {
   const t = String(text).replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
@@ -88,7 +99,7 @@ export function metaForRoute(route) {
       const { gallery } = projectImages(item)
       return {
         title: titoloProgetto(item),
-        description: clip(item.desc),
+        description: clip(descrizioneProgetto(item)),
         canonical: `${SITE}/progetto/${item.slug}`,
         image: ogImage(item.slug),
         imageAlt: `${item.title} · ${item.cat}`,
@@ -139,7 +150,9 @@ const ID_PERSONA = `${SITE}/#persona`
 const ID_ARCHIVIO = `${SITE}/archivio#raccolta`
 
 /* `sameAs` lega il nome ai profili: vanno elencati tutti. */
-const SOCIAL = [profile.instagram, profile.youtube, profile.tiktok].filter(Boolean)
+const SOCIAL = [profile.instagram, profile.youtube, profile.tiktok, profile.linkedin].filter(
+  Boolean,
+)
 
 const nodoSito = {
   '@type': 'WebSite',
