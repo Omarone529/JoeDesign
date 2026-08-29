@@ -19,9 +19,18 @@ export default function About() {
           <p className="m-0 max-w-[42ch] text-[clamp(15px,1.15vw,18px)] leading-[1.5]">
             {about.intro}
           </p>
+          {/* Con `leading-[0.85]` la riga finisce 0.046em sotto la linea di base,
+              e SARCHIOLLA resterebbe sospesa sopra il filetto. Il margine
+              negativo recupera esattamente quello scarto e appoggia le lettere
+              sul bordo, senza scavalcarlo. Il numero viene dalle metriche del
+              taglio in uso — Helvetica Neue BOLD, 975 + 217 su 1000 di corpo:
+              (975 + 217 - 850) / 2 = 171 di mezzo-interlinea tolti ai 217 di
+              discesa. Da ricalcolare se cambiano peso, font o `leading`.
+              Solo da md, dove il titolo sta in fondo alla colonna: sotto ha la
+              foto, non il filetto. */}
           <h1
             aria-label={profile.displayName}
-            className="m-0 mt-12 font-bold uppercase leading-[0.85] tracking-[-0.03em] text-[min(calc((100vw_-_40px)*0.1526),300px)] sm:text-[min(calc((100vw_-_64px)*0.1526),300px)] md:mt-auto md:text-[min(calc((100vw_-_104px)*0.0954),300px)] lg:text-[min(calc((100vw_-_208px)*0.0954),300px)]"
+            className="m-0 mt-12 font-bold uppercase leading-[0.85] tracking-[-0.03em] text-[min(calc((100vw_-_40px)*0.1526),300px)] sm:text-[min(calc((100vw_-_64px)*0.1526),300px)] md:-mb-[0.046em] md:mt-auto md:text-[min(calc((100vw_-_104px)*0.0954),300px)] lg:text-[min(calc((100vw_-_208px)*0.0954),300px)]"
           >
             {/* Lo spazio separa le due parole nel testo estratto dai crawler,
                 che leggono "JoeSarchiolla" se i due span si toccano. */}

@@ -110,9 +110,8 @@ export const about = {
  * `tavola` = numero della tavola nell'archivio sorgente (cartella "COPERTINE
  * - dettaglio archivio"); mostrato in hover sulle celle di /archivio.
  * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
- * Questo ordine vale solo a parità di anno (l'ordinamento vero lo applica
- * `archive`): anno decrescente, e a parità di anno la numerazione delle
- * tavole nell'archivio sorgente (COPERTINE - dettaglio archivio), crescente.
+ * L'ordine in cui sono scritti qui non conta: quello vero lo applica
+ * `archive`, per numero di tavola decrescente.
  */
 const progetti = [
 
@@ -460,13 +459,16 @@ export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
 }
 
-const annoRecente = (item) => Math.max(0, ...anniDi(item))
-
 /*
- * Ordinato dal più recente. `sort` è stabile: a parità d'anno vale l'ordine di
- * `progetti`, e le voci senza anno vanno in coda.
+ * Ordine cronologico rovesciato: prima l'ultimo progetto, in fondo il primo.
+ *
+ * Il criterio è `tavola`, la numerazione dell'archivio sorgente, che è già
+ * cronologica: 1–5 sono del 2024, 6–10 del 2025, 11–19 del 2026. Ordinare per
+ * `year` darebbe gli stessi blocchi ma non saprebbe disporre i progetti dentro
+ * l'anno, dove la data precisa non c'è: la tavola sì, ed è l'unico dato che la
+ * conserva. Chi non ha tavola (i progetti raccolti, come `grafica`) va in coda.
  */
-export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
+export const archive = [...progetti].sort((a, b) => (b.tavola ?? 0) - (a.tavola ?? 0))
 
 /* "1 progetto" / "19 progetti": il singolare capita, e "1 progetti" no. */
 export function contaProgetti(n) {
