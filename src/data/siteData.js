@@ -107,6 +107,7 @@ export const about = {
  * `sfondo: true` = esiste sfondo.webp, immagine di sfondo mostrata in fondo
  * alla scheda progetto (sopra la navigazione prev/next).
  * `area` = area dell'archivio ('product' o 'graphic'); assente = 'product'.
+ * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
  * `tavola` = numero della tavola nell'archivio sorgente (cartella "COPERTINE
  * - dettaglio archivio"); mostrato in hover sulle celle di /archivio.
  * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
@@ -432,25 +433,85 @@ const progetti = [
     },
   },
   {
-    slug: 'grafica',
-    title: 'PROGETTI GRAFICI',
-    cat: 'Graphic Design',
+    slug: 'direzione-tolleranza',
+    title: 'DIREZIONE TOLLERANZA',
+    cat: 'Manifesto',
     area: 'graphic',
-    year: '2024 · 2026',
-    photos: 9,
-    desc: 'Progetti grafici presentati a concorsi e bandi nazionali e internazionali, dal 2024 a oggi. Manifesti e mascotte che uniscono un linguaggio essenziale e geometrico a un messaggio sociale.',
+    year: '2026',
+    photos: 0,
+    senzaFoto: true,
+    desc: 'Frecce e segnaletica urbana: ogni elemento mantiene la propria direzione ma convive in un unico sistema. La parola TOLLERANZA contiene le differenze.',
     spec: {
-      Oggetto: 'Manifesti e identità visive',
-      Contesto: 'Concorsi e bandi nazionali e internazionali',
+      Oggetto: 'Manifesto',
+      Contesto: 'Concorso · Friuli-Venezia Giulia',
     },
-    works: [
-      { title: '“Il Fauno” · Mascotte', meta: 'Emilia Romagna, 2025', note: 'Omaggio a Fortunato Depero, maestro del Futurismo, reinterpretato in chiave contemporanea con linee nette e forme geometriche.' },
-      { title: '“Possiamo ancora far crescere i fiori”', meta: 'Emilia Romagna, 2024 · 4° posto', note: 'Un invito a credere nella rinascita anche nei momenti più oscuri: i fiori come simboli fragili ma ostinati di vita, contro l’ombra della guerra.' },
-      { title: '“In the Box” · Sketch your Deck', meta: 'Bonobolabo, Bologna 2025', note: 'Una riflessione sulla condizione abitativa del futuro: la città racchiusa in uno scatolone, simbolo di spazi sempre più piccoli e temporanei.' },
-      { title: '“Un’Europa che unisce”', meta: 'Emilia Romagna, 2025 · Vincitore, 3° posto', note: 'Un pacco da spedizione che ruota attorno a un mondo stilizzato: metafora di un’Europa in movimento che unisce persone, culture e valori.' },
-      { title: '“La Città parla e tu?”', meta: 'IGPDecaux Graphic Award, Milano 2025', note: 'Due sedie vuote e un giallo acceso per richiamare il dialogo che manca e invitare i giovani a fermarsi, incontrarsi e tornare a parlare.' },
-      { title: '“Direzione tolleranza”', meta: 'Friuli Venezia Giulia, 2026', note: 'Frecce e segnaletica urbana: ogni elemento mantiene la propria direzione ma convive in un unico sistema. La parola TOLLERANZA contiene le differenze.' },
-    ],
+  },
+  {
+    slug: 'il-fauno',
+    title: 'IL FAUNO',
+    cat: 'Mascotte',
+    area: 'graphic',
+    year: '2025',
+    photos: 1,
+    desc: 'Omaggio a Fortunato Depero, maestro del Futurismo, reinterpretato in chiave contemporanea con linee nette e forme geometriche.',
+    spec: {
+      Oggetto: 'Mascotte · Identità visiva',
+      Contesto: 'Concorso · Emilia-Romagna',
+    },
+  },
+  {
+    slug: 'europa-unisce',
+    title: 'UN’EUROPA CHE UNISCE',
+    cat: 'Manifesto',
+    area: 'graphic',
+    year: '2025',
+    photos: 1,
+    desc: 'Un pacco da spedizione che ruota attorno a un mondo stilizzato: metafora di un’Europa in movimento che unisce persone, culture e valori.',
+    spec: {
+      Oggetto: 'Manifesto',
+      Contesto: 'Concorso · Emilia-Romagna',
+      Esito: 'Vincitore · 3° posto',
+    },
+  },
+  {
+    slug: 'citta-parla',
+    title: 'LA CITTÀ PARLA E TU?',
+    cat: 'Manifesto',
+    area: 'graphic',
+    year: '2025',
+    photos: 1,
+    desc: 'Due sedie vuote e un giallo acceso per richiamare il dialogo che manca e invitare i giovani a fermarsi, incontrarsi e tornare a parlare.',
+    spec: {
+      Oggetto: 'Manifesto',
+      Contesto: 'IGPDecaux Graphic Award, Milano',
+    },
+  },
+  {
+    slug: 'in-the-box',
+    title: 'IN THE BOX',
+    cat: 'Manifesto',
+    area: 'graphic',
+    year: '2025',
+    photos: 0,
+    desc: 'Una riflessione sulla condizione abitativa del futuro: la città racchiusa in uno scatolone, simbolo di spazi sempre più piccoli e temporanei.',
+    spec: {
+      Oggetto: 'Manifesto',
+      Contesto: 'Sketch your Deck · Bonobolabo, Bologna',
+    },
+  },
+  {
+    slug: 'fiori',
+    title: 'POSSIAMO ANCORA FAR CRESCERE I FIORI',
+    cat: 'Manifesto',
+    area: 'graphic',
+    year: '2024',
+    photos: 1,
+    desc: 'Un invito a credere nella rinascita anche nei momenti più oscuri: i fiori come simboli fragili ma ostinati di vita, contro l’ombra della guerra.',
+    spec: {
+      Oggetto: 'Manifesto',
+      Contesto: 'Concorso · Emilia-Romagna',
+      Esito: '4° posto',
+    },
   },
 ]
 
@@ -459,16 +520,20 @@ export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
 }
 
+const annoRecente = (item) => Math.max(0, ...anniDi(item))
+
 /*
  * Ordine cronologico rovesciato: prima l'ultimo progetto, in fondo il primo.
  *
- * Il criterio è `tavola`, la numerazione dell'archivio sorgente, che è già
- * cronologica: 1–5 sono del 2024, 6–10 del 2025, 11–19 del 2026. Ordinare per
- * `year` darebbe gli stessi blocchi ma non saprebbe disporre i progetti dentro
- * l'anno, dove la data precisa non c'è: la tavola sì, ed è l'unico dato che la
- * conserva. Chi non ha tavola (i progetti raccolti, come `grafica`) va in coda.
+ * Prima l'anno, poi il numero di `tavola` decrescente. La tavola serve perché
+ * dentro l'anno la data precisa non c'è, e la numerazione dell'archivio
+ * sorgente è l'unico dato che la conserva (1–5 sono del 2024, 6–10 del 2025,
+ * 11–19 del 2026). I progetti grafici non hanno tavola: a parità d'anno vale
+ * l'ordine in cui stanno scritti qui sopra, perché `sort` è stabile.
  */
-export const archive = [...progetti].sort((a, b) => (b.tavola ?? 0) - (a.tavola ?? 0))
+export const archive = [...progetti].sort(
+  (a, b) => annoRecente(b) - annoRecente(a) || (b.tavola ?? 0) - (a.tavola ?? 0),
+)
 
 /* "1 progetto" / "19 progetti": il singolare capita, e "1 progetti" no. */
 export function contaProgetti(n) {
@@ -521,7 +586,12 @@ export function progettiArea(chiave) {
   return archive.filter((p) => areaDi(p) === chiave)
 }
 
-/* `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il blocco. */
+/*
+ * `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il
+ * blocco. Anche `cover` può mancare: `senzaFoto` marca i progetti pubblicati
+ * prima che le immagini arrivino, e chi la usa mostra un riquadro in attesa
+ * invece di un'immagine rotta.
+ */
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
   const gallery = Array.from(
@@ -529,7 +599,7 @@ export function projectImages(item) {
     (_, i) => `${base}/${String(i + 1).padStart(2, '0')}.webp`,
   )
   return {
-    cover: `${base}/cover.webp`,
+    cover: item.senzaFoto ? null : `${base}/cover.webp`,
     gallery,
     drawing: item.disegno ? `${base}/disegno.webp` : null,
     sfondo: item.sfondo ? `${base}/sfondo.webp` : null,

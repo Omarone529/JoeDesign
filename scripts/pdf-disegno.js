@@ -50,7 +50,7 @@ const PAGINE = {
   'fuori-asse': 58,
   'mari-chair': 60,
   flue: 64,
-  // "grafica" (progetti grafici) non ha scheda tecnica nell'archivio.
+  // I manifesti non hanno scheda tecnica nell'archivio.
 }
 
 const richiesti = process.argv.slice(2)

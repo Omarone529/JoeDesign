@@ -21,6 +21,7 @@ import {
   about,
   archive,
   aree,
+  contaProgetti,
   periodoArchivio,
   periodoDi,
   profile,
@@ -254,8 +255,8 @@ generati.push('archivio.jpg')
 
 /*
  * Una per area dell'archivio. Product design riusa la famiglia di prodotti;
- * graphic design prende la copertina del suo progetto più recente, che è un
- * manifesto e va quindi contenuto, non ritagliato.
+ * graphic design prende la copertina del manifesto più recente, contenuta e
+ * non ritagliata come tutte le immagini di questo impianto.
  */
 for (const area of aree) {
   const progetti = progettiArea(area.chiave)
@@ -265,12 +266,7 @@ for (const area of aree) {
       ? `${periodo.primo}`
       : `${periodo.primo}–${periodo.ultimo}`
     : ''
-  const occhielloArea = [
-    `${progetti.length} ${progetti.length === 1 ? 'progetto' : 'progetti'}`,
-    arco,
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  const occhielloArea = [contaProgetti(progetti.length), arco].filter(Boolean).join(' · ')
   const dest = path.join(outDir, `archivio-${area.slug}.jpg`)
 
   if (area.chiave === 'product') {
@@ -282,8 +278,11 @@ for (const area of aree) {
       dest,
     })
   } else {
+    // Il più recente FRA QUELLI con la copertina: una scheda in attesa di foto
+    // non ha immagine da mettere qui.
+    const vetrina = progetti.find((p) => projectImages(p).cover)
     await schedaConImmagine({
-      sorgente: path.join(root, 'public', projectImages(progetti[0]).cover),
+      sorgente: path.join(root, 'public', projectImages(vetrina).cover),
       categoria: occhielloArea,
       titolo: area.label,
       coda: firma,
@@ -306,6 +305,8 @@ generati.push('chi-sono.jpg')
 /* Una per progetto */
 for (const item of archive) {
   const { cover } = projectImages(item)
+  // Scheda ancora senza immagini: `seo.js` le fa usare l'anteprima dell'area.
+  if (!cover) continue
   await schedaConImmagine({
     sorgente: path.join(root, 'public', cover),
     categoria: item.cat,

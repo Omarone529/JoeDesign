@@ -77,7 +77,7 @@ delle rotte da generare, **i dati strutturati** e **le immagini da mettere in si
 
 **Dati strutturati** — un `@graph` per pagina, non frammenti sciolti. Sito e persona
 hanno un `@id` fisso (`#sito`, `#persona`) e le altre entità li richiamano invece di
-ridescriverli: così le 18 schede risultano di *una* persona, non di 18 omonimi.
+ridescriverli: così tutte le schede risultano di *una* persona, non di 25 omonimi.
 Per rotta: home `WebSite`+`Person`, `/archivio` e `/archivio/<area>`
 `CollectionPage`+`ItemList` (l'area aggiunge il `BreadcrumbList`),
 `/chi-sono` `ProfilePage`, scheda `CreativeWork`+`BreadcrumbList`. La 404 non ne ha
@@ -269,8 +269,14 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 ## Da fare (noto)
 
 - Il sito è ancora in costruzione: aspettarsi nuove sezioni, contenuti e progetti.
-- Le gallerie dei 18 progetti attuali sono **complete** (cover + `01.webp…NN.webp` per
-  tutti); mancano solo le foto dei progetti futuri.
+- Le gallerie sono **complete** (cover + `01.webp…NN.webp`) per tutti tranne
+  **`direzione-tolleranza`**, pubblicato con `senzaFoto: true` in attesa del manifesto:
+  quando il file arriva, basta creare `public/images/products/direzione-tolleranza/`
+  con `cover.webp` (più eventuali `01.webp…`), togliere `senzaFoto`, mettere il numero
+  giusto in `photos` e rilanciare `fit-foto.js` e `og-image.js`.
+- **IN-SICUREZZA** (manifesto per il Congresso UIL Ravenna 2026): l'immagine era in
+  archivio ma il progetto non è mai stato descritto, quindi è rimasto fuori. Il file
+  sta in `ARCHIVIO WEBP` e nella storia di git (era `products/grafica/06.webp`).
 - Prima/subito dopo il primo deploy: registrare il sito su **Google Search Console** e
   inviare `/sitemap.xml`. Valutare un'analitica leggera (Plausible/Umami, senza cookie).
 - **Decidere il dominio prima di pubblicare**: cambiarlo dopo che Google ha indicizzato

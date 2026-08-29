@@ -6,7 +6,6 @@ import {
   areaPerSlug,
   contaProgetti,
   familyBand,
-  homeHero,
   periodoArchivio,
   periodoDi,
   profile,
@@ -48,9 +47,24 @@ function descrizioneProgetto(item) {
   return `${titoloLeggibile(item.title)} — ${item.cat}${anno}. Progetto di ${profile.name}, ${profile.role} a ${profile.place}.`
 }
 
-function clip(text, max = 155) {
+/*
+ * Meta description entro `max` caratteri. Prima si prova a chiudere su una
+ * frase intera: nella SERP «…il fulcro del prodotto, conferendogli un forte…»
+ * si legge peggio di una frase che finisce. Se nemmeno la prima frase ci sta,
+ * allora si taglia sull'ultima parola e si mettono i puntini.
+ */
+function clip(text, max = 155, min = 80) {
   const t = String(text).replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
+
+  let intero = ''
+  for (const frase of t.match(/[^.!?]+[.!?]+(\s|$)/g) || []) {
+    if ((intero + frase).trim().length > max) break
+    intero += frase
+  }
+  intero = intero.trim()
+  if (intero.length >= min) return intero
+
   return t.slice(0, max - 1).replace(/\s+\S*$/, '').trim() + '…'
 }
 
@@ -127,12 +141,15 @@ export function metaForRoute(route) {
   if (route.name === 'project') {
     const item = archive.find((p) => p.slug === route.slug)
     if (item) {
-      const { gallery } = projectImages(item)
+      const { cover, gallery } = projectImages(item)
+      // Senza copertina non c'è nemmeno l'anteprima social della scheda:
+      // il link condiviso porta quella dell'area, non un riquadro vuoto.
+      const areaItem = aree.find((a) => a.chiave === areaDi(item))
       return {
         title: titoloProgetto(item),
         description: clip(descrizioneProgetto(item)),
         canonical: `${SITE}/progetto/${item.slug}`,
-        image: ogImage(item.slug),
+        image: ogImage(cover ? item.slug : `archivio-${areaItem.slug}`),
         imageAlt: `${item.title} · ${item.cat}`,
         preload: gallery[0], // prima diapositiva del carosello
         type: 'article',
@@ -179,8 +196,8 @@ export function allRoutes() {
 
 /*
  * Un grafo per pagina. Le entità hanno un `@id` stabile e si richiamano invece
- * di ridescriversi: così le 18 schede risultano di una persona sola, e non di
- * 18 omonimi.
+ * di ridescriversi: così tutte le schede risultano di una persona sola, e non
+ * di venticinque omonimi.
  */
 const ID_SITO = `${SITE}/#sito`
 const ID_PERSONA = `${SITE}/#persona`
@@ -247,7 +264,7 @@ function nodoProgetto(item, meta) {
     url: meta.canonical,
     inLanguage: 'it-IT',
     // La copertina per prima: è quella che finisce accanto al risultato.
-    image: [cover, ...gallery, ...(drawing ? [drawing] : [])].map(abs),
+    image: [cover, ...gallery, drawing].filter(Boolean).map(abs),
     ...(anni ? { dateCreated: anni[anni.length - 1] } : {}),
     ...(item.spec?.Materiale ? { material: item.spec.Materiale } : {}),
     keywords: [...new Set([item.cat, ...Object.values(item.spec || {})])].join(', '),
@@ -255,6 +272,20 @@ function nodoProgetto(item, meta) {
     isPartOf: { '@id': ID_ARCHIVIO },
     mainEntityOfPage: meta.canonical,
   }
+}
+
+/*
+ * Copia essenziale del nodo archivio. Le schede e le pagine d'area dichiarano
+ * `isPartOf` verso ID_ARCHIVIO, ma quel nodo è descritto per intero solo in
+ * /archivio: senza questa copia il rimando resterebbe a vuoto, e un validatore
+ * lo segnala. Poche righe, e ogni @id citato nella pagina è anche definito.
+ */
+const rimandoArchivio = {
+  '@type': 'CollectionPage',
+  '@id': ID_ARCHIVIO,
+  url: `${SITE}/archivio`,
+  name: 'Archivio progetti',
+  isPartOf: { '@id': ID_SITO },
 }
 
 /* Sito e persona ci sono sempre, più l'entità propria della pagina. */
@@ -265,7 +296,7 @@ export function schemaForRoute(route, meta) {
     const item = archive.find((p) => p.slug === route.slug)
     if (item) {
       const area = aree.find((a) => a.chiave === areaDi(item))
-      grafo.push(nodoProgetto(item, meta), {
+      grafo.push(rimandoArchivio, nodoProgetto(item, meta), {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
@@ -288,6 +319,7 @@ export function schemaForRoute(route, meta) {
     // La pagina d'area è una raccolta a sé, parte dell'archivio.
     const area = meta.area
     const progetti = area ? progettiArea(area.chiave) : archive
+    if (area) grafo.push(rimandoArchivio)
     grafo.push({
       '@type': 'CollectionPage',
       '@id': area ? `${meta.canonical}#raccolta` : ID_ARCHIVIO,
@@ -338,23 +370,32 @@ export function schemaForRoute(route, meta) {
  * queste righe le foto si scoprono solo passando dalla pagina che le ospita.
  */
 export function immaginiPerRotta(percorso) {
-  if (percorso === '/') return [homeHero.src, familyBand.src].map(abs)
+  /*
+   * Solo `familyBand`: il ritratto in cima alla home è decorativo e ha `alt`
+   * vuoto per questo. Dichiararlo qui lo proporrebbe a Google Immagini senza la
+   * descrizione che Google si aspetta di trovare nell'alt — un'immagine muta in
+   * un indice che vive di didascalie.
+   */
+  if (percorso === '/') return [familyBand.src].map(abs)
 
   if (percorso === '/chi-sono') {
     const tavole = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
     return [about.photos.hero.src, about.photos.lab.src, ...tavole].filter(Boolean).map(abs)
   }
 
-  if (percorso === '/archivio') return archive.map((p) => abs(projectImages(p).cover))
+  const copertine = (lista) =>
+    lista.map((p) => projectImages(p).cover).filter(Boolean).map(abs)
+
+  if (percorso === '/archivio') return copertine(archive)
 
   if (percorso.startsWith('/archivio/')) {
     const area = areaPerSlug(percorso.slice('/archivio/'.length))
-    return area ? progettiArea(area.chiave).map((p) => abs(projectImages(p).cover)) : []
+    return area ? copertine(progettiArea(area.chiave)) : []
   }
 
   if (!percorso.startsWith('/progetto/')) return []
   const item = archive.find((p) => p.slug === percorso.slice('/progetto/'.length))
   if (!item) return []
   const { cover, gallery, drawing, sfondo } = projectImages(item)
-  return [cover, ...gallery, ...(drawing ? [drawing] : []), ...(sfondo ? [sfondo] : [])].map(abs)
+  return [cover, ...gallery, drawing, sfondo].filter(Boolean).map(abs)
 }

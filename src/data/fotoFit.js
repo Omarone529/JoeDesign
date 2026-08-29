@@ -13,8 +13,26 @@ export const fotoFit = {
   "/images/products/bullone/sfondo.webp": {
     "pos": "51% 50%"
   },
+  "/images/products/citta-parla/01.webp": {
+    "pos": "2% 50%"
+  },
+  "/images/products/citta-parla/cover.webp": {
+    "fit": "contain"
+  },
   "/images/products/directional-arrow/sfondo.webp": {
     "pos": "40% 50%"
+  },
+  "/images/products/europa-unisce/01.webp": {
+    "fit": "contain"
+  },
+  "/images/products/europa-unisce/cover.webp": {
+    "fit": "contain"
+  },
+  "/images/products/fiori/01.webp": {
+    "fit": "contain"
+  },
+  "/images/products/fiori/cover.webp": {
+    "fit": "contain"
   },
   "/images/products/flue/03.webp": {
     "pos": "50% 94%"
@@ -40,34 +58,13 @@ export const fotoFit = {
   "/images/products/flue/sfondo.webp": {
     "pos": "34% 50%"
   },
-  "/images/products/grafica/01.webp": {
+  "/images/products/il-fauno/01.webp": {
     "fit": "contain"
   },
-  "/images/products/grafica/02.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/03.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/04.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/05.webp": {
-    "pos": "2% 50%"
-  },
-  "/images/products/grafica/06.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/07.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/08.webp": {
-    "fit": "contain"
-  },
-  "/images/products/grafica/09.webp": {
+  "/images/products/il-fauno/cover.webp": {
     "pos": "50% 45%"
   },
-  "/images/products/grafica/cover.webp": {
+  "/images/products/in-the-box/cover.webp": {
     "fit": "contain"
   },
   "/images/products/mari-chair/02.webp": {

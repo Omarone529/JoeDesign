@@ -75,7 +75,17 @@ export default function ProjectDetail({ slug }) {
 
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 md:px-0 lg:pt-12">
           {/* `key`: rimonta il carosello cambiando scheda (vedi Carousel). */}
-          <Carousel key={item.slug} images={slides} title={item.title} />
+          {slides.length > 0 ? (
+            <Carousel key={item.slug} images={slides} title={item.title} />
+          ) : (
+            /* Scheda pubblicata prima delle immagini: la cornice resta, vuota e
+               dichiarata, invece di lasciare la colonna a metà. */
+            <div className="flex aspect-square w-full items-center justify-center bg-placeholder">
+              <span className="text-[11px] uppercase tracking-[0.24em] text-muted">
+                Foto in arrivo
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

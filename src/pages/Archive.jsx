@@ -63,7 +63,9 @@ function Bivio() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-6 lg:gap-8">
           {aree.map((area, i) => {
             const progetti = progettiArea(area.chiave)
-            const primo = progetti[0]
+            // Il più recente FRA QUELLI con la copertina: una scheda in attesa
+            // di foto non può fare da vetrina all'area.
+            const primo = progetti.find((x) => projectImages(x).cover) ?? progetti[0]
             const { cover } = projectImages(primo)
             const fit = fotoFit[cover]
             return (
@@ -135,6 +137,10 @@ function GrigliaArea({ area }) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
           {progetti.map((p, i) => {
             const { cover } = projectImages(p)
+            // I manifesti sono verticali e il ritaglio quadrato gli mozzerebbe il
+            // testo: `fotoFit` dice quali vanno mostrati interi. Le copertine di
+            // prodotto non hanno voce lì e riempiono la cella come sempre.
+            const fit = fotoFit[cover]
             // Prime due righe (8 celle): in viewport all'apertura, richieste subito.
             const subito = i < 8
             return (
@@ -145,14 +151,25 @@ function GrigliaArea({ area }) {
               >
                 <article>
                   <div className="relative aspect-square overflow-hidden bg-placeholder">
-                    <img
-                      src={cover}
-                      alt={altCopertina(p)}
-                      loading={subito ? 'eager' : 'lazy'}
-                      fetchpriority={i < 4 ? 'high' : undefined}
-                      decoding="async"
-                      className="h-full w-full object-cover contrast-[1.02]"
-                    />
+                    {cover ? (
+                      <img
+                        src={cover}
+                        alt={altCopertina(p)}
+                        loading={subito ? 'eager' : 'lazy'}
+                        fetchpriority={i < 4 ? 'high' : undefined}
+                        decoding="async"
+                        style={fit?.pos ? { objectPosition: fit.pos } : undefined}
+                        className={`h-full w-full contrast-[1.02] ${
+                          fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
+                        }`}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <span className="text-[10px] uppercase tracking-[0.24em] text-muted">
+                          Foto in arrivo
+                        </span>
+                      </div>
+                    )}
                     {p.tavola && (
                       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-all duration-300 group-hover:bg-ink/35 group-hover:opacity-100">
                         <span className="text-[clamp(28px,5vw,52px)] font-bold uppercase leading-none tracking-[-0.02em] text-paper">

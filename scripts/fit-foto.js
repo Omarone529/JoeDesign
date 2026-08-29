@@ -35,7 +35,7 @@ const FOTOGRAFIA = 0.13 // quota di pixel sfumati sopra cui è uno scatto
  * Quello che la misura non prende: manifesti col fondo sfumato o con dentro una
  * foto, che alla conta dei pixel sembrano scatti. Si aggiunge a mano.
  */
-const SEMPRE_INTERE = new Set(['grafica/06.webp', 'grafica/07.webp'])
+const SEMPRE_INTERE = new Set(['in-the-box/cover.webp'])
 const TOLLERANZA = 0.04 // quanto il soggetto può debordare dalla finestra
 const CAMPIONE = 200 // lato massimo su cui si misura: basta e avanza
 const DIFF = 26 // distanza dal fondo oltre cui il pixel è soggetto
