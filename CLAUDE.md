@@ -42,7 +42,9 @@ console. Netlify risolve le directory da sé e non ha il problema.
 URL reali, non hash:
 - `/` → Home
 - `/chi-sono` → About (pagina "Chi sono")
-- `/archivio` → Archive
+- `/archivio` → Archive: il bivio fra le due aree (product design / graphic design)
+- `/archivio/<area>` → Archive: la griglia dei progetti di quell'area
+  (`/archivio/product-design`, `/archivio/graphic-design`). Area sconosciuta → 404
 - `/progetto/<slug>` → ProjectDetail
 
 `App.jsx` legge la rotta con `useRoute()` e monta la pagina giusta. Funziona sia nel
@@ -76,7 +78,8 @@ delle rotte da generare, **i dati strutturati** e **le immagini da mettere in si
 **Dati strutturati** — un `@graph` per pagina, non frammenti sciolti. Sito e persona
 hanno un `@id` fisso (`#sito`, `#persona`) e le altre entità li richiamano invece di
 ridescriverli: così le 18 schede risultano di *una* persona, non di 18 omonimi.
-Per rotta: home `WebSite`+`Person`, `/archivio` `CollectionPage`+`ItemList`,
+Per rotta: home `WebSite`+`Person`, `/archivio` e `/archivio/<area>`
+`CollectionPage`+`ItemList` (l'area aggiunge il `BreadcrumbList`),
 `/chi-sono` `ProfilePage`, scheda `CreativeWork`+`BreadcrumbList`. La 404 non ne ha
 (è `noindex`: descrivere un errore a un motore non ha senso).
 
@@ -92,6 +95,9 @@ Tutti i testi e i dati stanno qui, non nel markup:
 - `profile` — dati di Joe (nome, ruolo, contatti, manifesto)
 - `focusItems` — le schede "Lavori selezionati" in homepage
 - `archive` — TUTTI i progetti (slug, title, cat, year, photos, desc, spec, opzionale `works`)
+- `aree` — le due aree dell'archivio (slug d'URL, etichetta, descrizione). L'area di un
+  progetto sta nel suo campo `area`; chi non ce l'ha è product design (`AREA_PREDEFINITA`).
+  `progettiArea(chiave)` filtra, `areaPerSlug(slug)` risolve l'URL
 - `familyBand` — altra sezione home (il ticker "Skills" in home riusa `about.skills`)
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
 - `titoloLeggibile(t)` — i titoli sono scritti in maiuscolo e il CSS li mostra così;
@@ -106,7 +112,8 @@ Tutti i testi e i dati stanno qui, non nel markup:
    Per mailto/tel/URL esterni/`#` va bene `<a>` (o `Link`, che li gestisce come anchor normali).
 2. **Niente `fetch`/API a runtime** per contenuti che devono essere indicizzati: tienili in `siteData.js`.
    Il pre-rendering "fotografa" ciò che è nei dati statici.
-3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella),
+3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella;
+   se è grafica, `area: 'graphic'`),
    poi lancia `node scripts/og-image.js` per l'anteprima social. Pre-rendering, sitemap
    e meta tag si aggiornano da soli.
 4. **Non reintrodurre l'hash routing** (`#progetto/...`): romperebbe SEO e link profondi.

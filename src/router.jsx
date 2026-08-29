@@ -1,17 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { archive } from './data/siteData'
+import { archive, areaPerSlug } from './data/siteData'
 
 /*
  * Router minimale su path reali (History API), niente dipendenze: l'hash
  * routing impediva SEO e pre-rendering. Funziona anche in SSR, dove riceve
  * `initialPath` e non tocca mai `window`.
- *   /  ·  /chi-sono  ·  /archivio  ·  /progetto/<slug>  ·  altro → 404
+ *   /  ·  /chi-sono  ·  /archivio  ·  /archivio/<area>  ·  /progetto/<slug>
+ *   ·  altro → 404
  */
 export function parsePath(pathname) {
   const p = (pathname || '/').replace(/\/+$/, '') || '/'
   if (p === '/') return { name: 'home', path: '/' }
   if (p === '/chi-sono') return { name: 'about', path: '/chi-sono' }
-  if (p === '/archivio') return { name: 'archive', path: '/archivio' }
+  if (p === '/archivio') return { name: 'archive', area: null, path: '/archivio' }
+  if (p.startsWith('/archivio/')) {
+    const slug = decodeURIComponent(p.slice('/archivio/'.length))
+    // Area inesistente → 404, non una griglia vuota.
+    if (areaPerSlug(slug)) return { name: 'archive', area: slug, path: p }
+  }
   if (p.startsWith('/progetto/')) {
     const slug = decodeURIComponent(p.slice('/progetto/'.length))
     // Slug non in archivio → 404, non una scheda vuota.

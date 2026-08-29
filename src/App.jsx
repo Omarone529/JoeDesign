@@ -18,7 +18,7 @@ export default function App() {
       {/* `rotta`: al cambio pagina il boundary si riarma. */}
       <ErrorBoundary rotta={route.path}>
         {route.name === 'about' && <About />}
-        {route.name === 'archive' && <Archive />}
+        {route.name === 'archive' && <Archive area={route.area} />}
         {route.name === 'project' && <ProjectDetail slug={route.slug} />}
         {route.name === 'notfound' && <NotFound />}
         {route.name === 'home' && <Home />}
