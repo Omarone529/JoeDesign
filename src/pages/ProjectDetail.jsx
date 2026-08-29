@@ -3,6 +3,8 @@ import {
   altGalleria,
   altSfondo,
   archive,
+  areaDi,
+  aree,
   projectImages,
 } from '../data/siteData'
 import Carousel from '../components/Carousel'
@@ -20,14 +22,22 @@ const SFONDO_H = 941
  * strozza.
  */
 export default function ProjectDetail({ slug }) {
-  const index = archive.findIndex((p) => p.slug === slug)
-  const item = archive[index]
+  const item = archive.find((p) => p.slug === slug)
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
   const { gallery, drawing, sfondo } = projectImages(item)
   const slides = gallery.map((src, i) => ({ src, alt: altGalleria(item, i, gallery.length) }))
-  const prev = archive[(index - 1 + archive.length) % archive.length]
-  const next = archive[(index + 1) % archive.length]
+
+  /*
+   * Precedente e successivo restano dentro l'area: uscendo da una griglia di
+   * graphic design, il "successivo" non può essere un appendiabiti.
+   */
+  const area = aree.find((a) => a.chiave === areaDi(item))
+  const vicini = archive.filter((p) => areaDi(p) === areaDi(item))
+  const i = vicini.findIndex((p) => p.slug === slug)
+  const prev = vicini[(i - 1 + vicini.length) % vicini.length]
+  const next = vicini[(i + 1) % vicini.length]
+  const soloUno = vicini.length < 2
 
   const specRows = [
     ...(item.year ? [['Anno', item.year]] : []),
@@ -40,10 +50,10 @@ export default function ProjectDetail({ slug }) {
       <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
           <Link
-            to="/archivio"
+            to={area ? `/archivio/${area.slug}` : '/archivio'}
             className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
           >
-            ← Archivio
+            ← {area ? area.label : 'Archivio'}
           </Link>
 
           <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
@@ -139,6 +149,19 @@ export default function ProjectDetail({ slug }) {
         </section>
       )}
 
+      {soloUno ? (
+        <section className="mt-14 border-t border-line sm:mt-20 lg:mt-28">
+          <Link
+            to={area ? `/archivio/${area.slug}` : '/archivio'}
+            className="group block px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
+          >
+            <div className="text-[10px] uppercase tracking-[0.24em] text-muted">← Torna a</div>
+            <div className="mt-2 text-[clamp(16px,2vw,26px)] font-bold uppercase tracking-[-0.01em]">
+              {area ? area.label : 'Archivio'}
+            </div>
+          </Link>
+        </section>
+      ) : (
       <section className="mt-14 grid grid-cols-2 border-t border-line sm:mt-20 lg:mt-28">
         <Link
           to={`/progetto/${prev.slug}`}
@@ -159,6 +182,7 @@ export default function ProjectDetail({ slug }) {
           </div>
         </Link>
       </section>
+      )}
     </main>
   )
 }

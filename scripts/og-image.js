@@ -17,7 +17,16 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { about, archive, periodoArchivio, profile, projectImages } from '../src/data/siteData.js'
+import {
+  about,
+  archive,
+  aree,
+  periodoArchivio,
+  periodoDi,
+  profile,
+  progettiArea,
+  projectImages,
+} from '../src/data/siteData.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
@@ -242,6 +251,47 @@ await schedaPiena({
   dest: path.join(outDir, 'archivio.jpg'),
 })
 generati.push('archivio.jpg')
+
+/*
+ * Una per area dell'archivio. Product design riusa la famiglia di prodotti;
+ * graphic design prende la copertina del suo progetto più recente, che è un
+ * manifesto e va quindi contenuto, non ritagliato.
+ */
+for (const area of aree) {
+  const progetti = progettiArea(area.chiave)
+  const periodo = periodoDi(progetti)
+  const arco = periodo
+    ? periodo.primo === periodo.ultimo
+      ? `${periodo.primo}`
+      : `${periodo.primo}–${periodo.ultimo}`
+    : ''
+  const occhielloArea = [
+    `${progetti.length} ${progetti.length === 1 ? 'progetto' : 'progetti'}`,
+    arco,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  const dest = path.join(outDir, `archivio-${area.slug}.jpg`)
+
+  if (area.chiave === 'product') {
+    await schedaPiena({
+      sorgente: path.join(root, 'public/images/home/family-band.webp'),
+      occhielloTesto: occhielloArea,
+      titolo: area.label,
+      coda: firma,
+      dest,
+    })
+  } else {
+    await schedaConImmagine({
+      sorgente: path.join(root, 'public', projectImages(progetti[0]).cover),
+      categoria: occhielloArea,
+      titolo: area.label,
+      coda: firma,
+      dest,
+    })
+  }
+  generati.push(`archivio-${area.slug}.jpg`)
+}
 
 /* Chi sono */
 await schedaConImmagine({

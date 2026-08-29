@@ -1,10 +1,16 @@
 import {
   about,
   archive,
+  aree,
+  areaDi,
+  areaPerSlug,
+  contaProgetti,
   familyBand,
   homeHero,
   periodoArchivio,
+  periodoDi,
   profile,
+  progettiArea,
   projectImages,
   titoloLeggibile,
 } from './data/siteData'
@@ -69,11 +75,36 @@ function titoloProgetto(item) {
   return senzaCategoria.length <= 62 ? senzaCategoria : `${nome} · ${profile.name}`
 }
 
+/* "2024 · 2026", o il solo anno quando l'area ne copre uno. */
+function periodoTesto(periodo) {
+  if (!periodo) return ''
+  return periodo.primo === periodo.ultimo
+    ? `${periodo.primo}`
+    : `${periodo.primo} · ${periodo.ultimo}`
+}
+
 export function metaForRoute(route) {
   if (route.name === 'archive') {
+    // Pagina d'area: /archivio/product-design, /archivio/graphic-design.
+    const area = route.area ? areaPerSlug(route.area) : null
+    if (area) {
+      const progetti = progettiArea(area.chiave)
+      return {
+        title: `${area.label} · Archivio · ${FIRMA}`,
+        description: clip(
+          `${contaProgetti(progetti.length)} di ${area.label.toLowerCase()} di ${FIRMA}, ${periodoTesto(periodoDi(progetti))}. ${area.desc}`,
+        ),
+        canonical: `${SITE}/archivio/${area.slug}`,
+        image: ogImage(`archivio-${area.slug}`),
+        imageAlt: `${area.label} — progetti di ${profile.displayName}`,
+        type: 'website',
+        area,
+      }
+    }
+
     return {
       title: `Archivio progetti · ${FIRMA}`,
-      description: `Tutti i ${archive.length} progetti di ${FIRMA}: product design, arredo, packaging e grafica. Portfolio ${PERIODO}.`,
+      description: `Tutti i ${archive.length} progetti di ${FIRMA}, divisi in product design e graphic design. Portfolio ${PERIODO}.`,
       canonical: `${SITE}/archivio`,
       image: ogImage('archivio'),
       imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
@@ -135,7 +166,13 @@ export function metaForRoute(route) {
 }
 
 export function allRoutes() {
-  return ['/', '/chi-sono', '/archivio', ...archive.map((p) => `/progetto/${p.slug}`)]
+  return [
+    '/',
+    '/chi-sono',
+    '/archivio',
+    ...aree.map((a) => `/archivio/${a.slug}`),
+    ...archive.map((p) => `/progetto/${p.slug}`),
+  ]
 }
 
 /* ─────────────────────────── Dati strutturati ─────────────────────────── */
@@ -227,29 +264,43 @@ export function schemaForRoute(route, meta) {
   if (route.name === 'project') {
     const item = archive.find((p) => p.slug === route.slug)
     if (item) {
+      const area = aree.find((a) => a.chiave === areaDi(item))
       grafo.push(nodoProgetto(item, meta), {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
           { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
-          { '@type': 'ListItem', position: 3, name: titoloLeggibile(item.title) },
+          ...(area
+            ? [
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: area.label,
+                  item: `${SITE}/archivio/${area.slug}`,
+                },
+              ]
+            : []),
+          { '@type': 'ListItem', position: area ? 4 : 3, name: titoloLeggibile(item.title) },
         ],
       })
     }
   } else if (route.name === 'archive') {
+    // La pagina d'area è una raccolta a sé, parte dell'archivio.
+    const area = meta.area
+    const progetti = area ? progettiArea(area.chiave) : archive
     grafo.push({
       '@type': 'CollectionPage',
-      '@id': ID_ARCHIVIO,
-      url: `${SITE}/archivio`,
-      name: 'Archivio progetti',
+      '@id': area ? `${meta.canonical}#raccolta` : ID_ARCHIVIO,
+      url: meta.canonical,
+      name: area ? `${area.label} · Archivio progetti` : 'Archivio progetti',
       description: meta.description,
       inLanguage: 'it-IT',
-      isPartOf: { '@id': ID_SITO },
+      isPartOf: { '@id': area ? ID_ARCHIVIO : ID_SITO },
       about: { '@id': ID_PERSONA },
       mainEntity: {
         '@type': 'ItemList',
-        numberOfItems: archive.length,
-        itemListElement: archive.map((p, i) => ({
+        numberOfItems: progetti.length,
+        itemListElement: progetti.map((p, i) => ({
           '@type': 'ListItem',
           position: i + 1,
           url: `${SITE}/progetto/${p.slug}`,
@@ -257,6 +308,16 @@ export function schemaForRoute(route, meta) {
         })),
       },
     })
+    if (area) {
+      grafo.push({
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
+          { '@type': 'ListItem', position: 3, name: area.label },
+        ],
+      })
+    }
   } else if (route.name === 'about') {
     grafo.push({
       '@type': 'ProfilePage',
@@ -285,6 +346,11 @@ export function immaginiPerRotta(percorso) {
   }
 
   if (percorso === '/archivio') return archive.map((p) => abs(projectImages(p).cover))
+
+  if (percorso.startsWith('/archivio/')) {
+    const area = areaPerSlug(percorso.slice('/archivio/'.length))
+    return area ? progettiArea(area.chiave).map((p) => abs(projectImages(p).cover)) : []
+  }
 
   if (!percorso.startsWith('/progetto/')) return []
   const item = archive.find((p) => p.slug === percorso.slice('/progetto/'.length))

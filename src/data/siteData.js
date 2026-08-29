@@ -106,12 +106,12 @@ export const about = {
  * `disegno: true` = esiste disegno.webp (da `scripts/pdf-disegno.js`).
  * `sfondo: true` = esiste sfondo.webp, immagine di sfondo mostrata in fondo
  * alla scheda progetto (sopra la navigazione prev/next).
+ * `area` = area dell'archivio ('product' o 'graphic'); assente = 'product'.
  * `tavola` = numero della tavola nell'archivio sorgente (cartella "COPERTINE
  * - dettaglio archivio"); mostrato in hover sulle celle di /archivio.
  * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
- * Questo ordine vale solo a parità di anno (l'ordinamento vero lo applica
- * `archive`): anno decrescente, e a parità di anno la numerazione delle
- * tavole nell'archivio sorgente (COPERTINE - dettaglio archivio), crescente.
+ * L'ordine in cui sono scritti qui non conta: quello vero lo applica
+ * `archive`, per numero di tavola decrescente.
  */
 const progetti = [
 
@@ -435,6 +435,7 @@ const progetti = [
     slug: 'grafica',
     title: 'PROGETTI GRAFICI',
     cat: 'Graphic Design',
+    area: 'graphic',
     year: '2024 · 2026',
     photos: 9,
     desc: 'Progetti grafici presentati a concorsi e bandi nazionali e internazionali, dal 2024 a oggi. Manifesti e mascotte che uniscono un linguaggio essenziale e geometrico a un messaggio sociale.',
@@ -458,18 +459,67 @@ export function anniDi(item) {
   return (String(item?.year || '').match(/\d{4}/g) || []).map(Number)
 }
 
-const annoRecente = (item) => Math.max(0, ...anniDi(item))
+/*
+ * Ordine cronologico rovesciato: prima l'ultimo progetto, in fondo il primo.
+ *
+ * Il criterio è `tavola`, la numerazione dell'archivio sorgente, che è già
+ * cronologica: 1–5 sono del 2024, 6–10 del 2025, 11–19 del 2026. Ordinare per
+ * `year` darebbe gli stessi blocchi ma non saprebbe disporre i progetti dentro
+ * l'anno, dove la data precisa non c'è: la tavola sì, ed è l'unico dato che la
+ * conserva. Chi non ha tavola (i progetti raccolti, come `grafica`) va in coda.
+ */
+export const archive = [...progetti].sort((a, b) => (b.tavola ?? 0) - (a.tavola ?? 0))
+
+/* "1 progetto" / "19 progetti": il singolare capita, e "1 progetti" no. */
+export function contaProgetti(n) {
+  return `${n} ${n === 1 ? 'progetto' : 'progetti'}`
+}
+
+/* Il periodo coperto da un gruppo di progetti, o null se nessuno ha un anno. */
+export function periodoDi(lista) {
+  const anni = lista.flatMap(anniDi)
+  return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
+}
+
+export const periodoArchivio = periodoDi(archive)
 
 /*
- * Ordinato dal più recente. `sort` è stabile: a parità d'anno vale l'ordine di
- * `progetti`, e le voci senza anno vanno in coda.
+ * L'archivio si apre su due aree: /archivio le presenta, e ognuna ha la sua
+ * pagina (/archivio/product-design, /archivio/graphic-design) con la stessa
+ * griglia di prima, ristretta ai suoi progetti.
+ *
+ * L'area sta sul progetto, nel campo `area`. Chi non la dichiara è product
+ * design: è la regola, e ripeterla su ogni voce sarebbe solo rumore.
  */
-export const archive = [...progetti].sort((a, b) => annoRecente(b) - annoRecente(a))
+export const AREA_PREDEFINITA = 'product'
 
-export const periodoArchivio = (() => {
-  const anni = archive.flatMap(anniDi)
-  return anni.length ? { primo: Math.min(...anni), ultimo: Math.max(...anni) } : null
-})()
+export function areaDi(item) {
+  return item?.area || AREA_PREDEFINITA
+}
+
+export const aree = [
+  {
+    slug: 'product-design',
+    chiave: 'product',
+    label: 'Product design',
+    desc: 'Oggetti di arredo, bigiotteria, illuminazione e packaging.',
+  },
+  {
+    slug: 'graphic-design',
+    chiave: 'graphic',
+    label: 'Graphic design',
+    desc: 'Manifesti, mascotte e identità visive per concorsi e bandi.',
+  },
+]
+
+export function areaPerSlug(slug) {
+  return aree.find((a) => a.slug === slug) || null
+}
+
+/* Ordinati come `archive`: dal più recente. */
+export function progettiArea(chiave) {
+  return archive.filter((p) => areaDi(p) === chiave)
+}
 
 /* `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il blocco. */
 export function projectImages(item) {
