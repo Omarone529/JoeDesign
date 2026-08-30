@@ -34,6 +34,18 @@ function Intestazione({ sinistra, destra }) {
   )
 }
 
+/*
+ * La forma delle celle della griglia. Le copertine di prodotto sono quadrate o
+ * quasi; quelle grafiche sono manifesti verticali (7:10), e in una cella
+ * quadrata restavano una striscia stretta fra due fasce vuote. Il bivio invece
+ * tiene le due celle quadrate, perché le due carte devono restare uguali: lì
+ * il manifesto sta al centro e il colore del suo bordo (`fondo` in `fotoFit`)
+ * copre lo spazio che avanza ai lati.
+ */
+function formaCella(area) {
+  return area.chiave === 'graphic' ? 'aspect-[7/10]' : 'aspect-square'
+}
+
 function Titolo({ children }) {
   return (
     <section className="px-5 pb-8 pt-12 text-center sm:px-8 sm:pb-12 sm:pt-20 lg:px-[72px] lg:pt-[120px]">
@@ -83,7 +95,10 @@ function Bivio() {
                   {area.desc}
                 </p>
 
-                <div className="relative mt-5 aspect-square overflow-hidden bg-placeholder">
+                <div
+                  className="relative mt-5 aspect-square overflow-hidden bg-placeholder"
+                  style={fit?.fondo ? { backgroundColor: fit.fondo } : undefined}
+                >
                   <img
                     src={cover}
                     alt={altCopertina(primo)}
@@ -113,6 +128,7 @@ function Bivio() {
 function GrigliaArea({ area }) {
   const progetti = progettiArea(area.chiave)
   const altra = aree.find((a) => a.slug !== area.slug)
+  const cella = formaCella(area)
 
   return (
     <main className="animate-viewIn">
@@ -150,7 +166,10 @@ function GrigliaArea({ area }) {
                 className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
               >
                 <article>
-                  <div className="relative aspect-square overflow-hidden bg-placeholder">
+                  <div
+                    className={`relative ${cella} overflow-hidden bg-placeholder`}
+                    style={fit?.fondo ? { backgroundColor: fit.fondo } : undefined}
+                  >
                     {cover ? (
                       <img
                         src={cover}

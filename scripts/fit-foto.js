@@ -35,7 +35,15 @@ const FOTOGRAFIA = 0.13 // quota di pixel sfumati sopra cui è uno scatto
  * Quello che la misura non prende: manifesti col fondo sfumato o con dentro una
  * foto, che alla conta dei pixel sembrano scatti. Si aggiunge a mano.
  */
-const SEMPRE_INTERE = new Set(['in-the-box/cover.webp'])
+const SEMPRE_INTERE = new Set([
+  'in-the-box/cover.webp',
+  'rilegno/cover.webp',
+  // Manifesti su campo pieno: la misura li crede tagliabili perché il
+  // giallo è uniforme, ma il testo sta tutto in alto e si perderebbe.
+  'citta-parla/cover.webp',
+  'direzione-tolleranza/cover.webp',
+])
+
 const TOLLERANZA = 0.04 // quanto il soggetto può debordare dalla finestra
 const CAMPIONE = 200 // lato massimo su cui si misura: basta e avanza
 const DIFF = 26 // distanza dal fondo oltre cui il pixel è soggetto
@@ -87,8 +95,11 @@ async function misura(file) {
     y1 = h - 1
   }
 
+  const esa = (v) => '#' + v.map((k) => Math.round(k).toString(16).padStart(2, '0')).join('')
+
   return {
     rapporto: meta.width / meta.height,
+    fondo: esa(fondo),
     pulito,
     sfumati: await quotaSfumati(file),
     box: { x0: x0 / w, x1: (x1 + 1) / w, y0: y0 / h, y1: (y1 + 1) / h },
@@ -175,13 +186,18 @@ function decidi({ rapporto, sfumati, box }) {
   for (const slug of fs.readdirSync(RADICE).sort()) {
     for (const f of fs.readdirSync(path.join(RADICE, slug)).sort()) {
       if (!f.endsWith('.webp') || f === 'disegno.webp') continue
-      const d = SEMPRE_INTERE.has(`${slug}/${f}`)
+      const chiave = `${slug}/${f}`
+      const m = await misura(path.join(RADICE, slug, f))
+      const d = SEMPRE_INTERE.has(chiave)
         ? { fit: 'contain', motivo: 'grafica segnata a mano' }
-        : decidi(await misura(path.join(RADICE, slug, f)))
+        : decidi(m)
       const src = `/images/products/${slug}/${f}`
 
       if (d.fit === 'contain') {
-        voci[src] = { fit: 'contain' }
+        // Mostrata intera lascia scoperti i lati della cella: se il suo bordo è
+        // di un colore solo, quel colore riempie lo scoperto e lo spazio vuoto
+        // sparisce. Bordo screziato (una foto al vivo): si lascia il grigio.
+        voci[src] = { fit: 'contain', ...(m.pulito > 0.85 ? { fondo: m.fondo } : {}) }
         conto.contain++
       } else if (d.pos) {
         voci[src] = { pos: d.pos }
@@ -200,6 +216,8 @@ function decidi({ rapporto, sfumati, box }) {
  * riempie la cornice restando centrato: è il comportamento di base.
  *   fit: 'contain' → mostrata intera, il ritaglio le toglierebbe il soggetto
  *   pos: '<x>% <y>%' → riempie, ma il ritaglio è puntato sul prodotto
+ *   fondo: '#rrggbb' → il colore del suo bordo, per coprire lo spazio che
+ *     l'immagine intera lascia scoperto nella cella
  */
 export const fotoFit = ${JSON.stringify(voci, null, 2)}
 `

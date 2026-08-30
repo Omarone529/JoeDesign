@@ -81,6 +81,11 @@ export default function Carousel({ images, title }) {
 
   if (n === 0) return null
 
+  // La foto mostrata intera non copre la cornice: il colore del suo bordo
+  // (`fondo`, da `fotoFit`) riempie lo scoperto. Cambia con la foto, in
+  // dissolvenza come lei; senza, resta il grigio di `bg-placeholder`.
+  const fondo = fotoFit[images[index]?.src]?.fondo
+
   return (
     // Le frecce da tastiera raccolgono gli eventi in risalita dai comandi veri,
     // che sono tutti <button>. Il contenitore non è focusabile di suo.
@@ -99,7 +104,8 @@ export default function Carousel({ images, title }) {
           tastiera è il pulsante contatore qui sotto. */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
-        className="relative aspect-square w-full cursor-pointer select-none overflow-hidden bg-placeholder"
+        className="relative aspect-square w-full cursor-pointer select-none overflow-hidden bg-placeholder transition-colors duration-700 ease-[cubic-bezier(.2,.7,.2,1)]"
+        style={fondo ? { backgroundColor: fondo } : undefined}
         onTouchStart={inizioTocco}
         onTouchEnd={fineTocco}
         onClick={(e) => {
