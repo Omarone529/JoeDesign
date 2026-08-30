@@ -108,8 +108,11 @@ export const about = {
  * alla scheda progetto (sopra la navigazione prev/next).
  * `area` = area dell'archivio ('product' o 'graphic'); assente = 'product'.
  * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
- * `tavola` = numero della tavola nell'archivio sorgente (cartella "COPERTINE
- * - dettaglio archivio"); mostrato in hover sulle celle di /archivio.
+ * `tavola` = numero del progetto dentro la sua area, in ordine cronologico
+ * crescente (01 = il più vecchio); mostrato in hover sulle celle di /archivio.
+ * Per i prodotti coincide con la tavola dell'archivio sorgente (cartella
+ * "COPERTINE - dettaglio archivio"), per la grafica è una numerazione a parte:
+ * le due aree si guardano in griglie separate, quindi ognuna parte da 01.
  * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
  * L'ordine in cui sono scritti qui non conta: quello vero lo applica
  * `archive`, per numero di tavola decrescente.
@@ -439,6 +442,7 @@ const progetti = [
     area: 'graphic',
     year: '2026',
     photos: 4,
+    tavola: 7,
     desc: 'Una sedia in equilibrio su una catasta di scarti: il legno che torna materia e poi di nuovo oggetto. Illustrazione di copertina per Walden, la rivista di Rilegno dedicata all’economia circolare.',
     spec: {
       Oggetto: 'Illustrazione · Copertina',
@@ -452,6 +456,7 @@ const progetti = [
     area: 'graphic',
     year: '2025',
     photos: 2,
+    tavola: 6,
     desc: 'Frecce e segnaletica urbana: ogni elemento mantiene la propria direzione ma convive in un unico sistema. La parola TOLLERANZA contiene le differenze.',
     spec: {
       Oggetto: 'Manifesto',
@@ -465,6 +470,7 @@ const progetti = [
     area: 'graphic',
     year: '2025',
     photos: 3,
+    tavola: 5,
     desc: 'Omaggio a Fortunato Depero, maestro del Futurismo, reinterpretato in chiave contemporanea con linee nette e forme geometriche.',
     spec: {
       Oggetto: 'Mascotte · Identità visiva',
@@ -478,6 +484,7 @@ const progetti = [
     area: 'graphic',
     year: '2025',
     photos: 4,
+    tavola: 4,
     desc: 'Un pacco da spedizione che ruota attorno a un mondo stilizzato: metafora di un’Europa in movimento che unisce persone, culture e valori.',
     spec: {
       Oggetto: 'Manifesto',
@@ -492,6 +499,7 @@ const progetti = [
     area: 'graphic',
     year: '2025',
     photos: 3,
+    tavola: 3,
     desc: 'Due sedie vuote e un giallo acceso per richiamare il dialogo che manca e invitare i giovani a fermarsi, incontrarsi e tornare a parlare.',
     spec: {
       Oggetto: 'Manifesto',
@@ -505,6 +513,7 @@ const progetti = [
     area: 'graphic',
     year: '2025',
     photos: 4,
+    tavola: 2,
     desc: 'Una riflessione sulla condizione abitativa del futuro: la città racchiusa in uno scatolone, simbolo di spazi sempre più piccoli e temporanei.',
     spec: {
       Oggetto: 'Manifesto',
@@ -518,6 +527,7 @@ const progetti = [
     area: 'graphic',
     year: '2024',
     photos: 3,
+    tavola: 1,
     desc: 'Un invito a credere nella rinascita anche nei momenti più oscuri: i fiori come simboli fragili ma ostinati di vita, contro l’ombra della guerra.',
     spec: {
       Oggetto: 'Manifesto',
@@ -538,10 +548,10 @@ const annoRecente = (item) => Math.max(0, ...anniDi(item))
  * Ordine cronologico rovesciato: prima l'ultimo progetto, in fondo il primo.
  *
  * Prima l'anno, poi il numero di `tavola` decrescente. La tavola serve perché
- * dentro l'anno la data precisa non c'è, e la numerazione dell'archivio
- * sorgente è l'unico dato che la conserva (1–5 sono del 2024, 6–10 del 2025,
- * 11–19 del 2026). I progetti grafici non hanno tavola: a parità d'anno vale
- * l'ordine in cui stanno scritti qui sopra, perché `sort` è stabile.
+ * dentro l'anno la data precisa non c'è, e la numerazione è l'unico dato che
+ * conserva l'ordine in cui i progetti sono stati fatti. Product: 1–5 del 2024,
+ * 6–10 del 2025, 11–19 del 2026. Graphic: 1 del 2024, 2–6 del 2025, 7 del 2026.
+ * Le due numerazioni non si incrociano perché le griglie sono per area.
  */
 export const archive = [...progetti].sort(
   (a, b) => annoRecente(b) - annoRecente(a) || (b.tavola ?? 0) - (a.tavola ?? 0),
