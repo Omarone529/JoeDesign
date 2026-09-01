@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
-import { Link } from '../router'
+import { LINGUE, testi } from '../i18n'
+import { Link, percorso, percorsoTradotto } from '../router'
 
 const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
 const MOVIMENTO_MINIMO = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
@@ -70,13 +71,21 @@ function NavLink({ to, active = false, children }) {
 // Occupa i suoi 4rem anche da nascosta: su quella misura è tarata la hero in About.
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
-  const [nascosta, setNascosta] = useNavbarNascosta(name)
+  const lang = route?.lang ?? 'it'
+  const T = testi(lang)
+  // Sulla `path` e non sul nome: cambiando lingua la rotta resta la stessa, e
+  // la barra deve riesporsi lo stesso.
+  const [nascosta, setNascosta] = useNavbarNascosta(route?.path ?? '/')
 
   // Solo le tre rotte: i recapiti stanno nel footer.
   const links = [
-    { label: 'Home', to: '/', active: name === 'home' },
-    { label: 'Archivio', to: '/archivio', active: name === 'archive' || name === 'project' },
-    { label: 'Chi sono', to: '/chi-sono', active: name === 'about' },
+    { label: T.nav.home, to: percorso('home', {}, lang), active: name === 'home' },
+    {
+      label: T.nav.archivio,
+      to: percorso('archive', {}, lang),
+      active: name === 'archive' || name === 'project',
+    },
+    { label: T.nav.chiSono, to: percorso('about', {}, lang), active: name === 'about' },
   ]
 
   return (
@@ -87,7 +96,11 @@ export default function Navbar({ route }) {
       }`}
     >
       <div className="relative flex h-16 items-center justify-between gap-2 px-5 sm:px-8 lg:px-[72px]">
-        <Link to="/" aria-label="Joe Sarchiolla — home" className="flex shrink-0 items-center">
+        <Link
+          to={percorso('home', {}, lang)}
+          aria-label={T.nav.logo}
+          className="flex shrink-0 items-center"
+        >
           <img
             src="/images/navbar/logo.webp"
             alt=""
@@ -106,22 +119,67 @@ export default function Navbar({ route }) {
             href={profile.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${profile.handle} su Instagram`}
+            aria-label={T.nav.instagram(profile.handle)}
             className="flex shrink-0 items-center text-ink transition-colors hover:text-muted"
           >
             <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
           </a>
         </div>
 
-        <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
-          {links.map((l) => (
-            <NavLink key={l.label} to={l.to} active={l.active}>
-              {l.label}
-            </NavLink>
-          ))}
-        </nav>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4 md:gap-5 lg:gap-8">
+          <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
+            {links.map((l) => (
+              <NavLink key={l.label} to={l.to} active={l.active}>
+                {l.label}
+              </NavLink>
+            ))}
+          </nav>
+          <SelettoreLingua route={route} />
+        </div>
       </div>
     </header>
+  )
+}
+
+/*
+ * Le due lingue sono due indirizzi, non un interruttore: ognuna è un link alla
+ * gemella della pagina aperta, così restano condivisibili e apribili a freddo.
+ * `hrefLang` dice al browser (e ai crawler) cosa aspettarsi dall'altra parte.
+ *
+ * Da sm si vedono tutte e due, con la corrente in nero; sotto, dove la barra è
+ * già piena di voci, resta la sola lingua di destinazione e il selettore
+ * diventa un interruttore — la lingua in cui si sta è già scritta in pagina.
+ */
+function SelettoreLingua({ route }) {
+  const attuale = route?.lang ?? 'it'
+
+  return (
+    <div
+      aria-label={testi(attuale).nav.lingua}
+      className="flex shrink-0 items-center gap-1 border-l border-line pl-2 text-[9px] uppercase tracking-[0.06em] sm:gap-1.5 sm:pl-3 sm:text-[10px] sm:tracking-[0.14em] lg:text-[11px]"
+    >
+      {LINGUE.map((l, i) => (
+        <Fragment key={l}>
+          {i > 0 && (
+            <span aria-hidden="true" className="hidden text-line sm:inline">
+              /
+            </span>
+          )}
+          <Link
+            to={percorsoTradotto(route, l)}
+            hrefLang={l}
+            aria-current={l === attuale ? 'true' : undefined}
+            className={`py-2 transition-colors ${
+              l === attuale
+                ? 'hidden font-bold text-ink sm:inline-block'
+                : 'text-muted hover:text-ink'
+            }`}
+          >
+            {l}
+          </Link>
+        </Fragment>
+      ))}
+    </div>
   )
 }
 

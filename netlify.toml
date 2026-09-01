@@ -50,6 +50,14 @@
 # quello sarebbe un "soft 404" e Google indicizzerebbe copie della home su URL
 # sbagliati. Il sito non ha rotte generate a runtime, quindi non serve alcun
 # fallback SPA.
+# Prima la 404 inglese: chi sbaglia un indirizzo sotto /en deve trovare la
+# pagina d'errore in inglese, non quella italiana. Le regole si leggono
+# dall'alto, quindi questa va scritta prima di quella generale.
+[[redirects]]
+  from = "/en/*"
+  to = "/en/404.html"
+  status = 404
+
 [[redirects]]
   from = "/*"
   to = "/404.html"

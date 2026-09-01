@@ -1,3 +1,5 @@
+import plugin from 'tailwindcss/plugin'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
@@ -50,5 +52,14 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // `hover-fine:` = c'è almeno un dispositivo capace di sostare su un
+    // elemento (mouse, trackpad, anche sui portatili con schermo touch).
+    // Sul telefono il :hover non esiste — o peggio resta appiccicato dopo il
+    // tap — quindi gli effetti "al passaggio" valgono solo qui, e lì vengono
+    // sostituiti da uno stato sempre visibile.
+    plugin(({ addVariant }) => {
+      addVariant('hover-fine', '@media (any-hover: hover)')
+    }),
+  ],
 }

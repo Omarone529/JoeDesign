@@ -1,22 +1,30 @@
 import {
-  about,
-  archive,
-  aree,
+  aboutIn,
+  archivioIn,
   areaDi,
-  areaPerSlug,
+  areaPerSlugIn,
+  areeIn,
   contaProgetti,
   familyBand,
   periodoArchivio,
   periodoDi,
   profile,
-  progettiArea,
+  profiloIn,
+  progettiAreaIn,
   projectImages,
   titoloLeggibile,
 } from './data/siteData'
+import { LINGUE, testi } from './i18n'
+import { percorso, percorsoTradotto } from './router'
 
 /*
  * Metadati per rotta: meta tag, dati strutturati, immagini della sitemap.
  * Li scrive nelle pagine `scripts/prerender.js`, che qui non decide nulla.
+ *
+ * Il sito è bilingue e ogni pagina esiste due volte, una per lingua: qui la
+ * lingua arriva sempre dalla rotta (`route.lang`), e da lì scendono titolo,
+ * descrizione, `inLanguage`, l'anteprima social e gli hreflang che legano le
+ * due versioni. Nessuna pagina si descrive nella lingua dell'altra.
  *
  * SITE lo passa Netlify al deploy nella env `URL`, quindi segue da sé il
  * dominio vero. Per forzarlo: `SITE_URL=https://miodominio.it npm run build`.
@@ -30,6 +38,9 @@ export const SITE = (ENV_SITE || 'https://joedesign.netlify.app').replace(/\/+$/
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
+/* L'URL assoluto di una pagina, nella lingua chiesta. */
+const url = (name, params, lang) => SITE + percorso(name, params, lang)
+
 const PERIODO = periodoArchivio
   ? periodoArchivio.primo === periodoArchivio.ultimo
     ? `${periodoArchivio.primo}`
@@ -41,10 +52,18 @@ const PERIODO = periodoArchivio
  * vuota, che vale meno di niente: qui il ripiego dice almeno oggetto, anno e
  * autore. Appena la descrizione c'è, vince quella.
  */
-function descrizioneProgetto(item) {
+function descrizioneProgetto(item, lang) {
   if (item.desc?.trim()) return item.desc
+  const p = profiloIn(lang)
   const anno = item.year ? `, ${item.year}` : ''
-  return `${titoloLeggibile(item.title)} — ${item.cat}${anno}. Progetto di ${profile.name}, ${profile.role} a ${profile.place}.`
+  return testi(lang).seo.progettoDesc(
+    titoloLeggibile(item.title),
+    item.cat,
+    anno,
+    p.name,
+    p.role,
+    p.place,
+  )
 }
 
 /*
@@ -70,9 +89,10 @@ function clip(text, max = 155, min = 80) {
 
 /*
  * JPEG e non le WebP del sito: LinkedIn e WhatsApp non le mostrano, e il link
- * condiviso uscirebbe senza immagine. Le prepara `scripts/og-image.js`.
+ * condiviso uscirebbe senza immagine. Le prepara `scripts/og-image.js`, che
+ * scrive le italiane in /images/og/ e le inglesi in /images/og/en/.
  */
-const ogImage = (nome) => abs(`/images/og/${nome}.jpg`)
+const ogImage = (nome, lang) => abs(`/images/og/${lang === 'en' ? 'en/' : ''}${nome}.jpg`)
 
 const FIRMA = `${profile.name} “${profile.nick}”`
 
@@ -97,41 +117,70 @@ function periodoTesto(periodo) {
     : `${periodo.primo} · ${periodo.ultimo}`
 }
 
+/*
+ * Le due versioni della stessa pagina, più `x-default` che indica quale
+ * servire a chi non dichiara una lingua: l'italiano, che è la lingua del
+ * lavoro e del dominio. Senza queste righe Google vedrebbe due pagine
+ * concorrenti sullo stesso contenuto invece di due traduzioni.
+ */
+function alternative(route) {
+  if (route.name === 'notfound') return []
+  return [
+    ...LINGUE.map((l) => ({ lang: l, href: SITE + percorsoTradotto(route, l) })),
+    { lang: 'x-default', href: SITE + percorsoTradotto(route, 'it') },
+  ]
+}
+
 export function metaForRoute(route) {
+  const lang = route.lang || 'it'
+  const T = testi(lang)
+  const p = profiloIn(lang)
+  const comuni = { lang, htmlLang: T.htmlLang, ogLocale: T.ogLocale, alternate: alternative(route) }
+
   if (route.name === 'archive') {
-    // Pagina d'area: /archivio/product-design, /archivio/graphic-design.
-    const area = route.area ? areaPerSlug(route.area) : null
+    // Pagina d'area: /archivio/product-design, /en/archive/graphic-design.
+    const area = route.area ? areaPerSlugIn(route.area, lang) : null
     if (area) {
-      const progetti = progettiArea(area.chiave)
+      const progetti = progettiAreaIn(area.chiave, lang)
       return {
-        title: `${area.label} · Archivio · ${FIRMA}`,
+        ...comuni,
+        title: T.seo.areaTitolo(area.label, FIRMA),
         description: clip(
-          `${contaProgetti(progetti.length)} di ${area.label.toLowerCase()} di ${FIRMA}, ${periodoTesto(periodoDi(progetti))}. ${area.desc}`,
+          T.seo.areaDesc(
+            contaProgetti(progetti.length, lang),
+            area.label.toLowerCase(),
+            FIRMA,
+            periodoTesto(periodoDi(progetti)),
+            area.desc,
+          ),
         ),
-        canonical: `${SITE}/archivio/${area.slug}`,
-        image: ogImage(`archivio-${area.slug}`),
-        imageAlt: `${area.label} — progetti di ${profile.displayName}`,
+        canonical: url('archive', { area: area.slug }, lang),
+        image: ogImage(`archivio-${area.slug}`, lang),
+        imageAlt: T.seo.areaImmagineAlt(area.label, p.displayName),
         type: 'website',
         area,
       }
     }
 
     return {
-      title: `Archivio progetti · ${FIRMA}`,
-      description: `Tutti i ${archive.length} progetti di ${FIRMA}, divisi in product design e graphic design. Portfolio ${PERIODO}.`,
-      canonical: `${SITE}/archivio`,
-      image: ogImage('archivio'),
-      imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
+      ...comuni,
+      title: T.seo.archivioTitolo(FIRMA),
+      description: T.seo.archivioDesc(archivioIn(lang).length, FIRMA, PERIODO),
+      canonical: url('archive', {}, lang),
+      image: ogImage('archivio', lang),
+      imageAlt: T.seo.areaImmagineAlt(T.seo.archivioNome, p.displayName),
       type: 'website',
     }
   }
 
   if (route.name === 'about') {
+    const about = aboutIn(lang)
     return {
-      title: `Chi sono · ${FIRMA} · ${profile.role}`,
+      ...comuni,
+      title: T.seo.chiSonoTitolo(FIRMA, p.role),
       description: clip(about.intro),
-      canonical: `${SITE}/chi-sono`,
-      image: ogImage('chi-sono'),
+      canonical: url('about', {}, lang),
+      image: ogImage('chi-sono', lang),
       imageAlt: about.photos.lab.alt,
       preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
@@ -139,17 +188,18 @@ export function metaForRoute(route) {
   }
 
   if (route.name === 'project') {
-    const item = archive.find((p) => p.slug === route.slug)
+    const item = archivioIn(lang).find((x) => x.slug === route.slug)
     if (item) {
       const { cover, gallery } = projectImages(item)
       // Senza copertina non c'è nemmeno l'anteprima social della scheda:
       // il link condiviso porta quella dell'area, non un riquadro vuoto.
-      const areaItem = aree.find((a) => a.chiave === areaDi(item))
+      const areaItem = areeIn(lang).find((a) => a.chiave === areaDi(item))
       return {
+        ...comuni,
         title: titoloProgetto(item),
-        description: clip(descrizioneProgetto(item)),
-        canonical: `${SITE}/progetto/${item.slug}`,
-        image: ogImage(cover ? item.slug : `archivio-${areaItem.slug}`),
+        description: clip(descrizioneProgetto(item, lang)),
+        canonical: url('project', { slug: item.slug }, lang),
+        image: ogImage(cover ? item.slug : `archivio-${areaItem.slug}`, lang),
         imageAlt: `${item.title} · ${item.cat}`,
         preload: gallery[0], // prima diapositiva del carosello
         type: 'article',
@@ -162,10 +212,11 @@ export function metaForRoute(route) {
   // indicarne uno "giusto" direbbe a Google che è un'altra pagina del sito.
   if (route.name === 'notfound') {
     return {
-      title: `Pagina non trovata · ${FIRMA}`,
-      description: `L'indirizzo non corrisponde a nessuna pagina del sito di ${FIRMA}.`,
-      image: ogImage('home'),
-      imageAlt: about.photos.hero.alt,
+      ...comuni,
+      title: T.seo.nonTrovataTitolo(FIRMA),
+      description: T.seo.nonTrovataDesc(FIRMA),
+      image: ogImage('home', lang),
+      imageAlt: aboutIn(lang).photos.hero.alt,
       type: 'website',
       noindex: true,
     }
@@ -173,23 +224,25 @@ export function metaForRoute(route) {
 
   // Nome, ruolo e città: le chiavi delle ricerche realistiche.
   return {
-    title: `${FIRMA} · ${profile.role} a Reggio Emilia`,
-    description: `${FIRMA}, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,
-    canonical: `${SITE}/`,
-    image: ogImage('home'),
-    imageAlt: about.photos.hero.alt,
+    ...comuni,
+    title: T.seo.homeTitolo(FIRMA, p.role),
+    description: T.seo.homeDesc(FIRMA, p.role, p.place, PERIODO),
+    canonical: url('home', {}, lang),
+    image: ogImage('home', lang),
+    imageAlt: aboutIn(lang).photos.hero.alt,
     type: 'website',
   }
 }
 
+/* Tutte le pagine da generare: le stesse rotte in tutte e due le lingue. */
 export function allRoutes() {
-  return [
-    '/',
-    '/chi-sono',
-    '/archivio',
-    ...aree.map((a) => `/archivio/${a.slug}`),
-    ...archive.map((p) => `/progetto/${p.slug}`),
-  ]
+  return LINGUE.flatMap((lang) => [
+    percorso('home', {}, lang),
+    percorso('about', {}, lang),
+    percorso('archive', {}, lang),
+    ...areeIn(lang).map((a) => percorso('archive', { area: a.slug }, lang)),
+    ...archivioIn(lang).map((p) => percorso('project', { slug: p.slug }, lang)),
+  ])
 }
 
 /* ─────────────────────────── Dati strutturati ─────────────────────────── */
@@ -198,63 +251,73 @@ export function allRoutes() {
  * Un grafo per pagina. Le entità hanno un `@id` stabile e si richiamano invece
  * di ridescriversi: così tutte le schede risultano di una persona sola, e non
  * di venticinque omonimi.
+ *
+ * Sito e persona hanno un `@id` unico anche fra le due lingue — la persona è
+ * la stessa, e sdoppiarla darebbe due designer omonimi. Cambia solo il testo
+ * con cui ogni pagina la descrive. Le raccolte e le opere, che sono pagine,
+ * hanno invece un `@id` per lingua: sono due URL distinti e indicizzabili.
  */
 const ID_SITO = `${SITE}/#sito`
 const ID_PERSONA = `${SITE}/#persona`
-const ID_ARCHIVIO = `${SITE}/archivio#raccolta`
+const idArchivio = (lang) => `${url('archive', {}, lang)}#raccolta`
 
 /* `sameAs` lega il nome ai profili: vanno elencati tutti. */
 const SOCIAL = [profile.instagram, profile.youtube, profile.tiktok, profile.linkedin].filter(
   Boolean,
 )
 
-const nodoSito = {
-  '@type': 'WebSite',
-  '@id': ID_SITO,
-  url: `${SITE}/`,
-  name: `${profile.name} “${profile.nick}”`,
-  description: `Portfolio di ${profile.name}, ${profile.role} a ${profile.place}.`,
-  inLanguage: 'it-IT',
-  publisher: { '@id': ID_PERSONA },
+function nodoSito(lang) {
+  const T = testi(lang)
+  const p = profiloIn(lang)
+  return {
+    '@type': 'WebSite',
+    '@id': ID_SITO,
+    url: `${SITE}/`,
+    name: `${profile.name} “${profile.nick}”`,
+    description: T.seo.sitoDesc(p.name, p.role, p.place),
+    inLanguage: T.schemaLang,
+    publisher: { '@id': ID_PERSONA },
+  }
 }
 
-const nodoPersona = {
-  '@type': 'Person',
-  '@id': ID_PERSONA,
-  name: profile.name,
-  alternateName: [profile.displayName, profile.nick],
-  jobTitle: profile.role,
-  description: clip(about.intro),
-  url: `${SITE}/chi-sono`,
-  image: abs(about.photos.hero.src),
-  email: `mailto:${profile.email}`,
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: profile.place.split(',')[0].trim(),
-    addressRegion: 'Emilia-Romagna',
-    addressCountry: 'IT',
-  },
-  alumniOf: { '@type': 'CollegeOrUniversity', name: profile.formazione },
-  hasOccupation: {
-    '@type': 'Occupation',
-    name: profile.role,
-    occupationLocation: { '@type': 'City', name: profile.place.split(',')[0].trim() },
-  },
-  // Discipline più gli strumenti, che `about.skills` tiene già aggiornati.
-  knowsAbout: [
-    'Product design',
-    'Industrial design',
-    'Packaging design',
-    'Graphic design',
-    ...about.skills,
-  ],
-  sameAs: SOCIAL,
+function nodoPersona(lang) {
+  const p = profiloIn(lang)
+  const about = aboutIn(lang)
+  return {
+    '@type': 'Person',
+    '@id': ID_PERSONA,
+    name: p.name,
+    alternateName: [p.displayName, p.nick],
+    jobTitle: p.role,
+    description: clip(about.intro),
+    url: url('about', {}, lang),
+    image: abs(about.photos.hero.src),
+    email: `mailto:${p.email}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: p.place.split(',')[0].trim(),
+      addressRegion: 'Emilia-Romagna',
+      addressCountry: 'IT',
+    },
+    alumniOf: { '@type': 'CollegeOrUniversity', name: p.formazione },
+    hasOccupation: {
+      '@type': 'Occupation',
+      name: p.role,
+      occupationLocation: { '@type': 'City', name: p.place.split(',')[0].trim() },
+    },
+    // Discipline più gli strumenti, che `about.skills` tiene già aggiornati.
+    knowsAbout: [...testi(lang).seo.discipline, ...about.skills],
+    sameAs: SOCIAL,
+  }
 }
 
 function nodoProgetto(item, meta) {
   const { cover, gallery, drawing } = projectImages(item)
   const nome = titoloLeggibile(item.title)
   const anni = String(item.year || '').match(/\d{4}/g)
+  // `spec` cambia lingua e con essa le chiavi: il materiale è la seconda voce
+  // in italiano e in inglese, e va cercato per l'una o per l'altra.
+  const materiale = item.spec?.Materiale || item.spec?.Material
 
   return {
     '@type': 'CreativeWork',
@@ -262,72 +325,80 @@ function nodoProgetto(item, meta) {
     name: nome,
     description: meta.description,
     url: meta.canonical,
-    inLanguage: 'it-IT',
+    inLanguage: testi(meta.lang).schemaLang,
     // La copertina per prima: è quella che finisce accanto al risultato.
     image: [cover, ...gallery, drawing].filter(Boolean).map(abs),
     ...(anni ? { dateCreated: anni[anni.length - 1] } : {}),
-    ...(item.spec?.Materiale ? { material: item.spec.Materiale } : {}),
+    ...(materiale ? { material: materiale } : {}),
     keywords: [...new Set([item.cat, ...Object.values(item.spec || {})])].join(', '),
     creator: { '@id': ID_PERSONA },
-    isPartOf: { '@id': ID_ARCHIVIO },
+    isPartOf: { '@id': idArchivio(meta.lang) },
     mainEntityOfPage: meta.canonical,
   }
 }
 
 /*
  * Copia essenziale del nodo archivio. Le schede e le pagine d'area dichiarano
- * `isPartOf` verso ID_ARCHIVIO, ma quel nodo è descritto per intero solo in
- * /archivio: senza questa copia il rimando resterebbe a vuoto, e un validatore
- * lo segnala. Poche righe, e ogni @id citato nella pagina è anche definito.
+ * `isPartOf` verso l'archivio della loro lingua, ma quel nodo è descritto per
+ * intero solo in /archivio: senza questa copia il rimando resterebbe a vuoto,
+ * e un validatore lo segnala. Poche righe, e ogni @id citato nella pagina è
+ * anche definito.
  */
-const rimandoArchivio = {
-  '@type': 'CollectionPage',
-  '@id': ID_ARCHIVIO,
-  url: `${SITE}/archivio`,
-  name: 'Archivio progetti',
-  isPartOf: { '@id': ID_SITO },
+function rimandoArchivio(lang) {
+  return {
+    '@type': 'CollectionPage',
+    '@id': idArchivio(lang),
+    url: url('archive', {}, lang),
+    name: testi(lang).seo.archivioNome,
+    isPartOf: { '@id': ID_SITO },
+  }
 }
 
 /* Sito e persona ci sono sempre, più l'entità propria della pagina. */
 export function schemaForRoute(route, meta) {
-  const grafo = [nodoSito, nodoPersona]
+  const lang = meta.lang || 'it'
+  const T = testi(lang)
+  const grafo = [nodoSito(lang), nodoPersona(lang)]
+  const briciole = (voci) => ({ '@type': 'BreadcrumbList', itemListElement: voci })
 
   if (route.name === 'project') {
-    const item = archive.find((p) => p.slug === route.slug)
+    const item = archivioIn(lang).find((p) => p.slug === route.slug)
     if (item) {
-      const area = aree.find((a) => a.chiave === areaDi(item))
-      grafo.push(rimandoArchivio, nodoProgetto(item, meta), {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-          { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
-          ...(area
-            ? [
-                {
-                  '@type': 'ListItem',
-                  position: 3,
-                  name: area.label,
-                  item: `${SITE}/archivio/${area.slug}`,
-                },
-              ]
-            : []),
-          { '@type': 'ListItem', position: area ? 4 : 3, name: titoloLeggibile(item.title) },
-        ],
-      })
+      const area = areeIn(lang).find((a) => a.chiave === areaDi(item))
+      grafo.push(rimandoArchivio(lang), nodoProgetto(item, meta), briciole([
+        { '@type': 'ListItem', position: 1, name: T.seo.briciolaHome, item: url('home', {}, lang) },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: T.seo.briciolaArchivio,
+          item: url('archive', {}, lang),
+        },
+        ...(area
+          ? [
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: area.label,
+                item: url('archive', { area: area.slug }, lang),
+              },
+            ]
+          : []),
+        { '@type': 'ListItem', position: area ? 4 : 3, name: titoloLeggibile(item.title) },
+      ]))
     }
   } else if (route.name === 'archive') {
     // La pagina d'area è una raccolta a sé, parte dell'archivio.
     const area = meta.area
-    const progetti = area ? progettiArea(area.chiave) : archive
-    if (area) grafo.push(rimandoArchivio)
+    const progetti = area ? progettiAreaIn(area.chiave, lang) : archivioIn(lang)
+    if (area) grafo.push(rimandoArchivio(lang))
     grafo.push({
       '@type': 'CollectionPage',
-      '@id': area ? `${meta.canonical}#raccolta` : ID_ARCHIVIO,
+      '@id': area ? `${meta.canonical}#raccolta` : idArchivio(lang),
       url: meta.canonical,
-      name: area ? `${area.label} · Archivio progetti` : 'Archivio progetti',
+      name: area ? T.seo.areaNome(area.label) : T.seo.archivioNome,
       description: meta.description,
-      inLanguage: 'it-IT',
-      isPartOf: { '@id': area ? ID_ARCHIVIO : ID_SITO },
+      inLanguage: T.schemaLang,
+      isPartOf: { '@id': area ? idArchivio(lang) : ID_SITO },
       about: { '@id': ID_PERSONA },
       mainEntity: {
         '@type': 'ItemList',
@@ -335,28 +406,37 @@ export function schemaForRoute(route, meta) {
         itemListElement: progetti.map((p, i) => ({
           '@type': 'ListItem',
           position: i + 1,
-          url: `${SITE}/progetto/${p.slug}`,
+          url: url('project', { slug: p.slug }, lang),
           name: titoloLeggibile(p.title),
         })),
       },
     })
     if (area) {
-      grafo.push({
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
-          { '@type': 'ListItem', position: 2, name: 'Archivio', item: `${SITE}/archivio` },
+      grafo.push(
+        briciole([
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: T.seo.briciolaHome,
+            item: url('home', {}, lang),
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: T.seo.briciolaArchivio,
+            item: url('archive', {}, lang),
+          },
           { '@type': 'ListItem', position: 3, name: area.label },
-        ],
-      })
+        ]),
+      )
     }
   } else if (route.name === 'about') {
     grafo.push({
       '@type': 'ProfilePage',
-      '@id': `${SITE}/chi-sono#pagina`,
-      url: `${SITE}/chi-sono`,
+      '@id': `${url('about', {}, lang)}#pagina`,
+      url: url('about', {}, lang),
       name: meta.title,
-      inLanguage: 'it-IT',
+      inLanguage: T.schemaLang,
       isPartOf: { '@id': ID_SITO },
       mainEntity: { '@id': ID_PERSONA },
     })
@@ -368,17 +448,24 @@ export function schemaForRoute(route, meta) {
 /*
  * Per un portfolio Google Immagini vale quanto la ricerca per testo: senza
  * queste righe le foto si scoprono solo passando dalla pagina che le ospita.
+ *
+ * Prende la rotta già interpretata: le stesse immagini valgono per entrambe le
+ * lingue, ma ogni URL dichiara le proprie — la pagina inglese è una pagina a
+ * sé, e in sitemap deve portarsi dietro le sue.
  */
-export function immaginiPerRotta(percorso) {
+export function immaginiPerRotta(route) {
+  const lang = route.lang || 'it'
+
   /*
    * Solo `familyBand`: il ritratto in cima alla home è decorativo e ha `alt`
    * vuoto per questo. Dichiararlo qui lo proporrebbe a Google Immagini senza la
    * descrizione che Google si aspetta di trovare nell'alt — un'immagine muta in
    * un indice che vive di didascalie.
    */
-  if (percorso === '/') return [familyBand.src].map(abs)
+  if (route.name === 'home') return [familyBand.src].map(abs)
 
-  if (percorso === '/chi-sono') {
+  if (route.name === 'about') {
+    const about = aboutIn(lang)
     const tavole = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
     return [about.photos.hero.src, about.photos.lab.src, ...tavole].filter(Boolean).map(abs)
   }
@@ -386,15 +473,14 @@ export function immaginiPerRotta(percorso) {
   const copertine = (lista) =>
     lista.map((p) => projectImages(p).cover).filter(Boolean).map(abs)
 
-  if (percorso === '/archivio') return copertine(archive)
-
-  if (percorso.startsWith('/archivio/')) {
-    const area = areaPerSlug(percorso.slice('/archivio/'.length))
-    return area ? copertine(progettiArea(area.chiave)) : []
+  if (route.name === 'archive') {
+    if (!route.area) return copertine(archivioIn(lang))
+    const area = areaPerSlugIn(route.area, lang)
+    return area ? copertine(progettiAreaIn(area.chiave, lang)) : []
   }
 
-  if (!percorso.startsWith('/progetto/')) return []
-  const item = archive.find((p) => p.slug === percorso.slice('/progetto/'.length))
+  if (route.name !== 'project') return []
+  const item = archivioIn(lang).find((p) => p.slug === route.slug)
   if (!item) return []
   const { cover, gallery, drawing, sfondo } = projectImages(item)
   return [cover, ...gallery, drawing, sfondo].filter(Boolean).map(abs)

@@ -8,6 +8,10 @@
  *
  *   node scripts/og-image.js
  *
+ * Una serie per lingua: le italiane in public/images/og/, le inglesi in
+ * public/images/og/en/. Il testo dell'anteprima è quello della pagina, quindi
+ * un link inglese condiviso non può mostrare un riquadro che dice "Archivio".
+ *
  * Due impianti, nella grammatica del sito: schede e "Chi sono" con testo a
  * sinistra e immagine a destra sempre CONTENUTA (ritagliata, i manifesti e le
  * figure intere perderebbero la parte che conta); home e archivio con la
@@ -18,16 +22,17 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import {
-  about,
-  archive,
-  aree,
+  aboutIn,
+  archivioIn,
+  areeIn,
   contaProgetti,
   periodoArchivio,
   periodoDi,
-  profile,
-  progettiArea,
+  profiloIn,
+  progettiAreaIn,
   projectImages,
 } from '../src/data/siteData.js'
+import { LINGUE, testi } from '../src/i18n.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
@@ -294,107 +299,118 @@ async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
 
 /* ------------------------------------------------------------------------- */
 
-fs.mkdirSync(outDir, { recursive: true })
-
 const PERIODO = periodoArchivio
   ? periodoArchivio.primo === periodoArchivio.ultimo
     ? `${periodoArchivio.primo}`
     : `${periodoArchivio.primo}–${periodoArchivio.ultimo}`
   : ''
 
-const firma = `${profile.displayName} · ${profile.role}`
 const generati = []
 
-/*
- * Home — il biglietto da visita. È il link che si condivide per primo, quindi
- * porta la persona e non il catalogo: il ritratto scontornato (lo stesso di
- * "Chi sono") a destra, e a sinistra nome, mestiere e una riga su cosa nasce
- * dal lavoro. La famiglia di prodotti resta l'anteprima dell'archivio, che è
- * la pagina dove quei prodotti si guardano davvero.
- */
-await schedaConImmagine({
-  sorgente: path.join(root, 'public', about.photos.hero.src),
-  categoria: profile.place,
-  titolo: profile.displayName,
-  descrizione: profile.sintesi,
-  coda: profile.role,
-  ancoraInBasso: true,
-  dest: path.join(outDir, 'home.jpg'),
-})
-generati.push('home.jpg')
+for (const lang of LINGUE) {
+  const T = testi(lang)
+  const profile = profiloIn(lang)
+  const about = aboutIn(lang)
+  const archive = archivioIn(lang)
+  // Le italiane in og/, le inglesi in og/en/: `seo.js` le cerca lì.
+  const dirLingua = lang === 'en' ? path.join(outDir, 'en') : outDir
+  fs.mkdirSync(dirLingua, { recursive: true })
 
-/* Archivio */
-await schedaPiena({
-  sorgente: path.join(root, 'public/images/home/family-band.webp'),
-  occhielloTesto: `${archive.length} progetti · ${PERIODO}`,
-  titolo: 'Archivio progetti',
-  coda: firma,
-  dest: path.join(outDir, 'archivio.jpg'),
-})
-generati.push('archivio.jpg')
+  const firma = `${profile.displayName} · ${profile.role}`
+  const dove = (nome) => path.join(dirLingua, nome)
+  const fatto = (nome) => generati.push(path.join(lang === 'en' ? 'en' : '', nome))
 
-/*
- * Una per area dell'archivio. Product design riusa la famiglia di prodotti;
- * graphic design prende la copertina del manifesto più recente, contenuta e
- * non ritagliata come tutte le immagini di questo impianto.
- */
-for (const area of aree) {
-  const progetti = progettiArea(area.chiave)
-  const periodo = periodoDi(progetti)
-  const arco = periodo
-    ? periodo.primo === periodo.ultimo
-      ? `${periodo.primo}`
-      : `${periodo.primo}–${periodo.ultimo}`
-    : ''
-  const occhielloArea = [contaProgetti(progetti.length), arco].filter(Boolean).join(' · ')
-  const dest = path.join(outDir, `archivio-${area.slug}.jpg`)
-
-  if (area.chiave === 'product') {
-    await schedaPiena({
-      sorgente: path.join(root, 'public/images/home/family-band.webp'),
-      occhielloTesto: occhielloArea,
-      titolo: area.label,
-      coda: firma,
-      dest,
-    })
-  } else {
-    // Il più recente FRA QUELLI con la copertina: una scheda in attesa di foto
-    // non ha immagine da mettere qui.
-    const vetrina = progetti.find((p) => projectImages(p).cover)
-    await schedaConImmagine({
-      sorgente: path.join(root, 'public', projectImages(vetrina).cover),
-      categoria: occhielloArea,
-      titolo: area.label,
-      coda: firma,
-      dest,
-    })
-  }
-  generati.push(`archivio-${area.slug}.jpg`)
-}
-
-/* Chi sono */
-await schedaConImmagine({
-  sorgente: path.join(root, 'public', about.photos.lab.src),
-  categoria: profile.place,
-  titolo: 'Chi sono',
-  coda: firma,
-  dest: path.join(outDir, 'chi-sono.jpg'),
-})
-generati.push('chi-sono.jpg')
-
-/* Una per progetto */
-for (const item of archive) {
-  const { cover } = projectImages(item)
-  // Scheda ancora senza immagini: `seo.js` le fa usare l'anteprima dell'area.
-  if (!cover) continue
+  /*
+   * Home — il biglietto da visita. È il link che si condivide per primo, quindi
+   * porta la persona e non il catalogo: il ritratto scontornato (lo stesso di
+   * "Chi sono") a destra, e a sinistra nome, mestiere e una riga su cosa nasce
+   * dal lavoro. La famiglia di prodotti resta l'anteprima dell'archivio, che è
+   * la pagina dove quei prodotti si guardano davvero.
+   */
   await schedaConImmagine({
-    sorgente: path.join(root, 'public', cover),
-    categoria: item.cat,
-    titolo: item.title,
-    coda: [item.year, profile.displayName].filter(Boolean).join(' · '),
-    dest: path.join(outDir, `${item.slug}.jpg`),
+    sorgente: path.join(root, 'public', about.photos.hero.src),
+    categoria: profile.place,
+    titolo: profile.displayName,
+    descrizione: profile.sintesi,
+    coda: profile.role,
+    ancoraInBasso: true,
+    dest: dove('home.jpg'),
   })
-  generati.push(`${item.slug}.jpg`)
+  fatto('home.jpg')
+
+  /* Archivio */
+  await schedaPiena({
+    sorgente: path.join(root, 'public/images/home/family-band.webp'),
+    occhielloTesto: `${contaProgetti(archive.length, lang)} · ${PERIODO}`,
+    titolo: T.seo.archivioNome,
+    coda: firma,
+    dest: dove('archivio.jpg'),
+  })
+  fatto('archivio.jpg')
+
+  /*
+   * Una per area dell'archivio. Product design riusa la famiglia di prodotti;
+   * graphic design prende la copertina del manifesto più recente, contenuta e
+   * non ritagliata come tutte le immagini di questo impianto.
+   */
+  for (const area of areeIn(lang)) {
+    const progetti = progettiAreaIn(area.chiave, lang)
+    const periodo = periodoDi(progetti)
+    const arco = periodo
+      ? periodo.primo === periodo.ultimo
+        ? `${periodo.primo}`
+        : `${periodo.primo}–${periodo.ultimo}`
+      : ''
+    const occhielloArea = [contaProgetti(progetti.length, lang), arco].filter(Boolean).join(' · ')
+    const nome = `archivio-${area.slug}.jpg`
+
+    if (area.chiave === 'product') {
+      await schedaPiena({
+        sorgente: path.join(root, 'public/images/home/family-band.webp'),
+        occhielloTesto: occhielloArea,
+        titolo: area.label,
+        coda: firma,
+        dest: dove(nome),
+      })
+    } else {
+      // Il più recente FRA QUELLI con la copertina: una scheda in attesa di foto
+      // non ha immagine da mettere qui.
+      const vetrina = progetti.find((p) => projectImages(p).cover)
+      await schedaConImmagine({
+        sorgente: path.join(root, 'public', projectImages(vetrina).cover),
+        categoria: occhielloArea,
+        titolo: area.label,
+        coda: firma,
+        dest: dove(nome),
+      })
+    }
+    fatto(nome)
+  }
+
+  /* Chi sono */
+  await schedaConImmagine({
+    sorgente: path.join(root, 'public', about.photos.lab.src),
+    categoria: profile.place,
+    titolo: T.chiSono.occhiello,
+    coda: firma,
+    dest: dove('chi-sono.jpg'),
+  })
+  fatto('chi-sono.jpg')
+
+  /* Una per progetto */
+  for (const item of archive) {
+    const { cover } = projectImages(item)
+    // Scheda ancora senza immagini: `seo.js` le fa usare l'anteprima dell'area.
+    if (!cover) continue
+    await schedaConImmagine({
+      sorgente: path.join(root, 'public', cover),
+      categoria: item.cat,
+      titolo: item.title,
+      coda: [item.year, profile.displayName].filter(Boolean).join(' · '),
+      dest: dove(`${item.slug}.jpg`),
+    })
+    fatto(`${item.slug}.jpg`)
+  }
 }
 
 const peso = generati.reduce((t, f) => t + fs.statSync(path.join(outDir, f)).size, 0)

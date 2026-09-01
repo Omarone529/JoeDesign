@@ -1,4 +1,6 @@
 import { about } from '../../data/siteData'
+import { testi } from '../../i18n'
+import { useLang } from '../../router'
 
 /*
  * Nastro continuo: due copie identiche che traslano del 50%, così al riavvio la
@@ -7,10 +9,12 @@ import { about } from '../../data/siteData'
  * il nastro per tutti.
  */
 export default function SkillsTicker() {
+  const T = testi(useLang())
+
   return (
     <section className="overflow-hidden border-b border-t-2 border-b-line border-t-ink py-7 sm:py-10 lg:py-12">
       <div className="mb-[22px] px-5 text-[10px] uppercase tracking-[0.24em] text-muted sm:px-8 lg:px-[72px]">
-        Skills
+        {T.home.skills}
       </div>
       <div className="flex w-max animate-marquee [will-change:transform]">
         <SkillList />

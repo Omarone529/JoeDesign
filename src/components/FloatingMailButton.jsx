@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
+import { testi } from '../i18n'
+import { useLang } from '../router'
 
 /* Duplica il contatto del footer; sparisce quando il footer entra in schermo. */
 export default function FloatingMailButton() {
+  const T = testi(useLang())
   const [sopraFooter, setSopraFooter] = useState(true)
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export default function FloatingMailButton() {
       href={profile.emailHref}
       target="_blank"
       rel="noreferrer"
-      aria-label={`Scrivi a ${profile.email}`}
+      aria-label={T.footer.scriviA(profile.email)}
       aria-hidden={!visibile}
       tabIndex={visibile ? 0 : -1}
       className={`fixed bottom-6 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper shadow-lg transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:bg-night sm:right-8 lg:right-[72px] ${

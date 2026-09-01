@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 import { homeHero, profile } from '../../data/siteData'
+import { testi } from '../../i18n'
 import { scorrimento } from '../../motion'
+import { useLang } from '../../router'
 
 /* Tempi dell'ingresso, in secondi. */
 const PRIMA_LETTERA = 0.2 // attesa prima che parta il nome
@@ -20,6 +22,8 @@ const DOPO_NOME = 1.1 // pausa fra la fine del nome e l'invito a scorrere
  * tracking o peso.
  */
 export default function Hero() {
+  const T = testi(useLang())
+
   // Salto a mano per rispettare la preferenza animazioni. L'href resta valido
   // per il tasto centrale e per "copia indirizzo".
   const vaiAiLavori = (e) => {
@@ -108,7 +112,7 @@ export default function Hero() {
           style={{ animationDelay: `${ritardoScorri}s` }}
           className="flex animate-viewIn flex-col items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-muted transition-colors hover:text-ink motion-reduce:animate-none sm:text-[11px]"
         >
-          Scorri
+          {T.home.scorri}
           <span
             aria-hidden="true"
             className="animate-float text-[13px] leading-none motion-reduce:animate-none"

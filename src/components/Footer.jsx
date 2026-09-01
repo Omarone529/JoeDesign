@@ -1,6 +1,7 @@
-import { profile } from '../data/siteData'
+import { profiloIn } from '../data/siteData'
+import { testi } from '../i18n'
 import { scorrimento } from '../motion'
-import { Link } from '../router'
+import { Link, percorso, useLang } from '../router'
 
 // Fissato a build-time. Con `getFullYear()` al render, il primo gennaio l'HTML
 // statico e il browser direbbero anni diversi e l'hydration si romperebbe.
@@ -12,10 +13,14 @@ const FILETTO = 'border-paper/10'
 
 /* Fa anche da pagina contatti, che come rotta non esiste. */
 export default function Footer() {
+  const lang = useLang()
+  const T = testi(lang)
+  const profile = profiloIn(lang)
+
   const pagine = [
-    { label: 'Home', to: '/' },
-    { label: 'Archivio', to: '/archivio' },
-    { label: 'Chi sono', to: '/chi-sono' },
+    { label: T.nav.home, to: percorso('home', {}, lang) },
+    { label: T.nav.archivio, to: percorso('archive', {}, lang) },
+    { label: T.nav.chiSono, to: percorso('about', {}, lang) },
   ]
 
   return (
@@ -27,7 +32,7 @@ export default function Footer() {
       className="scroll-mt-16 bg-night text-paper focus:outline-none"
     >
       <div className="flex flex-col items-center px-5 py-14 text-center sm:px-8 sm:py-16 lg:px-[72px] lg:py-20">
-        <nav aria-label="Pagine del sito">
+        <nav aria-label={T.footer.pagine}>
           <ul className="m-0 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 p-0 list-none">
             {pagine.map((p) => (
               <li key={p.to}>
@@ -48,7 +53,7 @@ export default function Footer() {
             href={profile.emailHref}
             target="_blank"
             rel="noreferrer"
-            aria-label={`Scrivi a ${profile.email}`}
+            aria-label={T.footer.scriviA(profile.email)}
             className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
           >
             <LogoGmail className="h-5 w-5" />
@@ -58,7 +63,7 @@ export default function Footer() {
             href={profile.instagram}
             target="_blank"
             rel="noreferrer"
-            aria-label={`@${profile.handle} su Instagram`}
+            aria-label={T.footer.instagram(profile.handle)}
             className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
           >
             <LogoInstagram className="h-5 w-5" />
@@ -68,7 +73,7 @@ export default function Footer() {
             href={profile.youtube}
             target="_blank"
             rel="noreferrer"
-            aria-label="Joe Sarchiolla su YouTube"
+            aria-label={T.footer.youtube}
             className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
           >
             <LogoYoutube className="h-5 w-5" />
@@ -78,7 +83,7 @@ export default function Footer() {
             href={profile.tiktok}
             target="_blank"
             rel="noreferrer"
-            aria-label="Joe Sarchiolla su TikTok"
+            aria-label={T.footer.tiktok}
             className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
           >
             <LogoTiktok className="h-5 w-5" />
@@ -88,7 +93,7 @@ export default function Footer() {
             href={profile.linkedin}
             target="_blank"
             rel="noreferrer"
-            aria-label="Giovanni Sarchiolla su LinkedIn"
+            aria-label={T.footer.linkedin}
             className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
           >
             <LogoLinkedin className="h-5 w-5" />
@@ -96,7 +101,7 @@ export default function Footer() {
         </div>
 
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
-          {profile.role}, di {profile.place}.
+          {T.footer.riga(profile.role, profile.place)}
         </p>
       </div>
 
@@ -104,14 +109,14 @@ export default function Footer() {
         className={`flex flex-col items-center gap-3 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
         <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
-          © {ANNO} {profile.name} · Tutti i diritti riservati
+          © {ANNO} {profile.name} · {T.footer.diritti}
         </div>
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scorrimento() })}
           className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-paper"
         >
-          Torna su
+          {T.footer.tornaSu}
           <span
             aria-hidden="true"
             className="transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-translate-y-0.5"

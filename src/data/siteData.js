@@ -4,6 +4,9 @@
  * (cover.webp + 01.webp…NN.webp); i percorsi li costruisce `projectImages()`.
  */
 
+import { testi } from '../i18n.js'
+import { aboutEn, areeEn, familyBandEn, profileEn, progettiEn } from './contenutiEn.js'
+
 export const profile = {
   name: 'Giovanni Sarchiolla',
   displayName: 'Joe Sarchiolla', // nome "d'arte" mostrato nel sito (home, chi sono)
@@ -187,7 +190,7 @@ const progetti = [
     desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
     spec: {
       Oggetto: 'Servomuto',
-      Contesto: 'Concorso HIRO Design',
+      Contesto: 'Concorso HIRO Design · Concept design',
       Materiale: 'Acciaio',
       Colore: 'Arancione / Nero',
     },
@@ -204,7 +207,7 @@ const progetti = [
     desc: 'Fuori asse è uno sgabello realizzato accostando tavole in legno recuperato, mantenute volutamente separate da una distanza funzionale di 30 mm. La fessura centrale diventa una presa integrata e, allo stesso tempo, il segno visibile dell’incontro tra elementi diversi: una condizione tipica del riuso trasformata in principio costruttivo e identitario.',
     spec: {
       Oggetto: 'Sgabello',
-      Contesto: 'Concorso RiLegno · MasterWood',
+      Contesto: 'Concorso RiLegno · MasterWood · Concept design',
       Materiale: 'Legno recuperato',
       Colore: 'Legno chiaro',
     },
@@ -280,10 +283,11 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 6,
+    designer: 'Giovanni Sarchiolla, Sara Marchini, Elena Vecchi',
     desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
     spec: {
       Oggetto: 'Postazione di lavoro',
-      Contesto: 'Salone Satellite Milano · Meco / Mobilferro',
+      Contesto: 'Salone Satellite, Milano · prodotto da Meco / Mobilferro',
       Materiale: 'Legno / Acciaio',
       Colore: 'Legno / Nero',
     },
@@ -334,7 +338,7 @@ const progetti = [
     desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Conta l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
     spec: {
       Oggetto: 'Seduta',
-      Contesto: 'Progetto Universitario · Eco design',
+      Contesto: 'Progetto Universitario · Eco design · Concept design',
       Materiale: 'Legno di okumè',
       Colore: 'Okumè',
     },
@@ -351,7 +355,7 @@ const progetti = [
     desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
     spec: {
       Oggetto: 'Architettura / Interior',
-      Contesto: 'Progetto Universitario',
+      Contesto: 'Progetto Universitario · Concept design',
       Materiale: 'Cemento / Legno',
     },
   },
@@ -384,7 +388,7 @@ const progetti = [
     desc: '“Anelli” è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
     spec: {
       Oggetto: 'Portariviste',
-      Contesto: 'Progetto Universitario',
+      Contesto: 'Progetto Universitario · Concept design',
       Materiale: 'PLA',
       Colore: 'Nero',
     },
@@ -401,7 +405,7 @@ const progetti = [
     desc: 'Pistone è un coprivaso in plastica realizzato tramite stampaggio a iniezione, progettato per unire funzionalità e carattere estetico. Il design prende ispirazione dalla forma dei pistoni dei motori, reinterpretata in chiave morbida e contemporanea per adattarsi agli ambienti domestici.',
     spec: {
       Oggetto: 'Coprivaso',
-      Contesto: 'Progetto Universitario',
+      Contesto: 'Progetto Universitario · Concept design',
       Materiale: 'PLA',
       Colore: 'Blu / Grigio',
     },
@@ -418,7 +422,7 @@ const progetti = [
     desc: 'Questa lunch box è progettata non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
     spec: {
       Oggetto: 'Lunch box',
-      Contesto: 'Progetto Universitario',
+      Contesto: 'Progetto Universitario · Concept design',
       Materiale: 'PLA',
       Colore: 'Grigio / Bianco',
     },
@@ -435,7 +439,7 @@ const progetti = [
     desc: 'Nymphē è un progetto di packaging e identità visiva sviluppato per Davines, ispirato al mondo mitologico delle ninfe e al loro legame con la natura. Le silhouette delle boccette prendono ispirazione dai flaconi delle essenze chimiche, reinterpretati in chiave elegante per evocare l’idea di formule naturali e ingredienti puri.',
     spec: {
       Oggetto: 'Packaging · Prodotti per capelli',
-      Contesto: 'Contest Universitario',
+      Contesto: 'Contest Universitario · Lavoro di gruppo · Concept design',
       Materiale: 'PLA (prototipo)',
       Colore: 'Nero / Trasparente',
     },
@@ -563,8 +567,8 @@ export const archive = [...progetti].sort(
 )
 
 /* "1 progetto" / "19 progetti": il singolare capita, e "1 progetti" no. */
-export function contaProgetti(n) {
-  return `${n} ${n === 1 ? 'progetto' : 'progetti'}`
+export function contaProgetti(n, lang) {
+  return testi(lang).archivio.conteggio(n)
 }
 
 /* Il periodo coperto da un gruppo di progetti, o null se nessuno ha un anno. */
@@ -653,20 +657,20 @@ export function titoloLeggibile(titolo) {
  * foto non ce ne sono, e inventarle sarebbe peggio del generico: la posizione
  * nella serie è quanto si può dire di vero.
  */
-export function altCopertina(item) {
-  return `${titoloLeggibile(item.title)}, ${item.cat} — progetto di ${profile.name}`
+export function altCopertina(item, lang) {
+  return testi(lang).alt.copertina(titoloLeggibile(item.title), item.cat, profile.name)
 }
 
-export function altGalleria(item, i, totale) {
-  return `${titoloLeggibile(item.title)}, ${item.cat} — immagine ${i + 1} di ${totale}`
+export function altGalleria(item, i, totale, lang) {
+  return testi(lang).alt.galleria(titoloLeggibile(item.title), item.cat, i + 1, totale)
 }
 
-export function altDisegno(item) {
-  return `Disegno tecnico quotato di ${titoloLeggibile(item.title)}, ${item.cat}`
+export function altDisegno(item, lang) {
+  return testi(lang).alt.disegno(titoloLeggibile(item.title), item.cat)
 }
 
-export function altSfondo(item) {
-  return `${titoloLeggibile(item.title)} — ambientazione`
+export function altSfondo(item, lang) {
+  return testi(lang).alt.sfondo(titoloLeggibile(item.title))
 }
 
 /*
@@ -681,3 +685,91 @@ export const focusItems = focusSlugs.map((slug) => {
   const { title, cat, year } = item
   return { slug, title, cat, year, cover: projectImages(item).cover }
 })
+
+/* ─────────────────────────────── Lingue ─────────────────────────────── */
+
+/*
+ * Il sito esiste in italiano e in inglese. I dati qui sopra sono l'italiano;
+ * `contenutiEn.js` porta i campi che cambiano lingua, agganciati per slug.
+ * Ogni funzione qui sotto restituisce la versione giusta, e la calcola una
+ * volta sola: le pagine ricevono sempre lo stesso oggetto, quindi React non
+ * rimonta niente al cambio di rotta.
+ *
+ * Le altre chiavi non compaiono: immagini, anni, aree e ordine sono gli
+ * stessi in entrambe le lingue, e duplicarli vorrebbe dire tenerli allineati.
+ */
+const inglese = (lang) => lang === 'en'
+
+/* `cat`, `desc` e `spec` si sostituiscono in blocco: nella tabella cambiano
+   anche le chiavi (Oggetto → Object), quindi fondere le due `spec` darebbe
+   una riga per lingua. Un progetto non ancora tradotto resta in italiano. */
+function progettoInglese(item) {
+  const en = progettiEn[item.slug]
+  return en ? { ...item, ...en } : item
+}
+
+const archivioEn = archive.map(progettoInglese)
+
+export function archivioIn(lang) {
+  return inglese(lang) ? archivioEn : archive
+}
+
+export function progettoIn(item, lang) {
+  if (!item || !inglese(lang)) return item
+  return archivioEn.find((p) => p.slug === item.slug) || progettoInglese(item)
+}
+
+const areeEnList = aree.map((a) => ({ ...a, ...(areeEn[a.slug] || {}) }))
+
+export function areeIn(lang) {
+  return inglese(lang) ? areeEnList : aree
+}
+
+export function areaPerSlugIn(slug, lang) {
+  return areeIn(lang).find((a) => a.slug === slug) || null
+}
+
+export function progettiAreaIn(chiave, lang) {
+  return archivioIn(lang).filter((p) => areaDi(p) === chiave)
+}
+
+const focusItemsEn = focusItems.map((f) => {
+  const en = progettiEn[f.slug]
+  return en ? { ...f, cat: en.cat } : f
+})
+
+export function focusItemsIn(lang) {
+  return inglese(lang) ? focusItemsEn : focusItems
+}
+
+const profileEnCompleto = { ...profile, ...profileEn }
+
+export function profiloIn(lang) {
+  return inglese(lang) ? profileEnCompleto : profile
+}
+
+/* Le foto restano le stesse: cambiano solo i testi alternativi. */
+const aboutEnCompleto = {
+  ...about,
+  intro: aboutEn.intro,
+  experience: aboutEn.experience,
+  education: aboutEn.education,
+  photos: {
+    hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
+    lab: { ...about.photos.lab, alt: aboutEn.photos.lab },
+  },
+  sketchbook: about.sketchbook.map((tavola, i) => ({
+    front: tavola.front ? { ...tavola.front, alt: aboutEn.sketchbook[i]?.front } : null,
+    back: tavola.back ? { ...tavola.back, alt: aboutEn.sketchbook[i]?.back } : null,
+  })),
+}
+
+export function aboutIn(lang) {
+  return inglese(lang) ? aboutEnCompleto : about
+}
+
+const familyBandEnCompleto = { ...familyBand, ...familyBandEn }
+
+export function familyBandIn(lang) {
+  return inglese(lang) ? familyBandEnCompleto : familyBand
+}

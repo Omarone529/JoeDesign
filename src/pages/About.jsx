@@ -1,5 +1,6 @@
-import { about, profile } from '../data/siteData'
-import { Link } from '../router'
+import { aboutIn, profiloIn } from '../data/siteData'
+import { testi } from '../i18n'
+import { Link, percorso, useLang } from '../router'
 import Sketchbook from '../components/about/Sketchbook'
 
 /*
@@ -9,13 +10,19 @@ import Sketchbook from '../components/about/Sketchbook'
  * cambiano griglia, padding o tracking.
  */
 export default function About() {
+  const lang = useLang()
+  const T = testi(lang)
+  const about = aboutIn(lang)
+  const profile = profiloIn(lang)
   const { hero, lab } = about.photos
 
   return (
     <main className="animate-viewIn">
       <section className="grid grid-cols-1 gap-y-10 border-b-2 border-ink px-5 sm:px-8 md:min-h-[calc(100vh-4rem)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] md:gap-x-10 lg:px-[72px] lg:gap-x-16">
         <div className="flex flex-col pt-10 sm:pt-14 md:col-start-1 md:row-start-1 lg:pt-16">
-          <div className="mb-6 text-[11px] uppercase tracking-[0.24em] text-muted">Chi sono</div>
+          <div className="mb-6 text-[11px] uppercase tracking-[0.24em] text-muted">
+            {T.chiSono.occhiello}
+          </div>
           <p className="m-0 max-w-[42ch] text-[clamp(15px,1.15vw,18px)] leading-[1.5]">
             {about.intro}
           </p>
@@ -55,7 +62,7 @@ export default function About() {
       <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
         <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
           <div className="space-y-12 lg:space-y-16">
-            <ArrowBlock label="Experience">
+            <ArrowBlock label={T.chiSono.experience}>
               <dl className="m-0">
                 {about.experience.map((it) => (
                   <Row key={it.titolo + it.anno} anno={it.anno} titolo={it.titolo} luogo={it.luogo} />
@@ -63,7 +70,7 @@ export default function About() {
               </dl>
             </ArrowBlock>
 
-            <ArrowBlock label="Education">
+            <ArrowBlock label={T.chiSono.education}>
               <dl className="m-0">
                 {about.education.map((it) => (
                   <Row key={it.titolo} anno={it.anno} titolo={it.titolo} luogo={it.luogo} />
@@ -73,7 +80,7 @@ export default function About() {
           </div>
 
           <div className="space-y-12 lg:space-y-16">
-            <ArrowBlock label="Skills">
+            <ArrowBlock label={T.chiSono.skills}>
               <ul className="flex flex-wrap gap-2">
                 {about.skills.map((s) => (
                   <li
@@ -86,7 +93,7 @@ export default function About() {
               </ul>
             </ArrowBlock>
 
-            <ArrowBlock label="Contacts">
+            <ArrowBlock label={T.chiSono.contacts}>
               <div className="space-y-1 text-[15px] lg:space-y-2 lg:text-[17px]">
                 <a
                   href={profile.emailHref}
@@ -123,12 +130,14 @@ export default function About() {
 
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link
-          to="/archivio"
+          to={percorso('archive', {}, lang)}
           className="group border-b border-line px-5 py-10 transition-colors hover:bg-hover sm:border-b-0 sm:border-r sm:px-8 lg:px-[72px] lg:py-16"
         >
-          <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Il lavoro</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
+            {T.chiSono.ilLavoro}
+          </div>
           <div className="mt-2 text-[clamp(18px,2.4vw,32px)] font-bold uppercase tracking-[-0.01em]">
-            Vai all’Archivio →
+            {T.chiSono.vaiArchivio}
           </div>
         </Link>
         <a
@@ -137,7 +146,9 @@ export default function About() {
           rel="noreferrer"
           className="group px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
         >
-          <div className="text-[10px] uppercase tracking-[0.24em] text-muted">Scrivimi</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
+            {T.chiSono.scrivimi}
+          </div>
           <div className="mt-2 break-words text-[clamp(16px,2.4vw,32px)] font-bold tracking-[-0.01em]">
             {profile.email}
           </div>

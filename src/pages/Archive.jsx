@@ -1,16 +1,17 @@
 import {
   altCopertina,
-  archive,
-  aree,
-  areaPerSlug,
+  archivioIn,
+  areaPerSlugIn,
+  areeIn,
   contaProgetti,
   periodoArchivio,
   periodoDi,
-  progettiArea,
+  progettiAreaIn,
   projectImages,
 } from '../data/siteData'
 import { fotoFit } from '../data/fotoFit'
-import { Link } from '../router'
+import { testi } from '../i18n'
+import { Link, percorso, useLang } from '../router'
 
 /* "2024 · 2026", o il solo anno quando l'area ne copre uno. */
 function testoPeriodo(periodo) {
@@ -62,46 +63,41 @@ function Titolo({ children }) {
  * che si ritrova in prima riga entrando, così la scelta è già un'anteprima.
  */
 function Bivio() {
+  const lang = useLang()
+  const T = testi(lang)
+  const archivio = archivioIn(lang)
+
   return (
     <main className="animate-viewIn">
-      <Titolo>Archivio</Titolo>
+      <Titolo>{T.archivio.titolo}</Titolo>
 
       <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-[72px] lg:pb-28">
         <Intestazione
-          sinistra={`${aree.length} aree · ${contaProgetti(archive.length)}`}
+          sinistra={contaProgetti(archivio.length, lang)}
           destra={testoPeriodo(periodoArchivio)}
         />
 
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-6 lg:gap-8">
-          {aree.map((area, i) => {
-            const progetti = progettiArea(area.chiave)
+        <div className="mx-auto mt-4 grid grid-cols-1 gap-10 sm:mt-8 sm:max-w-[980px] sm:grid-cols-2 sm:gap-8 lg:max-w-[1200px] lg:gap-10">
+          {areeIn(lang).map((area, i) => {
+            const progetti = progettiAreaIn(area.chiave, lang)
             // Il più recente FRA QUELLI con la copertina: una scheda in attesa
             // di foto non può fare da vetrina all'area.
             const primo = progetti.find((x) => projectImages(x).cover) ?? progetti[0]
             const { cover } = projectImages(primo)
             const fit = fotoFit[cover]
             return (
-              <Link key={area.slug} to={`/archivio/${area.slug}`} className="group block">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h2 className="m-0 text-[clamp(26px,4.2vw,52px)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">
-                    {area.label}
-                  </h2>
-                  <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.2em] text-muted">
-                    {contaProgetti(progetti.length)}
-                  </span>
-                </div>
-
-                <p className="mt-3 max-w-[44ch] text-[14px] leading-[1.5] text-muted">
-                  {area.desc}
-                </p>
-
+              <Link
+                key={area.slug}
+                to={percorso('archive', { area: area.slug }, lang)}
+                className="group block"
+              >
                 <div
-                  className="relative mt-5 aspect-square overflow-hidden bg-placeholder"
+                  className="relative aspect-square overflow-hidden bg-placeholder"
                   style={fit?.fondo ? { backgroundColor: fit.fondo } : undefined}
                 >
                   <img
                     src={cover}
-                    alt={altCopertina(primo)}
+                    alt={altCopertina(primo, lang)}
                     fetchpriority={i === 0 ? 'high' : undefined}
                     decoding="async"
                     style={fit?.pos ? { objectPosition: fit.pos } : undefined}
@@ -109,10 +105,21 @@ function Bivio() {
                       fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
                     }`}
                   />
+                  {/*
+                   * Il nome dell'area sta sopra la copertina, come il numero di
+                   * tavola nella griglia dei progetti. Dove c'è il puntatore
+                   * compare al passaggio; dove non c'è (touch) resta sempre
+                   * visibile, altrimenti le due carte sarebbero senza nome.
+                   */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/35 opacity-100 transition-all duration-300 hover-fine:bg-ink/0 hover-fine:opacity-0 hover-fine:group-hover:bg-ink/35 hover-fine:group-hover:opacity-100">
+                    <h2 className="m-0 px-4 text-center text-[clamp(22px,3.4vw,40px)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-paper">
+                      {area.label}
+                    </h2>
+                  </div>
                 </div>
 
-                <div className="mt-3 flex items-baseline justify-between gap-4 text-[11px] uppercase tracking-[0.2em] text-muted transition-colors group-hover:text-ink">
-                  <span>Apri l’area →</span>
+                <div className="mt-4 flex items-baseline justify-between gap-4 text-[11px] uppercase tracking-[0.2em] text-muted transition-colors group-hover:text-ink">
+                  <span>{T.archivio.apriArea}</span>
                   <span className="whitespace-nowrap">{testoPeriodo(periodoDi(progetti))}</span>
                 </div>
               </Link>
@@ -126,27 +133,23 @@ function Bivio() {
 
 /* La griglia di sempre, ristretta a un'area. */
 function GrigliaArea({ area }) {
-  const progetti = progettiArea(area.chiave)
-  const altra = aree.find((a) => a.slug !== area.slug)
+  const lang = useLang()
+  const T = testi(lang)
+  const progetti = progettiAreaIn(area.chiave, lang)
+  const altra = areeIn(lang).find((a) => a.slug !== area.slug)
   const cella = formaCella(area)
 
   return (
     <main className="animate-viewIn">
       <section className="px-5 pb-8 pt-12 text-center sm:px-8 sm:pb-12 sm:pt-20 lg:px-[72px] lg:pt-[120px]">
-        <Link
-          to="/archivio"
-          className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
-        >
-          ← Archivio
-        </Link>
-        <h1 className="m-0 mt-5 text-[clamp(40px,8.4vw,132px)] font-bold uppercase leading-[0.9] tracking-[-0.02em]">
+        <h1 className="m-0 text-[clamp(40px,8.4vw,132px)] font-bold uppercase leading-[0.9] tracking-[-0.02em]">
           {area.label}
         </h1>
       </section>
 
       <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:px-[72px] lg:pb-28">
         <Intestazione
-          sinistra={contaProgetti(progetti.length)}
+          sinistra={contaProgetti(progetti.length, lang)}
           destra={testoPeriodo(periodoDi(progetti))}
         />
 
@@ -162,7 +165,7 @@ function GrigliaArea({ area }) {
             return (
               <Link
                 key={p.slug}
-                to={`/progetto/${p.slug}`}
+                to={percorso('project', { slug: p.slug }, lang)}
                 className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
               >
                 <article>
@@ -173,7 +176,7 @@ function GrigliaArea({ area }) {
                     {cover ? (
                       <img
                         src={cover}
-                        alt={altCopertina(p)}
+                        alt={altCopertina(p, lang)}
                         loading={subito ? 'eager' : 'lazy'}
                         fetchpriority={i < 4 ? 'high' : undefined}
                         decoding="async"
@@ -185,7 +188,7 @@ function GrigliaArea({ area }) {
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
                         <span className="text-[10px] uppercase tracking-[0.24em] text-muted">
-                          Foto in arrivo
+                          {T.archivio.fotoInArrivo}
                         </span>
                       </div>
                     )}
@@ -221,11 +224,11 @@ function GrigliaArea({ area }) {
       {altra && (
         <section className="border-t border-line">
           <Link
-            to={`/archivio/${altra.slug}`}
+            to={percorso('archive', { area: altra.slug }, lang)}
             className="group block px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
           >
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
-              L’altra area →
+              {T.archivio.altraArea}
             </div>
             <div className="mt-2 text-[clamp(20px,3vw,40px)] font-bold uppercase tracking-[-0.02em]">
               {altra.label}
@@ -238,6 +241,7 @@ function GrigliaArea({ area }) {
 }
 
 export default function Archive({ area }) {
-  const scelta = area ? areaPerSlug(area) : null
+  const lang = useLang()
+  const scelta = area ? areaPerSlugIn(area, lang) : null
   return scelta ? <GrigliaArea area={scelta} /> : <Bivio />
 }
