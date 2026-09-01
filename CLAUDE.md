@@ -6,7 +6,8 @@ Contesto del progetto per Claude Code. Leggilo a inizio sessione prima di modifi
 
 Sito portfolio di **Giovanni "Joe" Sarchiolla**, product designer di Reggio Emilia.
 Estetica editoriale "Direzione A": carta/inchiostro, tipografia grande, molto bianco,
-griglie con bordi sottili. Mobile-first. Lingua del sito e dei commenti: **italiano**.
+griglie con bordi sottili. Mobile-first. Il sito è **bilingue** (italiano e inglese);
+codice e commenti restano in **italiano**.
 
 Stato: **in sviluppo, incompleto** — ci sono ancora sezioni e pagine da costruire (vedi "Da fare").
 
@@ -39,16 +40,48 @@ console. Netlify risolve le directory da sé e non ha il problema.
 ## Architettura
 
 ### Routing (`src/router.jsx`)
-URL reali, non hash:
-- `/` → Home
-- `/chi-sono` → About (pagina "Chi sono")
-- `/archivio` → Archive: il bivio fra le due aree (product design / graphic design)
-- `/archivio/<area>` → Archive: la griglia dei progetti di quell'area
-  (`/archivio/product-design`, `/archivio/graphic-design`). Area sconosciuta → 404
-- `/progetto/<slug>` → ProjectDetail
+URL reali, non hash. Ogni pagina esiste in due indirizzi, uno per lingua:
 
-`App.jsx` legge la rotta con `useRoute()` e monta la pagina giusta. Funziona sia nel
-browser sia in SSR (in build) tramite `RouterProvider` con `initialPath`.
+| Rotta     | Italiano                  | Inglese                    |
+| --------- | ------------------------- | -------------------------- |
+| home      | `/`                       | `/en`                      |
+| about     | `/chi-sono`               | `/en/about`                |
+| archivio  | `/archivio`               | `/en/archive`              |
+| area      | `/archivio/<area>`        | `/en/archive/<area>`       |
+| scheda    | `/progetto/<slug>`        | `/en/project/<slug>`       |
+
+Gli slug di area (`product-design`, `graphic-design`) e di progetto **non** si
+traducono: sono nomi propri e tradurli spezzerebbe i link già in giro. Area o slug
+sconosciuti → 404.
+
+`parsePath()` restituisce anche `lang`; `App.jsx` legge la rotta con `useRoute()` e monta
+la pagina giusta. Funziona sia nel browser sia in SSR (in build) tramite `RouterProvider`
+con `initialPath`.
+
+**Per costruire un link usa sempre `percorso(nome, params, lang)`** (da `router.jsx`),
+mai una stringa scritta a mano: è l'unico punto che sa come si chiamano i segmenti in
+ogni lingua. `percorsoTradotto(route, lang)` dà la gemella della pagina aperta — la usano
+il selettore in navbar e gli hreflang.
+
+### Lingue (`src/i18n.js` + `src/data/contenutiEn.js`)
+La lingua **sta nell'URL**, non in uno stato del browser: una pagina inglese dev'essere
+indicizzabile, condivisibile e apribile a freddo come quella italiana.
+
+- `src/i18n.js` — i testi dell'**interfaccia** nelle due lingue (menù, etichette, frecce,
+  404, aria-label, alt delle foto, titoli e descrizioni SEO). Non importa niente, così lo
+  usano sia i componenti sia `seo.js` sia gli script node. `testi(lang)` restituisce il
+  blocco giusto.
+- `src/data/contenutiEn.js` — i **contenuti** in inglese: profilo, bio, aree e, per slug,
+  `cat`/`desc`/`spec` di ogni progetto. `siteData.js` resta la fonte di verità: qui ci
+  sono solo i campi che cambiano lingua.
+- In `siteData.js` gli accessori `archivioIn(lang)`, `areeIn(lang)`, `progettiAreaIn()`,
+  `profiloIn()`, `aboutIn()`, `focusItemsIn()`, `areaPerSlugIn()` danno la versione giusta
+  (calcolata una volta sola, quindi l'oggetto è sempre lo stesso e React non rimonta).
+- Nei componenti: `const lang = useLang()` e `const T = testi(lang)`.
+- Le chiavi della tabella di scheda cambiano con la lingua (`Oggetto` → `Object`) perché
+  stanno dentro `spec`: la scheda non traduce nulla, mostra quello che riceve.
+- **Un progetto nuovo senza voce in `contenutiEn.js` resta in italiano dentro il sito
+  inglese**: aggiungere la traduzione fa parte dell'inserimento di un progetto.
 
 ### Anteprime social e icona — file già pronti, NON si rigenerano a ogni build
 Due script si lanciano **a mano** e salvano il risultato dentro `public/`, come le altre immagini:
@@ -61,6 +94,9 @@ node scripts/favicon.js    # favicon.ico/.svg, apple-touch-icon, icon-192/512, s
 - **`og-image.js` va rilanciato dopo aver aggiunto un progetto o cambiato una copertina**,
   altrimenti la scheda nuova punta a un JPEG che non esiste. È l'unico passo manuale
   quando cresce l'archivio.
+- Genera **due serie**: le italiane in `public/images/og/`, le inglesi in
+  `public/images/og/en/`. Il testo dell'anteprima è quello della pagina, quindi un link
+  inglese condiviso non può mostrare un riquadro che dice "Archivio".
 - Le anteprime sono in **JPEG e non in WebP**: LinkedIn e WhatsApp non mostrano le WebP,
   e il link condiviso uscirebbe senza immagine. Non ricondurle al WebP del sito.
 - `favicon.js` serve solo se cambia il marchio.
@@ -68,7 +104,12 @@ node scripts/favicon.js    # favicon.ico/.svg, apple-touch-icon, icon-192/512, s
 ### Pre-rendering / SEO (`scripts/prerender.js` + `src/seo.js` + `src/entry-server.jsx`)
 Ogni rotta viene renderizzata in un **HTML statico già completo** (es. `dist/progetto/flue/index.html`),
 con title, meta description, author, Open Graph, Twitter card e JSON-LD schema.org **per pagina**.
-Vengono generati anche `sitemap.xml` e `robots.txt`. Google e le anteprime dei link vedono
+Le rotte sono generate in **entrambe le lingue** (62 pagine): ogni HTML porta il proprio
+`<html lang>`, il proprio `og:locale` e i `hreflang` verso la gemella e verso `x-default`
+(l'italiano). Le 404 sono due, `dist/404.html` e `dist/en/404.html`, e `netlify.toml`
+serve la seconda a chi sbaglia un indirizzo sotto `/en`.
+Vengono generati anche `sitemap.xml` (con gli `xhtml:link` di traduzione per ogni URL) e
+`robots.txt`. Google e le anteprime dei link vedono
 il contenuto senza eseguire JS. Nel browser React si "aggancia" via hydration (`src/main.jsx`).
 
 `src/seo.js` è il posto dei metadati: title/description/immagine per rotta, l'elenco
@@ -108,12 +149,15 @@ Tutti i testi e i dati stanno qui, non nel markup:
 
 ## ⚠️ Regole da rispettare (per non rompere SEO/pre-rendering)
 
-1. **Link interni** → usa `<Link to="/...">` da `src/router.jsx`, MAI `<a href>` per rotte interne.
-   Per mailto/tel/URL esterni/`#` va bene `<a>` (o `Link`, che li gestisce come anchor normali).
+1. **Link interni** → usa `<Link to={percorso('archive', {}, lang)}>` da `src/router.jsx`,
+   MAI `<a href>` né un percorso scritto a mano: un `/archivio` fisso dentro il sito
+   inglese butta fuori dalla lingua. Per mailto/tel/URL esterni/`#` va bene `<a>`
+   (o `Link`, che li gestisce come anchor normali).
+   Nessun testo visibile scritto nel markup: sta in `src/i18n.js`, letto con `testi(lang)`.
 2. **Niente `fetch`/API a runtime** per contenuti che devono essere indicizzati: tienili in `siteData.js`.
    Il pre-rendering "fotografa" ciò che è nei dati statici.
 3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella;
-   se è grafica, `area: 'graphic'`),
+   se è grafica, `area: 'graphic'`), **più la traduzione in `src/data/contenutiEn.js`**,
    poi lancia `node scripts/og-image.js` per l'anteprima social. Pre-rendering, sitemap
    e meta tag si aggiornano da soli.
 4. **Non reintrodurre l'hash routing** (`#progetto/...`): romperebbe SEO e link profondi.
@@ -220,12 +264,14 @@ src/
 ├── App.jsx               # layout: Navbar + pagina corrente + Footer
 ├── router.jsx            # routing History API + <Link> + useRoute/useNavigate
 ├── seo.js                # meta per rotta + elenco rotte (usato dal pre-rendering)
+├── i18n.js               # testi dell'interfaccia nelle due lingue (it/en)
 ├── entry-server.jsx      # render(path) per la build SSR (mai spedito al browser)
 ├── index.css             # Tailwind + stili base
 ├── data/siteData.js      # TUTTI i contenuti (fonte di verità)
+├── data/contenutiEn.js   # i campi che cambiano lingua: versione inglese
 ├── data/fotoFit.js       # generato: come ogni foto entra nel carosello
 ├── components/
-│   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono)
+│   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono) + selettore IT/EN
 │   ├── Footer.jsx        # fa anche da pagina contatti
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
@@ -277,6 +323,7 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 - **IN-SICUREZZA** (manifesto per il Congresso UIL Ravenna 2026): l'immagine era in
   archivio ma il progetto non è mai stato descritto, quindi è rimasto fuori. Il file
   sta in `ARCHIVIO WEBP` e nella storia di git (era `products/grafica/06.webp`).
+- Le traduzioni inglesi dei progetti sono una prima stesura: **da far rileggere a Joe**.
 - Prima/subito dopo il primo deploy: registrare il sito su **Google Search Console** e
   inviare `/sitemap.xml`. Valutare un'analitica leggera (Plausible/Umami, senza cookie).
 - **Decidere il dominio prima di pubblicare**: cambiarlo dopo che Google ha indicizzato

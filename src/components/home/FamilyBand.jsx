@@ -1,6 +1,9 @@
-import { familyBand } from '../../data/siteData'
+import { familyBandIn } from '../../data/siteData'
+import { useLang } from '../../router'
 
 export default function FamilyBand() {
+  const familyBand = familyBandIn(useLang())
+
   return (
     <section className="bg-placeholder">
       <img

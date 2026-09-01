@@ -1,8 +1,12 @@
-import { altCopertina, focusItems } from '../../data/siteData'
-import { Link } from '../../router'
+import { altCopertina, focusItemsIn } from '../../data/siteData'
+import { testi } from '../../i18n'
+import { Link, percorso, useLang } from '../../router'
 
 /* I cinque progetti focus del portfolio 2026 (selezione in `focusSlugs`). */
 export default function SelectedWorks() {
+  const lang = useLang()
+  const T = testi(lang)
+
   return (
     <section
       id="lavori"
@@ -10,28 +14,28 @@ export default function SelectedWorks() {
     >
       <div className="mb-5 flex items-baseline justify-between sm:mb-6 lg:mb-8">
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
-          Lavori selezionati
+          {T.home.lavoriSelezionati}
         </h2>
         <Link
-          to="/archivio"
+          to={percorso('archive', {}, lang)}
           className="whitespace-nowrap border-b border-ink pb-[3px] text-[11px] uppercase tracking-[0.2em]"
         >
-          Archivio completo →
+          {T.home.archivioCompleto}
         </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-5">
-        {focusItems.map((p, i) => (
+        {focusItemsIn(lang).map((p, i) => (
           <Link
             key={p.slug}
-            to={`/progetto/${p.slug}`}
+            to={percorso('project', { slug: p.slug }, lang)}
             className="group relative block cursor-pointer transition-transform duration-[400ms] ease-[cubic-bezier(.2,.7,.2,1)] will-change-transform hover:z-10 hover:scale-[1.045]"
           >
             <article>
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 <img
                   src={p.cover}
-                  alt={altCopertina(p)}
+                  alt={altCopertina(p, lang)}
                   loading={i < 3 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}
                   decoding="async"

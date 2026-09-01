@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { about } from '../../data/siteData'
+import { about, aboutIn } from '../../data/siteData'
+import { testi } from '../../i18n'
+import { useLang } from '../../router'
 import { animazioniRidotte } from '../../motion'
 const { sketchbook } = about
 const N = sketchbook.length
@@ -100,6 +102,11 @@ function angoliVertici(angoliSegmento) {
  * costa; al rilascio assesta una molla vera innescata dalla velocità del dito.
  */
 export default function Sketchbook() {
+  // Le tavole sono le stesse in entrambe le lingue: cambiano i testi alternativi.
+  const lang = useLang()
+  const T = testi(lang)
+  const tavole = aboutIn(lang).sketchbook
+
   const [pagina, setPagina] = useState(0) // quante pagine sono già girate a sinistra
   const [pronto, setPronto] = useState(false) // scena 3D montata: si può nascondere la copertina di scorta
   const animateRef = useRef(null)
@@ -764,7 +771,9 @@ export default function Sketchbook() {
 
   return (
     <section className="border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
-      <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">Sketchbook</div>
+      <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">
+        {T.chiSono.sketchbook}
+      </div>
 
       <div className="flex flex-col items-center">
         {/* `tabIndex` e frecce sono l'unico modo di sfogliare senza mouse: il
@@ -775,8 +784,8 @@ export default function Sketchbook() {
           className="relative w-full max-w-[560px] touch-pan-y select-none sm:max-w-[780px] lg:max-w-[1000px] xl:max-w-[1120px]"
           role="group"
           tabIndex={0}
-          aria-roledescription="sketchbook sfogliabile"
-          aria-label="Tavole dello sketchbook personale di Joe Sarchiolla"
+          aria-roledescription={T.chiSono.sketchbookRuolo}
+          aria-label={T.chiSono.sketchbookAria}
           onKeyDown={(e) => {
             if (e.key === 'ArrowRight') gira(1)
             if (e.key === 'ArrowLeft') gira(-1)
@@ -790,8 +799,8 @@ export default function Sketchbook() {
                 MARGINE_CAMERA (≈89.3% del riquadro) più l'1% di prospettiva:
                 sta in cima alla pila, un filo più vicina alla camera. */}
             <img
-              src={sketchbook[0].front.src}
-              alt={sketchbook[0].front.alt}
+              src={tavole[0].front.src}
+              alt={tavole[0].front.alt}
               width={1000}
               height={1415}
               loading="eager"

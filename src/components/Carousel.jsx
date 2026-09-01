@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { fotoFit } from '../data/fotoFit'
+import { testi } from '../i18n'
+import { useLang } from '../router'
 import { animazioniRidotte } from '../motion'
 
 const INTERVAL = 2000
@@ -20,6 +22,7 @@ const SWIPE = 45 // spostamento minimo del dito perché valga come cambio foto
  * corrisponde a nessuna slide, e il riquadro resta vuoto.
  */
 export default function Carousel({ images, title }) {
+  const T = testi(useLang())
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   // Slide con il `src` assegnato. Parte dalla sola prima, l'unica che ce l'ha
@@ -94,7 +97,7 @@ export default function Carousel({ images, title }) {
       className="group relative mx-auto w-full max-w-[calc(100vh-9rem)] md:ml-auto md:mr-0"
       role="group"
       aria-roledescription="carosello"
-      aria-label={`Immagini di ${title}`}
+      aria-label={T.carosello.immaginiDi(title)}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') next()
         if (e.key === 'ArrowLeft') prev()
@@ -138,7 +141,7 @@ export default function Carousel({ images, title }) {
             <button
               type="button"
               onClick={prev}
-              aria-label="Immagine precedente"
+              aria-label={T.carosello.precedente}
               className="absolute left-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink opacity-0 backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 group-hover:opacity-100 sm:flex"
             >
               ←
@@ -146,7 +149,7 @@ export default function Carousel({ images, title }) {
             <button
               type="button"
               onClick={next}
-              aria-label="Immagine successiva"
+              aria-label={T.carosello.successiva}
               className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink opacity-0 backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 group-hover:opacity-100 sm:flex"
             >
               →
@@ -159,7 +162,7 @@ export default function Carousel({ images, title }) {
               type="button"
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
-              aria-label={paused ? 'Riprendi lo scorrimento' : 'Metti in pausa lo scorrimento'}
+              aria-label={paused ? T.carosello.riprendi : T.carosello.pausa}
               className="absolute right-2 top-2 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
             >
               {paused && <span aria-hidden="true">▌▌</span>}
@@ -178,7 +181,7 @@ export default function Carousel({ images, title }) {
               key={i}
               type="button"
               onClick={() => go(i)}
-              aria-label={`Vai all'immagine ${i + 1}`}
+              aria-label={T.carosello.vaiA(i + 1)}
               aria-current={i === index}
               className={`h-1.5 rounded-full transition-all ${
                 i === index ? 'w-6 bg-ink' : 'w-1.5 bg-dot hover:bg-muted'
