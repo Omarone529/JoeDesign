@@ -165,7 +165,7 @@ export function metaForRoute(route) {
       title: `Pagina non trovata · ${FIRMA}`,
       description: `L'indirizzo non corrisponde a nessuna pagina del sito di ${FIRMA}.`,
       image: ogImage('home'),
-      imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
+      imageAlt: about.photos.hero.alt,
       type: 'website',
       noindex: true,
     }
@@ -177,7 +177,7 @@ export function metaForRoute(route) {
     description: `${FIRMA}, ${profile.role} a ${profile.place}. Portfolio ${PERIODO}: prodotto, arredo, packaging e grafica.`,
     canonical: `${SITE}/`,
     image: ogImage('home'),
-    imageAlt: `La famiglia di prodotti disegnati da ${profile.displayName}`,
+    imageAlt: about.photos.hero.alt,
     type: 'website',
   }
 }
