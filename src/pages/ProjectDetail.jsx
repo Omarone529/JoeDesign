@@ -73,7 +73,6 @@ export default function ProjectDetail({ slug }) {
             <div className="mb-4 text-[10px] uppercase tracking-[0.24em] text-muted">
               {item.cat}
             </div>
-            {/* Le schede ancora senza testo saltano il blocco invece di lasciare il vuoto. */}
             {item.desc?.trim() && (
               <p className="m-0 max-w-[52ch] text-[clamp(16px,1.35vw,19px)] leading-[1.5]">
                 {item.desc}

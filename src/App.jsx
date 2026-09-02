@@ -15,7 +15,6 @@ export default function App() {
   return (
     <div id="top" className="min-h-screen bg-paper">
       <Navbar route={route} />
-      {/* `rotta`: al cambio pagina il boundary si riarma. */}
       <ErrorBoundary rotta={route.path} lang={route.lang}>
         {route.name === 'about' && <About />}
         {route.name === 'archive' && <Archive area={route.area} />}

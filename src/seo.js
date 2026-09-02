@@ -109,7 +109,6 @@ function titoloProgetto(item) {
   return senzaCategoria.length <= 62 ? senzaCategoria : `${nome} · ${profile.name}`
 }
 
-/* "2024 · 2026", o il solo anno quando l'area ne copre uno. */
 function periodoTesto(periodo) {
   if (!periodo) return ''
   return periodo.primo === periodo.ultimo

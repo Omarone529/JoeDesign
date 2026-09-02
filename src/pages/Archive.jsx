@@ -13,7 +13,6 @@ import { fotoFit } from '../data/fotoFit'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 
-/* "2024 · 2026", o il solo anno quando l'area ne copre uno. */
 function testoPeriodo(periodo) {
   if (!periodo) return ''
   return periodo.primo === periodo.ultimo
@@ -21,7 +20,6 @@ function testoPeriodo(periodo) {
     : `${periodo.primo} · ${periodo.ultimo}`
 }
 
-/* La riga sottile sopra la griglia: quanti progetti e in che anni. */
 function Intestazione({ sinistra, destra }) {
   return (
     <div className="mb-6 flex items-baseline justify-between gap-4 border-t border-line pt-5 sm:mb-8">
@@ -131,7 +129,6 @@ function Bivio() {
   )
 }
 
-/* La griglia di sempre, ristretta a un'area. */
 function GrigliaArea({ area }) {
   const lang = useLang()
   const T = testi(lang)

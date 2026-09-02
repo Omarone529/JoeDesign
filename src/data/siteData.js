@@ -20,13 +20,9 @@ export const profile = {
   tiktok: 'https://www.tiktok.com/@design.by.joesarchiolla',
   linkedin: 'https://www.linkedin.com/in/giovanni-sarchiolla-a80659232/',
   email: 'joe.artedesign@gmail.com',
-  // Apre la compose di Gmail (web) invece dell'app di posta predefinita del sistema.
   emailHref: 'https://mail.google.com/mail/?view=cm&fs=1&to=joe.artedesign@gmail.com',
   manifesto:
     'L’ispirazione arriva dall’arte, dalla moda e dalla grafica, e da lì prende forma il prodotto. La ricerca è sempre quella della forma che non ha bisogno di parole.',
-  // Una riga sola su cosa nasce dal lavoro: sta nell'anteprima social della
-  // home (`scripts/og-image.js`), dove c'è spazio per una frase e non per il
-  // manifesto intero.
   sintesi:
     'Lampade, sedute e oggetti d’uso: forme che uniscono estetica, funzione e dimensione emotiva.',
 }

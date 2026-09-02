@@ -19,7 +19,6 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(errore, info) {
-    // Nessun servizio di raccolta errori: resta in console.
     console.error('Errore in pagina:', errore, info?.componentStack)
   }
 

@@ -12,10 +12,6 @@ import { LINGUA_PREDEFINITA, normalizzaLingua } from './i18n'
  * nel browser ma parte dell'URL, perché una pagina inglese dev'essere
  * indicizzabile, condivisibile e apribile a freddo com'è quella italiana.
  *
- *   /  ·  /chi-sono  ·  /archivio  ·  /archivio/<area>  ·  /progetto/<slug>
- *   /en  ·  /en/about  ·  /en/archive  ·  /en/archive/<area>  ·  /en/project/<slug>
- *   ·  altro → 404
- *
  * Lo slug dell'area (product-design) e quello del progetto non cambiano fra le
  * due lingue: sono nomi propri, e tradurli spezzerebbe i link già in giro.
  */
@@ -53,7 +49,6 @@ export function percorsoTradotto(route, lang) {
 export function parsePath(pathname) {
   const intero = (pathname || '/').replace(/\/+$/, '') || '/'
 
-  // Prefisso di lingua: /en, /en/... — tutto il resto è italiano.
   const inglese = intero === '/en' || intero.startsWith('/en/')
   const lang = inglese ? 'en' : LINGUA_PREDEFINITA
   const p = inglese ? intero.slice(3) || '/' : intero
@@ -64,12 +59,10 @@ export function parsePath(pathname) {
   if (p === `/${seg.archive}`) return { name: 'archive', area: null, lang, path: intero }
   if (p.startsWith(`/${seg.archive}/`)) {
     const slug = decodeURIComponent(p.slice(seg.archive.length + 2))
-    // Area inesistente → 404, non una griglia vuota.
     if (areaPerSlug(slug)) return { name: 'archive', area: slug, lang, path: intero }
   }
   if (p.startsWith(`/${seg.project}/`)) {
     const slug = decodeURIComponent(p.slice(seg.project.length + 2))
-    // Slug non in archivio → 404, non una scheda vuota.
     if (archive.some((item) => item.slug === slug)) {
       return { name: 'project', slug, lang, path: intero }
     }
@@ -120,7 +113,6 @@ export function useNavigate() {
   return useContext(RouterContext).navigate
 }
 
-/* La lingua della pagina aperta: la dice l'URL, non uno stato del browser. */
 export function useLang() {
   return useContext(RouterContext).route.lang
 }
@@ -129,7 +121,6 @@ function isExternal(to) {
   return typeof to !== 'string' || !to.startsWith('/')
 }
 
-/* Client-side per i path interni, <a> normale per mailto/tel/esterni. */
 export function Link({ to, children, onClick, target, ...props }) {
   const ctx = useContext(RouterContext)
 

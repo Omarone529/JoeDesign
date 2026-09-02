@@ -77,7 +77,6 @@ export default function Navbar({ route }) {
   // la barra deve riesporsi lo stesso.
   const [nascosta, setNascosta] = useNavbarNascosta(route?.path ?? '/')
 
-  // Solo le tre rotte: i recapiti stanno nel footer.
   const links = [
     { label: T.nav.home, to: percorso('home', {}, lang), active: name === 'home' },
     {
