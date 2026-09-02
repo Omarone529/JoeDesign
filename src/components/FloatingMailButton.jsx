@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
 import { testi } from '../i18n'
 import { useLang } from '../router'
+import { useBannerAperto } from '../consenso'
 
 /* Duplica il contatto del footer; sparisce quando il footer entra in schermo. */
 export default function FloatingMailButton() {
   const T = testi(useLang())
   const [sopraFooter, setSopraFooter] = useState(true)
+  // Il banner è una fascia alta un terzo di schermo, e questo tasto le finirebbe
+  // sotto: chi lo cercasse col dito premerebbe "Accetta". Sparisce finché c'è.
+  const bannerAperto = useBannerAperto()
 
   useEffect(() => {
     const footer = document.getElementById('contatti')
@@ -16,7 +20,7 @@ export default function FloatingMailButton() {
     return () => observer.disconnect()
   }, [])
 
-  const visibile = sopraFooter
+  const visibile = sopraFooter && !bannerAperto
 
   return (
     <a

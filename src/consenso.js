@@ -75,3 +75,16 @@ const falso = () => false
 export function useMontato() {
   return useSyncExternalStore(nonCambiaMai, vero, falso)
 }
+
+/*
+ * Il banner è in pagina finché non si è risposto — e solo dopo l'hydration, per
+ * la ragione qui sopra. Sta qui e non dentro il banner perché non è l'unico a
+ * doverlo sapere: il tasto mail flottante si toglie di mezzo finché la fascia
+ * c'è, o si ritroverebbe sotto, e un dito che va a cercarlo finirebbe su
+ * "Accetta". Un consenso preso per sbaglio è peggio di un consenso non chiesto.
+ */
+export function useBannerAperto() {
+  const montato = useMontato()
+  const consenso = useConsensoVideo()
+  return montato && consenso === null
+}

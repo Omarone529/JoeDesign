@@ -33,6 +33,11 @@ const SCALA = 4
 // quindi la texture non viene mai ingrandita e tutto ciò che sta sopra a questa
 // larghezza sarebbe peso scaricato per niente.
 const LARGHEZZA = 1000
+// La seconda misura è per il telefono: lì una pagina viene disegnata in circa
+// 340 pixel reali, e nove texture da mille pixel occuperebbero una cinquantina
+// di megabyte di memoria video — che su un telefono si paga in scatti. Le legge
+// Sketchbook.jsx quando il puntatore è grosso (vedi `tavolaPer`).
+const LARGHEZZA_MEZZA = 500
 // Ogni rimpicciolimento ammorbidisce: una maschera di contrasto leggera
 // restituisce il filo alle lettere senza gli aloni dello sharpen aggressivo.
 const NITIDEZZA = { sigma: 0.6, m1: 0.4, m2: 0.9 }
@@ -67,7 +72,18 @@ for await (const pagina of await pdf(PDF_PATH, { scale: SCALA })) {
     const dest = path.join(OUT_DIR, `${tavola.nome}.webp`)
     await sharp(pagina).resize({ width: LARGHEZZA }).sharpen(NITIDEZZA).webp({ quality: QUALITA }).toFile(dest)
     const { width, height } = await sharp(dest).metadata()
-    console.log(`✓ ${tavola.nome}.webp (pagina ${n}, ${width}×${height})`)
+
+    // La mezza si ricava dalla grande già rimpicciolita, non dal render: due
+    // passaggi di lanczos su un render abbondante tengono le lettere più
+    // definite di un salto solo fino a 500.
+    const mezza = path.join(OUT_DIR, `${tavola.nome}-mezza.webp`)
+    await sharp(dest)
+      .resize({ width: LARGHEZZA_MEZZA, kernel: 'lanczos3' })
+      .sharpen(NITIDEZZA)
+      .webp({ quality: QUALITA - 2 })
+      .toFile(mezza)
+
+    console.log(`✓ ${tavola.nome}.webp (pagina ${n}, ${width}×${height}) + mezza`)
   }
   if (n >= ultima) break
 }

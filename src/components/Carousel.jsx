@@ -263,7 +263,7 @@ export default function Carousel({ images, title }) {
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
               aria-label={paused ? T.carosello.riprendi : T.carosello.pausa}
-              className="absolute right-2 top-2 z-10 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
+              className="absolute right-2 top-2 z-10 flex items-center gap-2 bg-ink/85 px-2 py-1 before:absolute before:-inset-1 before:content-[''] text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
             >
               {paused && <span aria-hidden="true">▌▌</span>}
               <span>
@@ -278,8 +278,10 @@ export default function Carousel({ images, title }) {
         /* Il `before` allarga il bersaglio senza toccare il disegno: un pallino
            è alto sei pixel, e sei pixel col dito non si prendono. Cresce fino a
            riempire lo spazio fra l'uno e l'altro, non oltre, o due bersagli
-           finirebbero uno sopra l'altro. */
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+           finirebbero uno sopra l'altro — ed è per questo che i pallini stanno
+           venti pixel distanti e non otto: è la distanza che serve perché
+           ventisei pixel di bersaglio ciascuno si tocchino senza accavallarsi. */
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-5">
           {images.map((_, i) => (
             <button
               key={i}
@@ -287,7 +289,7 @@ export default function Carousel({ images, title }) {
               onClick={() => go(i)}
               aria-label={T.carosello.vaiA(i + 1)}
               aria-current={i === index}
-              className={`relative h-1.5 rounded-full transition-all before:absolute before:-inset-x-1.5 before:-inset-y-3 before:content-[''] ${
+              className={`relative h-1.5 rounded-full transition-all before:absolute before:-inset-x-2.5 before:-inset-y-3 before:content-[''] ${
                 i === index ? 'w-6 bg-ink' : 'w-1.5 bg-dot hover:bg-muted'
               }`}
             />

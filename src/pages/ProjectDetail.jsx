@@ -80,7 +80,7 @@ export default function ProjectDetail({ slug }) {
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
           <Link
             to={percorso('archive', { area: area?.slug }, lang)}
-            className="text-[11px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-ink"
+            className="relative inline-block text-[11px] uppercase tracking-[0.2em] text-muted transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-ink"
           >
             ← {area ? area.label : T.progetto.archivio}
           </Link>

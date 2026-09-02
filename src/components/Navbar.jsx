@@ -94,6 +94,13 @@ export default function Navbar({ route }) {
         nascosta ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
+      {/*
+        Sotto md il gruppo di destra è `contents`: menù, Instagram e lingue
+        diventano figli diretti della barra, e `justify-between` distribuisce
+        lo spazio fra loro invece di lasciare un buco dopo il marchio e
+        ammassare tutto il resto contro il bordo. Da md torna una scatola, che
+        lì il nome al centro è in mezzo e le distanze le decide il `gap`.
+      */}
       <div className="relative flex h-16 items-center justify-between gap-3 px-5 sm:px-8 lg:px-[72px]">
         <Link
           to={percorso('home', {}, lang)}
@@ -117,15 +124,15 @@ export default function Navbar({ route }) {
           impossibile da centrare col dito. Sulla barra di un telefono ci va la
           navigazione, il resto può aspettare lo schermo grande.
         */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
+        <div className="hidden shrink-0 items-center gap-2 sm:flex sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="hidden whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:inline-block sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
           </span>
           <LinkInstagram lang={lang} className="hidden sm:flex" />
         </div>
 
-        <div className="flex shrink-0 items-center gap-3 sm:gap-4 md:gap-5 lg:gap-8">
-          <nav className="flex shrink-0 items-center gap-3 sm:gap-5 md:gap-6 lg:gap-10">
+        <div className="contents md:flex md:shrink-0 md:items-center md:gap-5 lg:gap-8">
+          <nav className="flex shrink-0 items-center gap-4 sm:gap-5 md:gap-6 lg:gap-10">
             {links.map((l) => (
               <NavLink key={l.label} to={l.to} active={l.active}>
                 {l.label}
@@ -143,6 +150,11 @@ export default function Navbar({ route }) {
 }
 
 /*
+ * Il `before` allarga il bersaglio senza toccare il disegno: l'icona è quindici
+ * pixel, e quindici pixel col dito non si prendono. Stessa cosa sulle due
+ * lingue, larghe due caratteri — lì la barretta in mezzo non intercetta il
+ * tocco, o si mangerebbe metà del bersaglio di "IT".
+ *
  * Compare due volte nella barra e mai insieme: da `sm` accanto al nome, sotto
  * in fondo alla riga (vedi il commento nel gruppo centrale). Quello nascosto
  * esce dal `display`, quindi per chi legge con la voce il link resta uno solo.
@@ -154,7 +166,7 @@ function LinkInstagram({ lang, className = '' }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={testi(lang).nav.instagram(profile.handle)}
-      className={`shrink-0 items-center text-ink transition-colors hover:text-muted ${className}`}
+      className={`relative shrink-0 items-center text-ink transition-colors hover:text-muted before:absolute before:-inset-1.5 before:content-[''] ${className}`}
     >
       <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
     </a>
@@ -182,7 +194,7 @@ function SelettoreLingua({ route }) {
       {LINGUE.map((l, i) => (
         <Fragment key={l}>
           {i > 0 && (
-            <span aria-hidden="true" className="text-line">
+            <span aria-hidden="true" className="pointer-events-none text-line">
               /
             </span>
           )}
@@ -190,7 +202,7 @@ function SelettoreLingua({ route }) {
             to={percorsoTradotto(route, l)}
             hrefLang={l}
             aria-current={l === attuale ? 'true' : undefined}
-            className={`py-2 transition-colors ${
+            className={`relative py-2 transition-colors before:absolute before:-inset-x-2 before:content-[''] ${
               l === attuale ? 'font-bold text-ink' : 'text-muted hover:text-ink'
             }`}
           >

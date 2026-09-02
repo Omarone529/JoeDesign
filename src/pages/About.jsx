@@ -46,15 +46,28 @@ export default function About() {
           </h1>
         </div>
 
-        {/* `object-top`: protegge la testa su finestre basse. */}
-        <div className="mx-auto w-full max-w-[440px] md:col-start-2 md:row-start-1 md:max-w-none">
+        {/* `object-top`: protegge la testa su finestre basse.
+            Il ritratto è ritagliato attorno alla figura, con appena un margine
+            di respiro: prima portava un quinto di trasparente per lato e sul
+            telefono, dove riempie la colonna per intero, la figura restava
+            piccola in mezzo a due bande vuote e sembrava messa storta.
+
+            ⚠️ Da md la foto è FUORI dal flusso. In colonna, `h-full` è una
+            percentuale che al momento di misurare la riga non ha ancora un
+            riferimento, e il browser ripiega sulle proporzioni vere del file:
+            la sezione diventava alta quanto la foto invece che quanto lo
+            schermo, e il nome finiva sotto la piega. Si vedeva solo con un
+            ritratto stretto — quello di prima era largo abbastanza da starci
+            dentro — quindi è una trappola che scatta cambiando immagine, non
+            codice. Fuori dal flusso, l'altezza la decide solo `min-h`. */}
+        <div className="mx-auto w-full max-w-[440px] md:relative md:col-start-2 md:row-start-1 md:max-w-none">
           <img
             src={hero.src}
             alt={hero.alt}
-            width="1600"
-            height="2132"
+            width="1040"
+            height="2022"
             fetchpriority="high"
-            className="block w-full md:h-full md:object-cover md:object-top"
+            className="block w-full md:absolute md:inset-0 md:h-full md:object-cover md:object-top"
           />
         </div>
       </section>
@@ -109,6 +122,11 @@ export default function About() {
         </div>
       </section>
 
+      {/* Il libro sfogliabile apre il manifesto: sono gli schizzi da cui i
+          progetti nascono, e la frase dice esattamente quello. Sotto restano la
+          foto in laboratorio e i due link d'uscita. */}
+      <Sketchbook />
+
       <section className="border-t-2 border-ink px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
         <blockquote className="m-0 max-w-[24ch] text-[clamp(26px,4vw,56px)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
           “{profile.manifesto}”
@@ -125,8 +143,6 @@ export default function About() {
           className="block aspect-[16/9] w-full object-cover object-top"
         />
       </section>
-
-      <Sketchbook />
 
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link

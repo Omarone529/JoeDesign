@@ -18,7 +18,7 @@ export default function SelectedWorks() {
         </h2>
         <Link
           to={percorso('archive', {}, lang)}
-          className="whitespace-nowrap border-b border-ink pb-[3px] text-[11px] uppercase tracking-[0.2em]"
+          className="relative whitespace-nowrap border-b border-ink pb-[3px] text-[11px] uppercase tracking-[0.2em] before:absolute before:-inset-x-2 before:-inset-y-2 before:content-['']"
         >
           {T.home.archivioCompleto}
         </Link>

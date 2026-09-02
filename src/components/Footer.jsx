@@ -38,7 +38,7 @@ export default function Footer() {
               <li key={p.to}>
                 <Link
                   to={p.to}
-                  className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-paper"
+                  className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 before:absolute before:-inset-x-2 before:-inset-y-1.5 before:content-[''] hover:text-paper"
                 >
                   {p.label}
                   <Sottolineatura />
@@ -54,7 +54,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label={T.footer.scriviA(profile.email)}
-            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+            className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoGmail className="h-5 w-5" />
           </a>
@@ -64,7 +64,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label={T.footer.instagram(profile.handle)}
-            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+            className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoInstagram className="h-5 w-5" />
           </a>
@@ -74,7 +74,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label={T.footer.youtube}
-            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+            className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoYoutube className="h-5 w-5" />
           </a>
@@ -84,7 +84,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label={T.footer.tiktok}
-            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+            className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoTiktok className="h-5 w-5" />
           </a>
@@ -94,7 +94,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
             aria-label={T.footer.linkedin}
-            className="text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:text-paper"
+            className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoLinkedin className="h-5 w-5" />
           </a>
@@ -106,7 +106,7 @@ export default function Footer() {
       </div>
 
       <div
-        className={`flex flex-col items-center gap-3 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
+        className={`flex flex-col items-center gap-4 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
         <div className="flex flex-wrap items-center justify-center gap-x-2 text-[10px] uppercase tracking-[0.2em] text-muted">
           <span>
@@ -115,7 +115,7 @@ export default function Footer() {
           <span aria-hidden="true">·</span>
           <Link
             to={percorso('privacy', {}, lang)}
-            className="group relative inline-block transition-colors hover:text-paper"
+            className="group relative inline-block transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
           >
             {T.footer.privacy}
             <Sottolineatura />
@@ -124,7 +124,7 @@ export default function Footer() {
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scorrimento() })}
-          className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-paper"
+          className="group relative flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
         >
           {T.footer.tornaSu}
           <span
@@ -138,6 +138,17 @@ export default function Footer() {
     </footer>
   )
 }
+
+/*
+ * I `before` sui link qui sopra allargano il bersaglio senza spostare niente:
+ * una riga di testo da 13px è alta venti pixel, le icone social venti per venti,
+ * e col dito non si prendono. Il padding non andava bene: la sottolineatura è
+ * ancorata al fondo del link e sarebbe scesa sotto lo spazio vuoto.
+ *
+ * Lo stacco fra "Privacy" e "Torna su" è di 16px e non di 12 perché i due
+ * bersagli allargati si toccano esattamente lì: a 12 si sovrapponevano, e nella
+ * striscia in comune il tocco finiva sempre sul secondo.
+ */
 
 /* Va in un contenitore `relative` dentro un elemento `group`. */
 function Sottolineatura() {

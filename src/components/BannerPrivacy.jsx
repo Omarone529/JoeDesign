@@ -1,4 +1,4 @@
-import { impostaConsensoVideo, useConsensoVideo, useMontato } from '../consenso'
+import { impostaConsensoVideo, useBannerAperto } from '../consenso'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 
@@ -22,7 +22,13 @@ import { Link, percorso, useLang } from '../router'
  *
  * Non ha un tasto per chiuderlo senza scegliere: chiuderlo e basta lascerebbe
  * la domanda in sospeso facendo credere di aver acconsentito, che è il difetto
- * di metà dei banner in giro. I due tasti pesano uguale, per la stessa ragione.
+ * di metà dei banner in giro.
+ *
+ * I due tasti sono disegnati uguali — stesso filetto, stesso corpo, stessa
+ * larghezza minima — e non è una scelta estetica: un "accetta" nero pieno
+ * accanto a un "rifiuta" in punta di filo è il modo consueto di far pendere la
+ * risposta da una parte, e un consenso ottenuto così non è libero. Qui, se una
+ * delle due deve saltare all'occhio, non è questa la pagina in cui deciderlo.
  *
  * Rispondere "no" non toglie niente: il reel resta la figura del sito che è
  * già, e premendo play parte lo stesso. Il banner decide se possa partire DA
@@ -31,10 +37,9 @@ import { Link, percorso, useLang } from '../router'
 export default function BannerPrivacy() {
   const lang = useLang()
   const T = testi(lang).banner
-  const consenso = useConsensoVideo()
-  const montato = useMontato()
+  const aperto = useBannerAperto()
 
-  if (!montato || consenso) return null
+  if (!aperto) return null
 
   return (
     /*
@@ -57,7 +62,7 @@ export default function BannerPrivacy() {
             {T.dettaglio}{' '}
             <Link
               to={percorso('privacy', {}, lang)}
-              className="whitespace-nowrap underline underline-offset-2 transition-colors hover:text-ink"
+              className="relative whitespace-nowrap underline underline-offset-2 transition-colors before:absolute before:-inset-x-1 before:-inset-y-2 before:content-[''] hover:text-ink"
             >
               {T.informativa}
             </Link>
@@ -70,14 +75,14 @@ export default function BannerPrivacy() {
           <button
             type="button"
             onClick={() => impostaConsensoVideo('no')}
-            className="min-w-[8rem] flex-1 border border-line px-5 py-3 text-[11px] uppercase tracking-[0.16em] transition-colors hover:border-ink hover:bg-hover md:flex-none"
+            className="min-w-[8rem] flex-1 border border-ink px-5 py-3 text-[11px] uppercase tracking-[0.16em] transition-colors hover:bg-hover md:flex-none"
           >
             {T.rifiuta}
           </button>
           <button
             type="button"
             onClick={() => impostaConsensoVideo('si')}
-            className="min-w-[8rem] flex-1 border border-ink bg-ink px-5 py-3 text-[11px] uppercase tracking-[0.16em] text-paper transition-colors hover:bg-night md:flex-none"
+            className="min-w-[8rem] flex-1 border border-ink px-5 py-3 text-[11px] uppercase tracking-[0.16em] transition-colors hover:bg-hover md:flex-none"
           >
             {T.attiva}
           </button>

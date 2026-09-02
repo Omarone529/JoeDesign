@@ -332,6 +332,73 @@ Due targhette diverse sulla stessa foto sarebbero due voci. La scritta dentro è
 e in inglese: la frase per intero, e nella lingua della pagina, la dà l'`alt` (`ai` in
 `src/i18n.js`).
 
+## Da telefono
+
+Il sito si guarda soprattutto sul telefono, e le pagine sono verificate a 320, 360, 390 e
+430px: nessuna sborda in orizzontale e ogni comando si prende col dito.
+
+**Bersagli da 24px.** Le icone social sono venti pixel, le due lingue in navbar larghe due
+caratteri, i pallini del carosello sei: col dito non si prendono. L'area sensibile si
+allarga con uno pseudo-elemento — `relative` sul comando e
+`before:absolute before:-inset-… before:content-['']` — e **non** con il padding: il
+padding sposta il testo, e dove c'è una sottolineatura ancorata al fondo (navbar, footer)
+la farebbe scendere sotto lo spazio vuoto. Il disegno resta identico, cresce solo quello
+che si tocca.
+
+Due aree allargate non devono accavallarsi: nella striscia in comune il tocco finisce
+sempre sull'ultimo elemento del DOM, che è quasi sempre quello sbagliato. Dove capitava è
+cresciuto lo stacco invece dell'area — i pallini del carosello stanno a 20px l'uno
+dall'altro, "Privacy" e "Torna su" a 16 — quindi **cambiando quegli stacchi va rifatto il
+conto**, non solo guardata la pagina.
+
+**La barra sotto `sm`** non porta il nome (lo dice già il marchio) e mette Instagram in
+fondo alla riga, prima delle lingue. Il gruppo di destra è `contents`, quindi menù,
+Instagram e lingue sono figli diretti della barra e `justify-between` li distribuisce da
+solo: senza, restava un buco dopo il marchio e tutto il resto ammassato contro il bordo.
+
+**Lo sketchbook sul telefono gira con un terzo del lavoro.** La scena è la stessa, ma
+quattro misure si abbassano quando `pointer: coarse` (una GPU da telefono, non una
+finestra stretta), e sono tutte in testa a `Sketchbook.jsx`:
+
+| | mouse | dito |
+| --- | --- | --- |
+| mappa d'ombra | 2048² PCF morbido | 1024² PCF |
+| rapporto pixel del canvas | fino a 2 | 1.5 |
+| anisotropia delle tavole | 16 | 4 |
+| tavole | `NN.webp`, 1000px | `NN-mezza.webp`, 500px |
+
+La mappa d'ombra è un secondo render dell'intera scena a ogni fotogramma, e a 2048² sono
+quattro milioni di texel per un libro che sullo schermo ne occupa settantamila. Le tavole
+grandi sono nove texture da 1000×1415: **una cinquantina di megabyte di memoria video**,
+che su un telefono si paga in scatti — le mezze ne occupano tredici e pesano un terzo da
+scaricare. In tutto il lavoro per fotogramma passa da ~4,9 a ~1,5 milioni di pixel.
+
+Le due misure delle tavole le produce `scripts/sketchbook-pages.js` in un colpo solo:
+rigenerandole, **escono sempre in coppia**, e `tavolaPer()` sceglie quale caricare. Anche
+la copertina di scorta nel markup passa dalla mezza, con un `<source media="(pointer:
+coarse)">`.
+
+**Lo sketchbook** ha il riquadro quadrato sotto `sm` e panoramico sopra, e la camera
+inquadra quello che c'è: una pagina sola a libro chiuso, due da aperto (`inquadra()` in
+`Sketchbook.jsx`, chiamata a ogni frame da `posizionaLibro` e dopo ogni resize). Prima era
+ferma sulla doppia pagina: la copertina chiusa stava nella metà destra e sul telefono
+sembrava un elemento messo storto. Lo zoom lo detta il lato più stretto, quindi il
+riquadro quadrato è ciò che permette alla copertina di crescere davvero — cambiando il
+formato del riquadro cambia di conseguenza quanto il libro si vede.
+
+Il ritratto di "Chi sono" (`about/joe-cutout.webp`) è ritagliato **attorno alla figura**,
+con appena un margine di respiro. Prima portava un quinto di trasparente per lato: sul
+telefono, dove riempie la colonna per intero, la figura restava piccola in mezzo a due
+bande vuote. Un ritaglio nuovo va rifatto così, e `width`/`height` in `About.jsx`
+aggiornati con esso.
+
+⚠️ Da `md` quel ritratto sta **fuori dal flusso** (`md:absolute` sull'`img`), e non è un
+vezzo: in colonna, `h-full` è una percentuale che al momento di misurare la riga non ha
+ancora un riferimento, e il browser ripiega sulle proporzioni vere del file. La sezione
+diventava alta quanto la foto invece che quanto lo schermo, e «JOE SARCHIOLLA», che sta in
+fondo alla colonna di sinistra, finiva sotto la piega. Col ritratto di prima, più largo,
+non si vedeva: **è una trappola che scatta cambiando immagine, non codice.**
+
 ## Design system (`tailwind.config.js`)
 
 Palette "carta / inchiostro":
@@ -369,8 +436,9 @@ src/
 ├── data/fotoFit.js       # generato: come ogni foto entra nel carosello
 ├── components/
 │   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono) + selettore IT/EN
-│   │                     #   sotto sm cade il nome e Instagram passa prima delle
-│   │                     #   lingue: su 320px le voci ci stanno leggibili
+│   │                     #   sotto sm cade il nome, Instagram passa prima delle lingue
+│   │                     #   e il gruppo di destra è `contents`: menù, IG e lingue
+│   │                     #   diventano figli della barra e si distribuiscono da soli
 │   ├── Footer.jsx        # fa anche da pagina contatti
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
 │   ├── BannerPrivacy.jsx # banner cookie e privacy (in App, su tutte le pagine)
@@ -427,6 +495,38 @@ minore): è la gerarchia occhiello/corpo usata ovunque nel sito, e regge meglio 
 paragrafo unico. Si ritira dalla sezione «La scelta
 sui video» dell'informativa: darlo senza poterlo togliere non sarebbe un consenso.
 
+⚠️ **«Rifiuta» e «Accetta» sono disegnati identici** — stesso filetto, stesso corpo, stessa
+larghezza minima — e non per estetica: un «accetta» nero pieno accanto a un «rifiuta» in
+punta di filo è il modo consueto di far pendere la risposta da una parte, e un consenso
+ottenuto così non è libero. Non rimetterci un tasto primario.
+
+⚠️ **Finché la fascia è in pagina il tasto mail flottante sparisce.** La fascia è alta un
+terzo di schermo su un telefono e il tasto le finiva sotto: chi lo cercava col dito
+premeva «Accetta». Un consenso preso per sbaglio è peggio di un consenso non chiesto. Chi
+è aperto e chi no lo dice `useBannerAperto()` in `src/consenso.js`, che è l'unico posto in
+cui la condizione è scritta — vale sia per la fascia sia per il tasto.
+
+⚠️ **L'informativa è scritta in italiano corrente, e nei suoi testi non ci sono trattini
+lunghi.** Le sostanze legali ci sono tutte, con i loro riferimenti di articolo, ma dette
+come le direbbe una persona: i titoli delle sezioni sono domande («Cosa raccoglie il
+sito», «Chi altro li vede», «Cosa si può chiedere»), non formule da modulo. Riscrivendone
+un pezzo, non tornare al lessico da generatore: è una pagina che qualcuno deve capire, non
+un adempimento da esibire.
+
+L'informativa copre le voci che un'informativa deve avere — titolare, dati raccolti,
+modalità e misure di sicurezza (art. 32), cookie e statistiche, la scelta sui video,
+finalità e base giuridica, destinatari e trasferimento fuori dallo SEE, tempi di
+conservazione, diritti (artt. 15–22, termine di risposta dell'art. 12, opposizione al
+legittimo interesse, reclamo al Garante), link esterni, modifiche. **Aggiungendo o
+togliendo una sezione, va fatto in tutte e due le lingue e va spostato `aggiornato`.**
+
+Da un generatore tipo iubenda si prende la *lista* delle voci, non le frasi: «noi e terze
+parti selezionate utilizziamo cookie…» qui sarebbe falso, e il banner esiste proprio per
+non dirlo. Le formule che invece servono davvero — che il consenso si può dare, negare e
+ritirare liberamente, e che ritirarlo non tocca quello che è già successo (art. 7, par. 3)
+— stanno nella sezione «La scelta sui video», e la revocabilità è ripetuta nel banner:
+un banner che non dice che si può cambiare idea non è a norma.
+
 La risposta sta in `localStorage` (`src/consenso.js`), non in un cookie: è una preferenza
 tecnica che serve a NON caricare roba di terzi, non lascia il dispositivo e non riconosce
 chi torna. L'informativa lo dice, perché salvare qualcosa nel browser senza dirlo è
@@ -441,7 +541,7 @@ Se un giorno si passasse a uno spezzone video **ospitato in proprio** (un `<vide
 `public/`, nessun terzo coinvolto), il banner tornerebbe a non servire e l'informativa
 andrebbe riscritta un'altra volta. Vale per ogni novità che tocchi i trattamenti — un'
 analitica anche cookieless tipo Plausible, un modulo di contatto: si riscrivono «Cookie e
-statistiche», «Finalità e base giuridica», «A chi vengono comunicati» e «Link esterni», e
+statistiche», «Perché, e con quale diritto», «Chi altro li vede» e «Link esterni», e
 `aggiornato` con esse, PRIMA che entri in funzione.
 
 Nell'informativa non compare la partita IVA: Joe non ce l'ha. Quando l'aprirà, va

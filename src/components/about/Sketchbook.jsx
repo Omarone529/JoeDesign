@@ -44,11 +44,44 @@ const DISTANZA_CAMERA = (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA) / 
 // larghezza del canvas (la camera è fissa): da qui si ricava in quanti pixel
 // reali viene disegnata, e quindi come conviene filtrarne la texture.
 const QUOTA_PAGINA = LARGHEZZA_MONDO / (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA)
-const LARGHEZZA_TAVOLA = 1000 // px di NN.webp (vedi scripts/sketchbook-pages.js)
+/*
+ * Le tavole esistono in due misure (vedi scripts/sketchbook-pages.js): NN.webp
+ * a 1000px e NN-mezza.webp a 500. Sul telefono una pagina viene disegnata in
+ * circa 340 pixel reali, quindi la tavola grande non si vedrebbe comunque: in
+ * cambio nove texture da 1000×1415 occupano una cinquantina di megabyte di
+ * memoria video, che su un telefono si paga in scatti. Le mezze ne occupano
+ * tredici e pesano un terzo da scaricare.
+ */
+const LARGHEZZA_TAVOLA = { dito: 500, mouse: 1000 }
+const tavolaPer = (src, dito) => (dito ? src.replace(/\.webp$/, '-mezza.webp') : src)
 // Rapporto texture/schermo sotto il quale i mipmap tolgono solo dettaglio:
 // il livello scelto cade tra 0 e 1 e il trilineare ci mescola dentro una copia
 // a metà risoluzione. Vicino all'1:1 conviene campionare la texture piena.
 const SOGLIA_MIPMAP = 1.4
+
+/*
+ * Su telefono e tablet la scena gira su una GPU a piastrelle con poca banda di
+ * memoria e uno schermo denso: la stessa scena che sul portatile non si sente
+ * lì costa il triplo, e il libro girava a scatti. Le quattro misure qui sotto
+ * si abbassano solo lì — sul desktop non cambia niente.
+ *
+ * `pointer: coarse` e non la larghezza della finestra: quello che conta è che
+ * dietro ci sia una GPU da telefono, non quanti pixel è larga la pagina.
+ */
+const suDito = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true
+
+// Mappa d'ombra: è un secondo render dell'intera scena, a ogni fotogramma.
+// A 2048² sono quattro milioni di texel per un libro che sullo schermo di un
+// telefono ne occupa settantamila: il quarto basta e non si vede la differenza.
+const OMBRA_PX = { dito: 1024, mouse: 2048 }
+// Campioni per pixel sulle tavole. Il libro si guarda quasi di faccia, quindi
+// l'anisotropia serve poco: sedici prelievi per frammento sono soldi buttati.
+const ANISOTROPIA = { dito: 4, mouse: 16 }
+// Il canvas sborda del 24%, quindi su un telefono a 3x un riquadro da 350px
+// diventerebbe 1300 pixel per lato. 1.5 è comunque il minimo che il testo
+// piccolo delle tavole richiede (vedi `rapportoPixel`).
+const PIXEL_MAX = { dito: 1.5, mouse: 2 }
 
 // `curvaAmp`: flessione totale, negativa se piega nell'altro verso.
 // `alzata`: sollevamento di volo in unità mondo, a rampa lungo la pagina.
@@ -119,15 +152,54 @@ export default function Sketchbook() {
   const flutter = useRef(null) // { anim, stato, indice }: la vibrazione di assestamento in corso
   const wrapperRef = useRef(null)
   const mountRef = useRef(null) // div in cui Three.js monta il proprio <canvas>
+  const aperturaRef = useRef(0) // apertura corrente: serve a reinquadrare dopo un resize
 
   /*
    * Libro a riposo per una data apertura (0 = chiuso davanti, N = chiuso
    * dietro); `salta` è la pagina in volo, che posiziona applicaAngolo. Tutto è
    * funzione continua dell'apertura, così niente scatta a fine giro.
    */
+  /*
+   * La camera inquadra quello che c'è davvero: una pagina sola a libro chiuso,
+   * due da aperto, e scivola da una cosa all'altra mentre la pagina gira.
+   *
+   * Prima era ferma sulla doppia pagina, quindi la copertina chiusa stava nella
+   * metà destra del riquadro e l'altra metà restava vuota. Sullo schermo grande
+   * si legge come un libro chiuso da aprire; sul telefono, dove il riquadro è
+   * largo un palmo, sembrava solo un elemento messo storto.
+   *
+   * Si muove `zoom` e non la distanza: avvicinare la camera cambierebbe la
+   * prospettiva, e la stessa pagina in volo si deformerebbe in modo diverso a
+   * seconda di quanto il libro è aperto. Il fattore lo detta il lato più
+   * stretto — il libro non si ritaglia mai per riempire — e siccome l'altezza
+   * inquadrata non dipende dal formato del riquadro, su uno panoramico la
+   * copertina chiusa si centra soltanto, mentre su uno quadrato cresce davvero:
+   * per questo sotto `sm` il riquadro è quadrato.
+   */
+  const inquadra = (apertura) => {
+    const tre = treRef.current
+    if (!tre) return
+    const apriSx = Math.min(1, apertura)
+    const apriDx = Math.min(1, N - apertura)
+    const centro = -LARGHEZZA_MONDO / 2 + (apriDx - apriSx) * (LARGHEZZA_MONDO / 2)
+    const altezzaVista = 2 * Math.tan((FOV_VERTICALE * Math.PI) / 360) * DISTANZA_CAMERA
+    const larghezzaVista = altezzaVista * tre.camera.aspect
+    const ingombro = MARGINE_CAMERA * MARGINE_TELA
+    const larghezzaLibro = Math.max(apriSx + apriDx, 0.001) * LARGHEZZA_MONDO
+    tre.camera.zoom = Math.min(
+      larghezzaVista / (larghezzaLibro * ingombro),
+      altezzaVista / (ALTEZZA_MONDO * ingombro),
+    )
+    tre.camera.position.x = centro
+    tre.camera.lookAt(centro, 0, 0)
+    tre.camera.updateProjectionMatrix()
+  }
+
   const posizionaLibro = (apertura, salta = null) => {
     const tre = treRef.current
     if (!tre) return
+    aperturaRef.current = apertura
+    inquadra(apertura)
     // L'alone segue l'impronta del libro: mezza pagina da chiuso, due da aperto.
     const apriSx = Math.min(1, apertura)
     const apriDx = Math.min(1, N - apertura)
@@ -179,11 +251,14 @@ export default function Sketchbook() {
       // piccolo e renderizzarlo più grande del canvas CSS (che poi il browser
       // rimpicciolisce) lo tiene leggibile. La scena è leggera, se lo può
       // permettere. Sopra 2 non si guadagna più niente di visibile.
-      const rapportoPixel = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2)
+      const dito = suDito()
+      const rapportoPixel = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), dito ? PIXEL_MAX.dito : PIXEL_MAX.mouse)
       renderer.setPixelRatio(rapportoPixel)
       renderer.outputColorSpace = THREE.SRGBColorSpace
       renderer.shadowMap.enabled = true
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap
+      // Il filtro morbido moltiplica i prelievi sulla mappa: sul telefono il PCF
+      // semplice, che ha il bordo appena più netto e costa una frazione.
+      renderer.shadowMap.type = dito ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
       renderer.setClearColor(0x000000, 0)
       mountRef.current.appendChild(renderer.domElement)
 
@@ -206,7 +281,10 @@ export default function Sketchbook() {
       const direzionale = new THREE.DirectionalLight(0xfff9f0, 1.35)
       direzionale.position.set(0.9, 1.4, 4.0)
       direzionale.castShadow = true
-      direzionale.shadow.mapSize.set(2048, 2048)
+      direzionale.shadow.mapSize.set(
+        dito ? OMBRA_PX.dito : OMBRA_PX.mouse,
+        dito ? OMBRA_PX.dito : OMBRA_PX.mouse,
+      )
       // Deve contenere la pila girata a sinistra e la pagina in volo: più
       // stretto e le ombre spariscono ai bordi, più largo e si sprecano texel.
       direzionale.shadow.camera.left = -LARGHEZZA_MONDO * 1.8
@@ -287,8 +365,9 @@ export default function Sketchbook() {
       // ~1000, cioè quanto è larga la tavola, quindi la texture non va quasi
       // mai ingrandita. Misurato una volta all'avvio: ridimensionare la
       // finestra non cambia il filtro.
+      const larghezzaTavola = dito ? LARGHEZZA_TAVOLA.dito : LARGHEZZA_TAVOLA.mouse
       const pxPagina = (mountRef.current.getBoundingClientRect().width || 0) * rapportoPixel * QUOTA_PAGINA
-      const senzaMipmap = pxPagina > 0 && LARGHEZZA_TAVOLA < pxPagina * SOGLIA_MIPMAP
+      const senzaMipmap = pxPagina > 0 && larghezzaTavola < pxPagina * SOGLIA_MIPMAP
 
       const caricatore = new THREE.TextureLoader()
       const caricaTexture = (src) =>
@@ -297,7 +376,10 @@ export default function Sketchbook() {
             src,
             (tex) => {
               tex.colorSpace = THREE.SRGBColorSpace
-              tex.anisotropy = renderer.capabilities.getMaxAnisotropy()
+              tex.anisotropy = Math.min(
+                renderer.capabilities.getMaxAnisotropy(),
+                dito ? ANISOTROPIA.dito : ANISOTROPIA.mouse,
+              )
               if (senzaMipmap) {
                 // Vicino all'1:1 il mipmap è solo una copia sfocata in più:
                 // meglio campionare la tavola piena.
@@ -373,8 +455,8 @@ export default function Sketchbook() {
 
       Promise.all(
         sketchbook.map(async (tavola) => ({
-          fronte: await caricaTexture(tavola.front.src),
-          retro: tavola.back ? await caricaTexture(tavola.back.src) : null,
+          fronte: await caricaTexture(tavolaPer(tavola.front.src, dito)),
+          retro: tavola.back ? await caricaTexture(tavolaPer(tavola.back.src, dito)) : null,
         }))
       ).then((texturePagine) => {
         if (!attivo) return
@@ -426,6 +508,9 @@ export default function Sketchbook() {
         renderer.setSize(rect.width, rect.height, true)
         camera.aspect = rect.width / rect.height
         camera.updateProjectionMatrix()
+        // Il rapporto del riquadro cambia da `sm` in giù: lo zoom va rifatto,
+        // o il libro resta inquadrato per il formato di prima.
+        inquadra(aperturaRef.current)
         if (treRef.current) richiediRender()
       }
       ridimensiona()
@@ -781,7 +866,7 @@ export default function Sketchbook() {
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
           ref={wrapperRef}
-          className="relative w-full max-w-[560px] touch-pan-y select-none sm:max-w-[780px] lg:max-w-[1000px] xl:max-w-[1120px]"
+          className="relative w-[96%] max-w-[538px] touch-pan-y select-none sm:max-w-[749px] lg:max-w-[960px] xl:max-w-[1075px]"
           role="group"
           tabIndex={0}
           aria-roledescription={T.chiSono.sketchbookRuolo}
@@ -791,24 +876,31 @@ export default function Sketchbook() {
             if (e.key === 'ArrowLeft') gira(-1)
           }}
         >
-          <div className="relative aspect-[2000/1415] w-full">
+          <div className="relative aspect-square w-full sm:aspect-[2000/1415]">
             {/* Copertina di scorta, sempre nel markup: senza JS il libro non
-                si sfoglia comunque, quindi mostrarla chiusa sulla metà destra
-                — dov'è anche nella scena 3D — è corretto. Sparisce quando la
-                scena è pronta, resta se manca WebGL. Misure derivate da
-                MARGINE_CAMERA (≈89.3% del riquadro) più l'1% di prospettiva:
-                sta in cima alla pila, un filo più vicina alla camera. */}
-            <img
-              src={tavole[0].front.src}
-              alt={tavole[0].front.alt}
-              width={1000}
-              height={1415}
-              loading="eager"
-              decoding="async"
-              className={`pointer-events-none absolute left-1/2 top-[5%] h-[90%] w-[45%] border border-line bg-paper object-cover transition-opacity duration-300 [filter:drop-shadow(0_18px_26px_rgba(20,17,15,0.18))] ${
-                pronto ? 'opacity-0' : 'opacity-100'
-              }`}
-            />
+                si sfoglia comunque, quindi mostrarla chiusa è corretto. Sparisce
+                quando la scena è pronta, resta se manca WebGL. Centrata come la
+                inquadra `inquadra()`, e alta quanto MARGINE_CAMERA le concede
+                (≈89.3% del riquadro) più l'1% di prospettiva: sta in cima alla
+                pila, un filo più vicina alla camera. La larghezza viene dal
+                rapporto della tavola, così sta in riga sia sul riquadro
+                quadrato del telefono sia su quello panoramico. */}
+            <picture>
+              {/* Sul telefono anche la scorta prende la tavola a mezza misura:
+                  è la stessa che poi userà la scena, quindi è già in cache. */}
+              <source media="(pointer: coarse)" srcSet={tavolaPer(tavole[0].front.src, true)} />
+              <img
+                src={tavole[0].front.src}
+                alt={tavole[0].front.alt}
+                width={1000}
+                height={1415}
+                loading="eager"
+                decoding="async"
+                className={`pointer-events-none absolute left-1/2 top-[5%] h-[90%] w-auto -translate-x-1/2 border border-line bg-paper object-cover transition-opacity duration-300 [filter:drop-shadow(0_18px_26px_rgba(20,17,15,0.18))] ${
+                  pronto ? 'opacity-0' : 'opacity-100'
+                }`}
+              />
+            </picture>
 
             {/* Three.js monta qui il suo <canvas>. Sborda del 12% per lato
                 (vedi MARGINE_TELA) e non riceve eventi: quelli li prende il
