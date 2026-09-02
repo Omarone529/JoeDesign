@@ -49,8 +49,9 @@ URL reali, non hash. Ogni pagina esiste in due indirizzi, uno per lingua:
 | archivio  | `/archivio`               | `/en/archive`              |
 | area      | `/archivio/<area>`        | `/en/archive/<area>`       |
 | scheda    | `/progetto/<slug>`        | `/en/project/<slug>`       |
+| privacy   | `/privacy`                | `/en/privacy`              |
 
-Gli slug di area (`product-design`, `graphic-design`) e di progetto **non** si
+Gli slug di area (`product-design`, `graphic-design`), di progetto e `privacy` **non** si
 traducono: sono nomi propri e tradurli spezzerebbe i link già in giro. Area o slug
 sconosciuti → 404.
 
@@ -104,7 +105,7 @@ node scripts/favicon.js    # favicon.ico/.svg, apple-touch-icon, icon-192/512, s
 ### Pre-rendering / SEO (`scripts/prerender.js` + `src/seo.js` + `src/entry-server.jsx`)
 Ogni rotta viene renderizzata in un **HTML statico già completo** (es. `dist/progetto/flue/index.html`),
 con title, meta description, author, Open Graph, Twitter card e JSON-LD schema.org **per pagina**.
-Le rotte sono generate in **entrambe le lingue** (62 pagine): ogni HTML porta il proprio
+Le rotte sono generate in **entrambe le lingue** (66 pagine): ogni HTML porta il proprio
 `<html lang>`, il proprio `og:locale` e i `hreflang` verso la gemella e verso `x-default`
 (l'italiano). Le 404 sono due, `dist/404.html` e `dist/en/404.html`, e `netlify.toml`
 serve la seconda a chi sbaglia un indirizzo sotto `/en`.
@@ -141,6 +142,8 @@ Tutti i testi e i dati stanno qui, non nel markup:
   `progettiArea(chiave)` filtra, `areaPerSlug(slug)` risolve l'URL
 - `familyBand` — altra sezione home (il ticker "Skills" in home riusa `about.skills`)
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
+- `video` (facoltativo, per progetto) — id di uno Short YouTube: il reel apre il
+  carosello e parte da solo. Vuole `video.webp` accanto alle foto, vedi sotto
 - `titoloLeggibile(t)` — i titoli sono scritti in maiuscolo e il CSS li mostra così;
   fuori dal markup (alt, `<title>`, dati strutturati) serve la forma leggibile.
   Maiuscola solo all'iniziale, come l'italiano vuole
@@ -158,8 +161,9 @@ Tutti i testi e i dati stanno qui, non nel markup:
    Il pre-rendering "fotografa" ciò che è nei dati statici.
 3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella;
    se è grafica, `area: 'graphic'`), **più la traduzione in `src/data/contenutiEn.js`**,
-   poi lancia `node scripts/og-image.js` per l'anteprima social. Pre-rendering, sitemap
-   e meta tag si aggiornano da soli.
+   poi lancia `node scripts/og-image.js` per l'anteprima social. Se il progetto ha un
+   reel, aggiungi `video: '<id>'` e lancia `node scripts/video-poster.js <slug> <id>`
+   (vedi "Video"). Pre-rendering, sitemap e meta tag si aggiornano da soli.
 4. **Non reintrodurre l'hash routing** (`#progetto/...`): romperebbe SEO e link profondi.
 5. Evita di usare `window`/`document` durante il render dei componenti (solo dentro `useEffect`/handler),
    altrimenti il pre-rendering fallisce.
@@ -236,6 +240,53 @@ Le sorgenti stanno FUORI dal repo, in due cartelle sul disco:
 
   (solo `sharp`, nessuna dipendenza extra).
 
+## Video (i reel di YouTube)
+
+Un progetto che ha un reel porta `video: '<id>'` in `siteData` — solo l'id, la coda di
+`youtube.com/shorts/<id>` — e il filmato **apre il carosello e parte da solo**, non è una
+sezione a sé: il verticale è l'unico formato non quadrato della pagina e in una sezione
+propria lasciava mezza griglia vuota. Nella cornice quadrata si mostra intero su fondo
+`night`, che è il modo in cui i reel si guardano.
+
+**Ma solo con il consenso.** Senza risposta al banner, o con un "no", non parte niente e
+non si contatta nessuno: resta la miniatura del sito col tasto play, e premerlo vale come
+consenso per quel singolo video. Il banner decide se un video possa partire **da solo**,
+non se si possa guardare.
+
+**Parte muto, e non può essere altrimenti**: Chrome, Safari e Firefox bloccano l'autoplay
+con audio, quindi senza `mute=1` il player resterebbe fermo sul primo fotogramma. Già che
+è muto cicla (`loop=1` + `playlist=<id>`, che YouTube pretende in coppia). Premuto a mano
+invece parte con il sonoro. Parte **dopo il `load`** della pagina, non insieme: il player
+pesa quasi un megabyte e toglierebbe banda alla prima immagine. E parte **una volta
+sola** per apertura di scheda — `avviatoDaSolo` in `Carousel.jsx` — o a ogni giro del
+carosello ricomincerebbe da capo.
+
+Con l'autoplay lo scorrimento automatico resta fermo finché il reel è in riproduzione:
+scivolare via da un video che sta giocando è peggio che aspettare. Le foto partono quando
+chi guarda passa avanti con freccia, pallino o dito.
+
+Lo scorrimento automatico prosegue come sulle foto, ma su quella slide aspetta 6 secondi
+invece di 2: a due il tasto play non è colpibile. Premendolo il carosello si ferma —
+senza toccare `paused`, che resta la scelta di chi guarda — e riparte da sé uscendo dalla
+slide. Lo Short **non** parte da solo: sarebbe l'iframe caricato a ogni apertura di
+scheda, cioè il contrario di quello che si legge qui sotto.
+
+La miniatura si genera una volta sola e vive nel sito come le altre immagini:
+
+```bash
+node scripts/video-poster.js <slug> <idVideo>   # → products/<slug>/video.webp
+```
+
+Prende `oardefault.jpg`, l'unica misura in cui YouTube conserva il fotogramma verticale
+(1080×1920): le altre sono 16:9 e nella cornice 9:16 tornerebbero con le bande.
+
+**L'iframe di YouTube non va messo direttamente nella pagina.** `VideoShort.jsx` mostra
+la miniatura e carica il player solo al click. Sono due i motivi, e valgono entrambi:
+l'iframe pesa quasi un megabyte su una scheda che serve WebP da 60 KB, e piazza
+identificatori nel browser all'apertura della pagina — il che obbligherebbe a un banner
+di consenso (vedi "Privacy"). Il pre-rendering fotografa la miniatura, quindi nell'HTML
+statico non finisce nessun iframe: è una cosa da ricontrollare se si tocca il componente.
+
 ## Design system (`tailwind.config.js`)
 
 Palette "carta / inchiostro":
@@ -263,6 +314,7 @@ src/
 ├── main.jsx              # entry: hydration (o mount in dev)
 ├── App.jsx               # layout: Navbar + pagina corrente + Footer
 ├── router.jsx            # routing History API + <Link> + useRoute/useNavigate
+├── consenso.js           # la scelta sui video di YouTube (localStorage + hook)
 ├── seo.js                # meta per rotta + elenco rotte (usato dal pre-rendering)
 ├── i18n.js               # testi dell'interfaccia nelle due lingue (it/en)
 ├── entry-server.jsx      # render(path) per la build SSR (mai spedito al browser)
@@ -274,6 +326,8 @@ src/
 │   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono) + selettore IT/EN
 │   ├── Footer.jsx        # fa anche da pagina contatti
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
+│   ├── BannerPrivacy.jsx # banner cookie e privacy (in App, su tutte le pagine)
+│   ├── VideoShort.jsx    # Short YouTube, 1ª slide del carosello: parte muto all'apertura
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
 │   ├── FloatingMailButton.jsx
 │   ├── about/
@@ -284,6 +338,7 @@ src/
     ├── Home.jsx
     ├── About.jsx         # "Chi sono": ritratto, bio, foto di Joe
     ├── Archive.jsx       # griglia di tutti i progetti
+    ├── Privacy.jsx       # informativa privacy (testo in i18n.js)
     └── ProjectDetail.jsx # scheda singola con galleria + prev/next
 
 scripts/
@@ -291,12 +346,58 @@ scripts/
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
 ├── pdf-disegno.js       # disegni tecnici dall'archivio PDF → products/<slug>/disegno.webp (a mano)
+├── video-poster.js      # miniatura di uno Short → products/<slug>/video.webp (a mano)
+│                        #   (fit-foto.js salta video.webp: il fit lo decide Carousel)
 ├── comprimi-foto.js     # riduce a 1600px e ricomprime public/images/ (a mano)
 ├── fit-foto.js          # come ogni foto entra nel carosello → src/data/fotoFit.js (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
 ├── remove-bg.js         # ritaglio soggetto → webp con trasparenza (segmentazione AI)
 └── ink-alpha.js         # tratto su fondo bianco → webp con alpha (firme, scansioni)
 ```
+
+## Privacy
+
+Il testo dell'informativa sta in `src/i18n.js` (blocco `privacy`, due lingue), come la
+404: è un testo di servizio, non un contenuto del portfolio. Descrive il sito **com'è
+oggi** — statico, senza cookie propri, senza statistiche, e con i video di YouTube che si
+caricano **solo dopo un consenso**. Il testo è allineato al codice.
+
+Il consenso si dà in due modi, ed è la stessa cosa detta due volte: rispondendo al banner
+(`components/BannerPrivacy.jsx`, montato in `App.jsx` e quindi presente su tutte le pagine
+finché non si risponde — la domanda va fatta all'ingresso, in home, non quando si è già
+dentro una scheda col reel pronto a partire), oppure premendo play su un singolo filmato.
+
+Il banner è intestato «Cookie e privacy» e dice il quadro intero: che cookie propri non ce
+ne sono, che non si misura niente, e che l'unica cosa che un consenso lo richiede davvero
+è il reel. Non scrivere mai «usiamo i cookie per migliorare l'esperienza»: su questo sito
+sarebbe falso, ed è la ragione per cui il banner esiste.
+
+È una fascia in fondo alla pagina, allineata al passo orizzontale delle sezioni — il sito
+è fatto di righe da bordo a bordo, e un riquadro appoggiato in un angolo ci sta come un
+adesivo. Il testo è diviso in `testo` (la frase che apre) e `dettaglio` (il corpo in tono
+minore): è la gerarchia occhiello/corpo usata ovunque nel sito, e regge meglio di un
+paragrafo unico. Si ritira dalla sezione «La scelta
+sui video» dell'informativa: darlo senza poterlo togliere non sarebbe un consenso.
+
+La risposta sta in `localStorage` (`src/consenso.js`), non in un cookie: è una preferenza
+tecnica che serve a NON caricare roba di terzi, non lascia il dispositivo e non riconosce
+chi torna. L'informativa lo dice, perché salvare qualcosa nel browser senza dirlo è
+esattamente ciò che non si vuole fare.
+
+⚠️ Il banner si disegna **solo dopo l'hydration** (`useMontato`): l'HTML statico è uno per
+tutti e non sa cosa si è già risposto, quindi metterlo lì lo farebbe lampeggiare a ogni
+visita a chi ha già scelto. Senza JavaScript nessun video si carica, quindi non c'è nulla
+da consentire e la sua assenza è corretta, non una mancanza.
+
+Se un giorno si passasse a uno spezzone video **ospitato in proprio** (un `<video>` da
+`public/`, nessun terzo coinvolto), il banner tornerebbe a non servire e l'informativa
+andrebbe riscritta un'altra volta. Vale per ogni novità che tocchi i trattamenti — un'
+analitica anche cookieless tipo Plausible, un modulo di contatto: si riscrivono «Cookie e
+statistiche», «Finalità e base giuridica», «A chi vengono comunicati» e «Link esterni», e
+`aggiornato` con esse, PRIMA che entri in funzione.
+
+Nell'informativa non compare la partita IVA: Joe non ce l'ha. Quando l'aprirà, va
+aggiunta nella sezione «Titolare del trattamento».
 
 ## Tono dei testi
 

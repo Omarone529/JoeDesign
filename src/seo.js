@@ -207,6 +207,23 @@ export function metaForRoute(route) {
     }
   }
 
+  /*
+   * L'anteprima social è quella della home: `og-image.js` non genera un
+   * riquadro per la privacy, e un'informativa non si condivide come un
+   * progetto — ma il link, se qualcuno lo incolla, non deve uscire spoglio.
+   */
+  if (route.name === 'privacy') {
+    return {
+      ...comuni,
+      title: T.seo.privacyTitolo(FIRMA),
+      description: T.seo.privacyDesc(FIRMA),
+      canonical: url('privacy', {}, lang),
+      image: ogImage('home', lang),
+      imageAlt: aboutIn(lang).photos.hero.alt,
+      type: 'website',
+    }
+  }
+
   // Nessun canonical: l'URL che mostra la 404 è per definizione sbagliato, e
   // indicarne uno "giusto" direbbe a Google che è un'altra pagina del sito.
   if (route.name === 'notfound') {
@@ -239,6 +256,7 @@ export function allRoutes() {
     percorso('home', {}, lang),
     percorso('about', {}, lang),
     percorso('archive', {}, lang),
+    percorso('privacy', {}, lang),
     ...areeIn(lang).map((a) => percorso('archive', { area: a.slug }, lang)),
     ...archivioIn(lang).map((p) => percorso('project', { slug: p.slug }, lang)),
   ])
@@ -429,6 +447,17 @@ export function schemaForRoute(route, meta) {
         ]),
       )
     }
+  } else if (route.name === 'privacy') {
+    // Nessun `about`: l'informativa parla del sito, non della persona.
+    grafo.push({
+      '@type': 'WebPage',
+      '@id': `${meta.canonical}#pagina`,
+      url: meta.canonical,
+      name: meta.title,
+      description: meta.description,
+      inLanguage: T.schemaLang,
+      isPartOf: { '@id': ID_SITO },
+    })
   } else if (route.name === 'about') {
     grafo.push({
       '@type': 'ProfilePage',
@@ -481,6 +510,6 @@ export function immaginiPerRotta(route) {
   if (route.name !== 'project') return []
   const item = archivioIn(lang).find((p) => p.slug === route.slug)
   if (!item) return []
-  const { cover, gallery, drawing, sfondo } = projectImages(item)
-  return [cover, ...gallery, drawing, sfondo].filter(Boolean).map(abs)
+  const { cover, gallery, drawing, sfondo, videoPoster } = projectImages(item)
+  return [cover, ...gallery, drawing, sfondo, videoPoster].filter(Boolean).map(abs)
 }

@@ -16,8 +16,8 @@ import { LINGUA_PREDEFINITA, normalizzaLingua } from './i18n'
  * due lingue: sono nomi propri, e tradurli spezzerebbe i link già in giro.
  */
 const SEGMENTI = {
-  it: { about: 'chi-sono', archive: 'archivio', project: 'progetto' },
-  en: { about: 'about', archive: 'archive', project: 'project' },
+  it: { about: 'chi-sono', archive: 'archivio', project: 'progetto', privacy: 'privacy' },
+  en: { about: 'about', archive: 'archive', project: 'project', privacy: 'privacy' },
 }
 
 const PREFISSO = { it: '', en: '/en' }
@@ -34,6 +34,10 @@ export function percorso(name, params = {}, lang = LINGUA_PREDEFINITA) {
       return params.area ? `${base}/${seg.archive}/${params.area}` : `${base}/${seg.archive}`
     case 'project':
       return `${base}/${seg.project}/${params.slug}`
+    // Unico segmento uguale nelle due lingue: "privacy" è la parola che si usa
+    // anche in italiano, e tradurla darebbe un indirizzo che nessuno cerca.
+    case 'privacy':
+      return `${base}/${seg.privacy}`
     default:
       return base || '/'
   }
@@ -56,6 +60,7 @@ export function parsePath(pathname) {
 
   if (p === '/') return { name: 'home', lang, path: intero }
   if (p === `/${seg.about}`) return { name: 'about', lang, path: intero }
+  if (p === `/${seg.privacy}`) return { name: 'privacy', lang, path: intero }
   if (p === `/${seg.archive}`) return { name: 'archive', area: null, lang, path: intero }
   if (p.startsWith(`/${seg.archive}/`)) {
     const slug = decodeURIComponent(p.slice(seg.archive.length + 2))

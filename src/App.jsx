@@ -2,10 +2,12 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingMailButton from './components/FloatingMailButton'
 import ErrorBoundary from './components/ErrorBoundary'
+import BannerPrivacy from './components/BannerPrivacy'
 import Home from './pages/Home'
 import About from './pages/About'
 import Archive from './pages/Archive'
 import ProjectDetail from './pages/ProjectDetail'
+import Privacy from './pages/Privacy'
 import NotFound from './pages/NotFound'
 import { useRoute } from './router'
 
@@ -19,11 +21,16 @@ export default function App() {
         {route.name === 'about' && <About />}
         {route.name === 'archive' && <Archive area={route.area} />}
         {route.name === 'project' && <ProjectDetail slug={route.slug} />}
+        {route.name === 'privacy' && <Privacy />}
         {route.name === 'notfound' && <NotFound />}
         {route.name === 'home' && <Home />}
       </ErrorBoundary>
       <Footer />
       <FloatingMailButton />
+      {/* Fuori dalla pagina corrente, così la domanda arriva all'ingresso — in
+          home — e non a chi è già dentro una scheda col reel pronto a partire.
+          Chi arriva da una ricerca atterra sulla scheda: là serve comunque. */}
+      <BannerPrivacy />
     </div>
   )
 }

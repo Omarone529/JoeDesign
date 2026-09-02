@@ -196,7 +196,9 @@ function decidi({ rapporto, sfumati, box }) {
 
   for (const slug of fs.readdirSync(RADICE).sort()) {
     for (const f of fs.readdirSync(path.join(RADICE, slug)).sort()) {
-      if (!f.endsWith('.webp') || f === 'disegno.webp') continue
+      // `video.webp` è la miniatura del reel: nel carosello si mostra intera
+      // per scelta (vedi Carousel), non per misura.
+      if (!f.endsWith('.webp') || f === 'disegno.webp' || f === 'video.webp') continue
       const chiave = `${slug}/${f}`
       const m = await misura(path.join(RADICE, slug, f))
       const d = FUOCO_A_MANO[chiave]

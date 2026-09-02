@@ -111,6 +111,10 @@ export const about = {
  * `sfondo: true` = esiste sfondo.webp, immagine di sfondo mostrata in fondo
  * alla scheda progetto (sopra la navigazione prev/next).
  * `area` = area dell'archivio ('product' o 'graphic'); assente = 'product'.
+ * `video` = id di uno Short YouTube (la coda di youtube.com/shorts/<id>), non
+ * l'indirizzo intero: l'id è lo stesso nelle due lingue, quindi non passa da
+ * `contenutiEn.js`. Vuole `video.webp` accanto alle foto, che si genera con
+ * `node scripts/video-poster.js <slug> <id>`.
  * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
  * `tavola` = numero del progetto dentro la sua area, in ordine cronologico
  * crescente (01 = il più vecchio); mostrato in hover sulle celle di /archivio.
@@ -163,6 +167,7 @@ const progetti = [
     photos: 6,
     disegno: true,
     sfondo: true,
+    video: 'G5DdfSOzRIo',
     tavola: 12,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
@@ -231,6 +236,7 @@ const progetti = [
     photos: 6,
     disegno: true,
     sfondo: true,
+    video: 'JuKGsEUnmUM',
     tavola: 16,
     desc: 'La sedia Autoprogettazione di Enzo Mari è reinterpretata attraverso un linguaggio tecnico e contemporaneo, ispirato all’estetica dei disegni CAD 3D. Le numerazioni identificano ogni componente e ne semplificano l’assemblaggio, rendendo visibile il processo costruttivo. Un omaggio al principio di Mari: un design accessibile, comprensibile e replicabile.',
     spec: {
@@ -279,6 +285,7 @@ const progetti = [
     cat: 'Portafiori',
     year: '2026',
     photos: 8,
+    video: 'VR8ZsS-mHAA',
     tavola: 19,
     desc: 'BLOOM è un concept di portafiori che nasce dall’idea di recuperare un elemento industriale esistente e trasformarlo in un oggetto d’uso quotidiano. Un mattone industriale a dieci fori viene reinterpretato attraverso un semplice accessorio a incastro, che lo rende un portafiori senza modificarne la struttura originale. L’intervento lascia visibile l’identità del mattone e ne valorizza la matericità e il carattere industriale: sul fronte una grafica ispirata alle ricerche sul Futurismo, recuperata da testi e pubblicazioni storiche, con il Fauno Giallo come elemento distintivo; nella parte inferiore una numerazione che richiama il linguaggio delle edizioni limitate e fa di ogni mattone recuperato un pezzo identificabile e da collezione.',
     spec: {
@@ -648,6 +655,8 @@ export function projectImages(item) {
     gallery,
     drawing: item.disegno ? `${base}/disegno.webp` : null,
     sfondo: item.sfondo ? `${base}/sfondo.webp` : null,
+    // Fotogramma del reel, mostrato al posto del player finché non si clicca.
+    videoPoster: item.video ? `${base}/video.webp` : null,
   }
 }
 
@@ -685,6 +694,10 @@ export function altDisegno(item, lang) {
 
 export function altSfondo(item, lang) {
   return testi(lang).alt.sfondo(titoloLeggibile(item.title))
+}
+
+export function altVideo(item, lang) {
+  return testi(lang).alt.video(titoloLeggibile(item.title))
 }
 
 /*

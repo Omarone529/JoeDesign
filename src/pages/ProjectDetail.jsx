@@ -2,6 +2,7 @@ import {
   altDisegno,
   altGalleria,
   altSfondo,
+  altVideo,
   archivioIn,
   areaDi,
   areeIn,
@@ -29,11 +30,25 @@ export default function ProjectDetail({ slug }) {
   const item = archivio.find((p) => p.slug === slug)
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
-  const { gallery, drawing, sfondo } = projectImages(item)
-  const slides = gallery.map((src, i) => ({
+  const { gallery, drawing, sfondo, videoPoster } = projectImages(item)
+  /*
+   * Il reel sta nel carosello, non in una sezione tutta sua: il formato
+   * verticale è l'unico della pagina e da solo lascerebbe mezza griglia vuota.
+   * La cornice quadrata lo mostra intero su fondo scuro (vedi Carousel).
+   *
+   * Ed è la PRIMA slide, perché parte da sola all'apertura della scheda (vedi
+   * Carousel): un reel che comincia a giocare è il modo in cui questi filmati
+   * si guardano, e in fondo alla galleria non lo vedeva nessuno. L'immagine
+   * misurata come LCP diventa quindi la miniatura del video — non è un danno di
+   * ranking, l'LCP è un tempo e la miniatura pesa quanto una foto, ma è bene
+   * saperlo prima di rimescolare l'ordine.
+   */
+  const foto = gallery.map((src, i) => ({
     src,
     alt: altGalleria(item, i, gallery.length, lang),
   }))
+  const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
+  const slides = [...reel, ...foto]
 
   /*
    * Precedente e successivo restano dentro l'area: uscendo da una griglia di

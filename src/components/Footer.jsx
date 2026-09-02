@@ -108,8 +108,18 @@ export default function Footer() {
       <div
         className={`flex flex-col items-center gap-3 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
-        <div className="text-[10px] uppercase tracking-[0.2em] text-muted">
-          © {ANNO} {profile.name} · {T.footer.diritti}
+        <div className="flex flex-wrap items-center justify-center gap-x-2 text-[10px] uppercase tracking-[0.2em] text-muted">
+          <span>
+            © {ANNO} {profile.name} · {T.footer.diritti}
+          </span>
+          <span aria-hidden="true">·</span>
+          <Link
+            to={percorso('privacy', {}, lang)}
+            className="group relative inline-block transition-colors hover:text-paper"
+          >
+            {T.footer.privacy}
+            <Sottolineatura />
+          </Link>
         </div>
         <button
           type="button"
