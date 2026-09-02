@@ -42,7 +42,7 @@ export const aboutEn = {
   sketchbook: [
     {
       front: 'Cover of the personal sketchbook of Joe Sarchiolla',
-      back: 'Title page “Vol.1 Archivio”',
+      back: 'Title page Vol.1 Archivio',
     },
     {
       front: 'Index of the 2024 projects, with thumbnails',
@@ -57,7 +57,7 @@ export const aboutEn = {
       back: 'Sheet for the Mari Chair CAD project, technical drawing and photo',
     },
     {
-      front: 'Sculpture “Sedia a tempo determinato”, In-sicurezza contest',
+      front: 'Sculpture Sedia a tempo determinato, In-sicurezza contest',
       back: null,
     },
   ],
@@ -104,7 +104,7 @@ export const progettiEn = {
   },
   'sedia-tempo-determinato': {
     cat: 'Design sculpture',
-    desc: '“Sedia a tempo determinato” (fixed-term chair) is a design object made of cardboard, a fragile and temporary material that becomes a metaphor for precarious work. The chair, a symbol of stability, is unstable here: a seat no one would truly feel safe on, like those living on fixed-term contracts, insufficient pay and an uncertain future. The work invites reflection on the dignity of work and on the right to a stable place to stay.',
+    desc: 'Sedia a tempo determinato (fixed-term chair) is a design object made of cardboard, a fragile and temporary material that becomes a metaphor for precarious work. The chair, a symbol of stability, is unstable here: a seat no one would truly feel safe on, like those living on fixed-term contracts, insufficient pay and an uncertain future. The work invites reflection on the dignity of work and on the right to a stable place to stay.',
     spec: {
       Object: 'Design sculpture',
       Context: 'In Sicurezza competition · UIL Ravenna',
@@ -152,17 +152,31 @@ export const progettiEn = {
       Colour: 'Orange / White / Black',
     },
   },
+  dose: {
+    cat: 'Lighter case',
+    desc: 'DOSE is a lighter case designed for anyone who can never find their lighter among cargo pockets, bags and the things carried around every day: it comes from the need to keep it always at hand, turning it into an accessory to be worn rather than simply stored away. The pill shape defines the identity of the product, while the pop aesthetics and bright industrial colours build a sharp, recognisable visual language. A system of magnets allows the different elements to be chosen and combined freely, and swapped with ease: every DOSE is modular and customisable in its colour configurations. The fastening clips it to trousers or to a bag and keeps the lighter always visible and within reach — a small accessory that makes an everyday gesture simpler.',
+    spec: {
+      Object: 'Lighter case · Keyring',
+      Context: 'Personal project',
+      Material: 'PLA',
+      Colour: 'Red / White',
+    },
+  },
   'exit-tie': {
     cat: 'Tie',
+    desc: 'EXIT TIE is a tie made for the graduation, born from the reinterpretation of a formal accessory through the visual language of industrial graphics and road signage. The traditional shape remains, but it is transformed by a few essential elements: black, technical lettering and above all a white arrow pointing downwards. The arrow becomes the communicative core of the project, an exit sign meant both literally and as a metaphor for the end of a path: an ironic object where design, visual communication and clothing meet, and a tie turns into a sign to be worn.',
     spec: {
       Object: 'Tie',
+      Context: 'Personal project',
       Colour: 'Black / White',
     },
   },
   bloom: {
     cat: 'Flower holder',
+    desc: 'BLOOM is a concept for a flower holder, born from the idea of salvaging an existing industrial element and turning it into an everyday object. A ten-hole industrial brick is reinterpreted through a simple interlocking accessory that makes it a flower holder without altering its original structure. The intervention leaves the identity of the brick visible and gives value to its materiality and industrial character: on the front, graphics inspired by research on Futurism, recovered from historical texts and publications, with the Yellow Faun as the distinctive element; on the lower part, a numbering that recalls the language of limited editions and makes every salvaged brick an identifiable, collectible piece.',
     spec: {
       Object: 'Flower holder',
+      Context: 'Concept design',
       Material: 'Brick',
       Colour: 'Terracotta / Black',
     },
@@ -189,7 +203,7 @@ export const progettiEn = {
   },
   trave: {
     cat: 'Jewellery · Fashion',
-    desc: 'Unisex silver pendant designed for QAIA. A drop earring shaped like a beam, a symbol of solidity and construction. The engraved word “Structure” becomes a message for those building their own future, laying solid foundations made of study, creativity and collaboration.',
+    desc: 'Unisex silver pendant designed for QAIA. A drop earring shaped like a beam, a symbol of solidity and construction. The engraved word Structure becomes a message for those building their own future, laying solid foundations made of study, creativity and collaboration.',
     spec: {
       Object: 'Earrings',
       Context: 'Collaboration with QAIA Laboratorio',
@@ -228,7 +242,7 @@ export const progettiEn = {
   },
   anelli: {
     cat: 'Magazine rack',
-    desc: '“Anelli” is a magazine rack inspired by the pop aesthetics of the 1960s and 1970s, reinterpreted in a contemporary key. The structure is made of three elongated overlapping rings that create a soft, dynamic form, conceived to hold magazines of different sizes while keeping them tidy and easy to reach.',
+    desc: 'Anelli is a magazine rack inspired by the pop aesthetics of the 1960s and 1970s, reinterpreted in a contemporary key. The structure is made of three elongated overlapping rings that create a soft, dynamic form, conceived to hold magazines of different sizes while keeping them tidy and easy to reach.',
     spec: {
       Object: 'Magazine rack',
       Context: 'University project · Concept design',

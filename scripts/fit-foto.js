@@ -44,6 +44,17 @@ const SEMPRE_INTERE = new Set([
   'direzione-tolleranza/cover.webp',
 ])
 
+/*
+ * Il ritaglio che la misura non può indovinare: uno scatto dove il soggetto
+ * riempie tutto il fotogramma, quindi non c'è un riquadro da puntare, ma il
+ * prodotto sta in un punto solo. Chiave '<slug>/<file>' → `object-position`.
+ */
+const FUOCO_A_MANO = {
+  // Primo piano del viso: centrata la cornice taglia gli occhi a metà, puntata
+  // in basso inquadra bocca e prodotto.
+  'dose/05.webp': '50% 100%',
+}
+
 const TOLLERANZA = 0.04 // quanto il soggetto può debordare dalla finestra
 const CAMPIONE = 200 // lato massimo su cui si misura: basta e avanza
 const DIFF = 26 // distanza dal fondo oltre cui il pixel è soggetto
@@ -188,9 +199,11 @@ function decidi({ rapporto, sfumati, box }) {
       if (!f.endsWith('.webp') || f === 'disegno.webp') continue
       const chiave = `${slug}/${f}`
       const m = await misura(path.join(RADICE, slug, f))
-      const d = SEMPRE_INTERE.has(chiave)
-        ? { fit: 'contain', motivo: 'grafica segnata a mano' }
-        : decidi(m)
+      const d = FUOCO_A_MANO[chiave]
+        ? { fit: 'cover', pos: FUOCO_A_MANO[chiave], motivo: 'ritaglio segnato a mano' }
+        : SEMPRE_INTERE.has(chiave)
+          ? { fit: 'contain', motivo: 'grafica segnata a mano' }
+          : decidi(m)
       const src = `/images/products/${slug}/${f}`
 
       if (d.fit === 'contain') {

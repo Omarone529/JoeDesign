@@ -5,6 +5,8 @@
  * riempie la cornice restando centrato: è il comportamento di base.
  *   fit: 'contain' → mostrata intera, il ritaglio le toglierebbe il soggetto
  *   pos: '<x>% <y>%' → riempie, ma il ritaglio è puntato sul prodotto
+ *   fondo: '#rrggbb' → il colore del suo bordo, per coprire lo spazio che
+ *     l'immagine intera lascia scoperto nella cella
  */
 export const fotoFit = {
   "/images/products/anelli/sfondo.webp": {
@@ -24,8 +26,30 @@ export const fotoFit = {
     "fit": "contain",
     "fondo": "#fef009"
   },
+  "/images/products/dose/01.webp": {
+    "pos": "50% 5%"
+  },
+  "/images/products/dose/04.webp": {
+    "pos": "50% 59%"
+  },
+  "/images/products/dose/05.webp": {
+    "pos": "50% 100%"
+  },
+  "/images/products/dose/06.webp": {
+    "pos": "50% 11%"
+  },
+  "/images/products/dose/07.webp": {
+    "pos": "50% 61%"
+  },
+  "/images/products/dose/08.webp": {
+    "pos": "50% 60%"
+  },
   "/images/products/europa-unisce/cover.webp": {
     "fit": "contain"
+  },
+  "/images/products/exit-tie/sfondo.webp": {
+    "fit": "contain",
+    "fondo": "#fefefe"
   },
   "/images/products/fiori/cover.webp": {
     "fit": "contain",

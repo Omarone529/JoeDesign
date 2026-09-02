@@ -88,7 +88,7 @@ export const about = {
   sketchbook: [
     {
       front: { src: '/images/about/sketchbook/01.webp', alt: 'Copertina dello sketchbook personale di Joe Sarchiolla' },
-      back: { src: '/images/about/sketchbook/02.webp', alt: 'Frontespizio “Vol.1 Archivio”' },
+      back: { src: '/images/about/sketchbook/02.webp', alt: 'Frontespizio Vol.1 Archivio' },
     },
     {
       front: { src: '/images/about/sketchbook/03.webp', alt: 'Indice dei progetti del 2024, con miniature' },
@@ -103,7 +103,7 @@ export const about = {
       back: { src: '/images/about/sketchbook/08.webp', alt: 'Scheda del progetto Mari Chair CAD, disegno tecnico e foto' },
     },
     {
-      front: { src: '/images/about/sketchbook/09.webp', alt: 'Scultura “Sedia a tempo determinato”, contest In-sicurezza' },
+      front: { src: '/images/about/sketchbook/09.webp', alt: 'Scultura Sedia a tempo determinato, contest In-sicurezza' },
       back: null,
     },
   ],
@@ -126,6 +126,21 @@ export const about = {
  * `archive`, per numero di tavola decrescente.
  */
 const progetti = [
+  {
+    slug: 'dose',
+    title: 'DOSE',
+    cat: 'Portaccendino',
+    year: '2026',
+    photos: 8,
+    tavola: 20,
+    desc: 'DOSE è un portaccendino pensato per chi il proprio accendino non lo trova mai, fra le tasche dei cargo, le borse e gli oggetti che si portano con sé ogni giorno: nasce dall’esigenza di averlo sempre a portata di mano, trasformandolo in un accessorio da indossare e non semplicemente da riporre. La forma a pillola ne definisce l’identità, mentre l’estetica pop e i colori industriali accesi ne costruiscono un linguaggio visivo deciso e riconoscibile. Un sistema di calamite permette di scegliere e combinare liberamente i diversi elementi, che si intercambiano con facilità: ogni DOSE è componibile e personalizzabile nelle sue configurazioni cromatiche. L’aggancio lo fissa ai pantaloni o alla borsa e tiene l’accendino sempre visibile e accessibile: un piccolo accessorio per rendere più semplice un gesto quotidiano.',
+    spec: {
+      Oggetto: 'Portaccendino · Portachiavi',
+      Contesto: 'Progetto Personale',
+      Materiale: 'PLA',
+      Colore: 'Rosso / Bianco',
+    },
+  },
 
   {
     slug: 'directional-arrow',
@@ -170,7 +185,7 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 13,
-    desc: '“Sedia a tempo determinato” è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
+    desc: 'Sedia a tempo determinato è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
     spec: {
       Oggetto: 'Scultura design',
       Contesto: 'Concorso In Sicurezza · UIL Ravenna',
@@ -253,10 +268,12 @@ const progetti = [
     year: '2026',
     photos: 1,
     disegno: true,
+    sfondo: true,
     tavola: 18,
-    desc: '',
+    desc: 'EXIT TIE è una cravatta realizzata in occasione della laurea, nata dalla reinterpretazione di un accessorio formale attraverso il linguaggio visivo della grafica industriale e della segnaletica stradale. La forma tradizionale resta, ma viene trasformata da pochi elementi essenziali: il nero, le scritte tecniche e soprattutto la freccia bianca rivolta verso il basso. La freccia diventa l’elemento comunicativo del progetto, un segnale di uscita inteso sia letteralmente sia come metafora della conclusione di un percorso: un oggetto ironico in cui design, comunicazione visiva e abbigliamento si incontrano, e una cravatta si trasforma in un segnale da indossare.',
     spec: {
       Oggetto: 'Cravatta',
+      Contesto: 'Progetto Personale',
       Colore: 'Nero / Bianco',
     },
   },
@@ -267,9 +284,10 @@ const progetti = [
     year: '2026',
     photos: 8,
     tavola: 19,
-    desc: '',
+    desc: 'BLOOM è un concept di portafiori che nasce dall’idea di recuperare un elemento industriale esistente e trasformarlo in un oggetto d’uso quotidiano. Un mattone industriale a dieci fori viene reinterpretato attraverso un semplice accessorio a incastro, che lo rende un portafiori senza modificarne la struttura originale. L’intervento lascia visibile l’identità del mattone e ne valorizza la matericità e il carattere industriale: sul fronte una grafica ispirata alle ricerche sul Futurismo, recuperata da testi e pubblicazioni storiche, con il Fauno Giallo come elemento distintivo; nella parte inferiore una numerazione che richiama il linguaggio delle edizioni limitate e fa di ogni mattone recuperato un pezzo identificabile e da collezione.',
     spec: {
       Oggetto: 'Portafiori',
+      Contesto: 'Concept design',
       Materiale: 'Laterizio',
       Colore: 'Terracotta / Nero',
     },
@@ -318,7 +336,7 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 8,
-    desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola “Structure” incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
+    desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola Structure incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
     spec: {
       Oggetto: 'Orecchini',
       Contesto: 'Collaborazione QAIA Laboratorio',
@@ -385,7 +403,7 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 2,
-    desc: '“Anelli” è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
+    desc: 'Anelli è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
     spec: {
       Oggetto: 'Portariviste',
       Contesto: 'Progetto Universitario · Concept design',
