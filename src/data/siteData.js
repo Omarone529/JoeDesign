@@ -116,6 +116,8 @@ export const about = {
  * `contenutiEn.js`. Vuole `video.webp` accanto alle foto, che si genera con
  * `node scripts/video-poster.js <slug> <id>`.
  * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
+ * `ai` = quali immagini della scheda sono generate o modificate con l'IA, da
+ * dichiarare a chi guarda (vedi `aiFoto` in fondo al file).
  * `tavola` = numero del progetto dentro la sua area, in ordine cronologico
  * crescente (01 = il più vecchio); mostrato in hover sulle celle di /archivio.
  * Per i prodotti coincide con la tavola dell'archivio sorgente (cartella
@@ -132,6 +134,7 @@ const progetti = [
     cat: 'Portaccendino',
     year: '2026',
     photos: 8,
+    ai: { generate: [1, 3, 5, 8] },
     tavola: 20,
     desc: 'DOSE è un portaccendino pensato per chi il proprio accendino non lo trova mai, fra le tasche dei cargo, le borse e gli oggetti che si portano con sé ogni giorno: nasce dall’esigenza di averlo sempre a portata di mano, trasformandolo in un accessorio da indossare e non semplicemente da riporre. La forma a pillola ne definisce l’identità, mentre l’estetica pop e i colori industriali accesi ne costruiscono un linguaggio visivo deciso e riconoscibile. Un sistema di calamite permette di scegliere e combinare liberamente i diversi elementi, che si intercambiano con facilità: ogni DOSE è componibile e personalizzabile nelle sue configurazioni cromatiche. L’aggancio lo fissa ai pantaloni o alla borsa e tiene l’accendino sempre visibile e accessibile: un piccolo accessorio per rendere più semplice un gesto quotidiano.',
     spec: {
@@ -150,6 +153,7 @@ const progetti = [
     photos: 5,
     disegno: true,
     sfondo: true,
+    ai: { generate: [2, 3, 4, 5], sfondo: 'generata' },
     tavola: 11,
     desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
     spec: {
@@ -168,6 +172,9 @@ const progetti = [
     disegno: true,
     sfondo: true,
     video: 'G5DdfSOzRIo',
+    // Il reel apre il carosello, quindi qui i numeri slittano di uno rispetto
+    // alle slide: 01 e 04 sono la seconda e la quinta cosa che si vede.
+    ai: { modificate: [1, 4], sfondo: 'modificata' },
     tavola: 12,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
     spec: {
@@ -185,6 +192,7 @@ const progetti = [
     photos: 5,
     disegno: true,
     sfondo: true,
+    ai: { generate: [1], sfondo: 'modificata' },
     tavola: 13,
     desc: 'Sedia a tempo determinato è un oggetto di design in cartone, materiale fragile e temporaneo che diventa metafora della precarietà lavorativa. La sedia, simbolo di stabilità, qui è instabile: un posto su cui nessuno si sentirebbe davvero al sicuro, come chi vive contratti a termine, stipendi insufficienti e futuro incerto. L’opera invita a riflettere sulla dignità del lavoro e sul diritto a un posto stabile dove poter restare.',
     spec: {
@@ -202,6 +210,7 @@ const progetti = [
     photos: 6,
     disegno: true,
     sfondo: true,
+    ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 14,
     desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
     spec: {
@@ -219,6 +228,7 @@ const progetti = [
     photos: 6,
     disegno: true,
     sfondo: true,
+    ai: { generate: [1], modificate: [2, 3, 4, 5, 6], sfondo: 'generata' },
     tavola: 15,
     desc: 'Fuori asse è uno sgabello realizzato accostando tavole in legno recuperato, mantenute volutamente separate da una distanza funzionale di 30 mm. La fessura centrale diventa una presa integrata e, allo stesso tempo, il segno visibile dell’incontro tra elementi diversi: una condizione tipica del riuso trasformata in principio costruttivo e identitario.',
     spec: {
@@ -254,6 +264,7 @@ const progetti = [
     photos: 5,
     disegno: true,
     sfondo: true,
+    ai: { generate: [1, 3, 5], modificate: [2, 4], sfondo: 'generata' },
     tavola: 17,
     desc: 'FLUE nasce dall’osservazione del cambio di diametro nelle linee di estrusione, una fase produttiva che genera elementi fuori standard destinati allo smaltimento. Attraverso un approccio di upcycling strutturale, il progetto valorizza questi scarti preservandone forma, dimensione e identità industriale. I diametri standard diventano così il principio generativo di una collezione modulare di sistemi di illuminazione.',
     spec: {
@@ -271,6 +282,7 @@ const progetti = [
     photos: 1,
     disegno: true,
     sfondo: true,
+    ai: { modificate: [1], sfondo: 'generata' },
     tavola: 18,
     desc: 'EXIT TIE è una cravatta realizzata in occasione della laurea, nata dalla reinterpretazione di un accessorio formale attraverso il linguaggio visivo della grafica industriale e della segnaletica stradale. La forma tradizionale resta, ma viene trasformata da pochi elementi essenziali: il nero, le scritte tecniche e soprattutto la freccia bianca rivolta verso il basso. La freccia diventa l’elemento comunicativo del progetto, un segnale di uscita inteso sia letteralmente sia come metafora della conclusione di un percorso: un oggetto ironico in cui design, comunicazione visiva e abbigliamento si incontrano, e una cravatta si trasforma in un segnale da indossare.',
     spec: {
@@ -300,9 +312,10 @@ const progetti = [
     title: 'ZETA 3',
     cat: 'Postazione di lavoro',
     year: '2025',
-    photos: 9,
+    photos: 8,
     disegno: true,
     sfondo: true,
+    ai: { sfondo: 'modificata' },
     tavola: 6,
     designer: 'Giovanni Sarchiolla, Sara Marchini, Elena Vecchi',
     desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
@@ -352,9 +365,10 @@ const progetti = [
     title: 'ZERO SFRIDO',
     cat: 'Seduta · Eco design',
     year: '2025',
-    photos: 2,
+    photos: 1,
     disegno: true,
     sfondo: true,
+    ai: { sfondo: 'generata' },
     tavola: 9,
     desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Conta l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
     spec: {
@@ -372,6 +386,7 @@ const progetti = [
     photos: 3,
     disegno: true,
     sfondo: true,
+    ai: { generate: [2] },
     tavola: 10,
     desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
     spec: {
@@ -405,6 +420,7 @@ const progetti = [
     photos: 5,
     disegno: true,
     sfondo: true,
+    ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 2,
     desc: 'Anelli è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
     spec: {
@@ -422,6 +438,7 @@ const progetti = [
     photos: 4,
     disegno: true,
     sfondo: true,
+    ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 3,
     desc: 'Pistone è un coprivaso in plastica realizzato tramite stampaggio a iniezione, progettato per unire funzionalità e carattere estetico. Il design prende ispirazione dalla forma dei pistoni dei motori, reinterpretata in chiave morbida e contemporanea per adattarsi agli ambienti domestici.',
     spec: {
@@ -456,6 +473,7 @@ const progetti = [
     photos: 4,
     disegno: true,
     sfondo: true,
+    ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 5,
     desc: 'Nymphē è un progetto di packaging e identità visiva sviluppato per Davines, ispirato al mondo mitologico delle ninfe e al loro legame con la natura. Le silhouette delle boccette prendono ispirazione dai flaconi delle essenze chimiche, reinterpretati in chiave elegante per evocare l’idea di formule naturali e ingredienti puri.',
     spec: {
@@ -698,6 +716,32 @@ export function altSfondo(item, lang) {
 
 export function altVideo(item, lang) {
   return testi(lang).alt.video(titoloLeggibile(item.title))
+}
+
+/*
+ * Etichette AI Act. L'articolo 50 del regolamento europeo chiede che
+ * un'immagine generata o ritoccata con l'intelligenza artificiale si riconosca
+ * come tale: qui si dichiara quale lo è, il marchio lo mette `EtichettaAI`
+ * sopra la foto. Riguarda le immagini della scheda progetto — le slide del
+ * carosello e lo `sfondo.webp` in fondo alla pagina.
+ *
+ * Sul progetto il campo `ai` porta:
+ *   `generate` / `modificate` — i numeri delle foto di galleria (1 = 01.webp),
+ *     o la stringa 'tutte' quando lo sono tutte quante;
+ *   `sfondo` — 'generata' | 'modificata' per sfondo.webp.
+ * Quello che non è elencato non porta etichetta: il silenzio vuol dire che la
+ * foto è vera, quindi un progetto nuovo con immagini di sintesi va dichiarato
+ * qui, o resta senza. Il reel di YouTube non passa da qui: la miniatura è un
+ * suo fotogramma, e un filmato lo si dichiara nella scheda, non sulla slide.
+ */
+const marcata = (elenco, n) => elenco === 'tutte' || (Array.isArray(elenco) && elenco.includes(n))
+
+/* `n` è il numero della foto di galleria, da 1: 1 = 01.webp. */
+export function aiFoto(item, n) {
+  if (!item?.ai) return null
+  if (marcata(item.ai.generate, n)) return 'generata'
+  if (marcata(item.ai.modificate, n)) return 'modificata'
+  return null
 }
 
 /*

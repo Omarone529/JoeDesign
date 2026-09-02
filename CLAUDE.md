@@ -287,6 +287,39 @@ identificatori nel browser all'apertura della pagina — il che obbligherebbe a 
 di consenso (vedi "Privacy"). Il pre-rendering fotografa la miniatura, quindi nell'HTML
 statico non finisce nessun iframe: è una cosa da ricontrollare se si tocca il componente.
 
+## Etichette AI (AI Act)
+
+Diversi render e ambientazioni dell'archivio sono fatti — in tutto o in parte — con
+l'intelligenza artificiale, e l'art. 50 del regolamento europeo chiede che si vedano come
+tali. Ogni immagine interessata porta sopra il marchio standard **AI GENERATED** o
+**AI MODIFIED** (`components/EtichettaAI.jsx`), in basso a sinistra.
+
+Riguarda le immagini della **scheda progetto**: le slide del carosello e lo `sfondo.webp`
+in fondo alla pagina. Non le copertine della griglia d'archivio e della home, che sono
+anteprime: chi apre la scheda trova la dichiarazione sulla foto grande.
+
+Quali immagini lo siano si dichiara **in `siteData.js`**, sul progetto, nel campo `ai`:
+
+```js
+ai: { generate: [1, 3, 5], modificate: [2, 4], sfondo: 'generata' },
+ai: { generate: 'tutte', sfondo: 'generata' },   // quando lo sono tutte
+```
+
+`generate`/`modificate` elencano i **numeri delle foto di galleria** (1 = `01.webp`), non
+le slide del carosello: dove c'è un reel, quello è la prima slide ma non è una foto.
+`sfondo` vale `'generata'` o `'modificata'`. Quello che non è elencato non porta
+etichetta, quindi **il silenzio dichiara che la foto è vera**: un progetto nuovo con
+immagini di sintesi va dichiarato qui, o esce senza. `aiFoto(item, n)` in `siteData.js`
+risolve il campo, `ProjectDetail` lo passa alle slide.
+
+Il marchio sta in `public/images/etichette/` (`ai-generata.svg`, `ai-modificata.svg`).
+Sono i file del kit ufficiale, con due sole modifiche: il `viewBox` ritagliato sulla
+pastiglia — così la posizione la decide il CSS e non il margine incorporato nel file — e
+la pastiglia ritinta con l'`ink` del sito all'85%, la stessa del contatore del carosello.
+Due targhette diverse sulla stessa foto sarebbero due voci. La scritta dentro è disegnata
+e in inglese: la frase per intero, e nella lingua della pagina, la dà l'`alt` (`ai` in
+`src/i18n.js`).
+
 ## Design system (`tailwind.config.js`)
 
 Palette "carta / inchiostro":
@@ -328,6 +361,7 @@ src/
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
 │   ├── BannerPrivacy.jsx # banner cookie e privacy (in App, su tutte le pagine)
 │   ├── VideoShort.jsx    # Short YouTube, 1ª slide del carosello: parte muto all'apertura
+│   ├── EtichettaAI.jsx   # marchio AI GENERATED / AI MODIFIED sulle immagini di sintesi
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
 │   ├── FloatingMailButton.jsx
 │   ├── about/

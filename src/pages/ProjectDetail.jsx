@@ -1,4 +1,5 @@
 import {
+  aiFoto,
   altDisegno,
   altGalleria,
   altSfondo,
@@ -9,6 +10,7 @@ import {
   projectImages,
 } from '../data/siteData'
 import Carousel from '../components/Carousel'
+import EtichettaAI from '../components/EtichettaAI'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 
@@ -43,9 +45,12 @@ export default function ProjectDetail({ slug }) {
    * ranking, l'LCP è un tempo e la miniatura pesa quanto una foto, ma è bene
    * saperlo prima di rimescolare l'ordine.
    */
+  // `ai`: l'etichetta AI Act della singola foto, quando c'è (vedi `aiFoto`).
+  // La numerazione parte da 1, come i file 01.webp…NN.webp.
   const foto = gallery.map((src, i) => ({
     src,
     alt: altGalleria(item, i, gallery.length, lang),
+    ai: aiFoto(item, i + 1),
   }))
   const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
   const slides = [...reel, ...foto]
@@ -175,7 +180,7 @@ export default function ProjectDetail({ slug }) {
 
       {sfondo && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
-          <figure className="m-0 border-t border-line pt-6">
+          <figure className="relative m-0 border-t border-line pt-6">
             <img
               src={sfondo}
               alt={altSfondo(item, lang)}
@@ -185,6 +190,7 @@ export default function ProjectDetail({ slug }) {
               height={SFONDO_H}
               className="h-auto w-full object-cover"
             />
+            <EtichettaAI tipo={item.ai?.sfondo} />
           </figure>
         </section>
       )}

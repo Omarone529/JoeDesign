@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { fotoFit } from '../data/fotoFit'
 import { testi } from '../i18n'
 import { useLang } from '../router'
 import { animazioniRidotte } from '../motion'
 import { useConsensoVideo } from '../consenso'
 import VideoShort from './VideoShort'
+import EtichettaAI from './EtichettaAI'
 
 const INTERVAL = 2000
 // Sulla slide del reel lo scorrimento rallenta: due secondi bastano a vedere un
@@ -180,23 +181,31 @@ export default function Carousel({ images, title }) {
       >
         {/* I formati d'archivio sono disparati: riempiono tutti la cornice, e
             dove il ritaglio farebbe danno `fotoFit` dice come rimediare. */}
-        {images.map(({ src, alt, video }, i) => {
+        {images.map(({ src, alt, video, ai }, i) => {
           // Il 9:16 del reel nella cornice quadrata si mostra intero: tagliarlo
           // per riempire vorrebbe dire buttare via metà inquadratura.
           const fit = video ? { fit: 'contain' } : fotoFit[src]
+          // Foto ed etichetta entrano ed escono insieme: le slide sono
+          // impilate, e una targhetta che non svanisce con la sua finirebbe
+          // sopra la foto dopo, dichiarando quella sbagliata.
+          const dissolvenza = `transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
+            i === index ? 'opacity-100' : 'opacity-0'
+          }`
           return (
-            <img
-              key={src}
-              src={caricate.has(i) ? src : undefined}
-              alt={alt}
-              aria-hidden={i !== index}
-              fetchpriority={i === 0 ? 'high' : undefined}
-              decoding="async"
-              style={fit?.pos ? { objectPosition: fit.pos } : undefined}
-              className={`absolute inset-0 h-full w-full contrast-[1.02] transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
-                fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
-              } ${i === index ? 'opacity-100' : 'opacity-0'}`}
-            />
+            <Fragment key={src}>
+              <img
+                src={caricate.has(i) ? src : undefined}
+                alt={alt}
+                aria-hidden={i !== index}
+                fetchpriority={i === 0 ? 'high' : undefined}
+                decoding="async"
+                style={fit?.pos ? { objectPosition: fit.pos } : undefined}
+                className={`absolute inset-0 h-full w-full contrast-[1.02] ${
+                  fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
+                } ${dissolvenza}`}
+              />
+              <EtichettaAI tipo={ai} aria-hidden={i !== index} className={dissolvenza} />
+            </Fragment>
           )
         })}
 
