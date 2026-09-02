@@ -147,6 +147,18 @@ export default function Carousel({ images, title }) {
 
   if (n === 0) return null
 
+  /*
+   * L'iframe di YouTube è di un altro dominio: il dito che scorre sopra il
+   * player non arriva mai qui, e sotto `sm` le frecce sono nascoste perché lo
+   * swipe basta. Sulle foto è vero, sul reel no — restava l'unica via i
+   * pallini, sei pixel di bersaglio, e il carosello sembrava bloccato.
+   * Finché il player è montato le frecce si vedono, dito o mouse che sia.
+   */
+  const frecceFisse = videoAttivo
+  const classeFreccia = `absolute top-1/2 z-10 h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 sm:flex ${
+    frecceFisse ? 'flex opacity-100' : 'hidden opacity-0 group-hover:opacity-100'
+  }`
+
   // La foto mostrata intera non copre la cornice: il colore del suo bordo
   // (`fondo`, da `fotoFit`) riempie lo scoperto. Cambia con la foto, in
   // dissolvenza come lei; senza, resta il grigio di `bg-placeholder`.
@@ -230,7 +242,7 @@ export default function Carousel({ images, title }) {
               type="button"
               onClick={prev}
               aria-label={T.carosello.precedente}
-              className="absolute left-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink opacity-0 backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 group-hover:opacity-100 sm:flex"
+              className={`left-4 ${classeFreccia}`}
             >
               ←
             </button>
@@ -238,7 +250,7 @@ export default function Carousel({ images, title }) {
               type="button"
               onClick={next}
               aria-label={T.carosello.successiva}
-              className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink opacity-0 backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 group-hover:opacity-100 sm:flex"
+              className={`right-4 ${classeFreccia}`}
             >
               →
             </button>
@@ -251,7 +263,7 @@ export default function Carousel({ images, title }) {
               onClick={() => setPaused((p) => !p)}
               aria-pressed={paused}
               aria-label={paused ? T.carosello.riprendi : T.carosello.pausa}
-              className="absolute right-2 top-2 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
+              className="absolute right-2 top-2 z-10 flex items-center gap-2 bg-ink/85 px-2 py-1 text-[10px] tracking-[0.14em] text-paper transition-colors hover:bg-ink sm:right-4 sm:top-4"
             >
               {paused && <span aria-hidden="true">▌▌</span>}
               <span>
@@ -263,7 +275,11 @@ export default function Carousel({ images, title }) {
       </div>
 
       {n > 1 && (
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+        /* Il `before` allarga il bersaglio senza toccare il disegno: un pallino
+           è alto sei pixel, e sei pixel col dito non si prendono. Cresce fino a
+           riempire lo spazio fra l'uno e l'altro, non oltre, o due bersagli
+           finirebbero uno sopra l'altro. */
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           {images.map((_, i) => (
             <button
               key={i}
@@ -271,7 +287,7 @@ export default function Carousel({ images, title }) {
               onClick={() => go(i)}
               aria-label={T.carosello.vaiA(i + 1)}
               aria-current={i === index}
-              className={`h-1.5 rounded-full transition-all ${
+              className={`relative h-1.5 rounded-full transition-all before:absolute before:-inset-x-1.5 before:-inset-y-3 before:content-[''] ${
                 i === index ? 'w-6 bg-ink' : 'w-1.5 bg-dot hover:bg-muted'
               }`}
             />

@@ -35,9 +35,13 @@ export const homeHero = {
   height: 1351,
 }
 
+/* Fondo bianco vero, non trasparente: in home lo scatto va in `multiply` per
+   fonderlo con la carta, come il ritratto qui sopra. */
 export const familyBand = {
   src: '/images/home/family-band.webp',
   alt: 'La famiglia di prodotti',
+  width: 2000,
+  height: 1070,
 }
 
 export const about = {

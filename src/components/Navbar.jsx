@@ -53,7 +53,7 @@ function NavLink({ to, active = false, children }) {
     <Link
       to={to}
       aria-current={active ? 'page' : undefined}
-      className="group whitespace-nowrap py-2 text-[9px] uppercase tracking-[0.06em] text-ink transition-colors sm:text-[10px] sm:tracking-[0.14em] md:tracking-[0.16em] lg:text-[11px] lg:tracking-[0.2em]"
+      className="group whitespace-nowrap py-2.5 text-[10px] uppercase tracking-[0.08em] text-ink transition-colors sm:py-2 sm:tracking-[0.14em] md:tracking-[0.16em] lg:text-[11px] lg:tracking-[0.2em]"
     >
       <span className="relative">
         {children}
@@ -94,7 +94,7 @@ export default function Navbar({ route }) {
         nascosta ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
-      <div className="relative flex h-16 items-center justify-between gap-2 px-5 sm:px-8 lg:px-[72px]">
+      <div className="relative flex h-16 items-center justify-between gap-3 px-5 sm:px-8 lg:px-[72px]">
         <Link
           to={percorso('home', {}, lang)}
           aria-label={T.nav.logo}
@@ -109,30 +109,32 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Centrato solo da md: sotto non ci starebbe. */}
+        {/*
+          Centrato solo da md: sotto non ci starebbe. E sotto `sm` non c'è
+          proprio: il nome ripete quello che il marchio dice già, e Instagram
+          sta nel piede — a spartirsi 320 pixel con tre voci di menù e le due
+          lingue restava un rigo di caratteri da nove punti, illeggibile e
+          impossibile da centrare col dito. Sulla barra di un telefono ci va la
+          navigazione, il resto può aspettare lo schermo grande.
+        */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
-          <span className="whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
+          <span className="hidden whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:inline-block sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
           </span>
-          <a
-            href={profile.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={T.nav.instagram(profile.handle)}
-            className="flex shrink-0 items-center text-ink transition-colors hover:text-muted"
-          >
-            <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
-          </a>
+          <LinkInstagram lang={lang} className="hidden sm:flex" />
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4 md:gap-5 lg:gap-8">
-          <nav className="flex shrink-0 items-center gap-2 sm:gap-5 md:gap-6 lg:gap-10">
+        <div className="flex shrink-0 items-center gap-3 sm:gap-4 md:gap-5 lg:gap-8">
+          <nav className="flex shrink-0 items-center gap-3 sm:gap-5 md:gap-6 lg:gap-10">
             {links.map((l) => (
               <NavLink key={l.label} to={l.to} active={l.active}>
                 {l.label}
               </NavLink>
             ))}
           </nav>
+          {/* Sotto i 360px cade: i suoi quindici pixel sono quelli che
+              mandano "CHI SONO" fuori schermo. */}
+          <LinkInstagram lang={lang} className="hidden min-[360px]:flex sm:hidden" />
           <SelettoreLingua route={route} />
         </div>
       </div>
@@ -141,13 +143,33 @@ export default function Navbar({ route }) {
 }
 
 /*
+ * Compare due volte nella barra e mai insieme: da `sm` accanto al nome, sotto
+ * in fondo alla riga (vedi il commento nel gruppo centrale). Quello nascosto
+ * esce dal `display`, quindi per chi legge con la voce il link resta uno solo.
+ */
+function LinkInstagram({ lang, className = '' }) {
+  return (
+    <a
+      href={profile.instagram}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={testi(lang).nav.instagram(profile.handle)}
+      className={`shrink-0 items-center text-ink transition-colors hover:text-muted ${className}`}
+    >
+      <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
+    </a>
+  )
+}
+
+/*
  * Le due lingue sono due indirizzi, non un interruttore: ognuna è un link alla
  * gemella della pagina aperta, così restano condivisibili e apribili a freddo.
  * `hrefLang` dice al browser (e ai crawler) cosa aspettarsi dall'altra parte.
  *
- * Da sm si vedono tutte e due, con la corrente in nero; sotto, dove la barra è
- * già piena di voci, resta la sola lingua di destinazione e il selettore
- * diventa un interruttore — la lingua in cui si sta è già scritta in pagina.
+ * Si vedono tutte e due, con la corrente in nero. Sul telefono prima ne
+ * compariva una sola, per mancanza di spazio: ma "EN" da solo non dice se sei
+ * in inglese o se ci vai, e lo spazio adesso c'è — la barra sotto `sm` non
+ * porta più il nome né Instagram.
  */
 function SelettoreLingua({ route }) {
   const attuale = route?.lang ?? 'it'
@@ -155,12 +177,12 @@ function SelettoreLingua({ route }) {
   return (
     <div
       aria-label={testi(attuale).nav.lingua}
-      className="flex shrink-0 items-center gap-1 border-l border-line pl-2 text-[9px] uppercase tracking-[0.06em] sm:gap-1.5 sm:pl-3 sm:text-[10px] sm:tracking-[0.14em] lg:text-[11px]"
+      className="flex shrink-0 items-center gap-1 border-l border-line pl-2 text-[10px] uppercase tracking-[0.08em] sm:gap-1.5 sm:pl-3 sm:tracking-[0.14em] lg:text-[11px]"
     >
       {LINGUE.map((l, i) => (
         <Fragment key={l}>
           {i > 0 && (
-            <span aria-hidden="true" className="hidden text-line sm:inline">
+            <span aria-hidden="true" className="text-line">
               /
             </span>
           )}
@@ -169,9 +191,7 @@ function SelettoreLingua({ route }) {
             hrefLang={l}
             aria-current={l === attuale ? 'true' : undefined}
             className={`py-2 transition-colors ${
-              l === attuale
-                ? 'hidden font-bold text-ink sm:inline-block'
-                : 'text-muted hover:text-ink'
+              l === attuale ? 'font-bold text-ink' : 'text-muted hover:text-ink'
             }`}
           >
             {l}

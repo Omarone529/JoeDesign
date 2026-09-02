@@ -140,7 +140,11 @@ Tutti i testi e i dati stanno qui, non nel markup:
 - `aree` — le due aree dell'archivio (slug d'URL, etichetta, descrizione). L'area di un
   progetto sta nel suo campo `area`; chi non ce l'ha è product design (`AREA_PREDEFINITA`).
   `progettiArea(chiave)` filtra, `areaPerSlug(slug)` risolve l'URL
-- `familyBand` — altra sezione home (il ticker "Skills" in home riusa `about.skills`)
+- `familyBand` — la foto della famiglia di prodotti, in home accanto al manifesto:
+  stessa frase e stessa tipografia del blocco in "Chi sono", perché è lo stesso testo.
+  Ha il fondo bianco vero, quindi va in `mix-blend-multiply` su una sezione con
+  `bg-paper` (il fondo del `body` finisce sulla tela e non fonde). Il ticker "Skills"
+  in home riusa `about.skills`
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
 - `video` (facoltativo, per progetto) — id di uno Short YouTube: il reel apre il
   carosello e parte da solo. Vuole `video.webp` accanto alle foto, vedi sotto
@@ -265,6 +269,14 @@ Con l'autoplay lo scorrimento automatico resta fermo finché il reel è in ripro
 scivolare via da un video che sta giocando è peggio che aspettare. Le foto partono quando
 chi guarda passa avanti con freccia, pallino o dito.
 
+**Col player montato le frecce del carosello restano visibili, anche sul telefono.**
+L'iframe è di un altro dominio: il dito che scorre sopra il video non arriva mai al
+carosello, quindi lo swipe — l'unico modo di cambiare slide sotto `sm`, dove le frecce
+sono nascoste — lì non funziona. Sommato al `loop`, che tiene il reel in riproduzione
+all'infinito e con esso fermo lo scorrimento automatico, il risultato era una scheda in
+cui dal telefono non si arrivava più alle foto. `frecceFisse` in `Carousel.jsx` tiene le
+frecce in vista finché `videoAttivo`; toglierlo rimette la trappola.
+
 Lo scorrimento automatico prosegue come sulle foto, ma su quella slide aspetta 6 secondi
 invece di 2: a due il tasto play non è colpibile. Premendolo il carosello si ferma —
 senza toccare `paused`, che resta la scelta di chi guarda — e riparte da sé uscendo dalla
@@ -357,6 +369,8 @@ src/
 ├── data/fotoFit.js       # generato: come ogni foto entra nel carosello
 ├── components/
 │   ├── Navbar.jsx        # nav sticky (Home · Archivio · Chi sono) + selettore IT/EN
+│   │                     #   sotto sm cade il nome e Instagram passa prima delle
+│   │                     #   lingue: su 320px le voci ci stanno leggibili
 │   ├── Footer.jsx        # fa anche da pagina contatti
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
 │   ├── BannerPrivacy.jsx # banner cookie e privacy (in App, su tutte le pagine)
