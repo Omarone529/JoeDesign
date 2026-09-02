@@ -271,6 +271,13 @@ const TESTI = {
 
     // Testi alternativi delle immagini di prodotto: li usano le pagine e la
     // sitemap immagini, quindi stanno scritti una volta sola.
+    /* Marchio "AI GENERATED"/"AI MODIFIED": la scritta dentro è disegnata e in
+       inglese, quindi la frase per intero la dà il testo alternativo. */
+    ai: {
+      generata: 'Immagine generata con l’intelligenza artificiale',
+      modificata: 'Immagine modificata con l’intelligenza artificiale',
+    },
+
     alt: {
       copertina: (titolo, cat, nome) => `${titolo}, ${cat} — progetto di ${nome}`,
       galleria: (titolo, cat, i, totale) => `${titolo}, ${cat} — immagine ${i} di ${totale}`,
@@ -505,6 +512,11 @@ const TESTI = {
       briciolaHome: 'Home',
       briciolaArchivio: 'Archive',
       discipline: ['Product design', 'Industrial design', 'Packaging design', 'Graphic design'],
+    },
+
+    ai: {
+      generata: 'Image generated with artificial intelligence',
+      modificata: 'Image edited with artificial intelligence',
     },
 
     alt: {
