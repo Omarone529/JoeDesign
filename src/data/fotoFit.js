@@ -85,6 +85,9 @@ export const fotoFit = {
     "fit": "contain",
     "fondo": "#ffffff"
   },
+  "/images/products/stanza-nella-stanza/06.webp": {
+    "pos": "50% 33%"
+  },
   "/images/products/trave/sfondo.webp": {
     "pos": "47% 50%"
   },
