@@ -396,6 +396,7 @@ const progetti = [
     sfondo: true,
     ai: { sfondo: 'generata' },
     tavola: 10,
+    designer: 'Giovanni Sarchiolla, Giacomo Codeluppi',
     desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
     spec: {
       Oggetto: 'Architettura / Interior',
