@@ -261,6 +261,13 @@ const TESTI = {
       chiSonoTitolo: (firma, ruolo) => `Chi sono · ${firma} · ${ruolo}`,
       progettoDesc: (titolo, cat, anno, nome, ruolo, luogo) =>
         `${titolo} — ${cat}${anno}. Progetto di ${nome}, ${ruolo} a ${luogo}.`,
+      /*
+       * Firma in fondo all'anteprima social di una scheda: vedi og-image.js.
+       * In inglese anche sulla serie italiana, ed è l'unica eccezione alle due
+       * lingue separate: `designed by` è la formula con cui il design si firma,
+       * e in italiano si usa così. Non è un pezzo di frase rimasto indietro.
+       */
+      progettoFirma: (nome) => `Designed by ${nome}`,
       privacyTitolo: (firma) => `Informativa privacy · ${firma}`,
       privacyDesc: (firma) =>
         `Come il sito di ${firma} tratta i dati di chi lo visita: nessun cookie proprio, nessuna statistica, e i video di YouTube solo con il consenso.`,
@@ -509,6 +516,7 @@ const TESTI = {
       chiSonoTitolo: (firma, ruolo) => `About · ${firma} · ${ruolo}`,
       progettoDesc: (titolo, cat, anno, nome, ruolo, luogo) =>
         `${titolo} — ${cat}${anno}. Project by ${nome}, ${ruolo} in ${luogo}.`,
+      progettoFirma: (nome) => `Designed by ${nome}`,
       privacyTitolo: (firma) => `Privacy policy · ${firma}`,
       privacyDesc: (firma) =>
         `How the site of ${firma} handles visitors’ data: no cookies of its own, no analytics, and YouTube videos only with consent.`,

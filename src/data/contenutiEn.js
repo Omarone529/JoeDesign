@@ -183,7 +183,7 @@ export const progettiEn = {
   },
   'zeta-3': {
     cat: 'Workstation',
-    desc: 'ZetaTre is a compact workstation designed to answer the needs of craftspeople working in small spaces. It integrates three main functions — computer station, seat and tool container — in a single element made of wood.',
+    desc: 'ZETA 3 is a workstation developed as a university project and designed to be shown at SaloneSatellite 2025, on the stand of the Accademia di Belle Arti di Bologna. The project comes from the wish for a compact, versatile element able to hold three different functions in a single object: a computer station, a seat and a container for work materials. The structure pairs a contemporary language with elements drawn from craft and from the working of the material, bringing out how the object is built and what it does.',
     spec: {
       Object: 'Workstation',
       Context: 'Salone Satellite, Milan · produced by Meco / Mobilferro',
@@ -203,7 +203,7 @@ export const progettiEn = {
   },
   trave: {
     cat: 'Jewellery · Fashion',
-    desc: 'Unisex silver pendant designed for QAIA. A drop earring shaped like a beam, a symbol of solidity and construction. The engraved word Structure becomes a message for those building their own future, laying solid foundations made of study, creativity and collaboration.',
+    desc: 'TRAVE is a fashion design project that reinterprets the beam, a structural element, turning it into a piece of jewellery to wear. It takes the form of a drop earring in sterling silver 925, with an essential structure and an engraving that becomes part of what the piece says. The beam stands for solidity, support and construction: a metaphor for a personal path and for building a life of your own. The engraving on the surface turns that structure into a message to carry with you.',
     spec: {
       Object: 'Earrings',
       Context: 'Collaboration with QAIA Laboratorio',
@@ -232,7 +232,7 @@ export const progettiEn = {
   },
   'dog-lamp': {
     cat: 'Floor lamp',
-    desc: 'The Dog Lamp is meant to be far more than a source of light: a four-legged companion able to bring cheer and comfort to children’s rooms. Inspired by the idea of a pet that not every child can have, it has a soft, pop form that mixes play and elegance.',
+    desc: 'DOG LAMP is a lamp made for childhood, designed to bring together function, simple construction and a playful language. The project was developed to be made through 3D printing, with a system of interlocking parts that lets the lamp be assembled without glue or complicated fixings. The dog-inspired form turns the lamp into a small domestic presence able to relate to the child, making light part of everyday life. DOG LAMP comes out of the meeting between digital design, additive manufacturing and design for children.',
     spec: {
       Object: 'Children’s lamp',
       Context: 'University project',
@@ -242,7 +242,7 @@ export const progettiEn = {
   },
   anelli: {
     cat: 'Magazine rack',
-    desc: 'Anelli is a magazine rack inspired by the pop aesthetics of the 1960s and 1970s, reinterpreted in a contemporary key. The structure is made of three elongated overlapping rings that create a soft, dynamic form, conceived to hold magazines of different sizes while keeping them tidy and easy to reach.',
+    desc: 'ANELLI is a design concept developed during university, born from a reinterpretation of the magazine rack through a pop aesthetic and a moving system. The project is made of a series of rotating rings that let each section of the rack be turned, so the magazines can be reached from more than one direction.',
     spec: {
       Object: 'Magazine rack',
       Context: 'University project · Concept design',
@@ -261,8 +261,8 @@ export const progettiEn = {
     },
   },
   food: {
-    cat: 'Lunch box',
-    desc: 'This lunch box is designed not only as a container for food, but as a practical, dependable object to accompany daily life. Its soft, elegant design makes it easy to carry in bags and backpacks, while its versatility suits those who eat quickly or standing up.',
+    cat: 'Food container',
+    desc: 'LUNCH BOX is a design concept developed during university, born from the wish to simplify the lunch break and make it work in any situation. The project rethinks the classic lunch box through a system meant to organise and carry a meal in a simple, practical and intuitive way, adapting to the different needs of everyday life. The aim is an object able to follow its user away from home, at work, at university or on the move, making lunchtime easier to handle.',
     spec: {
       Object: 'Lunch box',
       Context: 'University project · Concept design',

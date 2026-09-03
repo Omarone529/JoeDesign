@@ -6,6 +6,7 @@ import {
   areeIn,
   contaProgetti,
   familyBand,
+  focusItemsIn,
   periodoArchivio,
   periodoDi,
   profile,
@@ -28,13 +29,19 @@ import { percorso, percorsoTradotto } from './router'
  *
  * SITE lo passa Netlify al deploy nella env `URL`, quindi segue da sé il
  * dominio vero. Per forzarlo: `SITE_URL=https://miodominio.it npm run build`.
+ *
+ * Il valore di scorta è il dominio del sito, non quello di Netlify: serve alle
+ * build fatte a mano, dove la env non c'è, e scrivere lì l'indirizzo `.netlify`
+ * significherebbe pubblicare canonical e sitemap che rimandano altrove. Deve
+ * combaciare con il dominio primario impostato su Netlify, apex compreso: se là
+ * il primario diventa `www`, va cambiato anche qui.
  */
 const ENV_SITE =
   (typeof process !== 'undefined' &&
     process.env &&
     (process.env.SITE_URL || process.env.URL)) ||
   ''
-export const SITE = (ENV_SITE || 'https://joedesign.netlify.app').replace(/\/+$/, '')
+export const SITE = (ENV_SITE || 'https://joesarchiolla.com').replace(/\/+$/, '')
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
@@ -485,12 +492,17 @@ export function immaginiPerRotta(route) {
   const lang = route.lang || 'it'
 
   /*
-   * Solo `familyBand`: il ritratto in cima alla home è decorativo e ha `alt`
-   * vuoto per questo. Dichiararlo qui lo proporrebbe a Google Immagini senza la
-   * descrizione che Google si aspetta di trovare nell'alt — un'immagine muta in
-   * un indice che vive di didascalie.
+   * `familyBand` e le anteprime dei lavori selezionati. Il ritratto in cima
+   * alla home invece no: è decorativo e ha `alt` vuoto per questo, e dichiararlo
+   * qui lo proporrebbe a Google Immagini senza la descrizione che Google si
+   * aspetta di trovare nell'alt, un'immagine muta in un indice che vive di
+   * didascalie. Le anteprime dei lavori l'alt ce l'hanno, e da quando non sono
+   * più le copertine d'archivio questa è l'unica pagina che le contiene: senza
+   * questa riga cinque fotografie non entrerebbero in sitemap da nessuna parte.
    */
-  if (route.name === 'home') return [familyBand.src].map(abs)
+  if (route.name === 'home') {
+    return [familyBand.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
+  }
 
   if (route.name === 'about') {
     const about = aboutIn(lang)

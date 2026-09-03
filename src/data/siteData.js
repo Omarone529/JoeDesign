@@ -35,8 +35,10 @@ export const homeHero = {
   height: 1351,
 }
 
-/* Fondo bianco vero, non trasparente: in home lo scatto va in `multiply` per
-   fonderlo con la carta, come il ritratto qui sopra. */
+/* Fondo bianco vero, non trasparente. In home la fascia va da bordo a bordo,
+   quindi il bianco riempie tutto e non dà fastidio; stringendola servirebbe il
+   `mix-blend-multiply` del ritratto qui sopra, o resterebbe un rettangolo
+   bianco appoggiato sulla carta. */
 export const familyBand = {
   src: '/images/home/family-band.webp',
   alt: 'La famiglia di prodotti',
@@ -138,7 +140,8 @@ const progetti = [
     cat: 'Portaccendino',
     year: '2026',
     photos: 8,
-    ai: { generate: [1, 3, 5, 8] },
+    sfondo: true,
+    ai: { generate: [1, 3, 5, 8], sfondo: 'generata' },
     tavola: 20,
     desc: 'DOSE è un portaccendino pensato per chi il proprio accendino non lo trova mai, fra le tasche dei cargo, le borse e gli oggetti che si portano con sé ogni giorno: nasce dall’esigenza di averlo sempre a portata di mano, trasformandolo in un accessorio da indossare e non semplicemente da riporre. La forma a pillola ne definisce l’identità, mentre l’estetica pop e i colori industriali accesi ne costruiscono un linguaggio visivo deciso e riconoscibile. Un sistema di calamite permette di scegliere e combinare liberamente i diversi elementi, che si intercambiano con facilità: ogni DOSE è componibile e personalizzabile nelle sue configurazioni cromatiche. L’aggancio lo fissa ai pantaloni o alla borsa e tiene l’accendino sempre visibile e accessibile: un piccolo accessorio per rendere più semplice un gesto quotidiano.',
     spec: {
@@ -302,6 +305,7 @@ const progetti = [
     year: '2026',
     photos: 8,
     video: 'VR8ZsS-mHAA',
+    sfondo: true,
     tavola: 19,
     desc: 'BLOOM è un concept di portafiori che nasce dall’idea di recuperare un elemento industriale esistente e trasformarlo in un oggetto d’uso quotidiano. Un mattone industriale a dieci fori viene reinterpretato attraverso un semplice accessorio a incastro, che lo rende un portafiori senza modificarne la struttura originale. L’intervento lascia visibile l’identità del mattone e ne valorizza la matericità e il carattere industriale: sul fronte una grafica ispirata alle ricerche sul Futurismo, recuperata da testi e pubblicazioni storiche, con il Fauno Giallo come elemento distintivo; nella parte inferiore una numerazione che richiama il linguaggio delle edizioni limitate e fa di ogni mattone recuperato un pezzo identificabile e da collezione.',
     spec: {
@@ -322,7 +326,7 @@ const progetti = [
     ai: { sfondo: 'modificata' },
     tavola: 6,
     designer: 'Giovanni Sarchiolla, Sara Marchini, Elena Vecchi',
-    desc: 'ZetaTre è una workstation compatta progettata per rispondere alle esigenze degli artigiani che lavorano in spazi ridotti. Integra tre funzioni principali: postazione per computer, seduta e contenitore per strumenti, in un unico elemento realizzato in legno.',
+    desc: 'ZETA 3 è una postazione di lavoro sviluppata come progetto universitario e progettata per essere presentata al SaloneSatellite 2025 all’interno dello stand fieristico dell’Accademia di Belle Arti di Bologna. Il progetto nasce dalla volontà di creare un elemento compatto e versatile capace di integrare tre diverse funzioni in un unico oggetto: postazione per PC, seduta e contenitore per il materiale di lavoro. La struttura combina un linguaggio contemporaneo con elementi legati all’artigianato e alla lavorazione del materiale, valorizzando la costruzione dell’oggetto e la sua componente funzionale.',
     spec: {
       Oggetto: 'Postazione di lavoro',
       Contesto: 'Salone Satellite, Milano · prodotto da Meco / Mobilferro',
@@ -356,7 +360,7 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 8,
-    desc: 'Pendente unisex in argento disegnato per QAIA. Un orecchino pendente a forma di trave, simbolo di solidità e costruzione. La parola Structure incisa diventa un messaggio dedicato a chi sta progettando il proprio futuro, costruendo fondamenta solide fatte di studio, creatività e collaborazione.',
+    desc: 'TRAVE è un progetto di fashion design che reinterpreta l’elemento strutturale della trave trasformandolo in un gioiello da indossare. Il progetto prende forma in un orecchino pendente realizzato in argento 925, caratterizzato da una struttura essenziale e da un’incisione che diventa parte integrante del messaggio del gioiello. La trave rappresenta solidità, sostegno e costruzione: una metafora del percorso personale e della costruzione del proprio progetto di vita. L’incisione sulla superficie rende questa struttura un vero e proprio messaggio da portare con sé.',
     spec: {
       Oggetto: 'Orecchini',
       Contesto: 'Collaborazione QAIA Laboratorio',
@@ -369,10 +373,10 @@ const progetti = [
     title: 'ZERO SFRIDO',
     cat: 'Seduta · Eco design',
     year: '2025',
-    photos: 1,
+    photos: 3,
     disegno: true,
     sfondo: true,
-    ai: { sfondo: 'generata' },
+    ai: { generate: [1, 2], sfondo: 'generata' },
     tavola: 9,
     desc: 'Un complemento d’arredo risultato di un processo di riduzione ed essenzialità, ispirato al linguaggio dell’architettura. Conta l’idea che la struttura non sia nascosta ma diventi espressione, che il materiale possa raccontarsi attraverso la sua logica costruttiva.',
     spec: {
@@ -387,10 +391,10 @@ const progetti = [
     title: 'STANZA NELLA STANZA',
     cat: 'Architettura · Interior',
     year: '2025',
-    photos: 3,
+    photos: 6,
     disegno: true,
     sfondo: true,
-    ai: { generate: [2] },
+    ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 10,
     desc: 'Il progetto si basa sull’idea che lo spazio nasca da un’esperienza abitativa più che da un singolo oggetto. Il fulcro della composizione è la zona bagno, trasformata in un’area di relax con una piscina incassata e una doccia a cascata dal soffitto: aperta e luminosa grazie all’assenza di barriere e a una vetrata a privacy controllata.',
     spec: {
@@ -408,7 +412,7 @@ const progetti = [
     disegno: true,
     sfondo: true,
     tavola: 1,
-    desc: 'La Dog Lamp è pensata per essere molto più di una semplice fonte di luce: un vero e proprio compagno a quattro zampe capace di portare allegria e comfort nelle camere dei bambini. Ispirata all’idea di un animale domestico che non tutti i bambini possono avere, ha una forma morbida e pop che mescola gioco ed eleganza.',
+    desc: 'DOG LAMP è una lampada pensata per il mondo dell’infanzia, progettata per unire funzionalità, semplicità costruttiva e un linguaggio giocoso. Il progetto è stato sviluppato per essere realizzato attraverso la stampa 3D, utilizzando un sistema di componenti ad incastro che permette di assemblare la lampada senza l’utilizzo di colle o sistemi di fissaggio complessi. La forma ispirata a un cane trasforma la lampada in un piccolo elemento domestico capace di entrare in relazione con il bambino, rendendo la luce parte dell’esperienza quotidiana. DOG LAMP nasce dall’incontro tra progettazione digitale, fabbricazione additiva e design per l’infanzia.',
     spec: {
       Oggetto: 'Lampada per bambini',
       Contesto: 'Progetto Universitario',
@@ -426,7 +430,7 @@ const progetti = [
     sfondo: true,
     ai: { generate: 'tutte', sfondo: 'generata' },
     tavola: 2,
-    desc: 'Anelli è un portariviste ispirato all’estetica pop degli anni ’60 e ’70, reinterpretata in chiave contemporanea. La struttura è composta da tre anelli allungati sovrapposti che creano una forma morbida e dinamica, pensata per contenere riviste di diverse dimensioni mantenendole ordinate e facilmente accessibili.',
+    desc: 'ANELLI è un concept di design sviluppato durante il percorso universitario, nato dalla reinterpretazione del portariviste attraverso un’estetica pop e un sistema dinamico. Il progetto è composto da una serie di anelli rotanti che permettono di orientare le singole sezioni del portariviste e di accedere alle riviste da più direzioni.',
     spec: {
       Oggetto: 'Portariviste',
       Contesto: 'Progetto Universitario · Concept design',
@@ -454,14 +458,14 @@ const progetti = [
   },
   {
     slug: 'food',
-    title: 'FOOD',
-    cat: 'Lunch box',
+    title: 'LUNCH BOX',
+    cat: 'Portapranzo',
     year: '2024',
     photos: 4,
     disegno: true,
     sfondo: true,
     tavola: 4,
-    desc: 'Questa lunch box è progettata non solo come contenitore per il cibo, ma come un oggetto pratico e affidabile per accompagnare la vita quotidiana. Il design morbido ed elegante la rende facile da portare in borse e zaini, mentre la sua versatilità la rende perfetta anche per chi pranza velocemente o in piedi.',
+    desc: 'LUNCH BOX è un concept di design sviluppato durante il percorso universitario, nato dalla volontà di semplificare e rendere più funzionale la pausa pranzo in qualsiasi situazione. Il progetto ripensa la classica lunch box attraverso un sistema pensato per organizzare e trasportare il pasto in modo semplice, pratico e intuitivo, adattandosi alle diverse esigenze della quotidianità. L’obiettivo è progettare un oggetto capace di accompagnare l’utente fuori casa, al lavoro, all’università o durante gli spostamenti, rendendo più immediata la gestione del momento del pranzo.',
     spec: {
       Oggetto: 'Lunch box',
       Contesto: 'Progetto Universitario · Concept design',
@@ -751,6 +755,12 @@ export function aiFoto(item, n) {
 /*
  * Solo gli slug: il resto viene dall'archivio, così non si duplica niente e uno
  * slug errato rompe la build. L'ordine qui è la numerazione 01–05 mostrata.
+ *
+ * L'anteprima però NON è la copertina d'archivio: la home ha le sue, in
+ * `/images/home/selezionati/<slug>.webp`, così chi arriva dalla home e poi apre
+ * l'archivio non rivede due volte la stessa fotografia. Cambiando `focusSlugs`
+ * va aggiunta anche la foto: qui non c'è archivio da cui ripiegare, e un file
+ * mancante è un riquadro vuoto in prima pagina.
  */
 const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'dog-lamp']
 
@@ -758,10 +768,8 @@ export const focusItems = focusSlugs.map((slug) => {
   const item = progetti.find((p) => p.slug === slug)
   if (!item) throw new Error(`focusItems: nessun progetto con slug "${slug}" nell'archivio`)
   const { title, cat, year } = item
-  return { slug, title, cat, year, cover: projectImages(item).cover }
+  return { slug, title, cat, year, cover: `/images/home/selezionati/${slug}.webp` }
 })
-
-/* ─────────────────────────────── Lingue ─────────────────────────────── */
 
 /*
  * Il sito esiste in italiano e in inglese. I dati qui sopra sono l'italiano;
@@ -823,7 +831,6 @@ export function profiloIn(lang) {
   return inglese(lang) ? profileEnCompleto : profile
 }
 
-/* Le foto restano le stesse: cambiano solo i testi alternativi. */
 const aboutEnCompleto = {
   ...about,
   intro: aboutEn.intro,

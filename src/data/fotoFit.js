@@ -12,6 +12,9 @@ export const fotoFit = {
   "/images/products/anelli/sfondo.webp": {
     "pos": "52% 50%"
   },
+  "/images/products/bloom/sfondo.webp": {
+    "pos": "46% 50%"
+  },
   "/images/products/bullone/sfondo.webp": {
     "pos": "51% 50%"
   },
@@ -79,13 +82,6 @@ export const fotoFit = {
     "fondo": "#ffffff"
   },
   "/images/products/sedia-tempo-determinato/sfondo.webp": {
-    "fit": "contain",
-    "fondo": "#ffffff"
-  },
-  "/images/products/stanza-nella-stanza/02.webp": {
-    "pos": "52% 50%"
-  },
-  "/images/products/stanza-nella-stanza/03.webp": {
     "fit": "contain",
     "fondo": "#ffffff"
   },

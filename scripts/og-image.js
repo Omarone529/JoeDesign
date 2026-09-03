@@ -406,7 +406,7 @@ for (const lang of LINGUE) {
       sorgente: path.join(root, 'public', cover),
       categoria: item.cat,
       titolo: item.title,
-      coda: [item.year, profile.displayName].filter(Boolean).join(' · '),
+      coda: T.seo.progettoFirma(profile.displayName),
       dest: dove(`${item.slug}.jpg`),
     })
     fatto(`${item.slug}.jpg`)

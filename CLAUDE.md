@@ -557,9 +557,21 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 
 - `netlify.toml`: build = `npm run build`, publish = `dist`.
 - **Dominio dinamico**: `SITE` in `src/seo.js` legge la env `URL` (che Netlify imposta al deploy),
-  con fallback `https://joedesign.netlify.app`. Canonical/sitemap/OG si adeguano da soli al dominio reale.
-  Quando Joe comprerà un dominio, basta aggiungerlo in Netlify — nessuna modifica al codice.
-  Per forzarlo in locale: `SITE_URL=https://miodominio.it npm run build`.
+  con fallback `https://joesarchiolla.com`, che è il dominio del sito (comprato su
+  Cloudflare). Canonical/sitemap/OG/JSON-LD si adeguano da soli al dominio reale.
+  Il fallback serve alle build fatte a mano, dove la env non c'è, e **deve combaciare con
+  il dominio primario impostato su Netlify**: se là il primario diventasse `www`, va
+  cambiato anche in `seo.js`. Per forzarlo in locale: `SITE_URL=https://altro.it npm run build`.
+
+  ⚠️ **Il dominio è cotto dentro l'HTML al momento della build.** Cambiarlo su Netlify non
+  riscrive le pagine già pubblicate: dopo aver impostato il dominio primario serve un
+  «Trigger deploy → Clear cache and deploy site», o il sito risponde sul dominio nuovo
+  mentre canonical, sitemap e anteprime social continuano a dire quello vecchio.
+
+  DNS su Cloudflare, due CNAME verso `<nome-sito>.netlify.app` (apex e `www`), **nuvola
+  grigia**: col proxy acceso Netlify non riesce a emettere il certificato, e con SSL/TLS
+  in «Flexible» si finisce in un loop di redirect. Netlify ha già CDN e certificato suoi;
+  Cloudflare resta registrar e DNS.
 
 ## Da fare (noto)
 
@@ -575,8 +587,9 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 - Le traduzioni inglesi dei progetti sono una prima stesura: **da far rileggere a Joe**.
 - Prima/subito dopo il primo deploy: registrare il sito su **Google Search Console** e
   inviare `/sitemap.xml`. Valutare un'analitica leggera (Plausible/Umami, senza cookie).
-- **Decidere il dominio prima di pubblicare**: cambiarlo dopo che Google ha indicizzato
-  gli indirizzi `*.netlify.app` obbliga a gestire i redirect.
+- **Dominio scelto: `joesarchiolla.com`** (Cloudflare). Restano da fare i passaggi su
+  Netlify: aggiungerlo, metterlo primario, i CNAME su Cloudflare, e il redeploy con cache
+  pulita perché l'HTML porti il dominio nuovo.
 
 ## Fonte dei contenuti (bio, CV, testi)
 
