@@ -7,3 +7,9 @@ dist-ssr
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Impostazioni locali dell'editor: sono di chi ci lavora, non del progetto.
+# Erano versionate per sbaglio (discord.xml compreso).
+.idea
+.vscode
+*.iml

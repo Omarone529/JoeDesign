@@ -54,14 +54,25 @@ toccato qualcosa di sensibile all'aggancio.
 segnalare le pagine come rotte. Se con `--rompi` risulta tutto verde, il rilevatore si è
 guastato e i suoi esiti normali non valgono più niente.
 
-`npm run verifica` gira **da solo prima di ogni build** (script `prebuild`), quindi una
-foto dichiarata e non presente, un'anteprima social non rigenerata o un'etichetta AI che
-punta a una foto inesistente **fermano la build** invece di uscire in produzione. Vale la
-pena lanciarlo a mano dopo aver toccato `siteData.js` o `public/images/`.
+`npm test` e `npm run verifica` girano **da soli prima di ogni build** (script
+`prebuild`), quindi una rotta rotta, una foto dichiarata e non presente, un'anteprima
+social non rigenerata o un'etichetta AI che punta a una foto inesistente **fermano la
+build** invece di uscire in produzione — anche su Netlify, che è il posto da cui il sito
+esce davvero. Vale la pena lanciare `verifica` a mano dopo aver toccato `siteData.js` o
+`public/images/`.
 
 I test girano con `node:test`, senza dipendenze: sono la rete di sicurezza su `rotte.js`
 (ogni indirizzo generato dev'essere rileggibile come la pagina che è, in tutte e due le
-lingue), su `clip()` in `seo.js` e sugli aiutanti di `siteData`.
+lingue), su `clip()` in `seo.js`, sugli aiutanti di `siteData`, sulla geometria del libro
+e sulla **parità fra le due lingue** di `i18n.js`.
+
+Quest'ultimo merita una riga, perché protegge da un guasto che non somiglia a un guasto
+di traduzione. `testi(lang)` restituisce l'oggetto della lingua e basta: non ripiega
+sull'italiano voce per voce. Una chiave dimenticata in `en` non è quindi una scritta
+italiana in una pagina inglese — è `undefined`, e trenta di quelle voci sono funzioni.
+`T.archivio.conteggio(n)` su `undefined` lancia in pieno render: **pagina bianca**. Il
+test confronta l'intera forma dei due alberi (chiavi, tipi, numero di argomenti,
+lunghezza degli elenchi) e dice quale voce manca e dove.
 
 ⚠️ **`npm run preview` va usato con lo slash finale** (`/progetto/anelli/`, non
 `/progetto/anelli`): senza, Vite fa il fallback SPA e serve la home al posto
@@ -530,7 +541,12 @@ src/
 tests/                   # node:test, nessuna dipendenza — `npm test`
 ├── rotte.test.js        # indirizzi, lingue, 404, round-trip percorso↔parsePath
 ├── seo.test.js          # clip(): il taglio delle meta description
-└── dati.test.js         # titoloLeggibile, aiFoto (etichette AI Act), periodoDi
+├── dati.test.js         # titoloLeggibile, aiFoto (etichette AI Act), periodoDi
+├── geometria.test.js    # la piega del libro dello sketchbook
+└── i18n.test.js         # parità it/en: chiavi, tipi, argomenti, lunghezze
+
+.github/workflows/
+└── verifica.yml         # CI: lint + test + verifica + build a ogni push e PR su main
 
 scripts/
 ├── verifica.js          # dati ↔ file su disco (gira da solo prima di `npm run build`)
@@ -629,6 +645,39 @@ aggiunta nella sezione «Titolare del trattamento».
 I testi delle pagine sono in **tono impersonale** (no prima persona "io", no terza
 persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product designer,
  di Reggio Emilia», «Si parte da un vincolo…». Mantenere questo registro ovunque.
+
+## Controlli automatici e commit
+
+**CI**: `.github/workflows/verifica.yml` gira a ogni push e a ogni pull request su `main`,
+su Node 20 come `netlify.toml`. Fa `npm ci` → `lint` → `test` → `verifica` → `build`: gli
+stessi comandi che si lanciano in locale, così se passa qui passa sul portatile e
+viceversa. **Non** lancia `npm run hydration`, che vuole un Chromium e un paio di minuti:
+quello resta un controllo da fare a mano dopo aver toccato qualcosa di sensibile
+all'aggancio.
+
+Se la CI si ferma, si legge quale dei cinque passi è rosso: sono separati apposta, per
+non dover aprire il log della build per scoprire che era un test.
+
+**Messaggi di commit**: descrivere *cosa cambia*, non che qualcosa è cambiato. Metà della
+storia del progetto si chiama `chore: update`, il che rende `git bisect` inutile e
+impossibile capire quando è entrata una regressione senza aprire ogni diff. D'ora in
+avanti, prefisso e oggetto:
+
+```
+feat: etichette AI Act sulle slide del carosello
+fix: lo scroll non si ripristinava chiudendo una scheda progetto
+ref: Hero diviso in componente e dati
+chore: aggiornate le anteprime social dopo i nuovi progetti
+docs: CLAUDE.md, sezione immagini
+```
+
+Una riga sola basta; il corpo serve solo quando *perché* non si capisce dal codice — e in
+questo progetto il perché sta quasi sempre nei commenti, che è il posto dove resta
+leggibile.
+
+**File dell'editor**: `.idea/`, `.vscode/` e `*.iml` sono in `.gitignore`. Erano
+versionati per sbaglio e sono stati tolti dall'indice (restano sul disco di chi ci
+lavora): non rimetterli.
 
 ## Deploy (Netlify)
 

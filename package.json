@@ -9,7 +9,7 @@
     "verifica": "node scripts/verifica.js",
     "test": "node --test tests/*.test.js",
     "hydration": "node scripts/controlla-hydration.js",
-    "prebuild": "node scripts/verifica.js",
+    "prebuild": "npm test && node scripts/verifica.js",
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.js",
     "prerender": "node scripts/prerender.js",
     "preview": "vite preview",
