@@ -29,7 +29,30 @@ npm run prerender  # solo lo step di pre-rendering (dopo una build)
 npm run lint       # ESLint (react, react-hooks, jsx-a11y). Deve restare a zero.
 npm test           # test di rotte, meta description e aiutanti dei dati (node:test)
 npm run verifica   # controlla che i dati combacino con i file su disco
+npm run hydration  # carica le 66 pagine in un browser e verifica l'aggancio di React
 ```
+
+**`npm run hydration`** è il controllo che nessun altro strumento fa. Il sito serve HTML
+già scritto e poi React ci si **aggancia** invece di ridisegnarlo: se quello che React
+disegna in memoria non combacia con quel markup, butta via il lavoro del pre-rendering e
+ridisegna tutto nel browser — la pagina lampeggia, e se un componente lancia durante
+l'aggancio resta bianca (è il motivo per cui esiste `ErrorBoundary`).
+
+Il codice è pieno di scelte fatte apposta per non romperlo, e nessuna si vede leggendo il
+file: l'anno del copyright fissato alla build (`__ANNO_BUILD__`), il consenso che in
+pre-rendering vale sempre `null` (`versioneServer`), il banner fuori dall'HTML statico
+(`useMontato`), la navbar che parte visibile, la sola prima slide del carosello con un
+`src`. **Basta un `new Date()` dentro un componente, o uno stato iniziale che legge
+`localStorage`, e uno di quei contratti salta in silenzio.**
+
+Vuole la build fatta (`npm run build`) e un Chromium — quello di Playwright se c'è,
+altrimenti `CHROME_PATH=/percorso npm run hydration`. Dura un paio di minuti, e **non** è
+in `prebuild`: su Netlify non c'è né browser né server. Va lanciato a mano dopo aver
+toccato qualcosa di sensibile all'aggancio.
+
+⚠️ `npm run hydration -- --rompi` è l'autotest: rompe l'aggancio di proposito e **deve**
+segnalare le pagine come rotte. Se con `--rompi` risulta tutto verde, il rilevatore si è
+guastato e i suoi esiti normali non valgono più niente.
 
 `npm run verifica` gira **da solo prima di ogni build** (script `prebuild`), quindi una
 foto dichiarata e non presente, un'anteprima social non rigenerata o un'etichetta AI che
@@ -511,6 +534,7 @@ tests/                   # node:test, nessuna dipendenza — `npm test`
 
 scripts/
 ├── verifica.js          # dati ↔ file su disco (gira da solo prima di `npm run build`)
+├── controlla-hydration.js # carica le 66 pagine e verifica l'aggancio di React (a mano)
 ├── prerender.js         # pre-rendering + sitemap + robots (parte di `npm run build`)
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)

@@ -50,6 +50,10 @@ module.exports = {
       // Script e test girano in Node e non finiscono nel bundle.
       files: ['scripts/**/*.js', 'tests/**/*.js', '*.config.js', '.eslintrc.cjs'],
       env: { node: true, browser: false },
+      // Client WebSocket integrato in Node (dalla 22): lo usa
+      // controlla-hydration.js per parlare col browser. `env: node` di ESLint 8
+      // è fermo a prima e non lo conosce.
+      globals: { WebSocket: 'readonly' },
       rules: { 'no-console': 'off' },
     },
   ],
