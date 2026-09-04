@@ -13,6 +13,7 @@ import Carousel from '../components/Carousel'
 import EtichettaAI from '../components/EtichettaAI'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
+import { srcSetDi, MISURE } from '../immagini'
 
 // Formato comune a tutti gli sfondo.webp: dichiararlo riserva lo spazio e la
 // navigazione sotto non salta a caricamento avvenuto.
@@ -147,6 +148,8 @@ export default function ProjectDetail({ slug }) {
             <figure className="m-0 border-t border-line pt-6">
               <img
                 src={drawing}
+                srcSet={srcSetDi(drawing)}
+                sizes={MISURE.mezza}
                 alt={altDisegno(item, lang)}
                 loading="lazy"
                 decoding="async"
@@ -183,6 +186,8 @@ export default function ProjectDetail({ slug }) {
           <figure className="relative m-0 border-t border-line pt-6">
             <img
               src={sfondo}
+              srcSet={srcSetDi(sfondo)}
+              sizes={MISURE.piena}
               alt={altSfondo(item, lang)}
               loading="lazy"
               decoding="async"

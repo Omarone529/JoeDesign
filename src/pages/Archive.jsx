@@ -12,6 +12,7 @@ import {
 import { fotoFit } from '../data/fotoFit'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
+import { srcSetDi, MISURE } from '../immagini'
 
 function testoPeriodo(periodo) {
   if (!periodo) return ''
@@ -95,6 +96,8 @@ function Bivio() {
                 >
                   <img
                     src={cover}
+                    srcSet={srcSetDi(cover)}
+                    sizes={MISURE.aree}
                     alt={altCopertina(primo, lang)}
                     fetchpriority={i === 0 ? 'high' : undefined}
                     decoding="async"
@@ -173,6 +176,8 @@ function GrigliaArea({ area }) {
                     {cover ? (
                       <img
                         src={cover}
+                        srcSet={srcSetDi(cover)}
+                        sizes={MISURE.archivio}
                         alt={altCopertina(p, lang)}
                         loading={subito ? 'eager' : 'lazy'}
                         fetchpriority={i < 4 ? 'high' : undefined}

@@ -1,5 +1,6 @@
 import { familyBandIn } from '../../data/siteData'
 import { useLang } from '../../router'
+import { srcSetDi, MISURE } from '../../immagini'
 
 /*
  * La famiglia di prodotti, da bordo a bordo e senza testo accanto: la fila di
@@ -20,6 +21,8 @@ export default function FamilyBand() {
     <section className="bg-placeholder">
       <img
         src={familyBand.src}
+        srcSet={srcSetDi(familyBand.src)}
+        sizes={MISURE.piena}
         alt={familyBand.alt}
         loading="lazy"
         decoding="async"

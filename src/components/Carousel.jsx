@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { fotoFit } from '../data/fotoFit'
+import { srcSetDi, MISURE } from '../immagini'
 import { testi } from '../i18n'
 import { useLang } from '../router'
 import { animazioniRidotte } from '../motion'
@@ -207,6 +208,8 @@ export default function Carousel({ images, title }) {
             <Fragment key={src}>
               <img
                 src={caricate.has(i) ? src : undefined}
+                srcSet={caricate.has(i) ? srcSetDi(src) : undefined}
+                sizes={MISURE.carosello}
                 alt={alt}
                 aria-hidden={i !== index}
                 fetchpriority={i === 0 ? 'high' : undefined}

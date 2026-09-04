@@ -1,6 +1,7 @@
 import { altCopertina, focusItemsIn } from '../../data/siteData'
 import { testi } from '../../i18n'
 import { Link, percorso, useLang } from '../../router'
+import { srcSetDi, MISURE } from '../../immagini'
 
 /* I cinque progetti focus del portfolio 2026 (selezione in `focusSlugs`). */
 export default function SelectedWorks() {
@@ -35,6 +36,8 @@ export default function SelectedWorks() {
               <div className="aspect-[4/5] overflow-hidden bg-placeholder">
                 <img
                   src={p.cover}
+                  srcSet={srcSetDi(p.cover)}
+                  sizes={MISURE.selezionati}
                   alt={altCopertina(p, lang)}
                   loading={i < 3 ? 'eager' : 'lazy'}
                   fetchpriority={i === 0 ? 'high' : undefined}

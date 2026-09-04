@@ -2,6 +2,7 @@ import { aboutIn, profiloIn } from '../data/siteData'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 import Sketchbook from '../components/about/Sketchbook'
+import { srcSetDi, MISURE } from '../immagini'
 
 /*
  * Il padding alto sta sulla colonna di testo, così la foto parte a filo del
@@ -63,6 +64,8 @@ export default function About() {
         <div className="mx-auto w-full max-w-[440px] md:relative md:col-start-2 md:row-start-1 md:max-w-none">
           <img
             src={hero.src}
+            srcSet={srcSetDi(hero.src)}
+            sizes={MISURE.mezza}
             alt={hero.alt}
             width="1040"
             height="2022"
@@ -136,6 +139,8 @@ export default function About() {
       <section className="bg-night">
         <img
           src={lab.src}
+          srcSet={srcSetDi(lab.src)}
+          sizes={MISURE.piena}
           alt={lab.alt}
           loading="lazy"
           width="1900"

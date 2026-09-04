@@ -43,7 +43,8 @@ function elenca(dir) {
   for (const nome of fs.readdirSync(dir)) {
     const p = path.join(dir, nome)
     if (fs.statSync(p).isDirectory()) out.push(...elenca(p))
-    else if (nome.endsWith('.webp')) out.push(p)
+    // Le varianti -800 sono derivate da queste: le rigenera varianti-foto.js.
+    else if (nome.endsWith('.webp') && !nome.endsWith('-800.webp')) out.push(p)
   }
   return out
 }

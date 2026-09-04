@@ -9,7 +9,7 @@ import { aboutEn, areeEn, familyBandEn, profileEn, progettiEn } from './contenut
 
 export const profile = {
   name: 'Giovanni Sarchiolla',
-  displayName: 'Joe Sarchiolla', // nome "d'arte" mostrato nel sito (home, chi sono)
+  displayName: 'Joe Sarchiolla',
   nick: 'Joe',
   role: 'Product Designer',
   place: 'Reggio Emilia, Italia',
@@ -35,7 +35,7 @@ export const homeHero = {
   height: 1351,
 }
 
-/* Fondo bianco vero, non trasparente. In home la fascia va da bordo a bordo,
+/* Fondo bianco. In home la fascia va da bordo a bordo,
    quindi il bianco riempie tutto e non dà fastidio; stringendola servirebbe il
    `mix-blend-multiply` del ritratto qui sopra, o resterebbe un rettangolo
    bianco appoggiato sulla carta. */
@@ -79,7 +79,7 @@ export const about = {
     lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
   },
   /*
-   * Pagine dello sketchbook personale (da "ARCHIVE JOE SARCHIOLLA.pdf", vedi
+   * Pagine dello sketchbook personale, vedi
    * scripts/sketchbook-pages.js), mostrato come libro sfogliabile in 3D sotto
    * la fascia "lab". Ogni voce è una pagina fisica con fronte e retro (le
    * tavole 01-08 sono accoppiate due a due, così come stanno nel PDF

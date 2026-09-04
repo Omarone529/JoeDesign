@@ -3,6 +3,7 @@ import { homeHero, profile } from '../../data/siteData'
 import { testi } from '../../i18n'
 import { scorrimento } from '../../motion'
 import { useLang } from '../../router'
+import { srcSetDi, MISURE } from '../../immagini'
 
 /* Tempi dell'ingresso, in secondi. */
 const PRIMA_LETTERA = 0.2 // attesa prima che parta il nome
@@ -53,6 +54,8 @@ export default function Hero() {
       <div aria-hidden="true" className="absolute inset-0 bg-paper">
         <img
           src={homeHero.src}
+          srcSet={srcSetDi(homeHero.src)}
+          sizes={MISURE.mezza}
           alt={homeHero.alt}
           width={homeHero.width}
           height={homeHero.height}
