@@ -140,6 +140,7 @@ const progetti = [
     cat: 'Portaccendino',
     year: '2026',
     photos: 8,
+    video: 'UYS6ik4XTV0',
     sfondo: true,
     ai: { generate: [1, 3, 5, 8], sfondo: 'generata' },
     tavola: 20,
