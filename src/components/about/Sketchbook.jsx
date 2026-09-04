@@ -3,6 +3,15 @@ import { about, aboutIn } from '../../data/siteData'
 import { testi } from '../../i18n'
 import { useLang } from '../../router'
 import { animazioniRidotte } from '../../motion'
+import {
+  ALTEZZA_MONDO,
+  LARGHEZZA_MONDO,
+  SCARTO_PILA,
+  angoliVertici,
+  calcolaColonne,
+  rigidita,
+} from './libro/geometria'
+import { MARGINE_CAMERA, ROT_Y_LIBRO, creaScena, tavolaPer } from './libro/scena'
 const { sketchbook } = about
 const N = sketchbook.length
 const SOGLIA_CLIC = 6
@@ -11,19 +20,8 @@ const SOGLIA_COMPLETAMENTO = 0.32
 const VELOCITA_MAX = 3.2 // gradi/ms
 const VELOCITA_STANTIA_MS = 90 // dito fermo da più di così al rilascio → niente slancio
 const CEDIMENTO_LIBRO = (3 * Math.PI) / 180 // oltre le copertine cede tutto il libro, non la pagina
-const M_COLONNE = 48
-const CURVA_MAX = (22 * Math.PI) / 180 // arco sobrio: una pagina vera non si piega a tubo
-// Verso giusto per un giro all'indietro; andando avanti lo ribalta `versoArco`.
-const CURVA_SEGNO = -1
-const LARGHEZZA_MONDO = 2
-const ALTEZZA_MONDO = LARGHEZZA_MONDO * (1415 / 1000)
-const SCARTO_PILA = 0.02
-const RIGIDITA_COPERTINA = 0.35 // le copertine sono cartone: si flettono molto meno della carta
 // Quanto il corpo della pagina si alza a metà giro, per scavalcare le pile.
 const SOLLEVAMENTO_VOLO = 0.28
-const FOV_VERTICALE = 18 // obiettivo leggermente tele: meno "bombatura" prospettica della pagina in volo
-const ROT_X_LIBRO = -0.1
-const ROT_Y_LIBRO = 0.07
 // Piega dinamica: il foglio si flette in proporzione alla velocità del gesto,
 // oltre alla campana geometrica del giro, e con lo stesso segno.
 const PIEGA_GUADAGNO = 0.2 // flessione extra per (grado/ms) di velocità
@@ -31,108 +29,23 @@ const PIEGA_MAX = 0.32
 const PIEGA_TOTALE_MAX = 1.15
 const PIEGA_INERZIA_MS = 40 // costante di tempo con cui la flessione insegue la velocità
 const GUTTER_OPACITA = 0.2 // ombra d'incavo lungo la costa, solo a libro aperto
-// Deve combaciare con l'aspect-ratio CSS del widget: la camera è fissa e il
-// libro non cambia mai scala.
-const ASPETTO_LIBRO = 2000 / 1415
-const K_LARGHEZZA = 2 * Math.tan((FOV_VERTICALE * Math.PI) / 360) * ASPETTO_LIBRO
-const MARGINE_CAMERA = 1.12
-// Il canvas sborda (-inset-[12%] nel JSX): a metà giro la pagina si proietta
-// più grande del libro e senza sbordo verrebbe tagliata sopra e sotto.
-const MARGINE_TELA = 1.24
-const DISTANZA_CAMERA = (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA) / K_LARGHEZZA
-// Nitidezza delle tavole. Una pagina occupa sempre questa frazione della
-// larghezza del canvas (la camera è fissa): da qui si ricava in quanti pixel
-// reali viene disegnata, e quindi come conviene filtrarne la texture.
-const QUOTA_PAGINA = LARGHEZZA_MONDO / (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA)
 /*
- * Le tavole esistono in due misure (vedi scripts/sketchbook-pages.js): NN.webp
- * a 1000px e NN-mezza.webp a 500. Sul telefono una pagina viene disegnata in
- * circa 340 pixel reali, quindi la tavola grande non si vedrebbe comunque: in
- * cambio nove texture da 1000×1415 occupano una cinquantina di megabyte di
- * memoria video, che su un telefono si paga in scatti. Le mezze ne occupano
- * tredici e pesano un terzo da scaricare.
- */
-const LARGHEZZA_TAVOLA = { dito: 500, mouse: 1000 }
-const tavolaPer = (src, dito) => (dito ? src.replace(/\.webp$/, '-mezza.webp') : src)
-// Rapporto texture/schermo sotto il quale i mipmap tolgono solo dettaglio:
-// il livello scelto cade tra 0 e 1 e il trilineare ci mescola dentro una copia
-// a metà risoluzione. Vicino all'1:1 conviene campionare la texture piena.
-const SOGLIA_MIPMAP = 1.4
-
-/*
- * Su telefono e tablet la scena gira su una GPU a piastrelle con poca banda di
- * memoria e uno schermo denso: la stessa scena che sul portatile non si sente
- * lì costa il triplo, e il libro girava a scatti. Le quattro misure qui sotto
- * si abbassano solo lì — sul desktop non cambia niente.
- *
- * `pointer: coarse` e non la larghezza della finestra: quello che conta è che
- * dietro ci sia una GPU da telefono, non quanti pixel è larga la pagina.
- */
-const suDito = () =>
-  typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true
-
-// Mappa d'ombra: è un secondo render dell'intera scena, a ogni fotogramma.
-// A 2048² sono quattro milioni di texel per un libro che sullo schermo di un
-// telefono ne occupa settantamila: il quarto basta e non si vede la differenza.
-const OMBRA_PX = { dito: 1024, mouse: 2048 }
-// Campioni per pixel sulle tavole. Il libro si guarda quasi di faccia, quindi
-// l'anisotropia serve poco: sedici prelievi per frammento sono soldi buttati.
-const ANISOTROPIA = { dito: 4, mouse: 16 }
-// Il canvas sborda del 24%, quindi su un telefono a 3x un riquadro da 350px
-// diventerebbe 1300 pixel per lato. 1.5 è comunque il minimo che il testo
-// piccolo delle tavole richiede (vedi `rapportoPixel`).
-const PIXEL_MAX = { dito: 1.5, mouse: 2 }
-
-// `curvaAmp`: flessione totale, negativa se piega nell'altro verso.
-// `alzata`: sollevamento di volo in unità mondo, a rampa lungo la pagina.
-function calcolaColonne(curvaAmp, alzata = 0) {
-  const posX = new Float32Array(M_COLONNE + 1)
-  const posZ = new Float32Array(M_COLONNE + 1)
-  const angoliSegmento = new Float32Array(M_COLONNE)
-  let x = 0
-  let z = 0
-  for (let s = 0; s < M_COLONNE; s += 1) {
-    const uMetà = (s + 0.5) / M_COLONNE
-    // Antisimmetrica: a gobba singola la profondità accumulata non tornerebbe
-    // a zero e il bordo libero andrebbe alla deriva invece di richiudersi.
-    const curvaLocale = CURVA_MAX * curvaAmp * Math.sin(2 * Math.PI * uMetà) * CURVA_SEGNO
-    angoliSegmento[s] = curvaLocale
-    x += (1 / M_COLONNE) * Math.cos(curvaLocale)
-    z += -(1 / M_COLONNE) * Math.sin(curvaLocale)
-    posX[s + 1] = x
-    posZ[s + 1] = z
-  }
-  // Nella geometria e non sul gruppo: a rampa dalla cerniera, così la radice
-  // resta incollata alla costa e si alza solo il corpo della pagina.
-  if (alzata !== 0) {
-    for (let v = 1; v <= M_COLONNE; v += 1) {
-      posZ[v] += (alzata / LARGHEZZA_MONDO) * Math.min(1, (v / M_COLONNE) * 2.2)
-    }
-  }
-  return { posX, posZ, angoliSegmento }
-}
-/* Primo e ultimo foglio sono cartone: ogni flessione gli arriva ridotta. */
-function rigidita(indice) {
-  return indice === 0 || indice === N - 1 ? RIGIDITA_COPERTINA : 1
-}
-
-function angoliVertici(angoliSegmento) {
-  const out = new Float32Array(M_COLONNE + 1)
-  for (let v = 0; v <= M_COLONNE; v += 1) {
-    if (v === 0) out[v] = angoliSegmento[0]
-    else if (v === M_COLONNE) out[v] = angoliSegmento[M_COLONNE - 1]
-    else out[v] = (angoliSegmento[v - 1] + angoliSegmento[v]) / 2
-  }
-  return out
-}
-
-/*
- * Libro sfogliabile in 3D. Three.js e Anime.js (~190 kB gzip) si caricano solo
+ * Libro sfogliabile in 3D. Three.js e Anime.js (~225 kB gzip) si caricano solo
  * quando il widget si avvicina al viewport; finché la scena non è pronta — e
  * per sempre, se manca WebGL — resta la copertina statica.
  *
  * Ogni pagina è una striscia di M_COLONNE quadrilateri che ruota attorno alla
  * costa; al rilascio assesta una molla vera innescata dalla velocità del dito.
+ *
+ * Il libro è diviso in tre pezzi, e questo è quello che raccoglie il gesto e
+ * decide di quanto muovere le pagine:
+ *
+ *   libro/geometria.js  la forma della piega — matematica pura, ha dei test
+ *   libro/scena.js      Three.js: renderer, camera, luci, texture, smaltimento
+ *   Sketchbook.jsx      questo: stato, trascinamento, molle, markup
+ *
+ * La regola per non rimescolarli: `geometria` non sa che esiste una scena,
+ * `scena` non sa che esiste un dito, e qui non si scrive mai `new THREE.…`.
  */
 export default function Sketchbook() {
   // Le tavole sono le stesse in entrambe le lingue: cambiano i testi alternativi.
@@ -152,54 +65,16 @@ export default function Sketchbook() {
   const flutter = useRef(null) // { anim, stato, indice }: la vibrazione di assestamento in corso
   const wrapperRef = useRef(null)
   const mountRef = useRef(null) // div in cui Three.js monta il proprio <canvas>
-  const aperturaRef = useRef(0) // apertura corrente: serve a reinquadrare dopo un resize
 
   /*
    * Libro a riposo per una data apertura (0 = chiuso davanti, N = chiuso
    * dietro); `salta` è la pagina in volo, che posiziona applicaAngolo. Tutto è
    * funzione continua dell'apertura, così niente scatta a fine giro.
    */
-  /*
-   * La camera inquadra quello che c'è davvero: una pagina sola a libro chiuso,
-   * due da aperto, e scivola da una cosa all'altra mentre la pagina gira.
-   *
-   * Prima era ferma sulla doppia pagina, quindi la copertina chiusa stava nella
-   * metà destra del riquadro e l'altra metà restava vuota. Sullo schermo grande
-   * si legge come un libro chiuso da aprire; sul telefono, dove il riquadro è
-   * largo un palmo, sembrava solo un elemento messo storto.
-   *
-   * Si muove `zoom` e non la distanza: avvicinare la camera cambierebbe la
-   * prospettiva, e la stessa pagina in volo si deformerebbe in modo diverso a
-   * seconda di quanto il libro è aperto. Il fattore lo detta il lato più
-   * stretto — il libro non si ritaglia mai per riempire — e siccome l'altezza
-   * inquadrata non dipende dal formato del riquadro, su uno panoramico la
-   * copertina chiusa si centra soltanto, mentre su uno quadrato cresce davvero:
-   * per questo sotto `sm` il riquadro è quadrato.
-   */
-  const inquadra = (apertura) => {
-    const tre = treRef.current
-    if (!tre) return
-    const apriSx = Math.min(1, apertura)
-    const apriDx = Math.min(1, N - apertura)
-    const centro = -LARGHEZZA_MONDO / 2 + (apriDx - apriSx) * (LARGHEZZA_MONDO / 2)
-    const altezzaVista = 2 * Math.tan((FOV_VERTICALE * Math.PI) / 360) * DISTANZA_CAMERA
-    const larghezzaVista = altezzaVista * tre.camera.aspect
-    const ingombro = MARGINE_CAMERA * MARGINE_TELA
-    const larghezzaLibro = Math.max(apriSx + apriDx, 0.001) * LARGHEZZA_MONDO
-    tre.camera.zoom = Math.min(
-      larghezzaVista / (larghezzaLibro * ingombro),
-      altezzaVista / (ALTEZZA_MONDO * ingombro),
-    )
-    tre.camera.position.x = centro
-    tre.camera.lookAt(centro, 0, 0)
-    tre.camera.updateProjectionMatrix()
-  }
-
   const posizionaLibro = (apertura, salta = null) => {
     const tre = treRef.current
     if (!tre) return
-    aperturaRef.current = apertura
-    inquadra(apertura)
+    tre.inquadra(apertura)
     // L'alone segue l'impronta del libro: mezza pagina da chiuso, due da aperto.
     const apriSx = Math.min(1, apertura)
     const apriDx = Math.min(1, N - apertura)
@@ -216,12 +91,10 @@ export default function Sketchbook() {
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return
     let attivo = true
-    let osservatoreResize = null
-    let annullato = false
 
     const osservatoreCarico = new IntersectionObserver(
       (entries) => {
-        if (!entries[0]?.isIntersecting || annullato) return
+        if (!entries[0]?.isIntersecting || !attivo) return
         osservatoreCarico.disconnect()
         avvia()
       },
@@ -229,323 +102,39 @@ export default function Sketchbook() {
     )
     if (wrapperRef.current) osservatoreCarico.observe(wrapperRef.current)
 
-    function avvia() {
-      Promise.all([import('three'), import('animejs')]).then(([THREE, { animate, spring }]) => {
+    async function avvia() {
+      const [THREE, { animate, spring }] = await Promise.all([import('three'), import('animejs')])
       if (!attivo || !mountRef.current) return
       animateRef.current = animate
       springRef.current = spring
 
-      let renderer
-      try {
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' })
-      } catch {
-        return // niente WebGL: resta la copertina statica di scorta
-      }
-
-      const scena = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(FOV_VERTICALE, ASPETTO_LIBRO, DISTANZA_CAMERA - 3.5, DISTANZA_CAMERA + 2.5)
-      camera.position.set(-LARGHEZZA_MONDO / 2, 0, DISTANZA_CAMERA)
-      camera.lookAt(-LARGHEZZA_MONDO / 2, 0, 0)
-
-      // Almeno 1.5 anche sugli schermi non retina: il libro è pieno di testo
-      // piccolo e renderizzarlo più grande del canvas CSS (che poi il browser
-      // rimpicciolisce) lo tiene leggibile. La scena è leggera, se lo può
-      // permettere. Sopra 2 non si guadagna più niente di visibile.
-      const dito = suDito()
-      const rapportoPixel = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), dito ? PIXEL_MAX.dito : PIXEL_MAX.mouse)
-      renderer.setPixelRatio(rapportoPixel)
-      renderer.outputColorSpace = THREE.SRGBColorSpace
-      renderer.shadowMap.enabled = true
-      // Il filtro morbido moltiplica i prelievi sulla mappa: sul telefono il PCF
-      // semplice, che ha il bordo appena più netto e costa una frazione.
-      renderer.shadowMap.type = dito ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
-      renderer.setClearColor(0x000000, 0)
-      mountRef.current.appendChild(renderer.domElement)
-
-      // Un render per frame: col mouse arrivano 125–1000 eventi al secondo, e
-      // senza coalescenza si renderizza più volte per frame e scatta.
-      let frameRichiesto = 0
-      const richiediRender = () => {
-        if (frameRichiesto) return
-        frameRichiesto = requestAnimationFrame(() => {
-          frameRichiesto = 0
-          renderer.render(scena, camera)
-        })
-      }
-      const fermaRender = () => cancelAnimationFrame(frameRichiesto)
-
-      scena.add(new THREE.AmbientLight(0xffffff, 0.55))
-      scena.add(new THREE.HemisphereLight(0xfff7ee, 0xd7d4cf, 0.4))
-      // Quasi frontale: angolata, la pagina a metà giro sparerebbe un'ombra
-      // lontano dal libro.
-      const direzionale = new THREE.DirectionalLight(0xfff9f0, 1.35)
-      direzionale.position.set(0.9, 1.4, 4.0)
-      direzionale.castShadow = true
-      direzionale.shadow.mapSize.set(
-        dito ? OMBRA_PX.dito : OMBRA_PX.mouse,
-        dito ? OMBRA_PX.dito : OMBRA_PX.mouse,
-      )
-      // Deve contenere la pila girata a sinistra e la pagina in volo: più
-      // stretto e le ombre spariscono ai bordi, più largo e si sprecano texel.
-      direzionale.shadow.camera.left = -LARGHEZZA_MONDO * 1.8
-      direzionale.shadow.camera.right = LARGHEZZA_MONDO * 1.1
-      direzionale.shadow.camera.top = ALTEZZA_MONDO * 0.8
-      direzionale.shadow.camera.bottom = -ALTEZZA_MONDO * 0.95
-      direzionale.shadow.camera.near = 0.5
-      direzionale.shadow.camera.far = 12
-      // Contro l'acne e le ombre "trapelate" tra fogli sottili e ravvicinati.
-      direzionale.shadow.bias = -0.0002
-      direzionale.shadow.normalBias = 0.02
-      scena.add(direzionale)
-
-      const libroGruppo = new THREE.Group()
-      libroGruppo.rotation.x = ROT_X_LIBRO
-      libroGruppo.rotation.y = ROT_Y_LIBRO
-      scena.add(libroGruppo)
-
-      // Alone pre-sfumato e non un piano che riceve le ombre vere: quella della
-      // pagina in volo finirebbe lontano dal libro. Nemmeno un drop-shadow CSS,
-      // che va ricalcolato a ogni frame e su mobile scatta.
-      const telaAlone = document.createElement('canvas')
-      telaAlone.width = 256
-      telaAlone.height = 256
-      const ctxAlone = telaAlone.getContext('2d')
-      const gradAlone = ctxAlone.createRadialGradient(128, 128, 30, 128, 128, 128)
-      gradAlone.addColorStop(0, 'rgba(20,17,15,0.38)')
-      gradAlone.addColorStop(0.5, 'rgba(20,17,15,0.22)')
-      gradAlone.addColorStop(0.75, 'rgba(20,17,15,0.08)')
-      gradAlone.addColorStop(1, 'rgba(20,17,15,0)')
-      ctxAlone.fillStyle = gradAlone
-      ctxAlone.fillRect(0, 0, 256, 256)
-      const alone = new THREE.Mesh(
-        new THREE.PlaneGeometry(1, 1),
-        new THREE.MeshBasicMaterial({
-          map: new THREE.CanvasTexture(telaAlone),
-          transparent: true,
-          depthWrite: false,
-          opacity: 0.55,
-        })
-      )
-      // Opposto alla luce, come una vera ombra di contatto.
-      alone.position.set(-LARGHEZZA_MONDO / 2 - 0.12, -0.16, -0.05)
-      libroGruppo.add(alone)
-
-      // Incavo lungo la costa: a libro aperto la luce lì non arriva.
-      const telaGutter = document.createElement('canvas')
-      telaGutter.width = 256
-      telaGutter.height = 4
-      const ctxGutter = telaGutter.getContext('2d')
-      const gradiente = ctxGutter.createLinearGradient(0, 0, telaGutter.width, 0)
-      gradiente.addColorStop(0, '#000')
-      gradiente.addColorStop(0.3, '#111')
-      gradiente.addColorStop(0.42, '#666')
-      gradiente.addColorStop(0.5, '#fff')
-      gradiente.addColorStop(0.58, '#666')
-      gradiente.addColorStop(0.7, '#111')
-      gradiente.addColorStop(1, '#000')
-      ctxGutter.fillStyle = gradiente
-      ctxGutter.fillRect(0, 0, telaGutter.width, telaGutter.height)
-      const gutterMat = new THREE.MeshBasicMaterial({
-        color: 0x14110f,
-        alphaMap: new THREE.CanvasTexture(telaGutter),
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
+      // `null` se WebGL non c'è, o se nel frattempo il componente è sparito:
+      // in tutti e due i casi resta la copertina statica di scorta.
+      const tre = await creaScena({
+        THREE,
+        contenitore: mountRef.current,
+        tavole: sketchbook,
+        paginaIniziale: pagina,
+        attivo: () => attivo,
       })
-      const gutter = new THREE.Mesh(new THREE.PlaneGeometry(LARGHEZZA_MONDO * 0.45, ALTEZZA_MONDO), gutterMat)
-      gutter.position.set(-LARGHEZZA_MONDO / 2, 0, N * SCARTO_PILA + 0.01)
-      gutter.renderOrder = 2
-      libroGruppo.add(gutter)
-
-      const spinaGruppo = new THREE.Group()
-      spinaGruppo.position.x = -LARGHEZZA_MONDO / 2
-      libroGruppo.add(spinaGruppo)
-
-      // In quanti pixel reali finisce una pagina su questo schermo: al massimo
-      // ~1000, cioè quanto è larga la tavola, quindi la texture non va quasi
-      // mai ingrandita. Misurato una volta all'avvio: ridimensionare la
-      // finestra non cambia il filtro.
-      const larghezzaTavola = dito ? LARGHEZZA_TAVOLA.dito : LARGHEZZA_TAVOLA.mouse
-      const pxPagina = (mountRef.current.getBoundingClientRect().width || 0) * rapportoPixel * QUOTA_PAGINA
-      const senzaMipmap = pxPagina > 0 && larghezzaTavola < pxPagina * SOGLIA_MIPMAP
-
-      const caricatore = new THREE.TextureLoader()
-      const caricaTexture = (src) =>
-        new Promise((risolvi) => {
-          caricatore.load(
-            src,
-            (tex) => {
-              tex.colorSpace = THREE.SRGBColorSpace
-              tex.anisotropy = Math.min(
-                renderer.capabilities.getMaxAnisotropy(),
-                dito ? ANISOTROPIA.dito : ANISOTROPIA.mouse,
-              )
-              if (senzaMipmap) {
-                // Vicino all'1:1 il mipmap è solo una copia sfocata in più:
-                // meglio campionare la tavola piena.
-                tex.generateMipmaps = false
-                tex.minFilter = THREE.LinearFilter
-              }
-              risolvi(tex)
-            },
-            undefined,
-            () => risolvi(null)
-          )
-        })
-
-      const creaGeometriaFaccia = (specchiaU) => {
-        const geo = new THREE.BufferGeometry()
-        const nVert = (M_COLONNE + 1) * 2
-        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(nVert * 3), 3))
-        geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nVert * 3), 3))
-        const uv = new Float32Array(nVert * 2)
-        for (let v = 0; v <= M_COLONNE; v += 1) {
-          const u = specchiaU ? 1 - v / M_COLONNE : v / M_COLONNE
-          uv[v * 4 + 0] = u
-          uv[v * 4 + 1] = 1 // riga alta
-          uv[v * 4 + 2] = u
-          uv[v * 4 + 3] = 0 // riga bassa
-        }
-        geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
-        const indici = []
-        for (let s = 0; s < M_COLONNE; s += 1) {
-          const a = s * 2
-          const b = s * 2 + 1
-          const c = (s + 1) * 2
-          const d = (s + 1) * 2 + 1
-          indici.push(a, b, c, c, b, d)
-        }
-        geo.setIndex(indici)
-        geo.setDrawRange(0, 0) // niente da disegnare finché applicaGeometria non la riempie
-        return geo
-      }
-
-      // Fronte e retro condividono la forma: questa riempie una faccia sola.
-      const applicaGeometria = (geo, posX, posZ, angoliVert) => {
-        const pos = geo.attributes.position.array
-        const norm = geo.attributes.normal.array
-        for (let v = 0; v <= M_COLONNE; v += 1) {
-          const x = posX[v] * LARGHEZZA_MONDO
-          const z = posZ[v] * LARGHEZZA_MONDO
-          const a = angoliVert[v]
-          const nx = Math.sin(a)
-          const nz = Math.cos(a)
-          const iAlto = v * 6
-          const iBasso = v * 6 + 3
-          pos[iAlto] = x
-          pos[iAlto + 1] = ALTEZZA_MONDO / 2
-          pos[iAlto + 2] = z
-          pos[iBasso] = x
-          pos[iBasso + 1] = -ALTEZZA_MONDO / 2
-          pos[iBasso + 2] = z
-          norm[iAlto] = nx
-          norm[iAlto + 1] = 0
-          norm[iAlto + 2] = nz
-          norm[iBasso] = nx
-          norm[iBasso + 1] = 0
-          norm[iBasso + 2] = nz
-        }
-        geo.attributes.position.needsUpdate = true
-        geo.attributes.normal.needsUpdate = true
-        geo.setDrawRange(0, M_COLONNE * 6)
-        geo.computeBoundingSphere()
-      }
-
-      const paginaColorePaper = new THREE.Color('#f4f3f1')
-
-      Promise.all(
-        sketchbook.map(async (tavola) => ({
-          fronte: await caricaTexture(tavolaPer(tavola.front.src, dito)),
-          retro: tavola.back ? await caricaTexture(tavolaPer(tavola.back.src, dito)) : null,
-        }))
-      ).then((texturePagine) => {
-        if (!attivo) return
-        const pagineMesh = texturePagine.map((tex, i) => {
-          const gruppo = new THREE.Group()
-          gruppo.rotation.y = i < pagina ? -Math.PI : 0
-          spinaGruppo.add(gruppo) // la z la mette posizionaLibro, qui sotto
-
-          const fronteGeo = creaGeometriaFaccia(false)
-          const fronteMat = new THREE.MeshStandardMaterial({
-            map: tex.fronte,
-            roughness: 0.86,
-            metalness: 0,
-            side: THREE.FrontSide,
-          })
-          const fronteMesh = new THREE.Mesh(fronteGeo, fronteMat)
-          fronteMesh.castShadow = true
-          fronteMesh.receiveShadow = true
-          gruppo.add(fronteMesh)
-
-          const retroGeo = creaGeometriaFaccia(true)
-          const retroMat = tex.retro
-            ? new THREE.MeshStandardMaterial({ map: tex.retro, roughness: 0.86, metalness: 0, side: THREE.BackSide })
-            : new THREE.MeshStandardMaterial({ color: paginaColorePaper, roughness: 0.92, metalness: 0, side: THREE.BackSide })
-          const retroMesh = new THREE.Mesh(retroGeo, retroMat)
-          retroMesh.castShadow = true
-          retroMesh.receiveShadow = true
-          gruppo.add(retroMesh)
-
-          // Applicato subito: niente frame vuoto prima della prima interazione.
-          const { posX, posZ, angoliSegmento } = calcolaColonne(0)
-          const angoliVert = angoliVertici(angoliSegmento)
-          applicaGeometria(fronteGeo, posX, posZ, angoliVert)
-          applicaGeometria(retroGeo, posX, posZ, angoliVert)
-
-          return { gruppo, fronteGeo, retroGeo }
-        })
-
-        treRef.current = { THREE, renderer, scena, camera, libroGruppo, pagine: pagineMesh, alone, gutterMat, applicaGeometria, richiediRender, fermaRender }
-        posizionaLibro(pagina)
-        ridimensiona()
-        renderer.render(scena, camera)
-        setPronto(true)
-      })
-
-      const ridimensiona = () => {
-        const rect = mountRef.current?.getBoundingClientRect()
-        if (!rect || !rect.width || !rect.height) return
-        renderer.setSize(rect.width, rect.height, true)
-        camera.aspect = rect.width / rect.height
-        camera.updateProjectionMatrix()
-        // Il rapporto del riquadro cambia da `sm` in giù: lo zoom va rifatto,
-        // o il libro resta inquadrato per il formato di prima.
-        inquadra(aperturaRef.current)
-        if (treRef.current) richiediRender()
-      }
-      ridimensiona()
-
-      osservatoreResize = new ResizeObserver(ridimensiona)
-      osservatoreResize.observe(mountRef.current)
-      })
+      if (!tre) return
+      treRef.current = tre
+      posizionaLibro(pagina)
+      tre.ridimensiona()
+      tre.renderer.render(tre.scena, tre.camera)
+      setPronto(true)
     }
 
     return () => {
       attivo = false
-      annullato = true
       osservatoreCarico.disconnect()
-      osservatoreResize?.disconnect()
       flutter.current?.anim?.cancel?.()
       flutter.current = null
       const tre = treRef.current
-      // Azzerato prima del dispose: gli onUpdate ancora vivi trovano treRef
-      // nullo e non toccano il renderer smaltito.
+      // Azzerato prima dello smaltimento: gli onUpdate ancora vivi trovano
+      // treRef nullo e non toccano il renderer già smontato.
       treRef.current = null
-      if (tre) {
-        tre.fermaRender()
-        tre.scena.traverse((oggetto) => {
-          if (oggetto.isMesh) {
-            oggetto.geometry.dispose()
-            const materiali = Array.isArray(oggetto.material) ? oggetto.material : [oggetto.material]
-            materiali.forEach((m) => {
-              m.map?.dispose()
-              m.alphaMap?.dispose()
-              m.dispose()
-            })
-          }
-        })
-        tre.renderer.dispose()
-      }
+      tre?.smaltisci()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -606,8 +195,8 @@ export default function Sketchbook() {
       const versoArco = -verso
       const curvaAmp =
         Math.max(-PIEGA_TOTALE_MAX, Math.min(PIEGA_TOTALE_MAX, versoArco * pieno + piega.current.extra)) *
-        rigidita(indice)
-      const alzata = SOLLEVAMENTO_VOLO * Math.sin(progresso * Math.PI) * rigidita(indice)
+        rigidita(indice, N)
+      const alzata = SOLLEVAMENTO_VOLO * Math.sin(progresso * Math.PI) * rigidita(indice, N)
       const { posX, posZ, angoliSegmento } = calcolaColonne(curvaAmp, alzata)
       const angoliVert = angoliVertici(angoliSegmento)
       tre.applicaGeometria(p.fronteGeo, posX, posZ, angoliVert)
@@ -626,7 +215,7 @@ export default function Sketchbook() {
     if (!tre) return
     const p = tre.pagine[indice]
     if (!p) return
-    const { posX, posZ, angoliSegmento } = calcolaColonne(extra * rigidita(indice))
+    const { posX, posZ, angoliSegmento } = calcolaColonne(extra * rigidita(indice, N))
     const angoliVert = angoliVertici(angoliSegmento)
     tre.applicaGeometria(p.fronteGeo, posX, posZ, angoliVert)
     tre.applicaGeometria(p.retroGeo, posX, posZ, angoliVert)

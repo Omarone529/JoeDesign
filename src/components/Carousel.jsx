@@ -50,6 +50,16 @@ export default function Carousel({ images, title }) {
   // guarda: uscendo dalla slide lo scorrimento riprende da sé.
   const [videoAttivo, setVideoAttivo] = useState(false)
   const [videoMuto, setVideoMuto] = useState(false)
+  /*
+   * Lo scorrimento si ferma da sé quando non c'è nessuno a guardarlo. Non è
+   * una pausa: la pausa la chiede chi guarda, col clic sulla foto o col
+   * contatore, e sta in `paused`. Questi due partono dal valore che l'HTML
+   * pre-renderizzato descrive — in vista, scheda in primo piano — così in
+   * hydration non c'è niente da correggere.
+   */
+  const [inVista, setInVista] = useState(true)
+  const [schedaVisibile, setSchedaVisibile] = useState(true)
+  const contenitore = useRef(null)
   const avviatoDaSolo = useRef(false)
   const n = images.length
   const slideVideo = images[index]?.video || null
@@ -139,12 +149,37 @@ export default function Carousel({ images, title }) {
     return () => window.removeEventListener('load', espandi)
   }, [index, n])
 
+  /*
+   * Fuori dallo schermo il carosello non scorre. Girare a vuoto significa
+   * scaricare le foto vicine (vedi `caricate`) e ridisegnare una dissolvenza
+   * che nessuno sta guardando: su una scheda lasciata aperta è banda e
+   * batteria spese per niente.
+   */
   useEffect(() => {
-    if (n <= 1 || paused || videoAttivo || animazioniRidotte()) return
+    const el = contenitore.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const osservatore = new IntersectionObserver(([voce]) => setInVista(voce.isIntersecting), {
+      threshold: 0.25,
+    })
+    osservatore.observe(el)
+    return () => osservatore.disconnect()
+  }, [])
+
+  /* Stessa ragione, per la scheda del browser passata in secondo piano. */
+  useEffect(() => {
+    const aggiorna = () => setSchedaVisibile(!document.hidden)
+    document.addEventListener('visibilitychange', aggiorna)
+    return () => document.removeEventListener('visibilitychange', aggiorna)
+  }, [])
+
+  const scorre = n > 1 && !paused && !videoAttivo && inVista && schedaVisibile
+
+  useEffect(() => {
+    if (!scorre || animazioniRidotte()) return
     const attesa = slideVideo ? INTERVAL_VIDEO : INTERVAL
     const timer = setTimeout(() => setIndex((i) => (i + 1) % n), attesa)
     return () => clearTimeout(timer)
-  }, [index, paused, videoAttivo, slideVideo, n])
+  }, [index, scorre, slideVideo, n])
 
   if (n === 0) return null
 
@@ -170,6 +205,7 @@ export default function Carousel({ images, title }) {
     // che sono tutti <button>. Il contenitore non è focusabile di suo.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
+      ref={contenitore}
       className="group relative mx-auto w-full max-w-[calc(100vh-9rem)] md:ml-auto md:mr-0"
       role="group"
       aria-roledescription="carosello"

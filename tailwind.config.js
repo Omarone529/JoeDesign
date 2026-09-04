@@ -9,7 +9,18 @@ export default {
         // Palette "Direzione A" — carta / inchiostro
         paper: '#f4f3f1', // sfondo principale
         ink: '#14110f', // testo / nero caldo
-        muted: '#8f8b86', // grigio testo secondario
+        /*
+         * Grigio del testo secondario. Il valore sta sotto il nero quanto basta
+         * a restare "in tono minore" e non un grado di più: su `paper` fa
+         * 4.76:1, oltre il 4.5 che la WCAG AA chiede per il testo sotto i 18pt.
+         * È la misura che conta qui, perché `muted` finisce quasi sempre su
+         * corpi da 10 a 13 pixel — occhielli, categorie, anni, contatori.
+         *
+         * ⚠️ Vale solo su fondo chiaro. Sul `night` del footer un grigio così
+         * scuro scende a 3.77:1: là il testo secondario è `night-soft`, che è
+         * lo stesso ruolo rovesciato. Non usare `text-muted` dentro `bg-night`.
+         */
+        muted: '#6f6b67', // grigio testo secondario (su carta)
         line: '#d7d4cf', // bordi chiari
         'line-soft': '#e4e1dd', // bordi molto chiari
         placeholder: '#e9e7e3', // sfondo immagini

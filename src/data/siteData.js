@@ -661,11 +661,6 @@ export function areaPerSlug(slug) {
   return aree.find((a) => a.slug === slug) || null
 }
 
-/* Ordinati come `archive`: dal più recente. */
-export function progettiArea(chiave) {
-  return archive.filter((p) => areaDi(p) === chiave)
-}
-
 /*
  * `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il
  * blocco. Anche `cover` può mancare: `senzaFoto` marca i progetti pubblicati
@@ -797,11 +792,6 @@ const archivioEn = archive.map(progettoInglese)
 
 export function archivioIn(lang) {
   return inglese(lang) ? archivioEn : archive
-}
-
-export function progettoIn(item, lang) {
-  if (!item || !inglese(lang)) return item
-  return archivioEn.find((p) => p.slug === item.slug) || progettoInglese(item)
 }
 
 const areeEnList = aree.map((a) => ({ ...a, ...(areeEn[a.slug] || {}) }))

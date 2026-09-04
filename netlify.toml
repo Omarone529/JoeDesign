@@ -27,6 +27,42 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     # Il sito non usa fotocamera, microfono né posizione: negarli in partenza.
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    # Una volta visto il sito in HTTPS, il browser non prova più a chiederlo in
+    # chiaro: toglie di mezzo il primo passaggio non cifrato, che è quello
+    # intercettabile. Un anno è il valore consueto.
+    #
+    # Volutamente SENZA `preload`: quella direttiva serve a farsi inserire nella
+    # lista precaricata nei browser, ed è una porta che si apre e non si chiude
+    # — uscirne richiede mesi. Va aggiunta solo scegliendolo, non di sfuggita.
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    #
+    # Quali risorse la pagina può caricare, e da dove. Il sito è statico e
+    # l'elenco è corto per davvero: tutto viene da sé, tranne il player dei reel.
+    # Dichiararlo per intero significa che un file finito qui per sbaglio — o
+    # una libreria che si porta dietro una chiamata a un dominio terzo — non
+    # parte, invece di partire e scoprirlo dopo.
+    #
+    #   default-src 'self'      tutto ciò che non è nominato sotto viene da qui
+    #   script-src  'self'      i bundle di Vite, three e animejs compresi
+    #   style-src   + inline    React scrive `style=` sugli elementi (i ritardi
+    #                           delle lettere in home, i fondi da `fotoFit`):
+    #                           sono attributi di stile, non fogli, e senza
+    #                           'unsafe-inline' il browser li scarta. Non è la
+    #                           falla che sembra: qui non entra testo di nessuno,
+    #                           quindi non c'è niente da iniettare
+    #   img-src     + data:     l'alone dello sketchbook è una tela disegnata
+    #                           al volo e passata a three come immagine
+    #   frame-src               l'unico terzo del sito, e solo la variante
+    #                           senza cookie pubblicitari (vedi VideoShort.jsx)
+    #   frame-ancestors 'none'  il clickjacking, detto come lo dicono i browser
+    #                           nuovi: è X-Frame-Options qui sopra, aggiornato
+    #   base-uri / form-action  non c'è nessun <base> e non c'è nessun modulo:
+    #                           negarli chiude due dirottamenti classici
+    #
+    # Se qualcosa smettesse di caricarsi, la diagnosi si fa rinominando questa
+    # riga in `Content-Security-Policy-Report-Only`: le violazioni finiscono
+    # nella console del browser senza che nulla venga bloccato.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
 
 # I bundle in /assets/ hanno l'hash del contenuto nel nome: contenuto nuovo,
 # nome nuovo. Possono quindi restare in cache a tempo indeterminato.

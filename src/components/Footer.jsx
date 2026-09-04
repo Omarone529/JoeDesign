@@ -11,6 +11,13 @@ const ANNO = __ANNO_BUILD__
 // fuori scala non genera la classe — il bordo resterebbe pieno.
 const FILETTO = 'border-paper/10'
 
+/*
+ * Il testo secondario di questo file è `night-soft` e non `muted`: sono lo
+ * stesso ruolo su fondi opposti. `muted` è tarato per leggersi sulla carta e
+ * sul nero del footer scenderebbe a 3.77:1, sotto il minimo AA; `night-soft`
+ * fa 11.47:1 ed è già il colore delle icone social qui sotto.
+ */
+
 /* Fa anche da pagina contatti, che come rotta non esiste. */
 export default function Footer() {
   const lang = useLang()
@@ -38,7 +45,7 @@ export default function Footer() {
               <li key={p.to}>
                 <Link
                   to={p.to}
-                  className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 before:absolute before:-inset-x-2 before:-inset-y-1.5 before:content-[''] hover:text-paper"
+                  className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-night-soft transition-colors duration-300 before:absolute before:-inset-x-2 before:-inset-y-1.5 before:content-[''] hover:text-paper"
                 >
                   {p.label}
                   <Sottolineatura />
@@ -100,7 +107,7 @@ export default function Footer() {
           </a>
         </div>
 
-        <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-muted">
+        <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-night-soft">
           {T.footer.riga(profile.role, profile.place)}
         </p>
       </div>
@@ -108,7 +115,7 @@ export default function Footer() {
       <div
         className={`flex flex-col items-center gap-4 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
-        <div className="flex flex-wrap items-center justify-center gap-x-2 text-[10px] uppercase tracking-[0.2em] text-muted">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 text-[10px] uppercase tracking-[0.2em] text-night-soft">
           <span>
             © {ANNO} {profile.name} · {T.footer.diritti}
           </span>
@@ -124,7 +131,7 @@ export default function Footer() {
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: scorrimento() })}
-          className="group relative flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
+          className="group relative flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-night-soft transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
         >
           {T.footer.tornaSu}
           <span

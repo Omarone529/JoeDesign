@@ -82,6 +82,10 @@ function Bivio() {
             // Il più recente FRA QUELLI con la copertina: una scheda in attesa
             // di foto non può fare da vetrina all'area.
             const primo = progetti.find((x) => projectImages(x).cover) ?? progetti[0]
+            // Un'area dichiarata prima del suo primo progetto non si annuncia:
+            // la carta sarebbe un invito a una griglia vuota. Ed è anche la
+            // riga che evita di chiedere le immagini di un progetto che non c'è.
+            if (!primo) return null
             const { cover } = projectImages(primo)
             const fit = fotoFit[cover]
             return (

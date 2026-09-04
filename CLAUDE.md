@@ -27,7 +27,18 @@ npm run build      # build client + build SSR + pre-rendering di tutte le pagine
 npm run preview    # anteprima della build di produzione
 npm run prerender  # solo lo step di pre-rendering (dopo una build)
 npm run lint       # ESLint (react, react-hooks, jsx-a11y). Deve restare a zero.
+npm test           # test di rotte, meta description e aiutanti dei dati (node:test)
+npm run verifica   # controlla che i dati combacino con i file su disco
 ```
+
+`npm run verifica` gira **da solo prima di ogni build** (script `prebuild`), quindi una
+foto dichiarata e non presente, un'anteprima social non rigenerata o un'etichetta AI che
+punta a una foto inesistente **fermano la build** invece di uscire in produzione. Vale la
+pena lanciarlo a mano dopo aver toccato `siteData.js` o `public/images/`.
+
+I test girano con `node:test`, senza dipendenze: sono la rete di sicurezza su `rotte.js`
+(ogni indirizzo generato dev'essere rileggibile come la pagina che è, in tutte e due le
+lingue), su `clip()` in `seo.js` e sugli aiutanti di `siteData`.
 
 ⚠️ **`npm run preview` va usato con lo slash finale** (`/progetto/anelli/`, non
 `/progetto/anelli`): senza, Vite fa il fallback SPA e serve la home al posto
@@ -54,6 +65,13 @@ URL reali, non hash. Ogni pagina esiste in due indirizzi, uno per lingua:
 Gli slug di area (`product-design`, `graphic-design`), di progetto e `privacy` **non** si
 traducono: sono nomi propri e tradurli spezzerebbe i link già in giro. Area o slug
 sconosciuti → 404.
+
+Il calcolo degli indirizzi (`SEGMENTI`, `percorso`, `percorsoTradotto`, `parsePath`) sta in
+**`src/rotte.js`, che non importa React**; `src/router.jsx` tiene la parte React — contesto,
+`navigate`, `<Link>` — e riesporta le tre funzioni, quindi `import … from './router'`
+continua a funzionare. Lo split serve a `seo.js`, agli script node e ai test, che di React
+non hanno bisogno. In quei due file le estensioni `.js` degli import sono esplicite perché
+li legge anche Node, che senza non risolve.
 
 `parsePath()` restituisce anche `lang`; `App.jsx` legge la rotta con `useRoute()` e monta
 la pagina giusta. Funziona sia nel browser sia in SSR (in build) tramite `RouterProvider`
@@ -139,7 +157,9 @@ Tutti i testi e i dati stanno qui, non nel markup:
 - `archive` — TUTTI i progetti (slug, title, cat, year, photos, desc, spec, opzionale `works`)
 - `aree` — le due aree dell'archivio (slug d'URL, etichetta, descrizione). L'area di un
   progetto sta nel suo campo `area`; chi non ce l'ha è product design (`AREA_PREDEFINITA`).
-  `progettiArea(chiave)` filtra, `areaPerSlug(slug)` risolve l'URL
+  `progettiAreaIn(chiave, lang)` filtra (**sempre questo**: la variante senza `lang`
+  è stata tolta perché restituiva l'archivio italiano anche dentro il sito inglese),
+  `areaPerSlug(slug)` risolve l'URL — gli slug non si traducono, quindi non ha `lang`
 - `familyBand` — la foto della famiglia di prodotti, in home accanto al manifesto:
   stessa frase e stessa tipografia del blocco in "Chi sono", perché è lo stesso testo.
   Ha il fondo bianco vero, quindi va in `mix-blend-multiply` su una sezione con
@@ -356,9 +376,24 @@ fondo alla riga, prima delle lingue. Il gruppo di destra è `contents`, quindi m
 Instagram e lingue sono figli diretti della barra e `justify-between` li distribuisce da
 solo: senza, restava un buco dopo il marchio e tutto il resto ammassato contro il bordo.
 
+**Lo sketchbook è diviso in tre file**, e la regola per non rimescolarli è che
+`geometria` non sa che esiste una scena, `scena` non sa che esiste un dito, e in
+`Sketchbook.jsx` non si scrive mai `new THREE.…`:
+
+| File | Cosa fa |
+| --- | --- |
+| `about/libro/geometria.js` | dove finiscono i vertici di una pagina piegata. Niente React, niente Three, niente DOM — e dei test in `tests/geometria.test.js` che ne fissano gli invarianti fisici (il bordo libero torna sul piano, la carta non si allunga, la cerniera non si muove) |
+| `about/libro/scena.js` | renderer, camera, luci, ombre, tavole come texture, e `smaltisci()`. È la parte che alloca memoria video, che nessuno libera al posto suo |
+| `about/Sketchbook.jsx` | stato, trascinamento, molle di Anime.js, markup |
+
+⚠️ I test di `geometria.js` non verificano dei numeri, verificano delle **proprietà**:
+fissare i numeri fisserebbe anche gli errori. Cambiando la formula della piega, i test
+che devono continuare a passare sono quelli — se uno cade, la pagina ha smesso di
+comportarsi come carta.
+
 **Lo sketchbook sul telefono gira con un terzo del lavoro.** La scena è la stessa, ma
 quattro misure si abbassano quando `pointer: coarse` (una GPU da telefono, non una
-finestra stretta), e sono tutte in testa a `Sketchbook.jsx`:
+finestra stretta), e sono tutte in testa a `libro/scena.js`:
 
 | | mouse | dito |
 | --- | --- | --- |
@@ -407,12 +442,20 @@ Palette "carta / inchiostro":
 | ------------- | --------- | ----------------------- |
 | `paper`       | `#f4f3f1` | sfondo principale       |
 | `ink`         | `#14110f` | testo / nero caldo      |
-| `muted`       | `#8f8b86` | testo secondario        |
+| `muted`       | `#6f6b67` | testo secondario **su fondo chiaro** |
+| `night-soft`  | `#c8c4bf` | testo secondario **su fondo notte** |
 | `line`        | `#d7d4cf` | bordi                   |
 | `line-soft`   | `#e4e1dd` | bordi molto chiari      |
 | `placeholder` | `#e9e7e3` | sfondo immagini         |
 | `hover`       | `#ececE8` | hover celle             |
 | `night`       | `#0a0908` | sfondo footer           |
+
+⚠️ **`muted` e `night-soft` sono lo stesso ruolo su fondi opposti, e non si scambiano.**
+`muted` finisce quasi sempre su corpi da 10 a 13 pixel, dove la WCAG AA chiede 4.5:1: sulla
+carta ne fa 4.76, sul `night` del footer scenderebbe a 3.77. `night-soft` fa l'opposto
+(11.47 sul nero, 1.56 sulla carta). Dentro `bg-night` — cioè nel footer — il testo
+secondario è `night-soft`. Cambiando uno dei due valori, il rapporto va **ricalcolato**,
+non guardato a occhio.
 
 - Font: **Helvetica Neue / Helvetica / Arial** (`font-sans`)
 - Animazione d'ingresso pagina: classe `animate-viewIn`
@@ -425,7 +468,8 @@ Palette "carta / inchiostro":
 src/
 ├── main.jsx              # entry: hydration (o mount in dev)
 ├── App.jsx               # layout: Navbar + pagina corrente + Footer
-├── router.jsx            # routing History API + <Link> + useRoute/useNavigate
+├── rotte.js              # indirizzi e lettura degli URL (niente React: la usano seo, node, i test)
+├── router.jsx            # routing History API + <Link> + useRoute/useLang + ripristino scroll
 ├── consenso.js           # la scelta sui video di YouTube (localStorage + hook)
 ├── seo.js                # meta per rotta + elenco rotte (usato dal pre-rendering)
 ├── i18n.js               # testi dell'interfaccia nelle due lingue (it/en)
@@ -447,7 +491,10 @@ src/
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
 │   ├── FloatingMailButton.jsx
 │   ├── about/
-│   │   └── Sketchbook.jsx  # libro sfogliabile 3D (three + animejs, caricati a vista)
+│   │   ├── Sketchbook.jsx  # libro sfogliabile 3D: stato, trascinamento, molle, markup
+│   │   └── libro/
+│   │       ├── geometria.js  # la forma della piega — matematica pura, ha dei test
+│   │       └── scena.js      # Three.js: renderer, camera, luci, texture, smaltimento
 │   └── home/             # sezioni homepage: Hero, SelectedWorks,
 │                         #   FamilyBand, SkillsTicker
 └── pages/
@@ -457,7 +504,13 @@ src/
     ├── Privacy.jsx       # informativa privacy (testo in i18n.js)
     └── ProjectDetail.jsx # scheda singola con galleria + prev/next
 
+tests/                   # node:test, nessuna dipendenza — `npm test`
+├── rotte.test.js        # indirizzi, lingue, 404, round-trip percorso↔parsePath
+├── seo.test.js          # clip(): il taglio delle meta description
+└── dati.test.js         # titoloLeggibile, aiFoto (etichette AI Act), periodoDi
+
 scripts/
+├── verifica.js          # dati ↔ file su disco (gira da solo prima di `npm run build`)
 ├── prerender.js         # pre-rendering + sitemap + robots (parte di `npm run build`)
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
@@ -556,6 +609,14 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 ## Deploy (Netlify)
 
 - `netlify.toml`: build = `npm run build`, publish = `dist`.
+- **Header di sicurezza**, tutti in `netlify.toml` e commentati lì: oltre a `nosniff`,
+  `X-Frame-Options`, `Referrer-Policy` e `Permissions-Policy` ci sono
+  `Strict-Transport-Security` (un anno, **senza `preload`**: quella è una porta che non si
+  richiude, va scelta apposta) e una **CSP** che elenca per intero le origini ammesse.
+  L'unico terzo è `https://www.youtube-nocookie.com` in `frame-src`. ⚠️ Aggiungendo una
+  risorsa esterna — un font Google, un'analitica, un altro player — **va aggiunta anche
+  alla CSP**, o il browser la blocca in silenzio. Per diagnosticare senza bloccare:
+  rinominare l'header in `Content-Security-Policy-Report-Only`.
 - **Dominio dinamico**: `SITE` in `src/seo.js` legge la env `URL` (che Netlify imposta al deploy),
   con fallback `https://joesarchiolla.com`, che è il dominio del sito (comprato su
   Cloudflare). Canonical/sitemap/OG/JSON-LD si adeguano da soli al dominio reale.

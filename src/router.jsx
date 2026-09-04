@@ -1,89 +1,74 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { archive, areaPerSlug } from './data/siteData'
-import { LINGUA_PREDEFINITA, normalizzaLingua } from './i18n'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { parsePath } from './rotte'
 
 /*
- * Router minimale su path reali (History API), niente dipendenze: l'hash
- * routing impediva SEO e pre-rendering. Funziona anche in SSR, dove riceve
- * `initialPath` e non tocca mai `window`.
+ * La parte React del routing: il contesto, la navigazione, `<Link>`.
  *
- * Il sito è bilingue e ogni pagina ha due indirizzi reali, uno per lingua:
- * l'italiano sta nella radice, l'inglese sotto /en. Non è uno stato salvato
- * nel browser ma parte dell'URL, perché una pagina inglese dev'essere
- * indicizzabile, condivisibile e apribile a freddo com'è quella italiana.
+ * Il calcolo degli indirizzi — quali segmenti ha ogni pagina in ogni lingua, e
+ * come si legge un URL — sta in `rotte.js`, che non importa React. È la stessa
+ * ragione per cui `i18n.js` non importa niente: quelle funzioni le usano anche
+ * `seo.js` e gli script node, che React non lo montano mai, e tenerle qui
+ * dentro voleva dire trascinarsi appresso un albero di componenti per sapere
+ * come si scrive "/chi-sono". Si rileggono anche da sole, il che è il motivo
+ * per cui i test le raggiungono.
  *
- * Lo slug dell'area (product-design) e quello del progetto non cambiano fra le
- * due lingue: sono nomi propri, e tradurli spezzerebbe i link già in giro.
+ * Riesportate qui sotto: chi importa da `./router` continua a trovarle dov'erano.
  */
-const SEGMENTI = {
-  it: { about: 'chi-sono', archive: 'archivio', project: 'progetto', privacy: 'privacy' },
-  en: { about: 'about', archive: 'archive', project: 'project', privacy: 'privacy' },
-}
-
-const PREFISSO = { it: '', en: '/en' }
-
-/* L'indirizzo di una pagina, nella lingua chiesta. Da usare in ogni <Link>. */
-export function percorso(name, params = {}, lang = LINGUA_PREDEFINITA) {
-  const l = normalizzaLingua(lang)
-  const base = PREFISSO[l]
-  const seg = SEGMENTI[l]
-  switch (name) {
-    case 'about':
-      return `${base}/${seg.about}`
-    case 'archive':
-      return params.area ? `${base}/${seg.archive}/${params.area}` : `${base}/${seg.archive}`
-    case 'project':
-      return `${base}/${seg.project}/${params.slug}`
-    // Unico segmento uguale nelle due lingue: "privacy" è la parola che si usa
-    // anche in italiano, e tradurla darebbe un indirizzo che nessuno cerca.
-    case 'privacy':
-      return `${base}/${seg.privacy}`
-    default:
-      return base || '/'
-  }
-}
-
-/* La stessa pagina nell'altra lingua: è il link del selettore in navbar e il
-   valore degli hreflang. Una 404 non ha gemella: si va alla home. */
-export function percorsoTradotto(route, lang) {
-  if (!route || route.name === 'notfound') return percorso('home', {}, lang)
-  return percorso(route.name, { area: route.area, slug: route.slug }, lang)
-}
-
-export function parsePath(pathname) {
-  const intero = (pathname || '/').replace(/\/+$/, '') || '/'
-
-  const inglese = intero === '/en' || intero.startsWith('/en/')
-  const lang = inglese ? 'en' : LINGUA_PREDEFINITA
-  const p = inglese ? intero.slice(3) || '/' : intero
-  const seg = SEGMENTI[lang]
-
-  if (p === '/') return { name: 'home', lang, path: intero }
-  if (p === `/${seg.about}`) return { name: 'about', lang, path: intero }
-  if (p === `/${seg.privacy}`) return { name: 'privacy', lang, path: intero }
-  if (p === `/${seg.archive}`) return { name: 'archive', area: null, lang, path: intero }
-  if (p.startsWith(`/${seg.archive}/`)) {
-    const slug = decodeURIComponent(p.slice(seg.archive.length + 2))
-    if (areaPerSlug(slug)) return { name: 'archive', area: slug, lang, path: intero }
-  }
-  if (p.startsWith(`/${seg.project}/`)) {
-    const slug = decodeURIComponent(p.slice(seg.project.length + 2))
-    if (archive.some((item) => item.slug === slug)) {
-      return { name: 'project', slug, lang, path: intero }
-    }
-  }
-  // 404 (Netlify la serve con lo status giusto). La lingua resta quella del
-  // prefisso: chi sbaglia un indirizzo sotto /en vede la 404 in inglese.
-  return { name: 'notfound', lang, path: intero }
-}
+export { parsePath, percorso, percorsoTradotto } from './rotte'
 
 const RouterContext = createContext(null)
 
+/*
+ * In pre-rendering non esiste un layout da misurare e React avviserebbe che
+ * `useLayoutEffect` non ha effetto sul server. Nel browser serve quello e non
+ * `useEffect`: il ripristino della posizione deve avvenire nello stesso
+ * fotogramma in cui la pagina compare, o si vede il salto dall'alto.
+ */
+const useEffettoDiLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
+
 export function RouterProvider({ initialPath = '/', children }) {
   const [path, setPath] = useState(initialPath)
+  /*
+   * Dove rimettere la pagina al prossimo render: un numero quando si torna
+   * indietro, `null` quando si va avanti (che vuol dire "in cima").
+   *
+   * Il ripristino automatico del browser qui non funziona. Il browser lo
+   * tenta prima che React abbia disegnato la pagina precedente — che è più
+   * alta di quella che si sta lasciando — quindi trova un documento corto e
+   * si ferma dove capita. Chiudendo una scheda progetto si tornava in cima
+   * all'archivio invece che sulla cella da cui si era partiti, e con
+   * venticinque celle vuol dire cercarla di nuovo.
+   *
+   * Funziona perché ogni riquadro d'immagine del sito riserva la propria
+   * altezza prima di caricare (`aspect-…`, o `width`/`height` dichiarati):
+   * al momento del ripristino la pagina è già alta quanto sarà. Togliendo
+   * quelle proporzioni si rompe anche questo.
+   */
+  const scrollDaRipristinare = useRef(null)
 
   useEffect(() => {
-    const onPop = () => setPath(window.location.pathname)
+    if (!window.history.scrollRestoration) return
+    const precedente = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+    return () => {
+      window.history.scrollRestoration = precedente
+    }
+  }, [])
+
+  useEffect(() => {
+    const onPop = (e) => {
+      scrollDaRipristinare.current = e.state?.scrollY ?? 0
+      setPath(window.location.pathname)
+    }
     window.addEventListener('popstate', onPop)
     // Fra il primo render e l'attacco del listener un popstate passerebbe
     // inosservato (indietro premuto prima dell'hydration): qui si recupera.
@@ -97,12 +82,26 @@ export function RouterProvider({ initialPath = '/', children }) {
 
   const navigate = useCallback((to) => {
     if (typeof window === 'undefined') return
+    // La posizione della pagina che si sta lasciando va scritta nella SUA voce
+    // di cronologia, ed è l'ultimo momento in cui la si conosce: dopo il
+    // pushState quella voce non è più quella corrente e non si può più toccare.
+    window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
     if (to !== window.location.pathname) {
-      window.history.pushState(null, '', to)
+      window.history.pushState({ scrollY: 0 }, '', to)
     }
+    scrollDaRipristinare.current = null
     setPath(to)
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [])
+
+  // Solo tornando indietro o avanti: andando avanti `navigate` ha già portato
+  // in cima, e alla prima apertura non c'è niente da ripristinare.
+  useEffettoDiLayout(() => {
+    const y = scrollDaRipristinare.current
+    if (y === null) return
+    scrollDaRipristinare.current = null
+    window.scrollTo(0, y)
+  }, [path])
 
   // parsePath scorre l'archivio, e un value nuovo ri-renderizzerebbe ogni <Link>.
   const value = useMemo(() => ({ route: parsePath(path), navigate }), [path, navigate])
@@ -112,10 +111,6 @@ export function RouterProvider({ initialPath = '/', children }) {
 
 export function useRoute() {
   return useContext(RouterContext).route
-}
-
-export function useNavigate() {
-  return useContext(RouterContext).navigate
 }
 
 export function useLang() {

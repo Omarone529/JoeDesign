@@ -1,3 +1,9 @@
+/*
+ * Le estensioni `.js` sono esplicite di proposito. Dentro il sito le
+ * risolverebbe Vite anche senza, ma questo file lo legge anche Node — i test e
+ * gli script — e Node le pretende. È la stessa scelta già fatta in
+ * `data/siteData.js`.
+ */
 import {
   aboutIn,
   archivioIn,
@@ -14,9 +20,9 @@ import {
   progettiAreaIn,
   projectImages,
   titoloLeggibile,
-} from './data/siteData'
-import { LINGUE, testi } from './i18n'
-import { percorso, percorsoTradotto } from './router'
+} from './data/siteData.js'
+import { LINGUE, testi } from './i18n.js'
+import { percorso, percorsoTradotto } from './rotte.js'
 
 /*
  * Metadati per rotta: meta tag, dati strutturati, immagini della sitemap.
@@ -79,7 +85,7 @@ function descrizioneProgetto(item, lang) {
  * si legge peggio di una frase che finisce. Se nemmeno la prima frase ci sta,
  * allora si taglia sull'ultima parola e si mettono i puntini.
  */
-function clip(text, max = 155, min = 80) {
+export function clip(text, max = 155, min = 80) {
   const t = String(text).replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
 
@@ -200,6 +206,16 @@ export function metaForRoute(route) {
       // Senza copertina non c'è nemmeno l'anteprima social della scheda:
       // il link condiviso porta quella dell'area, non un riquadro vuoto.
       const areaItem = areeIn(lang).find((a) => a.chiave === areaDi(item))
+      // Un `area` che non corrisponde a nessuna delle aree dichiarate è un
+      // refuso nei dati, e va fermato qui: senza questa riga la build muore più
+      // avanti su un `undefined`, e il messaggio non dice né dove né perché.
+      if (!areaItem) {
+        throw new Error(
+          `seo: il progetto "${item.slug}" dichiara area "${areaDi(item)}", che non esiste in \`aree\` (${areeIn(lang)
+            .map((a) => a.chiave)
+            .join(', ')})`,
+        )
+      }
       return {
         ...comuni,
         title: titoloProgetto(item),

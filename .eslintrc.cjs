@@ -47,8 +47,8 @@ module.exports = {
   },
   overrides: [
     {
-      // Gli script si lanciano a mano con Node, non finiscono nel bundle.
-      files: ['scripts/**/*.js', '*.config.js', '.eslintrc.cjs'],
+      // Script e test girano in Node e non finiscono nel bundle.
+      files: ['scripts/**/*.js', 'tests/**/*.js', '*.config.js', '.eslintrc.cjs'],
       env: { node: true, browser: false },
       rules: { 'no-console': 'off' },
     },
