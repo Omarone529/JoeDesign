@@ -67,6 +67,19 @@ const TESTI = {
 
     chiSono: {
       occhiello: 'Chi sono',
+      /* Le due righe della testata. Sono l'unico punto del sito in prima
+         persona: è la firma con cui Joe si presenta, non un testo di pagina.
+         `…Em` è quanto la riga misura in em — Helvetica Neue BOLD maiuscolo con
+         `tracking-[-0.03em]` — e serve a due cose in About.jsx: dare a tutte e
+         due le righe la stessa larghezza, e tenere quella larghezza uguale
+         nelle due lingue nonostante le stringhe siano diverse. ⚠️ Cambiando il
+         testo, il peso o il tracking vanno rimisurate, o le righe si
+         disallineano. Si misurano in pagina con un Range sul contenuto della
+         riga, diviso il suo font-size. */
+      heroNome: 'Sono Joe',
+      heroNomeEm: 4.966,
+      heroRuolo: 'Product designer e molto altro',
+      heroRuoloEm: 17.936,
       experience: 'Experience',
       education: 'Education',
       skills: 'Skills',
@@ -74,6 +87,11 @@ const TESTI = {
       sketchbook: 'Sketchbook',
       sketchbookAria: 'Tavole dello sketchbook personale di Joe Sarchiolla',
       sketchbookRuolo: 'sketchbook sfogliabile',
+      /* Il manifesto sotto lo sketchbook: prima riga in grassetto, seconda in
+         tondo. Sono due frasi, non due paragrafi: vanno di seguito. */
+      disegnoTitolo: 'Il disegno è la visione del prodotto finale.',
+      disegnoTesto:
+        'È il luogo in cui prende forma, viene modificato e perfezionato, fino a definire ciò che il prodotto diventerà.',
       ilLavoro: 'Il lavoro',
       vaiArchivio: 'Vai all’Archivio →',
       scrivimi: 'Scrivimi',
@@ -348,6 +366,10 @@ const TESTI = {
 
     chiSono: {
       occhiello: 'About',
+      heroNome: 'I’m Joe',
+      heroNomeEm: 3.53,
+      heroRuolo: 'Product designer and much more',
+      heroRuoloEm: 18.768,
       experience: 'Experience',
       education: 'Education',
       skills: 'Skills',
@@ -355,6 +377,9 @@ const TESTI = {
       sketchbook: 'Sketchbook',
       sketchbookAria: 'Pages from the personal sketchbook of Joe Sarchiolla',
       sketchbookRuolo: 'flippable sketchbook',
+      disegnoTitolo: 'Drawing is the vision of the final product.',
+      disegnoTesto:
+        'It is where the object takes shape, is reworked and refined, until it defines what the product will become.',
       ilLavoro: 'The work',
       vaiArchivio: 'Go to the Archive →',
       scrivimi: 'Write to me',

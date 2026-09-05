@@ -74,8 +74,16 @@ export const about = {
     { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
     { anno: '2026', titolo: 'Accademia di Belle Arti di Bologna', luogo: 'ABABO' },
   ],
+  /* `hero` è scontornato (sfondo trasparente): nella testata scavalca il
+     titolo, e un rettangolo bianco lo coprirebbe invece di intrecciarcisi.
+     `schizzi` invece ha il fondo bianco vero e va in `mix-blend-multiply` su
+     una sezione con `bg-paper`, come `familyBand` in home. */
   photos: {
-    hero: { src: '/images/about/joe-cutout.webp', alt: 'Ritratto di Joe Sarchiolla a braccia conserte' },
+    hero: { src: '/images/about/joe-hero.webp', alt: 'Ritratto di Joe Sarchiolla, cappello e occhiali' },
+    schizzi: {
+      src: '/images/about/schizzi.webp',
+      alt: 'Tavola di schizzi a mano: lampade, sedute, vasi, imbottiti e sistemi di illuminazione',
+    },
     lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
   },
   /*
@@ -830,6 +838,7 @@ const aboutEnCompleto = {
   education: aboutEn.education,
   photos: {
     hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
+    schizzi: { ...about.photos.schizzi, alt: aboutEn.photos.schizzi },
     lab: { ...about.photos.lab, alt: aboutEn.photos.lab },
   },
   sketchbook: about.sketchbook.map((tavola, i) => ({

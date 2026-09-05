@@ -10,8 +10,9 @@ export const LARGHEZZA_VARIANTE = 800
 export const SUFFISSO_VARIANTE = '-800'
 
 export const varianti = {
-  "/images/about/joe-cutout.webp": 1040,
+  "/images/about/joe-hero.webp": 1200,
   "/images/about/joe-lab.webp": 1900,
+  "/images/about/schizzi.webp": 1920,
   "/images/about/sketchbook/01.webp": 1000,
   "/images/about/sketchbook/02.webp": 1000,
   "/images/about/sketchbook/03.webp": 1000,

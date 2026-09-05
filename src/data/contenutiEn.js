@@ -35,7 +35,8 @@ export const aboutEn = {
     { anno: '2026', titolo: 'Bologna Academy of Fine Arts', luogo: 'ABABO' },
   ],
   photos: {
-    hero: 'Portrait of Joe Sarchiolla with his arms folded',
+    hero: 'Portrait of Joe Sarchiolla, cap and glasses',
+    schizzi: 'Sheet of hand sketches: lamps, seats, vases, upholstery and lighting systems',
     lab: 'The DADO lamp lit, held in one hand',
   },
   // Stesso ordine delle tavole in `about.sketchbook`.
