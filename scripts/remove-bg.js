@@ -49,6 +49,28 @@ const { data, info } = await sharp(png)
 
 cleanStraySpecks(data, info.width, info.height)
 
+/*
+ * Maschera netta.
+ *
+ * ⚠️ Serve quando il ritaglio finisce SOPRA a qualcosa — un titolo, un'altra
+ * foto — e non su fondo pieno. La segmentazione lascia il soggetto opaco al 90%
+ * e ne sfuma i bordi morbidi su decine di pixel: su fondo carta non si vede
+ * niente, ma con del testo dietro quel testo TRASPARE, e si legge in filigrana
+ * attraverso la figura. Nella testata di "Chi sono" il ritratto scavalca il
+ * titolo, e senza questo passaggio "ALTRO" si leggeva attraverso la manica.
+ *
+ * La soglia sta a metà della rampa, non in cima: presa a 190 tagliava il bordo
+ * morbido della manica dov'era ancora quasi opaco e lasciava un margine
+ * frastagliato. A 110 il taglio cade dove l'occhio vede il bordo, e la
+ * sfocatura che segue gli ridà l'antialiasing che la soglia gli aveva tolto.
+ */
+const alpha = Buffer.alloc(info.width * info.height)
+for (let i = 0; i < alpha.length; i += 1) alpha[i] = data[i * 4 + 3] >= 110 ? 255 : 0
+const raw1 = { width: info.width, height: info.height, channels: 1 }
+const maschera = await sharp(alpha, { raw: raw1 }).blur(1.2).toColourspace('b-w').raw().toBuffer()
+
+for (let i = 0; i < alpha.length; i += 1) data[i * 4 + 3] = maschera[i]
+
 await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
   .webp({ quality: Number(quality), alphaQuality: 100 })
   .toFile(dest)

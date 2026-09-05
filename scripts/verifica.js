@@ -124,6 +124,7 @@ focusItems.forEach((f) => chiediFile(f.cover, `home, lavoro selezionato "${f.slu
 chiediFile(homeHero.src, 'home')
 chiediFile(familyBand.src, 'home')
 chiediFile(about.photos.hero.src, 'chi sono')
+chiediFile(about.photos.schizzi.src, 'chi sono')
 chiediFile(about.photos.lab.src, 'chi sono')
 for (const tavola of about.sketchbook) {
   for (const faccia of [tavola.front, tavola.back]) {

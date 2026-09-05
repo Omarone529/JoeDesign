@@ -523,7 +523,8 @@ export function immaginiPerRotta(route) {
   if (route.name === 'about') {
     const about = aboutIn(lang)
     const tavole = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
-    return [about.photos.hero.src, about.photos.lab.src, ...tavole].filter(Boolean).map(abs)
+    const foto = [about.photos.hero.src, about.photos.schizzi.src, about.photos.lab.src]
+    return [...foto, ...tavole].filter(Boolean).map(abs)
   }
 
   const copertine = (lista) =>

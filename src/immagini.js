@@ -35,6 +35,10 @@ export const MISURE = {
   aree: '(min-width: 1024px) 580px, (min-width: 640px) 470px, 100vw',
   // Fascia e sfondo di chiusura: sempre a tutta larghezza.
   piena: '100vw',
-  // Disegno tecnico e ritratto: mezza colonna da tablet in su.
+  // Disegno tecnico e ritratto in home: mezza colonna da tablet in su.
   mezza: '(min-width: 768px) 55vw, 100vw',
+  // Ritratto della testata di "Chi sono": le stesse misure che ha in pagina —
+  // 46vw da tablet in su, 88 della finestra sotto. Cambiando quelle classi va
+  // cambiato anche questo, o il browser sceglie la variante sbagliata.
+  ritratto: '(min-width: 768px) 46vw, 88vw',
 }

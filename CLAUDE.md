@@ -284,7 +284,9 @@ Le sorgenti stanno FUORI dal repo, in due cartelle sul disco:
   node scripts/remove-bg.js "<sorgente>" public/images/<dest>.webp [larghezzaMax] [qualità]
   ```
 
-  (segmentazione AI → WebP con canale alpha). ⚠️ La libreria
+  (segmentazione AI → WebP con canale alpha, e **maschera netta**: la soglia toglie
+  l'alone semitrasparente che la segmentazione lascia sui bordi morbidi, senza il quale
+  un testo dietro il ritaglio traspare). ⚠️ La libreria
   `@imgly/background-removal-node` **non è in `package.json`**: pesa 174 MB e Netlify
   la scaricherebbe a ogni build senza che serva al sito. Va installata solo quando serve
   davvero, senza salvarla: `npm i --no-save @imgly/background-removal-node`.
@@ -455,18 +457,31 @@ sembrava un elemento messo storto. Lo zoom lo detta il lato più stretto, quindi
 riquadro quadrato è ciò che permette alla copertina di crescere davvero — cambiando il
 formato del riquadro cambia di conseguenza quanto il libro si vede.
 
-Il ritratto di "Chi sono" (`about/joe-cutout.webp`) è ritagliato **attorno alla figura**,
-con appena un margine di respiro. Prima portava un quinto di trasparente per lato: sul
-telefono, dove riempie la colonna per intero, la figura restava piccola in mezzo a due
-bande vuote. Un ritaglio nuovo va rifatto così, e `width`/`height` in `About.jsx`
-aggiornati con esso.
+Il ritratto di "Chi sono" (`about/joe-hero.webp`) è ritagliato **attorno alla figura**,
+con appena un margine di respiro. Con un quinto di trasparente per lato, sul telefono —
+dove riempie la colonna per intero — la figura resterebbe piccola in mezzo a due bande
+vuote. Un ritaglio nuovo va rifatto così, e `width`/`height` in `About.jsx` aggiornati
+con esso.
+
+⚠️ **Quel ritaglio finisce SOPRA al titolo, quindi vuole la maschera netta** che
+`remove-bg.js` applica in fondo (vedi lì il perché). La segmentazione lascia il soggetto
+opaco al 90% e ne sfuma i bordi morbidi su decine di pixel: su fondo carta non si vede
+nulla, ma col titolo dietro quel titolo **traspare** e si legge in filigrana attraverso la
+manica. Si nota solo sopra i ~2000px, dove la figura è grande.
 
 ⚠️ Da `md` quel ritratto sta **fuori dal flusso** (`md:absolute` sull'`img`), e non è un
 vezzo: in colonna, `h-full` è una percentuale che al momento di misurare la riga non ha
-ancora un riferimento, e il browser ripiega sulle proporzioni vere del file. La sezione
-diventava alta quanto la foto invece che quanto lo schermo, e «JOE SARCHIOLLA», che sta in
-fondo alla colonna di sinistra, finiva sotto la piega. Col ritratto di prima, più largo,
-non si vedeva: **è una trappola che scatta cambiando immagine, non codice.**
+ancora un riferimento, e il browser ripiega sulle proporzioni vere del file — la sezione
+diventava alta quanto la foto invece che quanto lo schermo. **È una trappola che scatta
+cambiando immagine, non codice.**
+
+⚠️ La foto è **larga** una frazione della finestra (`md:w-[46vw]`), non **alta** una
+frazione della sezione, e il titolo è appeso allo stesso lato (`md:mr-[39vw]`): così i due
+si sfiorano sempre allo stesso modo, con la manica sull'ultima parola del sottotitolo.
+Legata all'altezza, su una finestra bassa e larga la figura si allargava fin dentro il
+titolo. Le misure sono in `vw` e non in `%` perché fuori dal flusso la percentuale si
+risolve sul riquadro intero della sezione mentre il margine del titolo si risolve sulla
+colonna di testo: due basi diverse, e l'incastro si spostava a ogni cambio di padding.
 
 ## Design system (`tailwind.config.js`)
 
@@ -533,7 +548,8 @@ src/
 │                         #   FamilyBand, SkillsTicker
 └── pages/
     ├── Home.jsx
-    ├── About.jsx         # "Chi sono": ritratto, bio, foto di Joe
+    ├── About.jsx         # "Chi sono": testata col ritratto, bio, sketchbook,
+    │                     #   la tavola di schizzi e la foto in laboratorio
     ├── Archive.jsx       # griglia di tutti i progetti
     ├── Privacy.jsx       # informativa privacy (testo in i18n.js)
     └── ProjectDetail.jsx # scheda singola con galleria + prev/next
