@@ -2,12 +2,11 @@ import { aboutIn, profiloIn } from '../data/siteData'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 import Sketchbook from '../components/about/Sketchbook'
-import { scorrimento } from '../motion'
 import { srcSetDi, MISURE } from '../immagini'
 
 /*
  * La testata: il titolo grande incastrato nel ritratto scontornato, che gli sta
- * sopra e ne nasconde la coda, e la freccia che invita a scorrere.
+ * sopra e ne nasconde la coda.
  *
  * A essere fissata è la LARGHEZZA della riga grande, non il suo corpo: una
  * frazione della colonna, diversa a ogni breakpoint. Il corpo si ricava
@@ -24,15 +23,95 @@ import { srcSetDi, MISURE } from '../immagini'
  *
  * I numeri passano al CSS come variabili perché i breakpoint restano classi:
  * `calc()` divide per una variabile senza unità senza fare storie.
+ *
+ * ⚠️ L'INCASTRO È CALCOLATO, non tarato a occhio su una finestra sola. Titolo e
+ * ritratto sono appesi alla stessa misura — `--figura`, la larghezza con cui il
+ * ritaglio viene disegnato DAVVERO — e non a due frazioni indipendenti della
+ * finestra. Prima erano `46vw` per la foto e `39vw` per il titolo, due numeri
+ * che si sfioravano per caso: con `object-contain` la foto si rimpicciolisce
+ * quando a limitare è l'altezza, e la stessa pagina passava dalla coda scoperta
+ * per intero alla coda mangiata quasi tutta cambiando solo l'altezza della
+ * finestra. Misurato su un centinaio di formati fra 768 e 3440px, adesso la
+ * frase si legge sempre per intero e sotto la manica ne finisce fra il 14 e il
+ * 27 per cento dell'ultima lettera.
  */
 
 /*
  * Quanto la riga piccola sporge oltre quella grande, da md in su. 1 sarebbe
- * appaiata. Tarato perché a sparire sotto la manica sia l'ultima parola e non
- * mezza frase: la riga resta leggibile, e quello che si nasconde lo si è già
- * letto.
+ * appaiata: quello che avanza è la coda che arriva fin sotto la figura. Quanta
+ * di quella coda si nasconda davvero non lo decide questo numero ma INCASTRO,
+ * qui sotto.
  */
 const SPORGENZA = 1.2
+
+/*
+ * Quanta di quella sporgenza finisce sotto la figura. 1 la nasconderebbe tutta,
+ * 0 la lascerebbe scoperta: la frase si legge per intero e solo l'ultima
+ * lettera entra sotto la manica.
+ */
+const INCASTRO = 0.22
+
+/*
+ * Il riquadro in cui vive il ritratto: alto quanto la finestra meno la barra,
+ * largo 46vw. Con `object-contain` il ritaglio ne riempie uno dei due lati e
+ * viene disegnato largo `min(46vw, altezza * PROPORZIONE)` — su una finestra
+ * bassa e larga vince il secondo termine, ed è per questo che la larghezza
+ * vera va calcolata invece che data per scontata.
+ *
+ * ⚠️ PROPORZIONE_RITRATTO sono le proporzioni di `joe-hero.webp` (1200×1364).
+ * Cambiando ritaglio va rifatta, o l'incastro si sposta senza che nulla protesti.
+ */
+const PROPORZIONE_RITRATTO = 1200 / 1364
+const BARRA = '4rem'
+const RIQUADRO = `calc(100svh - ${BARRA})`
+const LARGHEZZA_FIGURA = `min(46vw, calc(${RIQUADRO} * ${PROPORZIONE_RITRATTO.toFixed(6)}))`
+const ALTEZZA_FIGURA = `calc(var(--figura) / ${PROPORZIONE_RITRATTO.toFixed(6)})`
+
+/*
+ * A che altezza della figura passa la riga piccola: 0 sarebbe ai piedi, 1 sopra
+ * la testa. 0.437 è il punto in cui la manica incrocia la coda della frase.
+ *
+ * ⚠️ Da md il titolo è appeso al FONDO della sezione (`mt-auto` più questo
+ * margine), non centrato in mezzo, perché al fondo ci sta anche la figura:
+ * centrato, su una finestra alta e stretta il titolo saliva sopra la testa e
+ * l'incastro spariva del tutto.
+ */
+/*
+ * Il corpo del titolo, da md in su, è il PIÙ PICCOLO fra tre numeri:
+ *
+ *   1. quello che sta nello spazio rimasto — la colonna meno la figura, più il
+ *      poco che la coda le entra sotto. È il vincolo che comanda sotto i
+ *      ~1700px, e senza il quale la testata sbatte contro il bordo sinistro:
+ *      lì `ml-auto` non ha più margine da distribuire, il titolo resta piantato
+ *      a sinistra e la coda si allunga sotto la figura da sola. L'incastro
+ *      tornava a dipendere dalla misura della finestra, che è il guasto da cui
+ *      viene tutto il resto di questo blocco;
+ *   2. la vecchia frazione della colonna (LARGO), che tiene il titolo dal
+ *      gonfiarsi quando la figura si rimpicciolisce su una finestra bassa;
+ *   3. il tetto in pixel, perché oltre un certo corpo il titolo non cresce più.
+ *
+ * FATTORE è il conto del punto 1 risolto: larghezza del titolo (SPORGENZA volte
+ * la riga grande) meno quanto rientra sotto la figura, in unità di riga grande.
+ * SICUREZZA è lo scarto fra la larghezza vera del testo e quella dichiarata in
+ * em: senza, un pixel di troppo fa rientrare il caso che si voleva evitare.
+ */
+const LARGO = 0.43
+const FATTORE = (SPORGENZA - INCASTRO * (SPORGENZA - 1)).toFixed(4)
+const SICUREZZA = '6px'
+const corpo = (colonna, tetto) =>
+  `min(calc((100vw - ${colonna} - var(--figura) - ${SICUREZZA}) / ${FATTORE} / var(--nome-em)),` +
+  ` calc((100vw - ${colonna}) * ${LARGO} / var(--nome-em)), ${tetto})`
+
+const ALTEZZA_RIGA = 0.437
+const PIEDE = '7rem' // il `pb-28` della sezione, da cui il margine va scalato
+
+/*
+ * Il respiro di carta sopra la testa. Serve quando la figura non arriva in
+ * cima: lì la testata smette di essere alta quanto la finestra e si accorcia
+ * fino alla figura, o su un tablet in verticale resterebbe mezzo schermo vuoto
+ * sopra a un titolo schiacciato in fondo.
+ */
+const ARIA = '8rem'
 
 export default function About() {
   const lang = useLang()
@@ -41,21 +120,25 @@ export default function About() {
   const profile = profiloIn(lang)
   const { hero, schizzi, lab } = about.photos
 
-  // Salto a mano per rispettare la preferenza animazioni. L'href resta valido
-  // per il tasto centrale e per "copia indirizzo".
-  const vaiAllIntro = (e) => {
-    const intro = document.getElementById('intro')
-    if (!intro) return // senza la sezione in pagina resta il salto nativo
-    e.preventDefault()
-    intro.scrollIntoView({ behavior: scorrimento(), block: 'start' })
-  }
-
   return (
     <main className="animate-viewIn">
-      <section className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden border-b-2 border-ink px-5 pb-24 pt-16 sm:px-8 sm:pb-28 lg:px-[72px]">
+      <section
+        style={{
+          '--figura': LARGHEZZA_FIGURA,
+          '--figura-alta': ALTEZZA_FIGURA,
+          '--figura-riquadro': RIQUADRO,
+          '--riga-bassa': `calc(${ALTEZZA_RIGA} * var(--figura-alta) - ${PIEDE})`,
+          '--testata-minima': `min(${RIQUADRO}, calc(var(--figura-alta) + ${ARIA}))`,
+        }}
+        className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden border-b-2 border-ink px-5 pt-16 sm:px-8 md:min-h-[var(--testata-minima)] md:pb-28 lg:px-[72px]"
+      >
         {/* Il titolo è largo quanto la sua riga più lunga, e da md `ml-auto`
-            lo spinge a destra finché la coda del sottotitolo non finisce
-            sotto la figura.
+            lo spinge a destra: il margine che lo trattiene è la larghezza della
+            figura meno quanto la coda deve entrarle sotto (`--sotto-figura`,
+            in em, quindi cresce col corpo del titolo). Il conto torna perché la
+            foto è appoggiata allo stesso bordo destro della colonna di testo
+            (`right-8`/`lg:right-[72px]` contro `sm:px-8`/`lg:px-[72px]`):
+            toccando uno dei due va toccato anche l'altro.
 
             Il titolo resta sotto la foto (`z` di default contro `z-10` della
             figura): il braccio alzato scavalca le ultime lettere, ed è
@@ -67,13 +150,19 @@ export default function About() {
             come lunghezza assoluta: presi dalla riga grande, quei pixel su un
             corpo tre volte più piccolo valgono -0.11em, e le lettere si toccano. */}
         <h1
-          style={{ '--nome-em': T.chiSono.heroNomeEm }}
-          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mr-[39vw] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[min(calc((100vw_-_64px)*0.43/var(--nome-em)),210px)] lg:text-[min(calc((100vw_-_144px)*0.43/var(--nome-em)),240px)]"
+          style={{
+            '--nome-em': T.chiSono.heroNomeEm,
+            '--sotto-figura': `calc(${((SPORGENZA - 1) * INCASTRO).toFixed(4)} * var(--nome-em) * 1em)`,
+            '--corpo-md': corpo('4rem', '210px'),
+            '--corpo-lg': corpo('9rem', '240px'),
+          }}
+          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_-_var(--sotto-figura))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
         >
           <span className="block tracking-[-0.03em]">{T.chiSono.heroNome}</span>
-          {/* La riga piccola SPORGE oltre quella grande e le ultime lettere
-              finiscono sotto la figura: è l'incastro della reference, e il
-              motivo per cui la foto sta sopra il titolo nel DOM. Solo da md —
+          {/* La riga piccola SPORGE oltre quella grande e va a finire sotto la
+              figura, che le mangia l'ultima lettera: è l'incastro della
+              reference, e il motivo per cui la foto sta sopra il titolo nel
+              DOM. La frase resta leggibile per intero. Solo da md —
               sotto, la foto è in colonna e non copre niente, quindi una riga
               che sporge perderebbe lettere contro `overflow-hidden` senza
               nulla che le nasconda: lì le due righe tornano appaiate. */}
@@ -89,33 +178,36 @@ export default function About() {
         </h1>
 
         {/* ⚠️ Da md la foto è FUORI dal flusso, e non è un vezzo: in colonna
-            `h-full` è una percentuale che al momento di misurare la riga non ha
+            l'altezza in percentuale al momento di misurare la riga non ha
             ancora un riferimento, e il browser ripiega sulle proporzioni vere
             del file — la sezione diventava alta quanto la foto invece che
-            quanto lo schermo. Fuori dal flusso l'altezza la decide solo
-            `min-h`, e la percentuale si risolve sul riquadro della sezione.
+            quanto lo schermo.
+
+            ⚠️ L'altezza è `--figura-riquadro` (la finestra meno la barra) e non
+            `h-full`: `h-full` è l'altezza della sezione, che da qui in poi non
+            è più sempre quella — su una finestra alta e stretta la testata si
+            accorcia fino alla figura. Con `h-full` la foto si rimpicciolirebbe
+            con la sezione e l'incastro, che quel numero lo dà per fisso, si
+            sposterebbe.
 
             Il ritratto è ritagliato attorno alla figura, con appena un margine
             di respiro: con un quinto di trasparente per lato, sul telefono la
             figura resterebbe piccola in mezzo a due bande vuote. Un ritaglio
             nuovo va rifatto così, e `width`/`height` aggiornati con esso.
 
-            ⚠️ La foto è LARGA una frazione della sezione, non ALTA una frazione
-            della sezione, e il motivo è che anche il titolo cresce con la
-            larghezza: appese allo stesso lato, le due misure si sfiorano sempre
-            allo stesso modo — il braccio alzato sull'ultima lettera. Legata
-            all'altezza, invece, su una finestra bassa e larga (un portatile in
-            orizzontale) la figura si allargava fin dentro il titolo e si
-            mangiava mezzo sottotitolo, mentre `max-w` la schiacciava per farla
-            stare: la stessa foto, ma stirata.
+            ⚠️ La foto è LARGA una frazione della finestra e non ALTA una
+            frazione della sezione: legata all'altezza, su una finestra bassa e
+            larga si allargava fin dentro il titolo, mentre `max-w` la
+            schiacciava per farla stare — la stessa foto, ma stirata.
 
             ⚠️ `46vw` e non `46%`: fuori dal flusso la percentuale si risolve
             sul riquadro INTERO della sezione, padding compreso, mentre il
-            margine che spinge il titolo (`mr-[39vw]`) si risolve sulla colonna
-            di testo. Con due basi diverse l'incastro fra i due si spostava a
-            ogni cambio di padding; in `vw` guardano entrambi la stessa misura.
-            `object-contain` serve al caso opposto — finestra alta e stretta,
-            dove a limitare è `h-full` — e `[object-position:100%_100%]` tiene
+            margine che trattiene il titolo si risolve sulla colonna di testo.
+            Con due basi diverse l'incastro fra i due si spostava a ogni cambio
+            di padding; in `vw` guardano entrambi la stessa misura.
+            `object-contain` serve al caso opposto — finestra bassa e larga,
+            dove a limitare è l'altezza del riquadro, ed è il caso che
+            `--figura` mette in conto — e `[object-position:100%_100%]` tiene
             la figura appoggiata all'angolo in basso a destra invece di
             centrarla nel riquadro rimasto. */}
         <img
@@ -126,23 +218,8 @@ export default function About() {
           width="1200"
           height="1364"
           fetchpriority="high"
-          className="relative z-10 mx-auto mt-auto block w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-8 md:mx-0 md:mt-0 md:h-full md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[72px]"
+          className="relative z-10 mx-auto mt-auto block w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-8 md:mx-0 md:mt-0 md:h-[var(--figura-riquadro)] md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[72px]"
         />
-
-        {/* Contenitore = centraggio, link = animazione: sullo stesso elemento
-            le due transform si annullerebbero. */}
-        <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center">
-          <a
-            href="#intro"
-            onClick={vaiAllIntro}
-            aria-label={T.chiSono.scorri}
-            className="text-[18px] leading-none text-muted transition-colors hover:text-ink"
-          >
-            <span aria-hidden="true" className="block animate-float motion-reduce:animate-none">
-              ↓
-            </span>
-          </a>
-        </div>
       </section>
 
       {/* L'intro esce dalla testata e sta da sola, centrata: la testata è

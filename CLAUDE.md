@@ -476,12 +476,38 @@ diventava alta quanto la foto invece che quanto lo schermo. **È una trappola ch
 cambiando immagine, non codice.**
 
 ⚠️ La foto è **larga** una frazione della finestra (`md:w-[46vw]`), non **alta** una
-frazione della sezione, e il titolo è appeso allo stesso lato (`md:mr-[39vw]`): così i due
-si sfiorano sempre allo stesso modo, con la manica sull'ultima parola del sottotitolo.
-Legata all'altezza, su una finestra bassa e larga la figura si allargava fin dentro il
-titolo. Le misure sono in `vw` e non in `%` perché fuori dal flusso la percentuale si
-risolve sul riquadro intero della sezione mentre il margine del titolo si risolve sulla
-colonna di testo: due basi diverse, e l'incastro si spostava a ogni cambio di padding.
+frazione della sezione: legata all'altezza, su una finestra bassa e larga la figura si
+allargava fin dentro il titolo. Ed è in `vw` e non in `%` perché fuori dal flusso la
+percentuale si risolve sul riquadro intero della sezione mentre il margine del titolo si
+risolve sulla colonna di testo: due basi diverse, e l'incastro si spostava a ogni cambio
+di padding.
+
+⚠️ **L'incastro fra titolo e figura è calcolato, non tarato a occhio.** Titolo e ritratto
+sono appesi alla stessa misura — `--figura`, cioè `min(46vw, (100svh - 4rem) *
+PROPORZIONE_RITRATTO)`: la larghezza con cui `object-contain` disegna DAVVERO il ritaglio.
+Il margine destro del titolo è quella misura meno quanto la coda della frase deve entrarle
+sotto (`INCASTRO`, in em sul corpo del titolo), e da `md` il titolo è appeso al **fondo**
+della sezione (`mt-auto` + `--riga-bassa`), non centrato, perché al fondo ci sta anche la
+figura. Le costanti stanno in testa a `About.jsx` con il perché di ciascuna.
+
+⚠️ Da `md` **anche il corpo del titolo esce da quel conto**: è il più piccolo fra quello
+che sta nello spazio rimasto (la colonna meno la figura), la vecchia frazione della colonna
+e il tetto in pixel. Senza il primo dei tre, sotto i ~1700px la testata sbatte contro il
+bordo sinistro, `ml-auto` non ha più margine da distribuire e la coda si allunga sotto la
+figura da sola — cioè l'incastro torna a dipendere dalla misura della finestra.
+
+Prima erano due frazioni indipendenti della finestra — `46vw` per la foto, `39vw` per il
+titolo — e si sfioravano per caso: con `object-contain` la foto si rimpicciolisce quando a
+limitare è l'altezza, e la stessa pagina passava dalla coda scoperta per intero alla coda
+mangiata quasi tutta cambiando **solo l'altezza della finestra**. Misurato su un centinaio
+di formati fra 768 e 3440px, adesso la frase si legge sempre per intero e sotto la manica
+ne finisce fra il 14 e il 27 per cento dell'ultima lettera.
+
+⚠️ Due conseguenze che si rompono in silenzio: `PROPORZIONE_RITRATTO` sono le proporzioni
+di `joe-hero.webp` (1200×1364) e **va rifatta cambiando ritaglio**; e la foto è alta
+`--figura-riquadro` e non `h-full`, perché da `md` la testata può essere più bassa della
+finestra — su una finestra alta e stretta si accorcia fino alla figura invece di lasciare
+mezzo schermo vuoto sopra a un titolo schiacciato in fondo.
 
 ## Design system (`tailwind.config.js`)
 
