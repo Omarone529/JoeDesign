@@ -1,6 +1,6 @@
 import Hero from '../components/home/Hero'
 import SelectedWorks from '../components/home/SelectedWorks'
-import FamilyBand from '../components/home/FamilyBand'
+import Manifesto from '../components/home/Manifesto'
 import SkillsTicker from '../components/home/SkillsTicker'
 
 export default function Home() {
@@ -8,7 +8,7 @@ export default function Home() {
     <main className="animate-viewIn">
       <Hero />
       <SelectedWorks />
-      <FamilyBand />
+      <Manifesto />
       <SkillsTicker />
     </main>
   )

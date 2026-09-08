@@ -5,7 +5,7 @@ import { testi } from '../i18n'
 import { useLang } from '../router'
 import { animazioniRidotte } from '../motion'
 import { useConsensoVideo } from '../consenso'
-import VideoShort from './VideoShort'
+import VideoYouTube from './VideoYouTube'
 import EtichettaAI from './EtichettaAI'
 
 const INTERVAL = 2000
@@ -23,7 +23,7 @@ const FONDO_VIDEO = '#0a0908'
  *
  * L'ultima slide può essere il reel del progetto: porta in più `video`, l'id
  * dello Short. La sua `src` è una miniatura del sito come tutte le altre, e
- * resta tale finché non si preme play — il player lo monta `VideoShort`, che
+ * resta tale finché non si preme play — il player lo monta `VideoYouTube`, che
  * spiega perché non basti incorporare l'iframe e via.
  *
  * Il tetto di dimensione sta sulla LARGHEZZA: con `aspect-square` l'altezza la
@@ -263,7 +263,7 @@ export default function Carousel({ images, title }) {
         {/* Solo sulla slide in vista: il tasto play delle altre sarebbe
             invisibile ma raggiungibile da tastiera. */}
         {slideVideo && (
-          <VideoShort
+          <VideoYouTube
             videoId={slideVideo}
             title={title}
             attivo={videoAttivo}

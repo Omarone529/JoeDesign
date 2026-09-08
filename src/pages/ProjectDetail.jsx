@@ -11,6 +11,7 @@ import {
 } from '../data/siteData'
 import Carousel from '../components/Carousel'
 import EtichettaAI from '../components/EtichettaAI'
+import FilmatoProgetto from '../components/FilmatoProgetto'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 import { srcSetDi, MISURE } from '../immagini'
@@ -33,7 +34,7 @@ export default function ProjectDetail({ slug }) {
   const item = archivio.find((p) => p.slug === slug)
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
-  const { gallery, drawing, sfondo, videoPoster } = projectImages(item)
+  const { gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
   /*
    * Il reel sta nel carosello, non in una sezione tutta sua: il formato
    * verticale è l'unico della pagina e da solo lascerebbe mezza griglia vuota.
@@ -178,6 +179,28 @@ export default function ProjectDetail({ slug }) {
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Il filmato orizzontale sta qui e non nel carosello: il 16:9 nella
+          cornice quadrata tornerebbe con due bande, e soprattutto è un video da
+          guardare per intero, non una slide fra le altre. Fascia gemella di
+          quella dello sfondo che le sta sotto — stesso filetto, stessa colonna
+          — perché sono le due chiusure della scheda e una cornice diversa le
+          farebbe sembrare di due pagine diverse.
+
+          Parte solo premendo play, anche con il consenso dato: vedi
+          FilmatoProgetto. */}
+      {filmatoPoster && (
+        <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
+          <figure className="m-0 border-t border-line pt-6">
+            <FilmatoProgetto
+              videoId={item.filmato}
+              title={item.title}
+              poster={filmatoPoster}
+              alt={altVideo(item, lang)}
+            />
+          </figure>
         </section>
       )}
 

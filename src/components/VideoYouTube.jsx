@@ -2,12 +2,16 @@ import { testi } from '../i18n'
 import { useLang } from '../router'
 
 /*
- * Lo Short di YouTube dentro il carosello della scheda: il tasto play e, una
- * volta premuto, il player.
+ * Il video di YouTube dentro la scheda progetto: il tasto play e, una volta
+ * premuto, il player. Lo usano in due, e il formato non lo decide questo file:
+ * il carosello per il reel verticale (`Carousel.jsx`) e la fascia in fondo alla
+ * pagina per il filmato orizzontale (`FilmatoProgetto.jsx`). Qui dentro non c'è
+ * niente di 9:16 né di 16:9 — l'iframe riempie il riquadro che trova.
  *
- * La miniatura NON sta qui: è una slide del carosello come le altre, quindi
- * passa dalla stessa dissolvenza e dallo stesso caricamento pigro. Qui c'è solo
- * la parte che riguarda YouTube, che è quella delicata. L'iframe porta con sé
+ * La miniatura NON sta qui: chi lo monta ce l'ha già, e nel carosello è una
+ * slide come le altre, con la stessa dissolvenza e lo stesso caricamento pigro.
+ * Qui c'è solo la parte che riguarda YouTube, che è quella delicata. L'iframe
+ * porta con sé
  * quasi un megabyte di script e piazza identificatori nel browser appena la
  * pagina si apre, video avviato o no: su una scheda che serve WebP da 60 KB
  * sarebbe la cosa più pesante, e obbligherebbe a un banner di consenso che oggi
@@ -28,7 +32,7 @@ import { useLang } from '../router'
  * non basta, YouTube vuole anche `playlist` con lo stesso id. Premuto a mano,
  * invece, parte com'è giusto: con il sonoro.
  */
-export default function VideoShort({ videoId, title, attivo, muto, onAvvia }) {
+export default function VideoYouTube({ videoId, title, attivo, muto, onAvvia }) {
   const T = testi(useLang()).progetto
 
   if (attivo) {
@@ -51,7 +55,8 @@ export default function VideoShort({ videoId, title, attivo, muto, onAvvia }) {
 
   /*
    * Gruppo con un nome suo: il carosello è già un `group` e muove le frecce
-   * all'hover, un `group-hover` anonimo qui dentro risponderebbe a quello.
+   * all'hover, e un `group-hover` anonimo qui dentro risponderebbe a quello
+   * invece che al proprio riquadro.
    */
   return (
     <button

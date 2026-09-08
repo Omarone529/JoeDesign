@@ -37,6 +37,7 @@ const {
   focusItems,
   homeHero,
   familyBand,
+  manifestoFoto,
   projectImages,
 } = await import(path.join(root, 'src/data/siteData.js'))
 const { progettiEn } = await import(path.join(root, 'src/data/contenutiEn.js'))
@@ -66,13 +67,14 @@ for (const p of archive) {
     err(`${dove}: area "${areaDi(p)}" non esiste (attese: ${[...chiaviArea].join(', ')})`)
   }
 
-  const { cover, gallery, drawing, sfondo, videoPoster } = projectImages(p)
+  const { cover, gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(p)
 
   if (cover) chiediFile(cover, dove)
   gallery.forEach((src) => chiediFile(src, dove))
   if (drawing) chiediFile(drawing, dove)
   if (sfondo) chiediFile(sfondo, dove)
   if (videoPoster) chiediFile(videoPoster, dove)
+  if (filmatoPoster) chiediFile(filmatoPoster, dove)
 
   /*
    * Il controllo all'incontrario: una foto in più nella cartella non rompe
@@ -122,10 +124,11 @@ for (const slug of Object.keys(progettiEn)) {
 
 focusItems.forEach((f) => chiediFile(f.cover, `home, lavoro selezionato "${f.slug}"`))
 chiediFile(homeHero.src, 'home')
-chiediFile(familyBand.src, 'home')
+chiediFile(manifestoFoto.src, 'home')
+// Non è più in pagina, ma è la sorgente delle anteprime social dell'archivio.
+chiediFile(familyBand.src, 'anteprime social dell’archivio')
 chiediFile(about.photos.hero.src, 'chi sono')
 chiediFile(about.photos.schizzi.src, 'chi sono')
-chiediFile(about.photos.lab.src, 'chi sono')
 for (const tavola of about.sketchbook) {
   for (const faccia of [tavola.front, tavola.back]) {
     if (!faccia) continue

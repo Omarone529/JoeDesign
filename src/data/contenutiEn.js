@@ -37,7 +37,6 @@ export const aboutEn = {
   photos: {
     hero: 'Portrait of Joe Sarchiolla, cap and glasses',
     schizzi: 'Sheet of hand sketches: lamps, seats, vases, upholstery and lighting systems',
-    lab: 'The DADO lamp lit, held in one hand',
   },
   // Stesso ordine delle tavole in `about.sketchbook`.
   sketchbook: [
@@ -64,7 +63,7 @@ export const aboutEn = {
   ],
 }
 
-export const familyBandEn = { alt: 'The family of products' }
+export const manifestoFotoEn = { alt: 'The DADO lamp lit, held in one hand' }
 
 export const areeEn = {
   'product-design': {

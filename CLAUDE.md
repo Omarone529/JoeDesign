@@ -194,11 +194,17 @@ Tutti i testi e i dati stanno qui, non nel markup:
   `progettiAreaIn(chiave, lang)` filtra (**sempre questo**: la variante senza `lang`
   è stata tolta perché restituiva l'archivio italiano anche dentro il sito inglese),
   `areaPerSlug(slug)` risolve l'URL — gli slug non si traducono, quindi non ha `lang`
-- `familyBand` — la foto della famiglia di prodotti, in home accanto al manifesto:
-  stessa frase e stessa tipografia del blocco in "Chi sono", perché è lo stesso testo.
-  Ha il fondo bianco vero, quindi va in `mix-blend-multiply` su una sezione con
-  `bg-paper` (il fondo del `body` finisce sulla tela e non fonde). Il ticker "Skills"
-  in home riusa `about.skills`
+- `manifestoFoto` — la foto di Joe con la lampada DADO accesa, in home sotto il
+  manifesto (`profile.manifesto`): la fascia scura che chiude la pagina prima del
+  nastro delle skills. Stava in fondo a "Chi sono", sotto la stessa frase, ed è
+  passata in home con essa; `scripts/og-image.js` la usa ancora per l'anteprima
+  social di "Chi sono", che è comunque un ritratto di Joe
+- `familyBand` — la foto della famiglia di prodotti. **Non è più in pagina**: al suo
+  posto, in home, sono tornati il manifesto e la foto qui sopra. Resta la sorgente
+  delle anteprime social dell'archivio (`scripts/og-image.js`), che è la pagina dove
+  quei prodotti si guardano davvero, quindi il file non si cancella e `verifica.js`
+  continua a pretenderlo. Non avendo più un alt da mostrare, non ha una gemella
+  inglese. Il ticker "Skills" in home riusa `about.skills`
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
 - `video` (facoltativo, per progetto) — id di uno Short YouTube: il reel apre il
   carosello e parte da solo. Vuole `video.webp` accanto alle foto, vedi sotto
@@ -220,8 +226,10 @@ Tutti i testi e i dati stanno qui, non nel markup:
 3. **Nuovo progetto** = aggiungi una voce in `archive` (e le immagini nella sua cartella;
    se è grafica, `area: 'graphic'`), **più la traduzione in `src/data/contenutiEn.js`**,
    poi lancia `node scripts/og-image.js` per l'anteprima social. Se il progetto ha un
-   reel, aggiungi `video: '<id>'` e lancia `node scripts/video-poster.js <slug> <id>`
-   (vedi "Video"). Pre-rendering, sitemap e meta tag si aggiornano da soli.
+   reel, aggiungi `video: '<id>'` e lancia `node scripts/video-poster.js <slug> <id>`;
+   se ha un filmato orizzontale, `filmato: '<id>'` e lo stesso script con
+   `--orizzontale`, poi `varianti-foto.js` (vedi "Video"). Pre-rendering, sitemap e meta
+   tag si aggiornano da soli.
 4. **Non reintrodurre l'hash routing** (`#progetto/...`): romperebbe SEO e link profondi.
 5. Evita di usare `window`/`document` durante il render dei componenti (solo dentro `useEffect`/handler),
    altrimenti il pre-rendering fallisce.
@@ -300,7 +308,15 @@ Le sorgenti stanno FUORI dal repo, in due cartelle sul disco:
 
   (solo `sharp`, nessuna dipendenza extra).
 
-## Video (i reel di YouTube)
+## Video (i reel e i filmati di YouTube)
+
+Due formati, due posti, due comportamenti. Il **reel** verticale (`video`) apre il
+carosello e con il consenso parte da solo; il **filmato** orizzontale (`filmato`) sta in
+una fascia in fondo alla scheda e parte solo premendo play. Un progetto può avere l'uno,
+l'altro o tutti e due. Il player è lo stesso componente (`VideoYouTube.jsx`), che di
+formati non sa niente: riempie il riquadro che trova.
+
+### Il reel verticale (`video`)
 
 Un progetto che ha un reel porta `video: '<id>'` in `siteData` — solo l'id, la coda di
 `youtube.com/shorts/<id>` — e il filmato **apre il carosello e parte da solo**, non è una
@@ -348,12 +364,46 @@ node scripts/video-poster.js <slug> <idVideo>   # → products/<slug>/video.webp
 Prende `oardefault.jpg`, l'unica misura in cui YouTube conserva il fotogramma verticale
 (1080×1920): le altre sono 16:9 e nella cornice 9:16 tornerebbero con le bande.
 
-**L'iframe di YouTube non va messo direttamente nella pagina.** `VideoShort.jsx` mostra
-la miniatura e carica il player solo al click. Sono due i motivi, e valgono entrambi:
-l'iframe pesa quasi un megabyte su una scheda che serve WebP da 60 KB, e piazza
-identificatori nel browser all'apertura della pagina — il che obbligherebbe a un banner
-di consenso (vedi "Privacy"). Il pre-rendering fotografa la miniatura, quindi nell'HTML
-statico non finisce nessun iframe: è una cosa da ricontrollare se si tocca il componente.
+### Il filmato orizzontale (`filmato`)
+
+`filmato: '<id>'` — l'id di un video normale, la coda di `?v=<id>` — mette una **fascia
+16:9 in fondo alla scheda, sopra lo sfondo** (`components/FilmatoProgetto.jsx`). È la
+gemella della fascia dello sfondo: stesso filetto, stessa colonna, nessuna scritta in
+mezzo. Sono le due chiusure della pagina, e una cornice diversa le farebbe sembrare di
+due pagine diverse. Ce l'hanno **`dog-lamp`** e **`zeta-3`**.
+
+Non sta nel carosello, e non per distrazione: un 16:9 nella cornice quadrata tornerebbe
+con due bande, ed è un video da guardare per intero, non una slide fra le altre.
+
+⚠️ **Parte solo premendo play, anche quando il consenso è stato dato** — è l'unica cosa
+in cui si comporta diversamente dal reel, ed è voluta: quaggiù si arriva scorrendo, e un
+video che parte da solo sotto la piega giocherebbe senza che nessuno lo veda, dopo aver
+contattato Google per farlo. Per questo `FilmatoProgetto` non legge `useConsensoVideo`:
+non ha una partenza automatica da autorizzare. Premere play vale come consenso per quel
+filmato soltanto, esattamente come sul reel.
+
+Ed è anche il motivo per cui **l'informativa privacy non è stata toccata**: dice quando
+YouTube viene contattato — col consenso, o premendo play — e resta vera parola per
+parola. Dare l'autoplay a questa fascia vorrebbe dire riscriverla.
+
+La miniatura è la stessa faccenda del reel, con il fotogramma dell'altro formato:
+
+```bash
+node scripts/video-poster.js <slug> <idVideo> --orizzontale   # → products/<slug>/filmato.webp
+```
+
+Prende `maxresdefault.jpg` (1280×720). Uscendo sopra i 900px vuole anche
+`node scripts/varianti-foto.js` per la variante da 800, che il reel a 720 non ha.
+
+### L'iframe
+
+**L'iframe di YouTube non va messo direttamente nella pagina.** `VideoYouTube.jsx` mostra
+il player solo dopo il click; finché non si preme, in pagina c'è una figura del sito.
+Sono due i motivi, e valgono entrambi: l'iframe pesa quasi un megabyte su una scheda che
+serve WebP da 60 KB, e piazza identificatori nel browser all'apertura della pagina — il
+che obbligherebbe a un banner di consenso (vedi "Privacy"). Il pre-rendering fotografa la
+miniatura, quindi nell'HTML statico non finisce nessun iframe: è una cosa da
+ricontrollare se si tocca il componente, e si vede con `grep iframe dist/progetto/*/index.html`.
 
 ## Etichette AI (AI Act)
 
@@ -463,11 +513,12 @@ dove riempie la colonna per intero — la figura resterebbe piccola in mezzo a d
 vuote. Un ritaglio nuovo va rifatto così, e `width`/`height` in `About.jsx` aggiornati
 con esso.
 
-⚠️ **Quel ritaglio finisce SOPRA al titolo, quindi vuole la maschera netta** che
-`remove-bg.js` applica in fondo (vedi lì il perché). La segmentazione lascia il soggetto
-opaco al 90% e ne sfuma i bordi morbidi su decine di pixel: su fondo carta non si vede
-nulla, ma col titolo dietro quel titolo **traspare** e si legge in filigrana attraverso la
-manica. Si nota solo sopra i ~2000px, dove la figura è grande.
+⚠️ **Il ritaglio non passa più sopra il titolo** — la testata si ferma prima della figura
+(vedi qui sotto) — ma la **maschera netta** di `remove-bg.js` resta quella giusta e non va
+tolta: la segmentazione lascia il soggetto opaco al 90% e ne sfuma i bordi morbidi su
+decine di pixel, e il giorno in cui qualcosa tornasse a passare dietro la figura si
+leggerebbe in filigrana attraverso la manica. Era il guasto di prima, quando il titolo ci
+finiva sotto apposta.
 
 ⚠️ Da `md` quel ritratto sta **fuori dal flusso** (`md:absolute` sull'`img`), e non è un
 vezzo: in colonna, `h-full` è una percentuale che al momento di misurare la riga non ha
@@ -479,29 +530,37 @@ cambiando immagine, non codice.**
 frazione della sezione: legata all'altezza, su una finestra bassa e larga la figura si
 allargava fin dentro il titolo. Ed è in `vw` e non in `%` perché fuori dal flusso la
 percentuale si risolve sul riquadro intero della sezione mentre il margine del titolo si
-risolve sulla colonna di testo: due basi diverse, e l'incastro si spostava a ogni cambio
-di padding.
+risolve sulla colonna di testo: due basi diverse, e lo stacco fra i due si spostava a ogni
+cambio di padding.
 
-⚠️ **L'incastro fra titolo e figura è calcolato, non tarato a occhio.** Titolo e ritratto
-sono appesi alla stessa misura — `--figura`, cioè `min(46vw, (100svh - 4rem) *
-PROPORZIONE_RITRATTO)`: la larghezza con cui `object-contain` disegna DAVVERO il ritaglio.
-Il margine destro del titolo è quella misura meno quanto la coda della frase deve entrarle
-sotto (`INCASTRO`, in em sul corpo del titolo), e da `md` il titolo è appeso al **fondo**
-della sezione (`mt-auto` + `--riga-bassa`), non centrato, perché al fondo ci sta anche la
+⚠️ **Testo e figura NON si sovrappongono, e lo stacco è calcolato, non tarato a occhio.**
+Titolo e ritratto sono appesi alla stessa misura — `--figura`, cioè `min(46vw, (100svh -
+4rem) * PROPORZIONE_RITRATTO)`: la larghezza con cui `object-contain` disegna DAVVERO il
+ritaglio. Il margine destro del titolo è quella misura **più** quanto la riga piccola
+sporge oltre quella grande (`SPORGENZA`, in em sul corpo del titolo) **più** il respiro
+fisso `STACCO`: si misura dalla coda della frase, che è il bordo destro vero della
+testata, non dal riquadro del titolo. Da `md` il titolo è appeso al **fondo** della
+sezione (`mt-auto` + `--riga-bassa`), non centrato, perché al fondo ci sta anche la
 figura. Le costanti stanno in testa a `About.jsx` con il perché di ciascuna.
 
+Fino a settembre 2026 era il contrario: la coda finiva **sotto** la manica apposta
+(`INCASTRO = 0.22`), ed era l'incastro della reference. Il cliente ha cambiato idea e ora
+il testo non va mai sotto la foto. Chi rimettesse un margine col meno rimette la
+sovrapposizione.
+
 ⚠️ Da `md` **anche il corpo del titolo esce da quel conto**: è il più piccolo fra quello
-che sta nello spazio rimasto (la colonna meno la figura), la vecchia frazione della colonna
-e il tetto in pixel. Senza il primo dei tre, sotto i ~1700px la testata sbatte contro il
-bordo sinistro, `ml-auto` non ha più margine da distribuire e la coda si allunga sotto la
-figura da sola — cioè l'incastro torna a dipendere dalla misura della finestra.
+che sta nello spazio rimasto (la colonna meno la figura e meno lo stacco), la vecchia
+frazione della colonna e il tetto in pixel. Senza il primo dei tre, sotto i ~1700px la
+testata sbatte contro il bordo sinistro, `ml-auto` non ha più margine da distribuire e la
+coda si allunga sotto la figura da sola — cioè torna la sovrapposizione, e per giunta
+dipendente dalla misura della finestra.
 
 Prima erano due frazioni indipendenti della finestra — `46vw` per la foto, `39vw` per il
 titolo — e si sfioravano per caso: con `object-contain` la foto si rimpicciolisce quando a
-limitare è l'altezza, e la stessa pagina passava dalla coda scoperta per intero alla coda
-mangiata quasi tutta cambiando **solo l'altezza della finestra**. Misurato su un centinaio
-di formati fra 768 e 3440px, adesso la frase si legge sempre per intero e sotto la manica
-ne finisce fra il 14 e il 27 per cento dell'ultima lettera.
+limitare è l'altezza, e la distanza fra i due cambiava con **la sola altezza della
+finestra**. Misurato su una trentina di formati fra 768 e 3440px, adesso fra la coda della
+frase e il bordo del ritratto restano sempre almeno 38px, e la frase si legge per intero
+in tutte e due le lingue.
 
 ⚠️ Due conseguenze che si rompono in silenzio: `PROPORZIONE_RITRATTO` sono le proporzioni
 di `joe-hero.webp` (1200×1364) e **va rifatta cambiando ritaglio**; e la foto è alta
@@ -561,7 +620,8 @@ src/
 │   ├── Footer.jsx        # fa anche da pagina contatti
 │   ├── Carousel.jsx      # carosello scheda progetto (autoplay + controlli)
 │   ├── BannerPrivacy.jsx # banner cookie e privacy (in App, su tutte le pagine)
-│   ├── VideoShort.jsx    # Short YouTube, 1ª slide del carosello: parte muto all'apertura
+│   ├── VideoYouTube.jsx  # il player: iframe nocookie + tasto play, per tutti e due i video
+│   ├── FilmatoProgetto.jsx # fascia 16:9 in fondo alla scheda: parte SOLO col play
 │   ├── EtichettaAI.jsx   # marchio AI GENERATED / AI MODIFIED sulle immagini di sintesi
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
 │   ├── FloatingMailButton.jsx
@@ -571,11 +631,11 @@ src/
 │   │       ├── geometria.js  # la forma della piega — matematica pura, ha dei test
 │   │       └── scena.js      # Three.js: renderer, camera, luci, texture, smaltimento
 │   └── home/             # sezioni homepage: Hero, SelectedWorks,
-│                         #   FamilyBand, SkillsTicker
+│                         #   Manifesto (frase + foto di Joe), SkillsTicker
 └── pages/
     ├── Home.jsx
-    ├── About.jsx         # "Chi sono": testata col ritratto, bio, sketchbook,
-    │                     #   la tavola di schizzi e la foto in laboratorio
+    ├── About.jsx         # "Chi sono": testata col ritratto, bio, sketchbook
+    │                     #   e la tavola di schizzi
     ├── Archive.jsx       # griglia di tutti i progetti
     ├── Privacy.jsx       # informativa privacy (testo in i18n.js)
     └── ProjectDetail.jsx # scheda singola con galleria + prev/next
@@ -597,8 +657,9 @@ scripts/
 ├── og-image.js          # anteprime social 1200×630 → public/images/og/ (a mano)
 ├── favicon.js           # icona del sito in tutti i formati → public/ (a mano)
 ├── pdf-disegno.js       # disegni tecnici dall'archivio PDF → products/<slug>/disegno.webp (a mano)
-├── video-poster.js      # miniatura di uno Short → products/<slug>/video.webp (a mano)
-│                        #   (fit-foto.js salta video.webp: il fit lo decide Carousel)
+├── video-poster.js      # miniatura di un video YouTube (a mano): video.webp dal reel,
+│                        #   filmato.webp col flag --orizzontale
+│                        #   (fit-foto.js li salta: il fit lo decidono i loro riquadri)
 ├── comprimi-foto.js     # riduce a 1600px e ricomprime public/images/ (a mano)
 ├── fit-foto.js          # come ogni foto entra nel carosello → src/data/fotoFit.js (a mano)
 ├── optimize-image.js    # jpg/png → webp ottimizzato (per le foto da media/)
