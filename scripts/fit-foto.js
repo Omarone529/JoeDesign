@@ -199,9 +199,10 @@ function decidi({ rapporto, sfumati, box }) {
       // Le -800 sono le varianti responsive: stessa inquadratura dell'originale,
       // che è già nel manifesto. Vedi scripts/varianti-foto.js.
       if (!f.endsWith('.webp') || f.endsWith('-800.webp')) continue
-      // `video.webp` è la miniatura del reel: nel carosello si mostra intera
-      // per scelta (vedi Carousel), non per misura.
-      if (f === 'disegno.webp' || f === 'video.webp') continue
+      // `video.webp` e `filmato.webp` sono le miniature dei due video: non
+      // sono slide del carosello, e come si inquadrano lo decidono i loro
+      // riquadri (vedi Carousel e FilmatoProgetto), non una misura presa qui.
+      if (f === 'disegno.webp' || f === 'video.webp' || f === 'filmato.webp') continue
       const chiave = `${slug}/${f}`
       const m = await misura(path.join(RADICE, slug, f))
       const d = FUOCO_A_MANO[chiave]

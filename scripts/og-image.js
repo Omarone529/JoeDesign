@@ -26,6 +26,7 @@ import {
   archivioIn,
   areeIn,
   contaProgetti,
+  manifestoFoto,
   periodoArchivio,
   periodoDi,
   profiloIn,
@@ -389,7 +390,7 @@ for (const lang of LINGUE) {
 
   /* Chi sono */
   await schedaConImmagine({
-    sorgente: path.join(root, 'public', about.photos.lab.src),
+    sorgente: path.join(root, 'public', manifestoFoto.src),
     categoria: profile.place,
     titolo: T.chiSono.occhiello,
     coda: firma,

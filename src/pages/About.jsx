@@ -18,38 +18,41 @@ import { srcSetDi, MISURE } from '../immagini'
  * stessa e cambia il corpo, che è il verso giusto in cui far cadere lo scarto.
  *
  * La riga piccola parte da lì — `heroNomeEm / heroRuoloEm` la porterebbe alla
- * stessa larghezza — e poi la supera di `SPORGENZA`: quello che avanza è la
- * coda che finisce sotto la figura.
+ * stessa larghezza — e poi la supera di `SPORGENZA`: è la più lunga delle due,
+ * e la sua coda è il punto più a destra della testata.
  *
  * I numeri passano al CSS come variabili perché i breakpoint restano classi:
  * `calc()` divide per una variabile senza unità senza fare storie.
  *
- * ⚠️ L'INCASTRO È CALCOLATO, non tarato a occhio su una finestra sola. Titolo e
+ * ⚠️ TITOLO E FIGURA NON SI TOCCANO. La coda della riga piccola si ferma prima
+ * del ritratto, di `STACCO`: il testo non finisce MAI sotto la foto. Prima ci
+ * finiva apposta — l'ultima lettera spariva sotto la manica — poi è stato
+ * chiesto il contrario, ed è per questo che il margine porta il segno più.
+ *
+ * Lo stacco è calcolato, non tarato a occhio su una finestra sola: titolo e
  * ritratto sono appesi alla stessa misura — `--figura`, la larghezza con cui il
  * ritaglio viene disegnato DAVVERO — e non a due frazioni indipendenti della
  * finestra. Prima erano `46vw` per la foto e `39vw` per il titolo, due numeri
  * che si sfioravano per caso: con `object-contain` la foto si rimpicciolisce
- * quando a limitare è l'altezza, e la stessa pagina passava dalla coda scoperta
- * per intero alla coda mangiata quasi tutta cambiando solo l'altezza della
- * finestra. Misurato su un centinaio di formati fra 768 e 3440px, adesso la
- * frase si legge sempre per intero e sotto la manica ne finisce fra il 14 e il
- * 27 per cento dell'ultima lettera.
+ * quando a limitare è l'altezza, e la distanza fra i due cambiava con la sola
+ * altezza della finestra — fino a farli sovrapporre.
  */
 
 /*
  * Quanto la riga piccola sporge oltre quella grande, da md in su. 1 sarebbe
- * appaiata: quello che avanza è la coda che arriva fin sotto la figura. Quanta
- * di quella coda si nasconda davvero non lo decide questo numero ma INCASTRO,
- * qui sotto.
+ * appaiata: quello che avanza è la coda, ed è lei — non la riga grande — il
+ * bordo destro vero della testata, quello da cui si misura lo stacco.
  */
 const SPORGENZA = 1.2
 
 /*
- * Quanta di quella sporgenza finisce sotto la figura. 1 la nasconderebbe tutta,
- * 0 la lascerebbe scoperta: la frase si legge per intero e solo l'ultima
- * lettera entra sotto la manica.
+ * Il respiro fra la coda della frase e il bordo della figura, da md in su.
+ *
+ * ⚠️ In rem e non in em: entra anche nel conto del corpo del titolo (`corpo()`,
+ * qui sotto), e in em dipenderebbe dal corpo che serve a calcolare. Un numero
+ * che si morde la coda, e il titolo tornerebbe a toccare la foto.
  */
-const INCASTRO = 0.22
+const STACCO = '2rem'
 
 /*
  * Il riquadro in cui vive il ritratto: alto quanto la finestra meno la barra,
@@ -69,37 +72,37 @@ const ALTEZZA_FIGURA = `calc(var(--figura) / ${PROPORZIONE_RITRATTO.toFixed(6)})
 
 /*
  * A che altezza della figura passa la riga piccola: 0 sarebbe ai piedi, 1 sopra
- * la testa. 0.437 è il punto in cui la manica incrocia la coda della frase.
+ * la testa. A 0.437 la frase si affianca alla figura all'altezza della manica.
  *
  * ⚠️ Da md il titolo è appeso al FONDO della sezione (`mt-auto` più questo
  * margine), non centrato in mezzo, perché al fondo ci sta anche la figura:
- * centrato, su una finestra alta e stretta il titolo saliva sopra la testa e
- * l'incastro spariva del tutto.
+ * centrato, su una finestra alta e stretta il titolo saliva sopra la testa e le
+ * due parti smettevano di stare su una riga sola.
  */
 /*
  * Il corpo del titolo, da md in su, è il PIÙ PICCOLO fra tre numeri:
  *
- *   1. quello che sta nello spazio rimasto — la colonna meno la figura, più il
- *      poco che la coda le entra sotto. È il vincolo che comanda sotto i
+ *   1. quello che sta nello spazio rimasto — la colonna meno la figura e meno
+ *      lo stacco che le corre a fianco. È il vincolo che comanda sotto i
  *      ~1700px, e senza il quale la testata sbatte contro il bordo sinistro:
  *      lì `ml-auto` non ha più margine da distribuire, il titolo resta piantato
- *      a sinistra e la coda si allunga sotto la figura da sola. L'incastro
- *      tornava a dipendere dalla misura della finestra, che è il guasto da cui
- *      viene tutto il resto di questo blocco;
+ *      a sinistra e la coda si allunga sotto la figura da sola — cioè proprio
+ *      la sovrapposizione che non si deve più vedere;
  *   2. la vecchia frazione della colonna (LARGO), che tiene il titolo dal
  *      gonfiarsi quando la figura si rimpicciolisce su una finestra bassa;
  *   3. il tetto in pixel, perché oltre un certo corpo il titolo non cresce più.
  *
- * FATTORE è il conto del punto 1 risolto: larghezza del titolo (SPORGENZA volte
- * la riga grande) meno quanto rientra sotto la figura, in unità di riga grande.
+ * FATTORE è il conto del punto 1 risolto: la larghezza del titolo è quella
+ * della riga piccola, cioè SPORGENZA volte la riga grande. Niente più rientra
+ * sotto la figura, quindi va sottratta per intero.
  * SICUREZZA è lo scarto fra la larghezza vera del testo e quella dichiarata in
  * em: senza, un pixel di troppo fa rientrare il caso che si voleva evitare.
  */
 const LARGO = 0.43
-const FATTORE = (SPORGENZA - INCASTRO * (SPORGENZA - 1)).toFixed(4)
+const FATTORE = SPORGENZA.toFixed(4)
 const SICUREZZA = '6px'
 const corpo = (colonna, tetto) =>
-  `min(calc((100vw - ${colonna} - var(--figura) - ${SICUREZZA}) / ${FATTORE} / var(--nome-em)),` +
+  `min(calc((100vw - ${colonna} - var(--figura) - ${STACCO} - ${SICUREZZA}) / ${FATTORE} / var(--nome-em)),` +
   ` calc((100vw - ${colonna}) * ${LARGO} / var(--nome-em)), ${tetto})`
 
 const ALTEZZA_RIGA = 0.437
@@ -118,7 +121,7 @@ export default function About() {
   const T = testi(lang)
   const about = aboutIn(lang)
   const profile = profiloIn(lang)
-  const { hero, schizzi, lab } = about.photos
+  const { hero, schizzi } = about.photos
 
   return (
     <main className="animate-viewIn">
@@ -134,16 +137,17 @@ export default function About() {
       >
         {/* Il titolo è largo quanto la sua riga più lunga, e da md `ml-auto`
             lo spinge a destra: il margine che lo trattiene è la larghezza della
-            figura meno quanto la coda deve entrarle sotto (`--sotto-figura`,
-            in em, quindi cresce col corpo del titolo). Il conto torna perché la
-            foto è appoggiata allo stesso bordo destro della colonna di testo
+            figura PIÙ quello che la coda sporge oltre il riquadro del titolo,
+            più lo stacco (`--fuori-figura`; la prima parte è in em, quindi
+            cresce col corpo del titolo). Il conto torna perché la foto è
+            appoggiata allo stesso bordo destro della colonna di testo
             (`right-8`/`lg:right-[72px]` contro `sm:px-8`/`lg:px-[72px]`):
             toccando uno dei due va toccato anche l'altro.
 
-            Il titolo resta sotto la foto (`z` di default contro `z-10` della
-            figura): il braccio alzato scavalca le ultime lettere, ed è
-            l'incastro che la reference mostra. Con la foto sotto, invece, il
-            ritaglio le passerebbe dietro e l'effetto sparirebbe.
+            ⚠️ Il margine si misura dalla CODA, non dal riquadro del titolo: il
+            riquadro è largo quanto la riga grande, e fermare lui al bordo della
+            figura lascerebbe la coda dentro il ritratto. La foto resta sopra il
+            titolo nel DOM (`z-10`), ma adesso non ha più niente da coprire.
 
             ⚠️ `tracking` va ripetuto sulla riga piccola. `letter-spacing` in em
             si risolve sul corpo dell'elemento che lo dichiara e poi si eredita
@@ -152,20 +156,19 @@ export default function About() {
         <h1
           style={{
             '--nome-em': T.chiSono.heroNomeEm,
-            '--sotto-figura': `calc(${((SPORGENZA - 1) * INCASTRO).toFixed(4)} * var(--nome-em) * 1em)`,
+            '--fuori-figura': `calc(${(SPORGENZA - 1).toFixed(4)} * var(--nome-em) * 1em + ${STACCO})`,
             '--corpo-md': corpo('4rem', '210px'),
             '--corpo-lg': corpo('9rem', '240px'),
           }}
-          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_-_var(--sotto-figura))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
+          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_+_var(--fuori-figura))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
         >
           <span className="block tracking-[-0.03em]">{T.chiSono.heroNome}</span>
-          {/* La riga piccola SPORGE oltre quella grande e va a finire sotto la
-              figura, che le mangia l'ultima lettera: è l'incastro della
-              reference, e il motivo per cui la foto sta sopra il titolo nel
-              DOM. La frase resta leggibile per intero. Solo da md —
-              sotto, la foto è in colonna e non copre niente, quindi una riga
-              che sporge perderebbe lettere contro `overflow-hidden` senza
-              nulla che le nasconda: lì le due righe tornano appaiate. */}
+          {/* La riga piccola SPORGE oltre quella grande, e si ferma prima
+              della figura: è il bordo destro della testata, non un pezzo che
+              va a nascondersi. Solo da md — sotto, la foto è in colonna, il
+              titolo è largo quanto la finestra e una riga che sporge
+              perderebbe lettere contro `overflow-hidden`: lì le due righe
+              tornano appaiate. */}
           <span
             style={{
               '--ruolo': T.chiSono.heroNomeEm / T.chiSono.heroRuoloEm,
@@ -187,8 +190,8 @@ export default function About() {
             `h-full`: `h-full` è l'altezza della sezione, che da qui in poi non
             è più sempre quella — su una finestra alta e stretta la testata si
             accorcia fino alla figura. Con `h-full` la foto si rimpicciolirebbe
-            con la sezione e l'incastro, che quel numero lo dà per fisso, si
-            sposterebbe.
+            con la sezione e lo stacco dal titolo, che quel numero lo dà per
+            fisso, si sposterebbe.
 
             Il ritratto è ritagliato attorno alla figura, con appena un margine
             di respiro: con un quinto di trasparente per lato, sul telefono la
@@ -203,7 +206,7 @@ export default function About() {
             ⚠️ `46vw` e non `46%`: fuori dal flusso la percentuale si risolve
             sul riquadro INTERO della sezione, padding compreso, mentre il
             margine che trattiene il titolo si risolve sulla colonna di testo.
-            Con due basi diverse l'incastro fra i due si spostava a ogni cambio
+            Con due basi diverse lo stacco fra i due si spostava a ogni cambio
             di padding; in `vw` guardano entrambi la stessa misura.
             `object-contain` serve al caso opposto — finestra bassa e larga,
             dove a limitare è l'altezza del riquadro, ed è il caso che
@@ -281,9 +284,8 @@ export default function About() {
         </div>
       </section>
 
-      {/* Il libro sfogliabile apre il manifesto: sono gli schizzi da cui i
-          progetti nascono, e la frase dice esattamente quello. Sotto restano la
-          foto in laboratorio e i due link d'uscita. */}
+      {/* Il libro sfogliabile: sono gli schizzi da cui i progetti nascono, e
+          la frase qui sotto dice esattamente quello. */}
       <Sketchbook />
 
       {/* La frase che chiude lo sketchbook e apre la tavola di schizzi: sta fra
@@ -316,25 +318,10 @@ export default function About() {
         />
       </section>
 
-      <section className="border-t-2 border-ink px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
-        <blockquote className="m-0 max-w-[24ch] text-[clamp(26px,4vw,56px)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
-          “{profile.manifesto}”
-        </blockquote>
-      </section>
-
-      <section className="bg-night">
-        <img
-          src={lab.src}
-          srcSet={srcSetDi(lab.src)}
-          sizes={MISURE.piena}
-          alt={lab.alt}
-          loading="lazy"
-          width="1900"
-          height="1425"
-          className="block aspect-[16/9] w-full object-cover object-top"
-        />
-      </section>
-
+      {/* Il manifesto e la foto con la lampada accesa, che chiudevano la
+          pagina, sono passati in home: là dicono con che criterio sono fatti i
+          progetti appena mostrati. Dopo la tavola di schizzi restano i due link
+          d'uscita, che il filetto grosso stacca da essa. */}
       <section className="grid grid-cols-1 border-t-2 border-ink sm:grid-cols-2">
         <Link
           to={percorso('archive', {}, lang)}

@@ -5,7 +5,7 @@
  */
 
 import { testi } from '../i18n.js'
-import { aboutEn, areeEn, familyBandEn, profileEn, progettiEn } from './contenutiEn.js'
+import { aboutEn, areeEn, manifestoFotoEn, profileEn, progettiEn } from './contenutiEn.js'
 
 export const profile = {
   name: 'Giovanni Sarchiolla',
@@ -35,15 +35,25 @@ export const homeHero = {
   height: 1351,
 }
 
-/* Fondo bianco. In home la fascia va da bordo a bordo,
-   quindi il bianco riempie tutto e non dà fastidio; stringendola servirebbe il
-   `mix-blend-multiply` del ritratto qui sopra, o resterebbe un rettangolo
-   bianco appoggiato sulla carta. */
+/* La famiglia di prodotti. In pagina non c'è più — in home, al suo posto, sono
+   tornati il manifesto e la foto qui sotto — ma resta la sorgente delle
+   anteprime social dell'archivio (`scripts/og-image.js`), che è la pagina dove
+   quei prodotti si guardano davvero: il file non si cancella. Non avendo più un
+   alt da mostrare, non ha nemmeno una gemella inglese. */
 export const familyBand = {
   src: '/images/home/family-band.webp',
-  alt: 'La famiglia di prodotti',
-  width: 2000,
-  height: 1070,
+}
+
+/* La foto di Joe con la lampada DADO, in home sotto il manifesto: la fascia
+   scura che chiude la pagina prima del nastro delle skills. Stava in fondo a
+   "Chi sono", sotto la stessa frase, ed è passata in home con essa.
+   `scripts/og-image.js` la usa ancora per l'anteprima social di "Chi sono": è
+   un ritratto di Joe, e per quel biglietto da visita va bene comunque. */
+export const manifestoFoto = {
+  src: '/images/about/joe-lab.webp',
+  alt: 'La lampada DADO accesa, tenuta in mano',
+  width: 1900,
+  height: 1425,
 }
 
 export const about = {
@@ -84,7 +94,6 @@ export const about = {
       src: '/images/about/schizzi.webp',
       alt: 'Tavola di schizzi a mano: lampade, sedute, vasi, imbottiti e sistemi di illuminazione',
     },
-    lab: { src: '/images/about/joe-lab.webp', alt: 'La lampada DADO accesa, tenuta in mano' },
   },
   /*
    * Pagine dello sketchbook personale, vedi
@@ -129,6 +138,14 @@ export const about = {
  * l'indirizzo intero: l'id è lo stesso nelle due lingue, quindi non passa da
  * `contenutiEn.js`. Vuole `video.webp` accanto alle foto, che si genera con
  * `node scripts/video-poster.js <slug> <id>`.
+ * `filmato` = id di un video YouTube ORIZZONTALE (la coda di ?v=<id>), mostrato
+ * in una fascia 16:9 in fondo alla scheda, sopra lo sfondo. È un campo a parte
+ * e non lo stesso di `video` perché sono due cose diverse: il reel è verticale,
+ * apre il carosello e con il consenso parte da sé; il filmato sta in fondo alla
+ * pagina e parte solo premendo play. Un progetto può avere l'uno, l'altro o
+ * tutti e due. Vuole `filmato.webp` accanto alle foto:
+ * `node scripts/video-poster.js <slug> <id> --orizzontale`, poi
+ * `node scripts/varianti-foto.js` per la variante da 800.
  * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
  * `ai` = quali immagini della scheda sono generate o modificate con l'IA, da
  * dichiarare a chi guarda (vedi `aiFoto` in fondo al file).
@@ -149,6 +166,7 @@ const progetti = [
     year: '2026',
     photos: 8,
     video: 'UYS6ik4XTV0',
+    disegno: true,
     sfondo: true,
     ai: { generate: [1, 3, 5, 8], sfondo: 'generata' },
     tavola: 20,
@@ -332,6 +350,7 @@ const progetti = [
     photos: 8,
     disegno: true,
     sfondo: true,
+    filmato: 'gzLI2nMSQi4',
     ai: { sfondo: 'modificata' },
     tavola: 6,
     designer: 'Giovanni Sarchiolla, Sara Marchini, Elena Vecchi',
@@ -421,6 +440,7 @@ const progetti = [
     photos: 5,
     disegno: true,
     sfondo: true,
+    filmato: 'vElQ6tz9LtU',
     tavola: 1,
     desc: 'DOG LAMP è una lampada pensata per il mondo dell’infanzia, progettata per unire funzionalità, semplicità costruttiva e un linguaggio giocoso. Il progetto è stato sviluppato per essere realizzato attraverso la stampa 3D, utilizzando un sistema di componenti ad incastro che permette di assemblare la lampada senza l’utilizzo di colle o sistemi di fissaggio complessi. La forma ispirata a un cane trasforma la lampada in un piccolo elemento domestico capace di entrare in relazione con il bambino, rendendo la luce parte dell’esperienza quotidiana. DOG LAMP nasce dall’incontro tra progettazione digitale, fabbricazione additiva e design per l’infanzia.',
     spec: {
@@ -688,6 +708,8 @@ export function projectImages(item) {
     sfondo: item.sfondo ? `${base}/sfondo.webp` : null,
     // Fotogramma del reel, mostrato al posto del player finché non si clicca.
     videoPoster: item.video ? `${base}/video.webp` : null,
+    // Lo stesso per il filmato orizzontale della fascia in fondo alla scheda.
+    filmatoPoster: item.filmato ? `${base}/filmato.webp` : null,
   }
 }
 
@@ -839,7 +861,6 @@ const aboutEnCompleto = {
   photos: {
     hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
     schizzi: { ...about.photos.schizzi, alt: aboutEn.photos.schizzi },
-    lab: { ...about.photos.lab, alt: aboutEn.photos.lab },
   },
   sketchbook: about.sketchbook.map((tavola, i) => ({
     front: tavola.front ? { ...tavola.front, alt: aboutEn.sketchbook[i]?.front } : null,
@@ -851,8 +872,8 @@ export function aboutIn(lang) {
   return inglese(lang) ? aboutEnCompleto : about
 }
 
-const familyBandEnCompleto = { ...familyBand, ...familyBandEn }
+const manifestoFotoEnCompleta = { ...manifestoFoto, ...manifestoFotoEn }
 
-export function familyBandIn(lang) {
-  return inglese(lang) ? familyBandEnCompleto : familyBand
+export function manifestoFotoIn(lang) {
+  return inglese(lang) ? manifestoFotoEnCompleta : manifestoFoto
 }

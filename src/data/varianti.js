@@ -80,6 +80,7 @@ export const varianti = {
   "/images/products/dog-lamp/04.webp": 1600,
   "/images/products/dog-lamp/05.webp": 1600,
   "/images/products/dog-lamp/cover.webp": 1600,
+  "/images/products/dog-lamp/filmato.webp": 1280,
   "/images/products/dog-lamp/sfondo.webp": 1672,
   "/images/products/dose/01.webp": 1080,
   "/images/products/dose/02.webp": 1080,
@@ -196,5 +197,6 @@ export const varianti = {
   "/images/products/zeta-3/07.webp": 1600,
   "/images/products/zeta-3/08.webp": 1600,
   "/images/products/zeta-3/cover.webp": 1200,
+  "/images/products/zeta-3/filmato.webp": 1280,
   "/images/products/zeta-3/sfondo.webp": 1672
 }

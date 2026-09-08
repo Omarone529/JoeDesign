@@ -11,13 +11,14 @@ import {
   areaPerSlugIn,
   areeIn,
   contaProgetti,
-  familyBand,
   focusItemsIn,
   periodoArchivio,
   periodoDi,
   profile,
   profiloIn,
   progettiAreaIn,
+  manifestoFoto,
+  manifestoFotoIn,
   projectImages,
   titoloLeggibile,
 } from './data/siteData.js'
@@ -193,7 +194,10 @@ export function metaForRoute(route) {
       description: clip(about.intro),
       canonical: url('about', {}, lang),
       image: ogImage('chi-sono', lang),
-      imageAlt: about.photos.lab.alt,
+      // L'alt descrive l'ANTEPRIMA social, che `og-image.js` compone ancora con
+      // la foto della lampada — passata in home ma rimasta la sorgente di quella
+      // scheda. Cambiando la sorgente là, va cambiato anche qui.
+      imageAlt: manifestoFotoIn(lang).alt,
       preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
     }
@@ -508,7 +512,7 @@ export function immaginiPerRotta(route) {
   const lang = route.lang || 'it'
 
   /*
-   * `familyBand` e le anteprime dei lavori selezionati. Il ritratto in cima
+   * La foto del manifesto e le anteprime dei lavori selezionati. Il ritratto in cima
    * alla home invece no: è decorativo e ha `alt` vuoto per questo, e dichiararlo
    * qui lo proporrebbe a Google Immagini senza la descrizione che Google si
    * aspetta di trovare nell'alt, un'immagine muta in un indice che vive di
@@ -517,13 +521,13 @@ export function immaginiPerRotta(route) {
    * questa riga cinque fotografie non entrerebbero in sitemap da nessuna parte.
    */
   if (route.name === 'home') {
-    return [familyBand.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
+    return [manifestoFoto.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
   }
 
   if (route.name === 'about') {
     const about = aboutIn(lang)
     const tavole = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
-    const foto = [about.photos.hero.src, about.photos.schizzi.src, about.photos.lab.src]
+    const foto = [about.photos.hero.src, about.photos.schizzi.src]
     return [...foto, ...tavole].filter(Boolean).map(abs)
   }
 
@@ -539,6 +543,6 @@ export function immaginiPerRotta(route) {
   if (route.name !== 'project') return []
   const item = archivioIn(lang).find((p) => p.slug === route.slug)
   if (!item) return []
-  const { cover, gallery, drawing, sfondo, videoPoster } = projectImages(item)
-  return [cover, ...gallery, drawing, sfondo, videoPoster].filter(Boolean).map(abs)
+  const { cover, gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
+  return [cover, ...gallery, drawing, sfondo, videoPoster, filmatoPoster].filter(Boolean).map(abs)
 }
