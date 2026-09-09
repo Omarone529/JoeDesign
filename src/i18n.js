@@ -39,8 +39,6 @@ const TESTI = {
       lavoriSelezionati: 'Lavori selezionati',
       archivioCompleto: 'Archivio completo →',
       skills: 'Skills',
-      fermaNastro: 'Ferma',
-      riprendiNastro: 'Riprendi',
     },
 
     archivio: {
@@ -338,8 +336,6 @@ const TESTI = {
       lavoriSelezionati: 'Selected works',
       archivioCompleto: 'Full archive →',
       skills: 'Skills',
-      fermaNastro: 'Stop',
-      riprendiNastro: 'Resume',
     },
 
     archivio: {
