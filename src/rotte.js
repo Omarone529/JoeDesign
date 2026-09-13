@@ -1,25 +1,8 @@
-/*
- * Le estensioni `.js` sono esplicite di proposito. Dentro il sito le
- * risolverebbe Vite anche senza, ma questo file lo legge anche Node — i test e
- * gli script — e Node le pretende. È la stessa scelta già fatta in
- * `data/siteData.js`.
- */
+// Estensioni `.js` esplicite: questo file lo legge anche Node (test e script).
 import { archive, areaPerSlug } from './data/siteData.js'
 import { LINGUA_PREDEFINITA, normalizzaLingua } from './i18n.js'
 
-/*
- * Router minimale su path reali (History API), niente dipendenze: l'hash
- * routing impediva SEO e pre-rendering. Funziona anche in SSR, dove riceve
- * `initialPath` e non tocca mai `window`.
- *
- * Il sito è bilingue e ogni pagina ha due indirizzi reali, uno per lingua:
- * l'italiano sta nella radice, l'inglese sotto /en. Non è uno stato salvato
- * nel browser ma parte dell'URL, perché una pagina inglese dev'essere
- * indicizzabile, condivisibile e apribile a freddo com'è quella italiana.
- *
- * Lo slug dell'area (product-design) e quello del progetto non cambiano fra le
- * due lingue: sono nomi propri, e tradurli spezzerebbe i link già in giro.
- */
+// Indirizzi nelle due lingue (italiano alla radice, inglese sotto /en). Gli slug non si traducono.
 const SEGMENTI = {
   it: { about: 'chi-sono', archive: 'archivio', project: 'progetto', privacy: 'privacy' },
   en: { about: 'about', archive: 'archive', project: 'project', privacy: 'privacy' },

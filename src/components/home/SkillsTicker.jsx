@@ -2,19 +2,8 @@ import { about } from '../../data/siteData'
 import { testi } from '../../i18n'
 import { useLang } from '../../router'
 
-/*
- * Nastro continuo: due copie identiche che traslano del 50%, così al riavvio la
- * seconda è dov'era la prima e il giro non si vede.
- *
- * Non si ferma mai: né con "riduci animazioni" — su Windows è spesso attiva a
- * insaputa dell'utente e bloccava il nastro per tutti — né sostandoci sopra col
- * puntatore, né con un comando. È una scelta del cliente, presa sapendo che un
- * movimento che parte da solo e dura più di cinque secondi dovrebbe poterlo
- * fermare chiunque (WCAG 2.2.2, livello A): il nastro è l'unico contenuto in
- * movimento del sito e nessun testo è leggibile solo lì dentro, ma la norma
- * resta non rispettata. Chi rimettesse una pausa la rimetta col tasto in riga
- * con l'occhiello, che è quello che vale da tastiera, non col solo hover.
- */
+// Nastro continuo: due copie che traslano del 50%. Non si ferma mai, per scelta del cliente
+// (⚠️ non rispetta WCAG 2.2.2): una pausa andrebbe rimessa con un tasto, non col solo hover.
 export default function SkillsTicker() {
   const T = testi(useLang())
 

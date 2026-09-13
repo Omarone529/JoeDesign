@@ -1,15 +1,6 @@
 /*
- * Icona del sito in tutti i formati, dal marchio della navbar. Da rilanciare
- * solo se il marchio cambia: i file finiti stanno nel repo.
- *
- *   node scripts/favicon.js
- *
- * Produce in public/: favicon.svg, favicon.ico, apple-touch-icon.png,
- * icon-192.png, icon-512.png, site.webmanifest.
- *
- * Il marchio non esiste in vettoriale, quindi l'SVG incapsula il raster. Nella
- * scheda del browser resta trasparente; le icone da schermata Home vanno sul
- * fondo `paper`, perché Apple e Android la trasparenza la gestiscono male.
+ * Icone del sito dal marchio della navbar, in public/. Solo se il marchio cambia: node scripts/favicon.js
+ * Le icone per la schermata Home vanno su fondo `paper`.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -31,10 +22,7 @@ const iconOpaca = (lato) =>
     .flatten({ background: PAPER })
     .png({ compressionLevel: 9 })
 
-/*
- * Un .ico può contenere un PNG così com'è: bastano 6 byte di testata e 16 che
- * descrivono l'unica voce, davanti ai byte dell'immagine.
- */
+// .ico con un PNG dentro: 6 byte di testata e 16 per la voce.
 function ico(pngBuffer, lato) {
   const testata = Buffer.alloc(6)
   testata.writeUInt16LE(0, 0) // riservato
@@ -70,10 +58,7 @@ fs.writeFileSync(
   ico(await (await iconTrasparente(32)).toBuffer(), 32),
 )
 
-/*
- * `display: browser` perché è un sito da leggere, non un'applicazione:
- * nascondere la barra toglierebbe il modo di condividere la pagina.
- */
+// `display: browser`: è un sito da leggere, la barra serve a condividere.
 fs.writeFileSync(
   path.join(publicDir, 'site.webmanifest'),
   JSON.stringify(

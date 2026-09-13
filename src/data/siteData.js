@@ -1,8 +1,4 @@
-/*
- * Contenuti del sito - fonte di verità unica: testi e dati stanno qui, non nel
- * markup. Le immagini di ogni progetto vivono in public/images/products/<slug>/
- * (cover.webp + 01.webp…NN.webp); i percorsi li costruisce `projectImages()`.
- */
+// Contenuti del sito: fonte di verità unica. Immagini in public/images/products/<slug>/.
 
 import { testi } from '../i18n.js'
 import { aboutEn, areeEn, manifestoFotoEn, profileEn, progettiEn } from './contenutiEn.js'
@@ -35,20 +31,12 @@ export const homeHero = {
   height: 1351,
 }
 
-/* La famiglia di prodotti. In pagina non c'è più — in home, al suo posto, sono
-   tornati il manifesto e la foto qui sotto — ma resta la sorgente delle
-   anteprime social dell'archivio (`scripts/og-image.js`), che è la pagina dove
-   quei prodotti si guardano davvero: il file non si cancella. Non avendo più un
-   alt da mostrare, non ha nemmeno una gemella inglese. */
+// Non più in pagina: resta la sorgente delle anteprime social dell'archivio (og-image.js).
 export const familyBand = {
   src: '/images/home/family-band.webp',
 }
 
-/* La foto di Joe con la lampada DADO, in home sotto il manifesto: la fascia
-   scura che chiude la pagina prima del nastro delle skills. Stava in fondo a
-   "Chi sono", sotto la stessa frase, ed è passata in home con essa.
-   `scripts/og-image.js` la usa ancora per l'anteprima social di "Chi sono": è
-   un ritratto di Joe, e per quel biglietto da visita va bene comunque. */
+// Foto di Joe con la lampada DADO, in home sotto il manifesto. La usa anche og-image.js per "Chi sono".
 export const manifestoFoto = {
   src: '/images/about/joe-lab.webp',
   alt: 'La lampada DADO accesa, tenuta in mano',
@@ -59,12 +47,7 @@ export const manifestoFoto = {
 export const about = {
   intro:
     'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
-  experience: [
-    { anno: '2020–2021', titolo: 'Arredatore', luogo: 'Emilia Casa SRL' },
-    { anno: '2021–2022', titolo: 'Arredatore', luogo: 'Casa Midì' },
-    { anno: '2025', titolo: 'Partecipazione Salone Satellite', luogo: 'Milano' },
-    { anno: '2025–2026', titolo: 'Concorsi Grafica & Product Design', luogo: '' },
-  ],
+  // Elenco piatto per il nastro in home e il JSON-LD. Uno strumento nuovo va anche in `competenze`.
   skills: [
     'Illustrator',
     'Photoshop',
@@ -80,14 +63,43 @@ export const about = {
     'Keynote',
     'Canva',
   ],
-  education: [
-    { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
-    { anno: '2026', titolo: 'Accademia di Belle Arti di Bologna', luogo: 'ABABO' },
+  /* Card di "Chi sono". Traduzione in `aboutEn.competenze`, agganciata per `chiave`.
+     `foto: null` finché le immagini non arrivano, poi `{ src, alt }`. */
+  competenze: [
+    {
+      chiave: 'grafica',
+      titolo: 'Grafica ed editoria',
+      testo:
+        'Tavole, manifesti e impaginati: il progetto si racconta con la stessa cura con cui è disegnato.',
+      strumenti: ['Illustrator', 'Photoshop', 'InDesign', 'Affinity', 'Canva'],
+      foto: null,
+    },
+    {
+      chiave: 'modellazione',
+      titolo: 'Modellazione 3D',
+      testo:
+        'Dal volume di massima al modello quotato: la forma si verifica in tre dimensioni prima di diventare un pezzo.',
+      strumenti: ['Rhino 3D', 'Shapr3D'],
+      foto: null,
+    },
+    {
+      chiave: 'configuratori',
+      titolo: 'Configuratori d’arredo',
+      testo:
+        'Composizioni su misura, disegnate dentro i sistemi con cui i mobilifici mandano in produzione.',
+      strumenti: ['Mobilturi 3D', 'Metron (Imab)', '3CAD', 'GSG'],
+      foto: null,
+    },
+    {
+      chiave: 'presentazione',
+      titolo: 'Presentazione',
+      testo:
+        'Il progetto come arriva al cliente: sequenza, ritmo e gerarchia, come per un impaginato.',
+      strumenti: ['PowerPoint', 'Keynote'],
+      foto: null,
+    },
   ],
-  /* `hero` è scontornato (sfondo trasparente): nella testata scavalca il
-     titolo, e un rettangolo bianco lo coprirebbe invece di intrecciarcisi.
-     `schizzi` invece ha il fondo bianco vero e va in `mix-blend-multiply` su
-     una sezione con `bg-paper`, come `familyBand` in home. */
+  // `hero` è scontornato; `schizzi` ha fondo bianco e va in mix-blend-multiply.
   photos: {
     hero: { src: '/images/about/joe-hero.webp', alt: 'Ritratto di Joe Sarchiolla, cappello e occhiali' },
     schizzi: {
@@ -95,15 +107,7 @@ export const about = {
       alt: 'Tavola di schizzi a mano: lampade, sedute, vasi, imbottiti e sistemi di illuminazione',
     },
   },
-  /*
-   * Pagine dello sketchbook personale, vedi
-   * scripts/sketchbook-pages.js), mostrato come libro sfogliabile in 3D sotto
-   * la fascia "lab". Ogni voce è una pagina fisica con fronte e retro (le
-   * tavole 01-08 sono accoppiate due a due, così come stanno nel PDF
-   * originale, es. indice/griglia miniature); la 09 chiude lo sketchbook da
-   * sola, col retro bianco. Stessa proporzione per tutte le tavole
-   * (1000×1415, ~A4).
-   */
+  // Tavole dello sketchbook (scripts/sketchbook-pages.js): fronte e retro per pagina, la 09 da sola.
   sketchbook: [
     {
       front: { src: '/images/about/sketchbook/01.webp', alt: 'Copertina dello sketchbook personale di Joe Sarchiolla' },
@@ -129,34 +133,10 @@ export const about = {
 }
 
 /*
- * Archivio: tutti i progetti. `photos` = numero di foto galleria (NN.webp);
- * `disegno: true` = esiste disegno.webp (da `scripts/pdf-disegno.js`).
- * `sfondo: true` = esiste sfondo.webp, immagine di sfondo mostrata in fondo
- * alla scheda progetto (sopra la navigazione prev/next).
- * `area` = area dell'archivio ('product' o 'graphic'); assente = 'product'.
- * `video` = id di uno Short YouTube (la coda di youtube.com/shorts/<id>), non
- * l'indirizzo intero: l'id è lo stesso nelle due lingue, quindi non passa da
- * `contenutiEn.js`. Vuole `video.webp` accanto alle foto, che si genera con
- * `node scripts/video-poster.js <slug> <id>`.
- * `filmato` = id di un video YouTube ORIZZONTALE (la coda di ?v=<id>), mostrato
- * in una fascia 16:9 in fondo alla scheda, sopra lo sfondo. È un campo a parte
- * e non lo stesso di `video` perché sono due cose diverse: il reel è verticale,
- * apre il carosello e con il consenso parte da sé; il filmato sta in fondo alla
- * pagina e parte solo premendo play. Un progetto può avere l'uno, l'altro o
- * tutti e due. Vuole `filmato.webp` accanto alle foto:
- * `node scripts/video-poster.js <slug> <id> --orizzontale`, poi
- * `node scripts/varianti-foto.js` per la variante da 800.
- * `senzaFoto: true` = scheda pubblicata prima che le immagini arrivino.
- * `ai` = quali immagini della scheda sono generate o modificate con l'IA, da
- * dichiarare a chi guarda (vedi `aiFoto` in fondo al file).
- * `tavola` = numero del progetto dentro la sua area, in ordine cronologico
- * crescente (01 = il più vecchio); mostrato in hover sulle celle di /archivio.
- * Per i prodotti coincide con la tavola dell'archivio sorgente (cartella
- * "COPERTINE - dettaglio archivio"), per la grafica è una numerazione a parte:
- * le due aree si guardano in griglie separate, quindi ognuna parte da 01.
- * `cat` e `year` sono stime da confermare; l'anno incerto è omesso.
- * L'ordine in cui sono scritti qui non conta: quello vero lo applica
- * `archive`, per numero di tavola decrescente.
+ * Campi: `photos` foto di galleria · `disegno`/`sfondo` file presenti · `area` 'product'|'graphic'
+ * · `video` id Short verticale · `filmato` id video orizzontale · `senzaFoto` immagini in arrivo
+ * · `ai` immagini di sintesi (vedi `aiFoto`) · `tavola` numero nell'area, 01 = il più vecchio.
+ * L'ordine qui non conta: lo applica `archive`.
  */
 const progetti = [
   {
@@ -630,15 +610,7 @@ export function anniDi(item) {
 
 const annoRecente = (item) => Math.max(0, ...anniDi(item))
 
-/*
- * Ordine cronologico rovesciato: prima l'ultimo progetto, in fondo il primo.
- *
- * Prima l'anno, poi il numero di `tavola` decrescente. La tavola serve perché
- * dentro l'anno la data precisa non c'è, e la numerazione è l'unico dato che
- * conserva l'ordine in cui i progetti sono stati fatti. Product: 1–5 del 2024,
- * 6–10 del 2025, 11–19 del 2026. Graphic: 1 del 2024, 2–6 del 2025, 7 del 2026.
- * Le due numerazioni non si incrociano perché le griglie sono per area.
- */
+// Dal più recente: anno, poi `tavola` decrescente (dentro l'anno la data precisa non c'è).
 export const archive = [...progetti].sort(
   (a, b) => annoRecente(b) - annoRecente(a) || (b.tavola ?? 0) - (a.tavola ?? 0),
 )
@@ -656,14 +628,7 @@ export function periodoDi(lista) {
 
 export const periodoArchivio = periodoDi(archive)
 
-/*
- * L'archivio si apre su due aree: /archivio le presenta, e ognuna ha la sua
- * pagina (/archivio/product-design, /archivio/graphic-design) con la stessa
- * griglia di prima, ristretta ai suoi progetti.
- *
- * L'area sta sul progetto, nel campo `area`. Chi non la dichiara è product
- * design: è la regola, e ripeterla su ogni voce sarebbe solo rumore.
- */
+// Le aree dell'archivio. Un progetto senza `area` è product design.
 export const AREA_PREDEFINITA = 'product'
 
 export function areaDi(item) {
@@ -689,12 +654,7 @@ export function areaPerSlug(slug) {
   return aree.find((a) => a.slug === slug) || null
 }
 
-/*
- * `drawing` e `sfondo` sono `null` dove il file non c'è: la scheda salta il
- * blocco. Anche `cover` può mancare: `senzaFoto` marca i progetti pubblicati
- * prima che le immagini arrivino, e chi la usa mostra un riquadro in attesa
- * invece di un'immagine rotta.
- */
+// `drawing` e `sfondo` sono null se il file non c'è; `cover` manca con `senzaFoto`.
 export function projectImages(item) {
   const base = `/images/products/${item.slug}`
   const gallery = Array.from(
@@ -713,26 +673,13 @@ export function projectImages(item) {
   }
 }
 
-/*
- * I titoli sono scritti in maiuscolo e il CSS li mostra così; fuori dal markup
- * (alt, `<title>`, dati strutturati) serve la forma leggibile. Maiuscola solo
- * all'iniziale, come l'italiano vuole: il Title Case inglese darebbe "Sedia A
- * Tempo Determinato". Per rimettere il maiuscolo pieno ovunque basta far
- * restituire `titolo` da qui.
- */
+// Forma leggibile dei titoli (maiuscolo solo all'iniziale) per alt, <title> e dati strutturati.
 export function titoloLeggibile(titolo) {
   const t = titolo.toLocaleLowerCase('it')
   return t.charAt(0).toLocaleUpperCase('it') + t.slice(1)
 }
 
-/*
- * Testi alternativi delle immagini di prodotto. Stanno qui perché li usano sia
- * le pagine sia la sitemap immagini: una foto si descrive in un posto solo.
- *
- * Dicono oggetto e categoria invece del solo titolo. Descrizioni per singola
- * foto non ce ne sono, e inventarle sarebbe peggio del generico: la posizione
- * nella serie è quanto si può dire di vero.
- */
+// Testi alternativi, condivisi fra pagine e sitemap immagini.
 export function altCopertina(item, lang) {
   return testi(lang).alt.copertina(titoloLeggibile(item.title), item.cat, profile.name)
 }
@@ -754,20 +701,8 @@ export function altVideo(item, lang) {
 }
 
 /*
- * Etichette AI Act. L'articolo 50 del regolamento europeo chiede che
- * un'immagine generata o ritoccata con l'intelligenza artificiale si riconosca
- * come tale: qui si dichiara quale lo è, il marchio lo mette `EtichettaAI`
- * sopra la foto. Riguarda le immagini della scheda progetto — le slide del
- * carosello e lo `sfondo.webp` in fondo alla pagina.
- *
- * Sul progetto il campo `ai` porta:
- *   `generate` / `modificate` — i numeri delle foto di galleria (1 = 01.webp),
- *     o la stringa 'tutte' quando lo sono tutte quante;
- *   `sfondo` — 'generata' | 'modificata' per sfondo.webp.
- * Quello che non è elencato non porta etichetta: il silenzio vuol dire che la
- * foto è vera, quindi un progetto nuovo con immagini di sintesi va dichiarato
- * qui, o resta senza. Il reel di YouTube non passa da qui: la miniatura è un
- * suo fotogramma, e un filmato lo si dichiara nella scheda, non sulla slide.
+ * Etichette AI Act (art. 50). `ai: { generate, modificate, sfondo }`: numeri delle foto di
+ * galleria o 'tutte'; `sfondo` 'generata'|'modificata'. Ciò che non è elencato è una foto vera.
  */
 const marcata = (elenco, n) => elenco === 'tutte' || (Array.isArray(elenco) && elenco.includes(n))
 
@@ -779,16 +714,7 @@ export function aiFoto(item, n) {
   return null
 }
 
-/*
- * Solo gli slug: il resto viene dall'archivio, così non si duplica niente e uno
- * slug errato rompe la build. L'ordine qui è la numerazione 01–05 mostrata.
- *
- * L'anteprima però NON è la copertina d'archivio: la home ha le sue, in
- * `/images/home/selezionati/<slug>.webp`, così chi arriva dalla home e poi apre
- * l'archivio non rivede due volte la stessa fotografia. Cambiando `focusSlugs`
- * va aggiunta anche la foto: qui non c'è archivio da cui ripiegare, e un file
- * mancante è un riquadro vuoto in prima pagina.
- */
+// Solo gli slug (uno sbagliato rompe la build). Le anteprime sono in /images/home/selezionati/<slug>.webp.
 const focusSlugs = ['flue', 'orbit', 'directional-arrow', 'dado-lamp', 'dog-lamp']
 
 export const focusItems = focusSlugs.map((slug) => {
@@ -798,16 +724,7 @@ export const focusItems = focusSlugs.map((slug) => {
   return { slug, title, cat, year, cover: `/images/home/selezionati/${slug}.webp` }
 })
 
-/*
- * Il sito esiste in italiano e in inglese. I dati qui sopra sono l'italiano;
- * `contenutiEn.js` porta i campi che cambiano lingua, agganciati per slug.
- * Ogni funzione qui sotto restituisce la versione giusta, e la calcola una
- * volta sola: le pagine ricevono sempre lo stesso oggetto, quindi React non
- * rimonta niente al cambio di rotta.
- *
- * Le altre chiavi non compaiono: immagini, anni, aree e ordine sono gli
- * stessi in entrambe le lingue, e duplicarli vorrebbe dire tenerli allineati.
- */
+// Accessori per lingua: calcolati una volta, così React riceve sempre lo stesso oggetto.
 const inglese = (lang) => lang === 'en'
 
 /* `cat`, `desc` e `spec` si sostituiscono in blocco: nella tabella cambiano
@@ -856,8 +773,11 @@ export function profiloIn(lang) {
 const aboutEnCompleto = {
   ...about,
   intro: aboutEn.intro,
-  experience: aboutEn.experience,
-  education: aboutEn.education,
+  // Per `chiave`, non per posizione: senza gemella la card resta in italiano.
+  competenze: about.competenze.map((c) => {
+    const en = aboutEn.competenze.find((v) => v.chiave === c.chiave)
+    return en ? { ...c, titolo: en.titolo, testo: en.testo } : c
+  }),
   photos: {
     hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
     schizzi: { ...about.photos.schizzi, alt: aboutEn.photos.schizzi },

@@ -7,20 +7,7 @@ import {
   calcolaColonne,
 } from './geometria'
 
-/*
- * La scena Three.js del libro: renderer, camera, luci, ombre, le tavole come
- * texture, e la geometria che le fa piegare. Costruisce, restituisce una maniglia
- * per comandarla, e sa smaltirsi.
- *
- * Sta in un file suo perché è la parte con un ciclo di vita: alloca memoria
- * sulla scheda grafica, che nessuno libera al posto suo, e un `dispose`
- * dimenticato non si vede finché non si aprono e chiudono venti pagine.
- * Isolata, la si sorveglia leggendo `smaltisci()` e basta.
- *
- * Non sa nulla di React né di gesti: riceve le tavole, restituisce oggetti da
- * muovere. Chi decide di quanto muoverli è `../Sketchbook.jsx`; la forma della
- * piega la calcola `geometria.js`.
- */
+// Scena Three.js del libro: renderer, camera, luci, texture e `smaltisci()`. Niente React né gesti.
 
 const FOV_VERTICALE = 18 // obiettivo leggermente tele: meno "bombatura" prospettica della pagina in volo
 const ROT_X_LIBRO = -0.1
@@ -40,14 +27,7 @@ const DISTANZA_CAMERA = (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA) / 
 // larghezza del canvas (la camera è fissa): da qui si ricava in quanti pixel
 // reali viene disegnata, e quindi come conviene filtrarne la texture.
 const QUOTA_PAGINA = LARGHEZZA_MONDO / (2 * LARGHEZZA_MONDO * MARGINE_CAMERA * MARGINE_TELA)
-/*
- * Le tavole esistono in due misure (vedi scripts/sketchbook-pages.js): NN.webp
- * a 1000px e NN-mezza.webp a 500. Sul telefono una pagina viene disegnata in
- * circa 340 pixel reali, quindi la tavola grande non si vedrebbe comunque: in
- * cambio nove texture da 1000×1415 occupano una cinquantina di megabyte di
- * memoria video, che su un telefono si paga in scatti. Le mezze ne occupano
- * tredici e pesano un terzo da scaricare.
- */
+// Tavole da 1000px col mouse, mezze da 500px col dito (un terzo della memoria video).
 const LARGHEZZA_TAVOLA = { dito: 500, mouse: 1000 }
 export const tavolaPer = (src, dito) => (dito ? src.replace(/\.webp$/, '-mezza.webp') : src)
 // Rapporto texture/schermo sotto il quale i mipmap tolgono solo dettaglio:
@@ -55,15 +35,7 @@ export const tavolaPer = (src, dito) => (dito ? src.replace(/\.webp$/, '-mezza.w
 // a metà risoluzione. Vicino all'1:1 conviene campionare la texture piena.
 const SOGLIA_MIPMAP = 1.4
 
-/*
- * Su telefono e tablet la scena gira su una GPU a piastrelle con poca banda di
- * memoria e uno schermo denso: la stessa scena che sul portatile non si sente
- * lì costa il triplo, e il libro girava a scatti. Le quattro misure qui sotto
- * si abbassano solo lì — sul desktop non cambia niente.
- *
- * `pointer: coarse` e non la larghezza della finestra: quello che conta è che
- * dietro ci sia una GPU da telefono, non quanti pixel è larga la pagina.
- */
+// `pointer: coarse` = GPU da telefono: ombre, pixel ratio, anisotropia e tavole si abbassano.
 export const suDito = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true
 
@@ -79,11 +51,7 @@ const ANISOTROPIA = { dito: 4, mouse: 16 }
 // piccolo delle tavole richiede (vedi `rapportoPixel`).
 const PIXEL_MAX = { dito: 1.5, mouse: 2 }
 
-/*
- * Monta la scena dentro `contenitore` e restituisce la maniglia per comandarla,
- * o `null` se WebGL non c'è (resta la copertina statica) o se `attivo()` dice
- * che nel frattempo il componente è stato smontato.
- */
+// Monta la scena; `null` se manca WebGL o il componente è stato smontato.
 export async function creaScena({ THREE, contenitore, tavole, paginaIniziale, attivo }) {
   let renderer
   try {
@@ -97,10 +65,7 @@ export async function creaScena({ THREE, contenitore, tavole, paginaIniziale, at
   camera.position.set(-LARGHEZZA_MONDO / 2, 0, DISTANZA_CAMERA)
   camera.lookAt(-LARGHEZZA_MONDO / 2, 0, 0)
 
-  // Almeno 1.5 anche sugli schermi non retina: il libro è pieno di testo
-  // piccolo e renderizzarlo più grande del canvas CSS (che poi il browser
-  // rimpicciolisce) lo tiene leggibile. La scena è leggera, se lo può
-  // permettere. Sopra 2 non si guadagna più niente di visibile.
+  // Almeno 1.5 per il testo piccolo delle tavole; oltre 2 non si vede differenza.
   const dito = suDito()
   const rapportoPixel = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), dito ? PIXEL_MAX.dito : PIXEL_MAX.mouse)
   renderer.setPixelRatio(rapportoPixel)
@@ -211,10 +176,7 @@ export async function creaScena({ THREE, contenitore, tavole, paginaIniziale, at
   spinaGruppo.position.x = -LARGHEZZA_MONDO / 2
   libroGruppo.add(spinaGruppo)
 
-  // In quanti pixel reali finisce una pagina su questo schermo: al massimo
-  // ~1000, cioè quanto è larga la tavola, quindi la texture non va quasi
-  // mai ingrandita. Misurato una volta all'avvio: ridimensionare la
-  // finestra non cambia il filtro.
+  // Pixel reali di una pagina, misurati una volta all'avvio.
   const larghezzaTavola = dito ? LARGHEZZA_TAVOLA.dito : LARGHEZZA_TAVOLA.mouse
   const pxPagina = (contenitore.getBoundingClientRect().width || 0) * rapportoPixel * QUOTA_PAGINA
   const senzaMipmap = pxPagina > 0 && larghezzaTavola < pxPagina * SOGLIA_MIPMAP
@@ -303,12 +265,7 @@ export async function creaScena({ THREE, contenitore, tavole, paginaIniziale, at
 
   const paginaColorePaper = new THREE.Color('#f4f3f1')
 
-  /*
-   * Dichiarate qui e non più in basso: `ridimensiona()` viene chiamata subito,
-   * prima ancora che le texture partano, e legge `pronta`. Più sotto sarebbe
-   * nella zona morta del `let` — un ReferenceError dentro una funzione async,
-   * cioè una promessa rifiutata in silenzio e un libro che non compare mai.
-   */
+  // Dichiarate qui: `ridimensiona()` le legge subito, più in basso sarebbero nella zona morta del `let`.
   let osservatoreResize = null
   let pronta = false
 
@@ -346,12 +303,7 @@ export async function creaScena({ THREE, contenitore, tavole, paginaIniziale, at
   ridimensiona()
 
 
-  /*
-   * La memoria della scheda grafica non la libera nessuno al posto nostro:
-   * geometrie, materiali e texture vanno smaltiti a mano, uno per uno. Il
-   * renderer per ultimo, e prima di tutto si ferma il fotogramma in coda, o
-   * quello troverebbe una scena già smontata.
-   */
+  // Memoria video da liberare a mano: prima il fotogramma in coda, il renderer per ultimo.
   const smaltisci = () => {
     osservatoreResize?.disconnect()
     fermaRender()

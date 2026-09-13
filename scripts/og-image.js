@@ -1,21 +1,6 @@
 /*
- * Anteprime social (Open Graph) in public/images/og/, una per pagina.
- *
- * Servono in JPEG: il sito è tutto WebP, che LinkedIn e WhatsApp non leggono
- * come anteprima, e il link condiviso uscirebbe con un riquadro vuoto.
- *
- * Da rilanciare dopo aver aggiunto un progetto o cambiato una copertina:
- *
- *   node scripts/og-image.js
- *
- * Una serie per lingua: le italiane in public/images/og/, le inglesi in
- * public/images/og/en/. Il testo dell'anteprima è quello della pagina, quindi
- * un link inglese condiviso non può mostrare un riquadro che dice "Archivio".
- *
- * Due impianti, nella grammatica del sito: schede e "Chi sono" con testo a
- * sinistra e immagine a destra sempre CONTENUTA (ritagliata, i manifesti e le
- * figure intere perderebbero la parte che conta); home e archivio con la
- * famiglia di prodotti a tutta pagina.
+ * Anteprime social 1200×630 in JPEG (LinkedIn e WhatsApp non leggono WebP), una serie per lingua:
+ * public/images/og/ e og/en/. Da rilanciare dopo nuovi progetti o copertine: node scripts/og-image.js
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -52,11 +37,7 @@ const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-/*
- * sharp disegna l'SVG ma non sa dire quanto misura il testo, e serve per
- * mandare a capo: le larghezze dei caratteri (millesimi di em, Helvetica Bold)
- * stanno qui.
- */
+// Larghezze dei caratteri (millesimi di em, Helvetica Bold): sharp non misura il testo.
 const ADV = {
   A: 722, B: 722, C: 722, D: 722, E: 667, F: 611, G: 778, H: 722, I: 278,
   J: 556, K: 722, L: 611, M: 833, N: 722, O: 778, P: 667, Q: 778, R: 722,
@@ -65,12 +46,7 @@ const ADV = {
   0: 556, 1: 556, 2: 556, 3: 556, 4: 556, 5: 556, 6: 556, 7: 556, 8: 556, 9: 556,
 }
 
-/*
- * Le stesse misure in Helvetica regular, minuscole comprese: la riga di
- * descrizione non è un titolo, si scrive come si parla e va a capo su parole
- * normali. Con la tabella del grassetto maiuscolo andrebbe a capo troppo
- * presto, lasciando righe corte in mezzo al vuoto.
- */
+// Le stesse in Helvetica regular, per la descrizione.
 const ADV_TESTO = {
   a: 556, b: 556, c: 500, d: 556, e: 556, f: 278, g: 556, h: 556, i: 222,
   j: 222, k: 500, l: 222, m: 833, n: 556, o: 556, p: 556, q: 556, r: 333,
@@ -107,11 +83,7 @@ function aCapo(testo, fontSize, maxW, tracking, tabella = ADV) {
   return righe
 }
 
-/*
- * Sceglie il corpo più grande con cui il titolo sta in `maxRighe` righe senza
- * sbordare. I titoli vanno da "FLUE" a "SEDIA A TEMPO DETERMINATO": un corpo
- * fisso servirebbe male entrambi.
- */
+// Il corpo più grande con cui il titolo sta in `maxRighe`.
 function titoloAdattato(testo, { maxW, maxRighe = 3, max = 78, min = 34 }) {
   const tracking = -0.02
   for (let size = max; size >= min; size -= 2) {
@@ -128,15 +100,7 @@ function occhiello(testo, x, y, colore = MUTED) {
     letter-spacing="3.4" fill="${colore}">${esc(String(testo).toUpperCase())}</text>`
 }
 
-/* ---------------------------------------------------------------------------
- * Impianto 1 — testo a sinistra, immagine contenuta a destra.
- * Usato dalle schede progetto, da "Chi sono" e dalla home.
- *
- * `descrizione` è facoltativa: una o due righe fra il titolo e il filetto, per
- * dire in chiaro di cosa si tratta. La porta la home, dove l'anteprima del
- * link è la prima cosa che si vede del lavoro; le schede no, che il titolo
- * del progetto e la sua foto bastano.
- * ------------------------------------------------------------------------- */
+// Impianto 1: testo a sinistra, immagine contenuta a destra (schede, "Chi sono", home).
 async function schedaConImmagine({
   sorgente,
   categoria,
@@ -166,14 +130,7 @@ async function schedaConImmagine({
     ? 34 + (righeDesc.length - 1) * DESC_INTERLINEA + DESC_SIZE * 0.72
     : 0
 
-  /*
-   * Ritmo verticale. Le altezze si calcolano tutte prima, così il blocco
-   * (occhiello · titolo · descrizione · filetto · firma) può essere centrato
-   * sull'altezza che occupa davvero: un titolo su tre righe scende quanto
-   * serve senza scavalcare l'occhiello.
-   * `capH` è l'altezza delle maiuscole: in un testo SVG la y è la linea di
-   * base, non il bordo superiore.
-   */
+  // Altezze calcolate prima, per centrare il blocco. `capH` = altezza delle maiuscole (y SVG = linea di base).
   const capH = size * 0.72
   const interlinea = size * 0.92
   const altezzaTitolo = (righe.length - 1) * interlinea + capH
@@ -213,16 +170,7 @@ async function schedaConImmagine({
     <line x1="${BOX.x - 48}" y1="0" x2="${BOX.x - 48}" y2="${H}" stroke="${LINE}" stroke-width="1"/>
   </svg>`
 
-  /*
-   * `contain` su fondo carta: l'immagine entra intera, mai tagliata.
-   *
-   * Il ritratto scontornato fa eccezione (`ancoraInBasso`): nell'originale la
-   * figura è già tagliata alle gambe, e centrata galleggerebbe a mezz'aria con
-   * un taglio netto in mezzo alla carta. Appoggiata al bordo inferiore, il
-   * taglio finisce fuori dalla cornice e la figura sta in piedi. Prima si
-   * toglie il vuoto trasparente attorno, altrimenti a scendere sarebbe il
-   * margine e non Joe.
-   */
+  // Immagine intera su carta; il ritratto (`ancoraInBasso`) va rifilato e appoggiato al fondo.
   const immagine = ancoraInBasso
     ? await sharp(sorgente)
         .trim({ threshold: 1 })
@@ -243,11 +191,7 @@ async function schedaConImmagine({
     .toFile(dest)
 }
 
-/* ---------------------------------------------------------------------------
- * Impianto 2 — immagine a tutta pagina, testo nel vuoto in alto a sinistra.
- * Usato da home e archivio, dove la famiglia di prodotti è già su fondo chiaro
- * e la parte alta della fotografia è libera.
- * ------------------------------------------------------------------------- */
+// Impianto 2: immagine a tutta pagina, testo in alto a sinistra (archivio).
 async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
   const TESTO_X = 72
   const { size, righe, tracking } = titoloAdattato(titolo.toUpperCase(), {
@@ -276,12 +220,7 @@ async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
     ${occhiello(coda, TESTO_X, codaY, INK)}
   </svg>`)
 
-  /*
-   * La fotografia della famiglia di prodotti è già scontornata su bianco pieno:
-   * la tela è bianca anche lei, così l'immagine entra INTERA (niente ritagli
-   * sui prodotti in basso) e il bordo non si vede. Il margine lascia respiro e
-   * libera l'angolo in alto a sinistra per il testo.
-   */
+  // Foto su bianco pieno: entra intera, col margine che libera l'angolo per il testo.
   const immagine = await sharp(sorgente)
     .resize(W - 96, H - 150, { fit: 'inside' })
     .flatten({ background: '#ffffff' })
@@ -321,13 +260,7 @@ for (const lang of LINGUE) {
   const dove = (nome) => path.join(dirLingua, nome)
   const fatto = (nome) => generati.push(path.join(lang === 'en' ? 'en' : '', nome))
 
-  /*
-   * Home — il biglietto da visita. È il link che si condivide per primo, quindi
-   * porta la persona e non il catalogo: il ritratto scontornato (lo stesso di
-   * "Chi sono") a destra, e a sinistra nome, mestiere e una riga su cosa nasce
-   * dal lavoro. La famiglia di prodotti resta l'anteprima dell'archivio, che è
-   * la pagina dove quei prodotti si guardano davvero.
-   */
+  // Home: il ritratto, con nome, mestiere e una riga sul lavoro.
   await schedaConImmagine({
     sorgente: path.join(root, 'public', about.photos.hero.src),
     categoria: profile.place,
@@ -349,11 +282,7 @@ for (const lang of LINGUE) {
   })
   fatto('archivio.jpg')
 
-  /*
-   * Una per area dell'archivio. Product design riusa la famiglia di prodotti;
-   * graphic design prende la copertina del manifesto più recente, contenuta e
-   * non ritagliata come tutte le immagini di questo impianto.
-   */
+  // Una per area: product riusa la famiglia di prodotti, graphic il manifesto più recente.
   for (const area of areeIn(lang)) {
     const progetti = progettiAreaIn(area.chiave, lang)
     const periodo = periodoDi(progetti)

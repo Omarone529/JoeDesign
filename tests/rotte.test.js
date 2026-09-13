@@ -1,13 +1,4 @@
-/*
- * Il calcolo degli indirizzi. È la logica più esposta del sito: decide ogni
- * URL, quale pagina si monta e in che lingua, e sbagliarla non dà un errore —
- * dà una 404 su un link buono, o una pagina italiana dentro il sito inglese.
- *
- * Il controllo che conta di più è l'ultimo: per OGNI rotta che il
- * pre-rendering genera, l'indirizzo scritto da `percorso()` dev'essere lo
- * stesso che `parsePath()` sa rileggere. Sono le due metà della stessa
- * convenzione tenute in file diversi, ed è dove si rompono le cose.
- */
+// Indirizzi e lingue. Il test chiave: ogni rotta generata da `percorso()` si rilegge con `parsePath()`.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { parsePath, percorso, percorsoTradotto } from '../src/rotte.js'

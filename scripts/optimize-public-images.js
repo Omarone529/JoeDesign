@@ -1,14 +1,6 @@
 /*
- * Riduce le immagini di public/images alla misura in cui vengono mostrate: le
- * foto di ARCHIVIO WEBP sono da stampa, fino a 4600x6200 px. Idempotente, e
- * gli originali restano nell'archivio.
- *
- * Superato da `comprimi-foto.js`, che fa lo stesso distinguendo foto e
- * grafiche piatte. Resta perché taglia per destinazione d'uso.
- *
- * Uso:
- *   node scripts/optimize-public-images.js            elenca gli interventi
- *   node scripts/optimize-public-images.js --applica  riscrive i file
+ * Riduce public/images alla misura d'uso. Superato da comprimi-foto.js.
+ *   node scripts/optimize-public-images.js [--applica]
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -19,10 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RADICE = path.resolve(__dirname, '..', 'public', 'images')
 const APPLICA = process.argv.includes('--applica')
 
-/*
- * Ingombro reale a schermo x2, per gli schermi a densità doppia. Il primo
- * criterio che corrisponde vince.
- */
+// Ingombro a schermo ×2; vince il primo criterio che corrisponde.
 const LIMITI = [
   { prova: (p) => /products[\\/][^\\/]+[\\/]cover\.webp$/.test(p), max: 900 },
   { prova: (p) => /products[\\/]/.test(p), max: 1200 },

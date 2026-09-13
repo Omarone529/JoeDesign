@@ -19,23 +19,9 @@ const SWIPE = 45 // spostamento minimo del dito perché valga come cambio foto
 const FONDO_VIDEO = '#0a0908'
 
 /*
- * Carosello della scheda progetto. `images` è una lista di `{ src, alt }`.
- *
- * L'ultima slide può essere il reel del progetto: porta in più `video`, l'id
- * dello Short. La sua `src` è una miniatura del sito come tutte le altre, e
- * resta tale finché non si preme play — il player lo monta `VideoYouTube`, che
- * spiega perché non basti incorporare l'iframe e via.
- *
- * Il tetto di dimensione sta sulla LARGHEZZA: con `aspect-square` l'altezza la
- * segue, quindi limitare quella tiene il quadrato dentro la prima schermata.
- *
- * Le slide sono impilate nello stesso riquadro, quindi per il browser sono
- * tutte nel viewport e `loading="lazy"` non ne rimanda nessuna: il `src` va
- * dato a mano (vedi `caricate`), o parte l'intera galleria al primo paint.
- *
- * Va montato con `key` sullo slug: senza, cambiando scheda React riusa
- * l'istanza e `index` resta quello di prima — su una galleria più corta non
- * corrisponde a nessuna slide, e il riquadro resta vuoto.
+ * Carosello della scheda: `images` è `[{ src, alt }]`, una slide può avere `video`.
+ * Le slide sono impilate, quindi `loading=lazy` non basta: i `src` li dà `caricate`.
+ * Va montato con `key` sullo slug, o `index` resta quello della scheda precedente.
  */
 export default function Carousel({ images, title }) {
   const T = testi(useLang())
@@ -50,13 +36,7 @@ export default function Carousel({ images, title }) {
   // guarda: uscendo dalla slide lo scorrimento riprende da sé.
   const [videoAttivo, setVideoAttivo] = useState(false)
   const [videoMuto, setVideoMuto] = useState(false)
-  /*
-   * Lo scorrimento si ferma da sé quando non c'è nessuno a guardarlo. Non è
-   * una pausa: la pausa la chiede chi guarda, col clic sulla foto o col
-   * contatore, e sta in `paused`. Questi due partono dal valore che l'HTML
-   * pre-renderizzato descrive — in vista, scheda in primo piano — così in
-   * hydration non c'è niente da correggere.
-   */
+  // Pausa automatica fuori vista o a scheda nascosta (diversa da `paused`, che sceglie chi guarda).
   const [inVista, setInVista] = useState(true)
   const [schedaVisibile, setSchedaVisibile] = useState(true)
   const contenitore = useRef(null)
@@ -67,21 +47,7 @@ export default function Carousel({ images, title }) {
   const tocco = useRef(null) // { x, y, trascinato } del tocco in corso
   const primoGiro = useRef(true)
 
-  /*
-   * Il reel apre la scheda e parte da sé, una volta sola: `avviatoDaSolo`
-   * impedisce che il ciclo del carosello lo faccia ripartire a ogni giro.
-   * Muto per forza — i browser non lasciano partire l'audio da solo — e fermo
-   * del tutto se chi guarda ha chiesto meno animazioni.
-   *
-   * Ma prima di tutto: solo con il consenso. Senza, o prima che sia stato dato,
-   * non parte niente e non si contatta nessuno — resta la miniatura del sito
-   * col tasto play, che vale come consenso per quel video soltanto.
-   *
-   * Non prima del `load`, come per le slide vicine qui sotto: il player di
-   * YouTube pesa quasi un megabyte e partendo insieme alla pagina toglierebbe
-   * banda alla prima immagine e al resto della scheda. Su una navigazione
-   * interna il `load` è già passato e non tornerà, quindi lì si parte subito.
-   */
+  // Il reel parte da solo una volta, muto, solo col consenso e dopo il `load` della pagina.
   useEffect(() => {
     if (consenso !== 'si') return
     if (avviatoDaSolo.current || index !== 0 || !images[0]?.video) return
@@ -149,12 +115,7 @@ export default function Carousel({ images, title }) {
     return () => window.removeEventListener('load', espandi)
   }, [index, n])
 
-  /*
-   * Fuori dallo schermo il carosello non scorre. Girare a vuoto significa
-   * scaricare le foto vicine (vedi `caricate`) e ridisegnare una dissolvenza
-   * che nessuno sta guardando: su una scheda lasciata aperta è banda e
-   * batteria spese per niente.
-   */
+  // Fuori dallo schermo il carosello non scorre.
   useEffect(() => {
     const el = contenitore.current
     if (!el || typeof IntersectionObserver === 'undefined') return
@@ -183,13 +144,7 @@ export default function Carousel({ images, title }) {
 
   if (n === 0) return null
 
-  /*
-   * L'iframe di YouTube è di un altro dominio: il dito che scorre sopra il
-   * player non arriva mai qui, e sotto `sm` le frecce sono nascoste perché lo
-   * swipe basta. Sulle foto è vero, sul reel no — restava l'unica via i
-   * pallini, sei pixel di bersaglio, e il carosello sembrava bloccato.
-   * Finché il player è montato le frecce si vedono, dito o mouse che sia.
-   */
+  // Col player montato lo swipe non arriva (iframe di altro dominio): frecce sempre visibili.
   const frecceFisse = videoAttivo
   const classeFreccia = `absolute top-1/2 z-10 h-12 w-12 -translate-y-1/2 items-center justify-center bg-paper/80 text-ink backdrop-blur-sm transition-opacity hover:bg-paper focus-visible:opacity-100 sm:flex ${
     frecceFisse ? 'flex opacity-100' : 'hidden opacity-0 group-hover:opacity-100'
@@ -314,12 +269,7 @@ export default function Carousel({ images, title }) {
       </div>
 
       {n > 1 && (
-        /* Il `before` allarga il bersaglio senza toccare il disegno: un pallino
-           è alto sei pixel, e sei pixel col dito non si prendono. Cresce fino a
-           riempire lo spazio fra l'uno e l'altro, non oltre, o due bersagli
-           finirebbero uno sopra l'altro — ed è per questo che i pallini stanno
-           venti pixel distanti e non otto: è la distanza che serve perché
-           ventisei pixel di bersaglio ciascuno si tocchino senza accavallarsi. */
+        /* `before` allarga il bersaglio dei pallini; lo stacco di 20px evita che si accavallino. */
         <div className="mt-4 flex flex-wrap items-center justify-center gap-5">
           {images.map((_, i) => (
             <button

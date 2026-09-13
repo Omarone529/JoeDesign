@@ -2,18 +2,7 @@ import { manifestoFotoIn, profiloIn } from '../../data/siteData'
 import { useLang } from '../../router'
 import { srcSetDi, MISURE } from '../../immagini'
 
-/*
- * Il manifesto e, sotto, la foto di Joe con la lampada accesa.
- *
- * Vengono da "Chi sono", dove chiudevano la pagina: in home dicono con che
- * criterio i progetti appena mostrati sono fatti, e prendono il posto della
- * fascia con la famiglia di prodotti — che resta la sorgente delle anteprime
- * social dell'archivio, la pagina in cui quegli oggetti si guardano davvero.
- *
- * La frase sta su fondo carta, la foto su `bg-night`: è lo stesso stacco che
- * porta al footer, e il filetto grosso in cima la separa dai lavori
- * selezionati, che finiscono senza bordo.
- */
+// Manifesto su carta e foto di Joe con la lampada su `bg-night`.
 export default function Manifesto() {
   const lang = useLang()
   const profile = profiloIn(lang)

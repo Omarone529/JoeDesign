@@ -1,31 +1,12 @@
 /*
- * La parità fra le due lingue di `i18n.js`.
- *
- * Perché esiste. `testi(lang)` restituisce l'oggetto della lingua e basta: non
- * ripiega sull'italiano chiave per chiave. Una voce dimenticata in `en` non è
- * quindi una scritta in italiano dentro una pagina inglese — è `undefined`, e
- * trenta di quelle voci sono funzioni. `T.archivio.conteggio(n)` su
- * `undefined` lancia in pieno render: in pre-rendering ferma la build, nel
- * browser fa fallire l'aggancio di React e la pagina resta bianca. È lo
- * scenario per cui esiste `ErrorBoundary`, e si evita con un confronto.
- *
- * Il confronto è sull'intera forma, non solo sui nomi: il tipo (una funzione
- * che diventa stringa si chiama lo stesso ma non si può chiamare), il numero
- * di argomenti (`vaiA(n)` senza `n` scrive "vai a undefined") e la lunghezza
- * degli elenchi, perché sono elenchi di struttura e non di testo — il titolo
- * della 404 è spezzato in due righe di proposito, e le sezioni della privacy
- * sono le stesse cose dette due volte, non due pagine diverse.
+ * Parità it/en di i18n.js: chiavi, tipi, argomenti, lunghezze. `testi(lang)` non ripiega
+ * sull'italiano, e una funzione mancante lancia in render (pagina bianca).
  */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { LINGUE, LINGUA_PREDEFINITA, testi } from '../src/i18n.js'
 
-/*
- * Ogni foglia dell'albero come `percorso → che cos'è`. Gli indici degli array
- * entrano nel percorso come le chiavi: così un elenco più corto si presenta
- * come una voce mancante, col suo indirizzo, invece che come una differenza da
- * cercare a mano.
- */
+// Ogni foglia come `percorso → tipo`, indici compresi.
 function percorsi(valore, prefisso = '', dentro = new Map()) {
   if (typeof valore === 'function') {
     dentro.set(prefisso, `funzione(${valore.length} argomenti)`)

@@ -1,11 +1,5 @@
 /*
- * Tratto su fondo bianco → WebP con canale alpha (firme, schizzi, scansioni):
- * il fondo diventa trasparenza e il tratto prende il nero del sito.
- *
- * Il chiaro-scuro dell'originale diventa opacità e non colore, così i bordi
- * morbidi del pennarello non si seghettano come con una soglia netta.
- *
- * Uso:
+ * Tratto su fondo bianco → WebP con alpha; il chiaro-scuro diventa opacità.
  *   node scripts/ink-alpha.js <sorgente> <destinazione.webp> [larghezzaMax] [colore]
  */
 import sharp from 'sharp'

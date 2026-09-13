@@ -10,49 +10,18 @@ import {
 } from 'react'
 import { parsePath } from './rotte'
 
-/*
- * La parte React del routing: il contesto, la navigazione, `<Link>`.
- *
- * Il calcolo degli indirizzi — quali segmenti ha ogni pagina in ogni lingua, e
- * come si legge un URL — sta in `rotte.js`, che non importa React. È la stessa
- * ragione per cui `i18n.js` non importa niente: quelle funzioni le usano anche
- * `seo.js` e gli script node, che React non lo montano mai, e tenerle qui
- * dentro voleva dire trascinarsi appresso un albero di componenti per sapere
- * come si scrive "/chi-sono". Si rileggono anche da sole, il che è il motivo
- * per cui i test le raggiungono.
- *
- * Riesportate qui sotto: chi importa da `./router` continua a trovarle dov'erano.
- */
+// Parte React del routing. Gli indirizzi stanno in rotte.js (senza React), riesportati qui.
 export { parsePath, percorso, percorsoTradotto } from './rotte'
 
 const RouterContext = createContext(null)
 
-/*
- * In pre-rendering non esiste un layout da misurare e React avviserebbe che
- * `useLayoutEffect` non ha effetto sul server. Nel browser serve quello e non
- * `useEffect`: il ripristino della posizione deve avvenire nello stesso
- * fotogramma in cui la pagina compare, o si vede il salto dall'alto.
- */
+// useLayoutEffect nel browser (scroll ripristinato prima del paint), useEffect in SSR.
 const useEffettoDiLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export function RouterProvider({ initialPath = '/', children }) {
   const [path, setPath] = useState(initialPath)
-  /*
-   * Dove rimettere la pagina al prossimo render: un numero quando si torna
-   * indietro, `null` quando si va avanti (che vuol dire "in cima").
-   *
-   * Il ripristino automatico del browser qui non funziona. Il browser lo
-   * tenta prima che React abbia disegnato la pagina precedente — che è più
-   * alta di quella che si sta lasciando — quindi trova un documento corto e
-   * si ferma dove capita. Chiudendo una scheda progetto si tornava in cima
-   * all'archivio invece che sulla cella da cui si era partiti, e con
-   * venticinque celle vuol dire cercarla di nuovo.
-   *
-   * Funziona perché ogni riquadro d'immagine del sito riserva la propria
-   * altezza prima di caricare (`aspect-…`, o `width`/`height` dichiarati):
-   * al momento del ripristino la pagina è già alta quanto sarà. Togliendo
-   * quelle proporzioni si rompe anche questo.
-   */
+  // Scroll da ripristinare: numero tornando indietro, null andando avanti. Quello del browser
+  // arriva prima del render e sbaglia. Regge perché le immagini riservano la loro altezza.
   const scrollDaRipristinare = useRef(null)
 
   useEffect(() => {
@@ -70,9 +39,7 @@ export function RouterProvider({ initialPath = '/', children }) {
       setPath(window.location.pathname)
     }
     window.addEventListener('popstate', onPop)
-    // Fra il primo render e l'attacco del listener un popstate passerebbe
-    // inosservato (indietro premuto prima dell'hydration): qui si recupera.
-    // Restituire lo stesso valore quando coincide evita un render in più.
+    // Recupera un popstate arrivato prima dell'hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPath((corrente) =>
       corrente === window.location.pathname ? corrente : window.location.pathname,

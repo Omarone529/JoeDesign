@@ -1,14 +1,4 @@
-/*
- * Il srcset delle foto d'archivio.
- *
- * `varianti-foto.js` mette accanto a ogni foto una copia da 800 px e ne scrive
- * l'elenco in `src/data/varianti.js`. Qui quell'elenco diventa l'attributo che
- * il browser legge: due misure con la loro larghezza reale, e la scelta la fa
- * lui in base a schermo e densità.
- *
- * Chi non è nell'elenco (foto già piccole, og:image) torna `undefined`: React
- * omette l'attributo e l'immagine resta servita così com'è.
- */
+// srcset dalle varianti da 800px (varianti-foto.js). Senza variante: undefined, attributo omesso.
 import { varianti, SUFFISSO_VARIANTE } from './data/varianti'
 
 export function srcSetDi(src) {
@@ -18,12 +8,7 @@ export function srcSetDi(src) {
   return `${variante} 800w, ${src} ${larghezza}w`
 }
 
-/*
- * Quanto spazio occupa la foto nella pagina, per ogni larghezza di finestra.
- * Il browser lo legge PRIMA di conoscere il layout, quindi va dichiarato a
- * mano: se manca, assume 100vw e su desktop scarica sempre l'originale.
- * I valori seguono i breakpoint di Tailwind (sm 640, md 768, lg 1024).
- */
+// `sizes` per layout: senza, il browser assume 100vw e scarica sempre l'originale.
 export const MISURE = {
   // Carousel: colonna destra della scheda progetto, piena su mobile.
   carosello: '(min-width: 768px) 55vw, 100vw',
@@ -37,6 +22,8 @@ export const MISURE = {
   piena: '100vw',
   // Disegno tecnico e ritratto in home: mezza colonna da tablet in su.
   mezza: '(min-width: 768px) 55vw, 100vw',
+  // Card degli strumenti in "Chi sono": mezza card da sm in su, piena sotto.
+  competenze: '(min-width: 640px) 45vw, 100vw',
   // Ritratto della testata di "Chi sono": le stesse misure che ha in pagina —
   // 46vw da tablet in su, 88 della finestra sotto. Cambiando quelle classi va
   // cambiato anche questo, o il browser sceglie la variante sbagliata.

@@ -1,10 +1,5 @@
-/*
- * jpg/png → WebP, per le foto che arrivano da `media`. Quelle di ARCHIVIO WEBP
- * sono già convertite e si copiano e basta.
- *
- * Uso:
- *   node scripts/optimize-image.js <sorgente> <dest.webp> [larghezzaMax] [qualità]
- */
+// jpg/png → WebP, per le foto da `media`.
+//   node scripts/optimize-image.js <sorgente> <dest.webp> [larghezzaMax] [qualità]
 import sharp from 'sharp'
 import fs from 'node:fs'
 import path from 'node:path'

@@ -1,15 +1,4 @@
-/*
- * Versione inglese dei contenuti. `siteData.js` resta la fonte di verità: qui
- * ci sono solo i campi che cambiano lingua, agganciati per slug o per chiave.
- * Tutto il resto (immagini, anni, numero di foto, aree, ordine) viene da lì.
- *
- * I titoli dei progetti NON si traducono: sono i nomi delle opere, e “Sedia a
- * tempo determinato” su una scheda inglese resta quello che l'autore ha
- * chiamato così. Cambiano categoria, descrizione e voci della tabella.
- *
- * Registro: impersonale come in italiano — niente “I designed”, forme passive
- * o nominali.
- */
+// Campi inglesi, agganciati per slug o chiave. I titoli dei progetti non si traducono. Tono impersonale.
 
 export const profileEn = {
   role: 'Product Designer',
@@ -24,15 +13,34 @@ export const profileEn = {
 export const aboutEn = {
   intro:
     'Product designer from Reggio Emilia. Objects that bring together aesthetics, function and an emotional dimension, with attention to production and to the relationship between form and user.',
-  experience: [
-    { anno: '2020–2021', titolo: 'Furniture consultant', luogo: 'Emilia Casa SRL' },
-    { anno: '2021–2022', titolo: 'Furniture consultant', luogo: 'Casa Midì' },
-    { anno: '2025', titolo: 'Exhibitor at Salone Satellite', luogo: 'Milan' },
-    { anno: '2025–2026', titolo: 'Graphic & product design competitions', luogo: '' },
-  ],
-  education: [
-    { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
-    { anno: '2026', titolo: 'Bologna Academy of Fine Arts', luogo: 'ABABO' },
+  /* Le card di "Chi sono", agganciate per `chiave` a quelle di `siteData.js`.
+     Gli strumenti non passano di qui: sono nomi propri di software e non si
+     traducono. */
+  competenze: [
+    {
+      chiave: 'grafica',
+      titolo: 'Graphics and editorial',
+      testo:
+        'Boards, posters and layouts: a project is told with the same care it is drawn with.',
+    },
+    {
+      chiave: 'modellazione',
+      titolo: '3D modelling',
+      testo:
+        'From the rough volume to the dimensioned model: form is checked in three dimensions before it becomes a part.',
+    },
+    {
+      chiave: 'configuratori',
+      titolo: 'Furniture configurators',
+      testo:
+        'Made-to-measure compositions, drawn inside the systems furniture makers use to send them into production.',
+    },
+    {
+      chiave: 'presentazione',
+      titolo: 'Presentation',
+      testo:
+        'The project as it reaches the client: sequence, rhythm and hierarchy, as in a layout.',
+    },
   ],
   photos: {
     hero: 'Portrait of Joe Sarchiolla, cap and glasses',
@@ -76,11 +84,7 @@ export const areeEn = {
   },
 }
 
-/*
- * Per slug: `cat`, `desc` e `spec` (con le chiavi già in inglese, così la
- * tabella non ha bisogno di alcuna traduzione a parte). Chi non compare qui
- * resta in italiano — e va tradotto appena il progetto entra in archivio.
- */
+// `cat`, `desc` e `spec` per slug. Un progetto assente resta in italiano.
 export const progettiEn = {
   'directional-arrow': {
     cat: 'Coat rack',

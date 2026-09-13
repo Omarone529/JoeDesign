@@ -1,18 +1,6 @@
 /*
- * Riduce le immagini di `public/images/` alla misura che il sito usa davvero e
- * le ricomprime. Da rilanciare dopo aver aggiunto foto, PRIMA di fit-foto.js.
- *
- *   node scripts/comprimi-foto.js            # applica
- *   node scripts/comprimi-foto.js --prova    # mostra e basta
- *
- * L'archivio arriva a 2000x2000, ma il carosello mostra al massimo ~800 px CSS
- * — 1600 su uno schermo retina, quindi i 2000 originali pesano il doppio del
- * necessario. Le grafiche piatte (`fit: 'contain'` in fit-foto.js) e quelle con
- * trasparenza restano più alte: hanno bordi netti, e la compressione lossy le
- * sgrana molto prima delle fotografie.
- *
- * Converge: su un file già compresso il margine di GUADAGNO_MINIMO non c'è più,
- * quindi rilanciarlo non rimastica l'archivio.
+ * Porta public/images/ a 1600px e ricomprime (grafiche piatte e trasparenze più alte). Prima di fit-foto.js.
+ *   node scripts/comprimi-foto.js [--prova]
  */
 import sharp from 'sharp'
 import fs from 'node:fs'

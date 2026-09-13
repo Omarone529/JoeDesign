@@ -1,12 +1,4 @@
-/*
- * La forma della pagina che gira. È la parte che si sbaglia in silenzio: un
- * segno invertito non lancia niente, dà una curva appena diversa che si nota
- * solo mettendo le due versioni una accanto all'altra.
- *
- * Questi test non fissano dei numeri — fisserebbero anche gli errori. Fissano
- * le proprietà fisiche che la formula deve avere perché quella cosa sembri un
- * foglio di carta e non un nastro elastico.
- */
+// Proprietà fisiche della piega, non numeri: se un test cade, la pagina non si comporta più come carta.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
@@ -45,11 +37,7 @@ test('la radice resta incollata alla costa, comunque si pieghi', () => {
 })
 
 test('il bordo libero torna sul piano: è il senso della curva antisimmetrica', () => {
-  /*
-   * Con una gobba sola la profondità accumulata non tornerebbe a zero e il
-   * bordo esterno se ne andrebbe alla deriva invece di richiudersi sulla pila.
-   * È l'invariante che tiene insieme il giro, e vale per ogni flessione.
-   */
+  // La profondità torna a zero: il bordo esterno si richiude sulla pila.
   for (const c of CURVE) {
     assert.ok(Math.abs(calcolaColonne(c, 0).posZ[M]) < 1e-12, `curva ${c}`)
   }
@@ -88,14 +76,7 @@ test('gli angoli dei vertici mediano quelli dei segmenti, e ai bordi li copiano'
   assert.equal(v.length, M + 1)
   assert.equal(v[0], angoliSegmento[0])
   assert.equal(v[M], angoliSegmento[M - 1])
-  /*
-   * Tolleranza a 1e-7 e non zero: questi vettori sono `Float32Array` — è la
-   * forma che la scheda grafica vuole, e ricopiarli in doppia precisione per
-   * poi riconvertirli sarebbe lavoro per niente. La media viene calcolata a 64
-   * bit e riposta a 32, quindi si arrotonda: lo scarto misurato è 1.5e-8,
-   * dentro l'epsilon del formato (~1.2e-7). Se un giorno superasse questa
-   * soglia non sarebbe più arrotondamento, sarebbe un errore di formula.
-   */
+  // Tolleranza 1e-7: Float32Array, lo scarto di arrotondamento misurato è 1.5e-8.
   for (let i = 1; i < M; i += 1) {
     assert.ok(Math.abs(v[i] - (angoliSegmento[i - 1] + angoliSegmento[i]) / 2) < 1e-7, `vertice ${i}`)
   }

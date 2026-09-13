@@ -1,17 +1,4 @@
-/*
- * La forma di una pagina che gira: data una flessione, dove finiscono i suoi
- * vertici. Matematica e basta — niente React, niente Three, niente DOM.
- *
- * Sta in un file suo perché è la parte che si sbaglia in silenzio. Un segno
- * invertito o un fattore fuori posto non danno un errore: danno una curva
- * appena diversa, che nessuno nota finché non guarda le due versioni una
- * accanto all'altra. Isolata così ha dei test (`tests/geometria.test.js`) che
- * ne fissano il comportamento, e si può leggere senza avere in testa il ciclo
- * di vita di una scena 3D.
- *
- * Il resto del libro sta accanto: `scena.js` disegna, `../Sketchbook.jsx`
- * raccoglie il gesto e decide quanta flessione passare di qui.
- */
+// Forma di una pagina piegata: matematica pura, niente React/Three/DOM. Test in tests/geometria.test.js.
 
 /* ── Le misure del mondo, condivise con la scena e col gesto ── */
 

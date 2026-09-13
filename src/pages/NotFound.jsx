@@ -1,10 +1,7 @@
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
 
-/*
- * Serve sia alla navigazione client-side sia a dist/404.html, che Netlify
- * restituisce con lo status 404 vero.
- */
+// Usata dal router e per dist/404.html (servita da Netlify con status 404).
 export default function NotFound() {
   const lang = useLang()
   const T = testi(lang)

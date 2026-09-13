@@ -3,14 +3,7 @@ import { impostaConsensoVideo, useConsensoVideo, useMontato } from '../consenso'
 import { testi } from '../i18n'
 import { useLang } from '../router'
 
-/*
- * Informativa privacy. Il testo sta in `i18n.js` (è un testo di servizio come
- * la 404, non un contenuto del portfolio): qui c'è solo l'impaginazione.
- *
- * Le sezioni sono righe di una tabella: titolo a sinistra in occhiello, corpo
- * a destra. È la griglia con filetti di "Chi sono", che un testo di legge
- * regge meglio di un blocco unico.
- */
+// Impaginazione dell'informativa (testo in i18n.js): titolo a sinistra, corpo a destra.
 export default function Privacy() {
   const lang = useLang()
   const T = testi(lang)
@@ -50,12 +43,7 @@ export default function Privacy() {
                   {p}
                 </p>
               ))}
-              {/*
-                * Il consenso ai video si ritira da qui: darlo e non poterlo
-                * togliere non sarebbe un consenso. Dice sempre anche in quale
-                * stato ci si trova, perché una preferenza salvata e invisibile
-                * è peggio che non averla.
-                */}
+              {/* Il consenso ai video si ritira qui, e lo stato attuale è sempre mostrato. */}
               {s.scelta && montato && (
                 <div className="flex flex-col items-start gap-4 pt-1">
                   <div className="text-[13px] text-muted">

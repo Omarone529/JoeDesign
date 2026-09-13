@@ -94,13 +94,7 @@ export default function Navbar({ route }) {
         nascosta ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
-      {/*
-        Sotto md il gruppo di destra è `contents`: menù, Instagram e lingue
-        diventano figli diretti della barra, e `justify-between` distribuisce
-        lo spazio fra loro invece di lasciare un buco dopo il marchio e
-        ammassare tutto il resto contro il bordo. Da md torna una scatola, che
-        lì il nome al centro è in mezzo e le distanze le decide il `gap`.
-      */}
+      {/* Sotto md il gruppo di destra è `contents`, così `justify-between` distribuisce menù, IG e lingue. */}
       <div className="relative flex h-16 items-center justify-between gap-3 px-5 sm:px-8 lg:px-[72px]">
         <Link
           to={percorso('home', {}, lang)}
@@ -116,14 +110,7 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/*
-          Centrato solo da md: sotto non ci starebbe. E sotto `sm` non c'è
-          proprio: il nome ripete quello che il marchio dice già, e Instagram
-          sta nel piede — a spartirsi 320 pixel con tre voci di menù e le due
-          lingue restava un rigo di caratteri da nove punti, illeggibile e
-          impossibile da centrare col dito. Sulla barra di un telefono ci va la
-          navigazione, il resto può aspettare lo schermo grande.
-        */}
+        {/* Nome visibile da sm, centrato da md: sul telefono la barra tiene solo la navigazione. */}
         <div className="hidden shrink-0 items-center gap-2 sm:flex sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="hidden whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:inline-block sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
@@ -149,16 +136,7 @@ export default function Navbar({ route }) {
   )
 }
 
-/*
- * Il `before` allarga il bersaglio senza toccare il disegno: l'icona è quindici
- * pixel, e quindici pixel col dito non si prendono. Stessa cosa sulle due
- * lingue, larghe due caratteri — lì la barretta in mezzo non intercetta il
- * tocco, o si mangerebbe metà del bersaglio di "IT".
- *
- * Compare due volte nella barra e mai insieme: da `sm` accanto al nome, sotto
- * in fondo alla riga (vedi il commento nel gruppo centrale). Quello nascosto
- * esce dal `display`, quindi per chi legge con la voce il link resta uno solo.
- */
+// `before` allarga il bersaglio dell'icona. Compare due volte, mai insieme (sm e sotto sm).
 function LinkInstagram({ lang, className = '' }) {
   return (
     <a
@@ -173,16 +151,7 @@ function LinkInstagram({ lang, className = '' }) {
   )
 }
 
-/*
- * Le due lingue sono due indirizzi, non un interruttore: ognuna è un link alla
- * gemella della pagina aperta, così restano condivisibili e apribili a freddo.
- * `hrefLang` dice al browser (e ai crawler) cosa aspettarsi dall'altra parte.
- *
- * Si vedono tutte e due, con la corrente in nero. Sul telefono prima ne
- * compariva una sola, per mancanza di spazio: ma "EN" da solo non dice se sei
- * in inglese o se ci vai, e lo spazio adesso c'è — la barra sotto `sm` non
- * porta più il nome né Instagram.
- */
+// Le lingue sono due link alla pagina gemella, non un interruttore. Visibili entrambe.
 function SelettoreLingua({ route }) {
   const attuale = route?.lang ?? 'it'
 

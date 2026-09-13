@@ -1,9 +1,4 @@
-/*
- * `clip()` scrive le meta description, cioè le righe che si leggono nei
- * risultati di Google. Il taglio è la parte che si sbaglia: una descrizione
- * troncata a metà parola vale meno di una più corta ma finita, e una che
- * sfora viene tagliata da Google dove capita.
- */
+// clip(): il taglio delle meta description.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { clip } from '../src/seo.js'
@@ -22,12 +17,7 @@ test('chiude sulla frase intera quando ce n’è una che ci sta', () => {
 })
 
 test('ma una frase troppo corta perde contro il taglio lungo', () => {
-  /*
-   * È il senso del terzo parametro, `min`. Chiudere su una frase intera vale
-   * finché la frase dice qualcosa: «Prima frase corta.» in un risultato di
-   * ricerca lascia due terzi di riga vuota, e mezza frase in più — puntini
-   * compresi — informa di più. Sotto `min` vince quindi il taglio sulla parola.
-   */
+  // Sotto `min` vince il taglio sulla parola: una frase troppo corta lascia la riga vuota.
   const t = 'Prima frase corta. Seconda frase molto più lunga che da sola supererebbe il limite imposto qui.'
   const out = clip(t, 60, 80)
   assert.ok(out.startsWith('Prima frase corta. Seconda'), out)

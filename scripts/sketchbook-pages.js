@@ -1,10 +1,6 @@
 /*
- * Tavole dello sketchbook per il widget 3D in "Chi sono", da "ARCHIVE JOE
- * SARCHIOLLA.pdf". A differenza di pdf-disegno.js si tiene la pagina intera,
- * come sfogliando il libro vero.
- *
- *   npm i --no-save pdf-to-img     (fuori da package.json: serve solo qui)
- *   node scripts/sketchbook-pages.js
+ * Tavole dello sketchbook dal PDF d'archivio, a pagina intera.
+ *   npm i --no-save pdf-to-img && node scripts/sketchbook-pages.js
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -23,20 +19,11 @@ if (!PDF_PATH) {
   process.exit(1)
 }
 
-// Le pagine hanno testo piccolo: serve nitidezza. Si rende molto più grande del
-// necessario e si rimpicciolisce con sharp (lanczos): il downsampling di un
-// render abbondante tiene i bordi delle lettere più definiti di un render già
-// vicino alla misura finale.
+// Render abbondante e riduzione con lanczos: il testo piccolo resta nitido.
 const SCALA = 4
-// 1000 px è la misura giusta, non un compromesso: nel widget 3D una pagina
-// occupa al massimo ~1000 pixel reali (widget largo 1120 CSS, pixel ratio 2),
-// quindi la texture non viene mai ingrandita e tutto ciò che sta sopra a questa
-// larghezza sarebbe peso scaricato per niente.
+// Una pagina nel widget occupa al massimo ~1000 pixel reali.
 const LARGHEZZA = 1000
-// La seconda misura è per il telefono: lì una pagina viene disegnata in circa
-// 340 pixel reali, e nove texture da mille pixel occuperebbero una cinquantina
-// di megabyte di memoria video — che su un telefono si paga in scatti. Le legge
-// Sketchbook.jsx quando il puntatore è grosso (vedi `tavolaPer`).
+// Mezza misura per il telefono (vedi `tavolaPer`).
 const LARGHEZZA_MEZZA = 500
 // Ogni rimpicciolimento ammorbidisce: una maschera di contrasto leggera
 // restituisce il filo alle lettere senza gli aloni dello sharpen aggressivo.

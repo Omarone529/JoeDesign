@@ -1,13 +1,6 @@
 /*
- * Disegni tecnici da "ARCHIVE JOE SARCHIOLLA.pdf". Sono vettoriali, quindi non
- * stanno fra le immagini incorporate e vanno ripresi rendendo la pagina: si
- * rasterizza, si ritaglia sul riquadro del disegno e si passa a `ink-alpha.js`,
- * che toglie il fondo bianco.
- *
- *   npm i --no-save pdf-to-img     (fuori da package.json: serve solo qui)
- *   node scripts/pdf-disegno.js [slug…]
- *
- * Senza argomenti rifà tutti i progetti elencati sotto.
+ * Disegni tecnici vettoriali dal PDF d'archivio: rende la pagina, ritaglia, passa a ink-alpha.js.
+ *   npm i --no-save pdf-to-img && node scripts/pdf-disegno.js [slug…]
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -24,11 +17,7 @@ const SCALA = 3
 // Oltre questa misura il file cresce senza che si veda.
 const LARGHEZZA = 900
 
-/*
- * Riquadro del disegno, in frazioni di pagina (uguale su tutte le schede). Si
- * ferma prima del filetto verticale e della freccia ↙, che sono segni della
- * pagina e non del disegno. Largo: i bianchi li toglie `ink-alpha.js`.
- */
+// Riquadro del disegno in frazioni di pagina, prima del filetto e della freccia.
 const RIQUADRO = { sinistra: 0.06, destra: 0.425, alto: 0.19, basso: 0.448 }
 
 /* Pagina della scheda per ogni progetto (numerazione del PDF, non del libro). */
