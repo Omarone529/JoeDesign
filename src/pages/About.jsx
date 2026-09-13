@@ -1,6 +1,7 @@
 import { aboutIn, profiloIn } from '../data/siteData'
 import { testi } from '../i18n'
 import { Link, percorso, useLang } from '../router'
+import Competenze from '../components/about/Competenze'
 import Sketchbook from '../components/about/Sketchbook'
 import { srcSetDi, MISURE } from '../immagini'
 
@@ -233,59 +234,7 @@ export default function About() {
           {about.intro}
         </p>
       </section>
-
-      <section className="px-5 py-12 sm:px-8 lg:px-[72px] lg:py-20">
-        <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:gap-x-24 lg:gap-y-16">
-          <div className="space-y-12 lg:space-y-16">
-            <ArrowBlock label={T.chiSono.experience}>
-              <dl className="m-0">
-                {about.experience.map((it) => (
-                  <Row key={it.titolo + it.anno} anno={it.anno} titolo={it.titolo} luogo={it.luogo} />
-                ))}
-              </dl>
-            </ArrowBlock>
-
-            <ArrowBlock label={T.chiSono.education}>
-              <dl className="m-0">
-                {about.education.map((it) => (
-                  <Row key={it.titolo} anno={it.anno} titolo={it.titolo} luogo={it.luogo} />
-                ))}
-              </dl>
-            </ArrowBlock>
-          </div>
-
-          <div className="space-y-12 lg:space-y-16">
-            <ArrowBlock label={T.chiSono.skills}>
-              <ul className="flex flex-wrap gap-2">
-                {about.skills.map((s) => (
-                  <li
-                    key={s}
-                    className="border border-line bg-paper px-3 py-1 text-[13px] tracking-[0.02em] lg:px-4 lg:py-1.5 lg:text-[15px]"
-                  >
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </ArrowBlock>
-
-            <ArrowBlock label={T.chiSono.contacts}>
-              <div className="space-y-1 text-[15px] lg:space-y-2 lg:text-[17px]">
-                <a
-                  href={profile.emailHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block break-all hover:underline"
-                >
-                  {profile.email}
-                </a>
-              </div>
-            </ArrowBlock>
-          </div>
-        </div>
-      </section>
-
-      {/* Il libro sfogliabile: sono gli schizzi da cui i progetti nascono, e
-          la frase qui sotto dice esattamente quello. */}
+      <Competenze />
       <Sketchbook />
 
       {/* La frase che chiude lo sketchbook e apre la tavola di schizzi: sta fra
@@ -349,35 +298,5 @@ export default function About() {
         </a>
       </section>
     </main>
-  )
-}
-
-/*
- * La freccia porta U+FE0E (VS-15), che forza la resa testuale: le diagonali
- * ↖↗↘↙ hanno una variante emoji e su iOS/Android uscirebbero a colori.
- */
-function ArrowBlock({ label, children }) {
-  return (
-    <div>
-      <div className="mb-4 flex items-center gap-2 lg:mb-6">
-        <span aria-hidden className="text-[15px] leading-none lg:text-[17px]">{'↘︎'}</span>
-        <h2 className="m-0 text-[13px] font-bold uppercase tracking-[0.22em] lg:text-[15px]">
-          {label}
-        </h2>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function Row({ anno, titolo, luogo }) {
-  return (
-    <div className="grid grid-cols-[96px_1fr] gap-4 border-t border-line-soft py-3 lg:grid-cols-[132px_1fr] lg:gap-6 lg:py-4">
-      <dt className="text-[13px] font-bold tabular-nums tracking-[0.02em] lg:text-[15px]">{anno}</dt>
-      <dd className="m-0 text-[14px] leading-snug lg:text-[17px]">
-        {titolo}
-        {luogo && <span className="text-muted"> · {luogo}</span>}
-      </dd>
-    </div>
   )
 }

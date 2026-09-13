@@ -59,12 +59,7 @@ export const manifestoFoto = {
 export const about = {
   intro:
     'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
-  experience: [
-    { anno: '2020–2021', titolo: 'Arredatore', luogo: 'Emilia Casa SRL' },
-    { anno: '2021–2022', titolo: 'Arredatore', luogo: 'Casa Midì' },
-    { anno: '2025', titolo: 'Partecipazione Salone Satellite', luogo: 'Milano' },
-    { anno: '2025–2026', titolo: 'Concorsi Grafica & Product Design', luogo: '' },
-  ],
+  // Elenco piatto per il nastro in home e il JSON-LD. Uno strumento nuovo va anche in `competenze`.
   skills: [
     'Illustrator',
     'Photoshop',
@@ -80,9 +75,41 @@ export const about = {
     'Keynote',
     'Canva',
   ],
-  education: [
-    { anno: '2021', titolo: 'Istituto Superiore G. Chierici', luogo: 'Reggio Emilia' },
-    { anno: '2026', titolo: 'Accademia di Belle Arti di Bologna', luogo: 'ABABO' },
+  /* Card di "Chi sono". Traduzione in `aboutEn.competenze`, agganciata per `chiave`.
+     `foto: null` finché le immagini non arrivano, poi `{ src, alt }`. */
+  competenze: [
+    {
+      chiave: 'grafica',
+      titolo: 'Grafica ed editoria',
+      testo:
+        'Tavole, manifesti e impaginati: il progetto si racconta con la stessa cura con cui è disegnato.',
+      strumenti: ['Illustrator', 'Photoshop', 'InDesign', 'Affinity', 'Canva'],
+      foto: null,
+    },
+    {
+      chiave: 'modellazione',
+      titolo: 'Modellazione 3D',
+      testo:
+        'Dal volume di massima al modello quotato: la forma si verifica in tre dimensioni prima di diventare un pezzo.',
+      strumenti: ['Rhino 3D', 'Shapr3D'],
+      foto: null,
+    },
+    {
+      chiave: 'configuratori',
+      titolo: 'Configuratori d’arredo',
+      testo:
+        'Composizioni su misura, disegnate dentro i sistemi con cui i mobilifici mandano in produzione.',
+      strumenti: ['Mobilturi 3D', 'Metron (Imab)', '3CAD', 'GSG'],
+      foto: null,
+    },
+    {
+      chiave: 'presentazione',
+      titolo: 'Presentazione',
+      testo:
+        'Il progetto come arriva al cliente: sequenza, ritmo e gerarchia, come per un impaginato.',
+      strumenti: ['PowerPoint', 'Keynote'],
+      foto: null,
+    },
   ],
   /* `hero` è scontornato (sfondo trasparente): nella testata scavalca il
      titolo, e un rettangolo bianco lo coprirebbe invece di intrecciarcisi.
@@ -856,8 +883,11 @@ export function profiloIn(lang) {
 const aboutEnCompleto = {
   ...about,
   intro: aboutEn.intro,
-  experience: aboutEn.experience,
-  education: aboutEn.education,
+  // Per `chiave`, non per posizione: senza gemella la card resta in italiano.
+  competenze: about.competenze.map((c) => {
+    const en = aboutEn.competenze.find((v) => v.chiave === c.chiave)
+    return en ? { ...c, titolo: en.titolo, testo: en.testo } : c
+  }),
   photos: {
     hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
     schizzi: { ...about.photos.schizzi, alt: aboutEn.photos.schizzi },

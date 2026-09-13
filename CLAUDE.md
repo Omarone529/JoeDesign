@@ -626,6 +626,8 @@ src/
 │   ├── ErrorBoundary.jsx # rete di sicurezza attorno alla pagina corrente
 │   ├── FloatingMailButton.jsx
 │   ├── about/
+│   │   ├── Competenze.jsx  # le card degli strumenti, impilate con sticky + scala
+│   │   │                   #   (niente librerie: un listener di scroll e basta)
 │   │   ├── Sketchbook.jsx  # libro sfogliabile 3D: stato, trascinamento, molle, markup
 │   │   └── libro/
 │   │       ├── geometria.js  # la forma della piega — matematica pura, ha dei test
@@ -634,8 +636,8 @@ src/
 │                         #   Manifesto (frase + foto di Joe), SkillsTicker
 └── pages/
     ├── Home.jsx
-    ├── About.jsx         # "Chi sono": testata col ritratto, bio, sketchbook
-    │                     #   e la tavola di schizzi
+    ├── About.jsx         # "Chi sono": testata col ritratto, bio, le card degli
+    │                     #   strumenti, sketchbook e la tavola di schizzi
     ├── Archive.jsx       # griglia di tutti i progetti
     ├── Privacy.jsx       # informativa privacy (testo in i18n.js)
     └── ProjectDetail.jsx # scheda singola con galleria + prev/next
@@ -833,7 +835,8 @@ lavora): non rimetterli.
 Oltre alle immagini, in `C:\Generale\Lavori\Joe design\` ci sono due PDF che sono la
 **fonte di verità** per testi e progetti:
 - `PORTFOLIO GIOVANNI SARCHIOLLA 2026.pdf` — presentazione: dalla pagina "MI PRESENTO"
-  arrivano intro, EXPERIENCE, SKILLS e EDUCATION di "Chi sono". La card Instagram e i QR
+  arrivano l'intro e gli SKILLS di "Chi sono" (EXPERIENCE ed EDUCATION c'erano e sono
+  state tolte su richiesta: al loro posto le card degli strumenti). La card Instagram e i QR
   della stessa pagina erano stati replicati e poi tolti: non riproporli senza chiedere.
 - `ARCHIVE JOE SARCHIOLLA.pdf` — archivio progetti.
 

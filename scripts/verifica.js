@@ -40,7 +40,7 @@ const {
   manifestoFoto,
   projectImages,
 } = await import(path.join(root, 'src/data/siteData.js'))
-const { progettiEn } = await import(path.join(root, 'src/data/contenutiEn.js'))
+const { progettiEn, aboutEn } = await import(path.join(root, 'src/data/contenutiEn.js'))
 const { varianti, SUFFISSO_VARIANTE } = await import(path.join(root, 'src/data/varianti.js'))
 
 const errori = []
@@ -127,6 +127,21 @@ chiediFile(homeHero.src, 'home')
 chiediFile(manifestoFoto.src, 'home')
 // Non è più in pagina, ma è la sorgente delle anteprime social dell'archivio.
 chiediFile(familyBand.src, 'anteprime social dell’archivio')
+// Card di "Chi sono" senza traduzione (avviso) o traduzioni senza card (errore).
+{
+  const chiaviEn = new Set(aboutEn.competenze.map((c) => c.chiave))
+  for (const c of about.competenze) {
+    if (!chiaviEn.has(c.chiave)) {
+      avv(`chi sono: la card "${c.chiave}" non ha traduzione in contenutiEn.js — resta in italiano`)
+    }
+    chiaviEn.delete(c.chiave)
+    if (c.foto) chiediFile(c.foto.src, `chi sono, card "${c.chiave}"`)
+  }
+  for (const chiave of chiaviEn) {
+    err(`contenutiEn.js: la card "${chiave}" non corrisponde a nessuna competenza di siteData.js`)
+  }
+}
+
 chiediFile(about.photos.hero.src, 'chi sono')
 chiediFile(about.photos.schizzi.src, 'chi sono')
 for (const tavola of about.sketchbook) {
