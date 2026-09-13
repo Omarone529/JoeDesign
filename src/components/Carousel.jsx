@@ -9,13 +9,11 @@ import VideoYouTube from './VideoYouTube'
 import EtichettaAI from './EtichettaAI'
 
 const INTERVAL = 2000
-// Sulla slide del reel lo scorrimento rallenta: due secondi bastano a vedere un
-// fotogramma, non a decidere di guardarlo e a centrare il tasto play.
+// Sulla slide del reel: a due secondi il tasto play non è colpibile.
 const INTERVAL_VIDEO = 6000
 const SWIPE = 45 // spostamento minimo del dito perché valga come cambio foto
 
-// `night`, lo stesso fondo del footer. Un verticale su fondo chiaro sembra una
-// foto tagliata male; su fondo scuro è la forma in cui i reel si guardano.
+// `night`: un verticale su fondo chiaro sembra una foto tagliata male.
 const FONDO_VIDEO = '#0a0908'
 
 /*
@@ -29,11 +27,9 @@ export default function Carousel({ images, title }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   // Slide con il `src` assegnato. Parte dalla sola prima, l'unica che ce l'ha
-  // anche nell'HTML pre-renderizzato: nessun mismatch in hydration. Chi entra
-  // non esce più, così tornare indietro non riscarica.
+  // anche nell'HTML pre-renderizzato: nessun mismatch in hydration.
   const [caricate, setCaricate] = useState(() => new Set([0]))
-  // Lo Short in riproduzione. Non tocca `paused`, che resta la scelta di chi
-  // guarda: uscendo dalla slide lo scorrimento riprende da sé.
+  // Lo Short in riproduzione. Non tocca `paused`, che resta la scelta di chi guarda.
   const [videoAttivo, setVideoAttivo] = useState(false)
   const [videoMuto, setVideoMuto] = useState(false)
   // Pausa automatica fuori vista o a scheda nascosta (diversa da `paused`, che sceglie chi guarda).
@@ -68,7 +64,7 @@ export default function Carousel({ images, title }) {
   }, [consenso, index, images])
 
   const go = (i) => {
-    // Ogni cambio slide passa di qui — frecce, pallini, dito. L'autoplay no, ma
+    // Ogni cambio slide passa di qui: frecce, pallini, dito. L'autoplay no, ma
     // mentre lo Short va è fermo, quindi non può scavalcare questa riga.
     setVideoAttivo(false)
     setVideoMuto(false)
@@ -151,8 +147,7 @@ export default function Carousel({ images, title }) {
   }`
 
   // La foto mostrata intera non copre la cornice: il colore del suo bordo
-  // (`fondo`, da `fotoFit`) riempie lo scoperto. Cambia con la foto, in
-  // dissolvenza come lei; senza, resta il grigio di `bg-placeholder`.
+  // (`fondo`, da `fotoFit`) riempie lo scoperto, in dissolvenza come lei.
   const fondo = slideVideo ? FONDO_VIDEO : fotoFit[images[index]?.src]?.fondo
 
   return (
@@ -183,15 +178,11 @@ export default function Carousel({ images, title }) {
           setPaused((p) => !p)
         }}
       >
-        {/* I formati d'archivio sono disparati: riempiono tutti la cornice, e
-            dove il ritaglio farebbe danno `fotoFit` dice come rimediare. */}
         {images.map(({ src, alt, video, ai }, i) => {
-          // Il 9:16 del reel nella cornice quadrata si mostra intero: tagliarlo
-          // per riempire vorrebbe dire buttare via metà inquadratura.
+          // Il 9:16 del reel si mostra intero: tagliarlo butterebbe metà inquadratura.
           const fit = video ? { fit: 'contain' } : fotoFit[src]
-          // Foto ed etichetta entrano ed escono insieme: le slide sono
-          // impilate, e una targhetta che non svanisce con la sua finirebbe
-          // sopra la foto dopo, dichiarando quella sbagliata.
+          // Foto ed etichetta svaniscono insieme: le slide sono impilate, e una
+          // targhetta rimasta indietro dichiarerebbe la foto sbagliata.
           const dissolvenza = `transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
             i === index ? 'opacity-100' : 'opacity-0'
           }`
@@ -215,8 +206,8 @@ export default function Carousel({ images, title }) {
           )
         })}
 
-        {/* Solo sulla slide in vista: il tasto play delle altre sarebbe
-            invisibile ma raggiungibile da tastiera. */}
+        {/* Solo la slide in vista: il tasto play delle altre sarebbe invisibile
+            ma raggiungibile da tastiera. */}
         {slideVideo && (
           <VideoYouTube
             videoId={slideVideo}
@@ -249,9 +240,8 @@ export default function Carousel({ images, title }) {
               →
             </button>
 
-            {/* Il contatore è anche il comando di pausa, e dev'essere un
-                controllo vero: lo scorrimento parte da solo, e la WCAG 2.2.2
-                chiede di poterlo fermare da tastiera. */}
+            {/* Il contatore è anche il comando di pausa: lo scorrimento parte da
+                solo, e la WCAG 2.2.2 chiede di poterlo fermare da tastiera. */}
             <button
               type="button"
               onClick={() => setPaused((p) => !p)}

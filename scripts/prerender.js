@@ -36,13 +36,13 @@ function headTags(meta, route) {
     // La 404 è l'unica senza canonical: non ha un indirizzo proprio.
     ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
     ...(meta.canonical ? [`<link rel="canonical" href="${meta.canonical}" />`] : []),
-    // Le due lingue della stessa pagina, più x-default per chi non ne dichiara
-    // nessuna. Ogni pagina elenca anche sé stessa: è la forma che Google chiede.
+    // Le due lingue della stessa pagina, più x-default. Ogni pagina elenca
+    // anche sé stessa: è la forma che Google chiede.
     ...(meta.alternate || []).map(
       (a) => `<link rel="alternate" hreflang="${a.lang}" href="${a.href}" />`,
     ),
     // Immagine principale nota in anticipo: il preload la mette in coda leggendo
-    // l'head, senza aspettare che il layout ne riveli la necessità.
+    // l'head, senza aspettare il layout.
     ...(meta.preload ? [`<link rel="preload" as="image" href="${meta.preload}" fetchpriority="high" />`] : []),
     `<meta property="og:type" content="${meta.type}" />`,
     `<meta property="og:site_name" content="Giovanni “Joe” Sarchiolla" />`,
@@ -54,8 +54,8 @@ function headTags(meta, route) {
     `<meta property="og:description" content="${esc(meta.description)}" />`,
     ...(meta.canonical ? [`<meta property="og:url" content="${meta.canonical}" />`] : []),
     `<meta property="og:image" content="${meta.image}" />`,
-    // Senza le dimensioni, alla prima condivisione la piattaforma deve scaricare
-    // il file per impaginarlo, e spesso mostra l'anteprima vuota proprio allora.
+    // Senza le dimensioni, alla prima condivisione la piattaforma scarica il
+    // file per impaginarlo e spesso mostra l'anteprima vuota.
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
     `<meta property="og:image:type" content="image/jpeg" />`,
@@ -83,9 +83,8 @@ function buildPage(pathname) {
   const { html } = render(pathname)
 
   return template
-    // La lingua del documento: la leggono i motori di ricerca, i traduttori
-    // automatici e le sintesi vocali, che con `it` su una pagina inglese
-    // leggerebbero l'inglese con la pronuncia italiana.
+    // La lingua del documento: con `it` su una pagina inglese, le sintesi
+    // vocali leggerebbero l'inglese con la pronuncia italiana.
     .replace(/<html lang="[^"]*"/, `<html lang="${meta.htmlLang}"`)
     .replace(
       /<title>[\s\S]*?<\/title>/,
@@ -151,9 +150,9 @@ const sitemap =
 fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8')
 console.log(`  ✓ sitemap.xml (${routes.length} URL)`)
 
-/* robots.txt — punta alla sitemap sul dominio reale del build. */
+/* robots.txt: punta alla sitemap sul dominio reale del build. */
 const robots = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
 fs.writeFileSync(path.join(distDir, 'robots.txt'), robots, 'utf8')
 console.log(`  ✓ robots.txt`)
 
-console.log(`\nPre-rendering completato per ${SITE} — ${routes.length} pagine.`)
+console.log(`\nPre-rendering completato per ${SITE}: ${routes.length} pagine.`)

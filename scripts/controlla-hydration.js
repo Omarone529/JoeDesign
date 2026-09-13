@@ -127,12 +127,12 @@ if (rotti.length) {
   console.error(`  ✗ aggancio rotto su ${rotti.length} pagine:`)
   for (const x of rotti.slice(0, 10)) console.error(`      ${x.rotta}\n        ${x.problemi[0].slice(0, 160)}`)
   if (rotti.length > 10) console.error(`      … e altre ${rotti.length - 10}`)
-  if (ROMPI) { console.log('\n  (autotest: il rilevatore vede il guasto simulato — è il risultato atteso)'); chiudi(0) }
+  if (ROMPI) { console.log('\n  (autotest: il rilevatore vede il guasto simulato, è il risultato atteso)'); chiudi(0) }
   chiudi(1)
 }
 if (ROMPI) {
   console.error('\n  ✗ AUTOTEST FALLITO: il guasto è stato iniettato e nessuno se n’è accorto.')
-  console.error('    Il rilevatore non funziona più — non fidarsi dei suoi esiti verdi.')
+  console.error('    Il rilevatore non funziona più: non fidarsi dei suoi esiti verdi.')
   chiudi(1)
 }
 console.log('  ✓ nessun disallineamento: React si aggancia a tutte le pagine pre-renderizzate')

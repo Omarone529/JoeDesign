@@ -72,8 +72,7 @@ function Bivio() {
             // di foto non può fare da vetrina all'area.
             const primo = progetti.find((x) => projectImages(x).cover) ?? progetti[0]
             // Un'area dichiarata prima del suo primo progetto non si annuncia:
-            // la carta sarebbe un invito a una griglia vuota. Ed è anche la
-            // riga che evita di chiedere le immagini di un progetto che non c'è.
+            // la carta sarebbe un invito a una griglia vuota.
             if (!primo) return null
             const { cover } = projectImages(primo)
             const fit = fotoFit[cover]
@@ -145,8 +144,7 @@ function GrigliaArea({ area }) {
           {progetti.map((p, i) => {
             const { cover } = projectImages(p)
             // I manifesti sono verticali e il ritaglio quadrato gli mozzerebbe il
-            // testo: `fotoFit` dice quali vanno mostrati interi. Le copertine di
-            // prodotto non hanno voce lì e riempiono la cella come sempre.
+            // testo: `fotoFit` dice quali vanno mostrati interi.
             const fit = fotoFit[cover]
             // Prime due righe (8 celle): in viewport all'apertura, richieste subito.
             const subito = i < 8

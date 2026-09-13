@@ -257,8 +257,6 @@ const TESTI = {
       discipline: ['Product design', 'Industrial design', 'Packaging design', 'Graphic design'],
     },
 
-    // Testi alternativi delle immagini di prodotto: li usano le pagine e la
-    // sitemap immagini, quindi stanno scritti una volta sola.
     /* Marchio "AI GENERATED"/"AI MODIFIED": la scritta dentro è disegnata e in
        inglese, quindi la frase per intero la dà il testo alternativo. */
     ai: {
@@ -266,6 +264,7 @@ const TESTI = {
       modificata: 'Immagine modificata con l’intelligenza artificiale',
     },
 
+    // Li usano le pagine e la sitemap immagini: una foto si descrive in un posto solo.
     alt: {
       copertina: (titolo, cat, nome) => `${titolo}, ${cat} — progetto di ${nome}`,
       galleria: (titolo, cat, i, totale) => `${titolo}, ${cat} — immagine ${i} di ${totale}`,

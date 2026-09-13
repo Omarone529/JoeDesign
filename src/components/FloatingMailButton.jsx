@@ -8,8 +8,8 @@ import { useBannerAperto } from '../consenso'
 export default function FloatingMailButton() {
   const T = testi(useLang())
   const [sopraFooter, setSopraFooter] = useState(true)
-  // Il banner è una fascia alta un terzo di schermo, e questo tasto le finirebbe
-  // sotto: chi lo cercasse col dito premerebbe "Accetta". Sparisce finché c'è.
+  // Sotto il banner questo tasto è irraggiungibile: chi lo cercasse col dito
+  // premerebbe "Accetta". Sparisce finché la fascia è in pagina.
   const bannerAperto = useBannerAperto()
 
   useEffect(() => {

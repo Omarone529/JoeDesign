@@ -15,7 +15,6 @@ export default function BannerPrivacy() {
   if (!aperto) return null
 
   return (
-    // Ombra verso l'alto: la fascia sta in fondo.
     <div
       role="region"
       aria-label={T.aria}
@@ -25,8 +24,6 @@ export default function BannerPrivacy() {
         <div className="max-w-[76ch]">
           <div className="text-[10px] uppercase tracking-[0.24em] text-muted">{T.occhiello}</div>
 
-          {/* Una frase che apre, poi il dettaglio in tono minore: la stessa
-              gerarchia delle sezioni del sito, occhiello e corpo. */}
           <p className="m-0 mt-3 text-[clamp(14px,1.15vw,16px)] leading-[1.45]">{T.testo}</p>
           <p className="m-0 mt-2 text-[13px] leading-[1.5] text-ink/70">
             {T.dettaglio}{' '}
@@ -39,8 +36,7 @@ export default function BannerPrivacy() {
           </p>
         </div>
 
-        {/* Larghezza minima uguale per i due tasti: pesano lo stesso perché
-            devono pesare lo stesso, non perché il testo è lungo uguale. */}
+        {/* Stessa larghezza minima: i due tasti devono pesare uguale. */}
         <div className="flex shrink-0 gap-3">
           <button
             type="button"

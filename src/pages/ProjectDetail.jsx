@@ -21,7 +21,6 @@ import { srcSetDi, MISURE } from '../immagini'
 const SFONDO_W = 1672
 const SFONDO_H = 941
 
-// Testo e carosello allineati in cima; da xl la colonna foto è più larga.
 export default function ProjectDetail({ slug }) {
   const lang = useLang()
   const T = testi(lang)
@@ -30,9 +29,8 @@ export default function ProjectDetail({ slug }) {
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
   const { gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
-  // Il reel è la prima slide del carosello (parte da solo); diventa quindi l'immagine LCP.
-  // `ai`: l'etichetta AI Act della singola foto, quando c'è (vedi `aiFoto`).
-  // La numerazione parte da 1, come i file 01.webp…NN.webp.
+  // `ai` è l'etichetta AI Act della singola foto (vedi `aiFoto`): la numerazione
+  // parte da 1, come i file 01.webp…NN.webp.
   const foto = gallery.map((src, i) => ({
     src,
     alt: altGalleria(item, i, gallery.length, lang),
@@ -89,8 +87,8 @@ export default function ProjectDetail({ slug }) {
           {slides.length > 0 ? (
             <Carousel key={item.slug} images={slides} title={item.title} />
           ) : (
-            /* Scheda pubblicata prima delle immagini: la cornice resta, vuota e
-               dichiarata, invece di lasciare la colonna a metà. */
+            /* Scheda pubblicata prima delle immagini: la cornice resta, invece
+               di lasciare la colonna a metà. */
             <div className="flex aspect-square w-full items-center justify-center bg-placeholder">
               <span className="text-[11px] uppercase tracking-[0.24em] text-muted">
                 {T.progetto.fotoInArrivo}
@@ -102,9 +100,8 @@ export default function ProjectDetail({ slug }) {
 
       <section className="px-5 sm:px-8 lg:px-[72px]">
         <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 md:mt-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-y-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12">
-          {/* L'occhiello resta appeso al filetto, in pari con quello del disegno;
-              la tabella, molto più corta della colonna accanto, si centra invece
-              sul disegno tecnico anziché restare appesa in alto. */}
+          {/* L'occhiello resta appeso al filetto; la tabella, molto più corta
+              della colonna accanto, si centra sul disegno tecnico. */}
           <div className="flex flex-col border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
               {T.progetto.scheda}

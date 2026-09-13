@@ -24,8 +24,7 @@ export const MISURE = {
   mezza: '(min-width: 768px) 55vw, 100vw',
   // Card degli strumenti in "Chi sono": mezza card da sm in su, piena sotto.
   competenze: '(min-width: 640px) 45vw, 100vw',
-  // Ritratto della testata di "Chi sono": le stesse misure che ha in pagina —
-  // 46vw da tablet in su, 88 della finestra sotto. Cambiando quelle classi va
-  // cambiato anche questo, o il browser sceglie la variante sbagliata.
+  // Ritratto della testata di "Chi sono": le stesse misure che ha in pagina.
+  // Cambiando quelle classi va cambiato anche questo.
   ritratto: '(min-width: 768px) 46vw, 88vw',
 }

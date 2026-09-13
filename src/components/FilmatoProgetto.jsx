@@ -14,9 +14,8 @@ export default function FilmatoProgetto({ videoId, title, poster, alt }) {
 
   return (
     <div className="relative aspect-video w-full overflow-hidden bg-night">
-      {/* Il poster resta sotto il player: montandolo l'iframe lo copre per
-          intero, e toglierlo dal DOM farebbe lampeggiare il fondo scuro nel
-          frattempo che YouTube carica. */}
+      {/* Il poster resta sotto il player, che lo copre per intero: togliendolo
+          dal DOM il fondo scuro lampeggerebbe mentre YouTube carica. */}
       <img
         src={poster}
         srcSet={srcSetDi(poster)}
@@ -32,8 +31,7 @@ export default function FilmatoProgetto({ videoId, title, poster, alt }) {
         videoId={videoId}
         title={title}
         attivo={attivo}
-        /* Premuto a mano: parte com'è giusto, con il sonoro. Qui non esiste
-           l'altra partenza, quella muta, che nel carosello serve al reel. */
+        /* Sempre con il sonoro: qui la partenza muta del reel non esiste. */
         muto={false}
         onAvvia={() => setAttivo(true)}
       />

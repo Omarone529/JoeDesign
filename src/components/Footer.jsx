@@ -8,12 +8,11 @@ import { Link, percorso, useLang } from '../router'
 const ANNO = __ANNO_BUILD__
 
 // `/10` e non `/12`: l'opacità Tailwind va di cinque in cinque, e un valore
-// fuori scala non genera la classe — il bordo resterebbe pieno.
+// fuori scala non genera la classe.
 const FILETTO = 'border-paper/10'
 
+// Fa anche da pagina contatti, che come rotta non esiste.
 // Testo secondario `night-soft`, non `muted`: sul nero `muted` scende sotto AA.
-
-/* Fa anche da pagina contatti, che come rotta non esiste. */
 export default function Footer() {
   const lang = useLang()
   const T = testi(lang)
@@ -26,8 +25,8 @@ export default function Footer() {
   ]
 
   return (
-    /* Destinazione del salto "Contatti": il focus arriva qui, senza contorno
-       (su un elemento così largo sarebbe enorme). */
+    /* Destinazione del salto "Contatti". Senza contorno di focus: su un
+       elemento così largo sarebbe enorme. */
     <footer
       id="contatti"
       tabIndex={-1}
@@ -141,9 +140,9 @@ export default function Footer() {
   )
 }
 
-// `before` allarga i bersagli senza spostare la sottolineatura. "Privacy" e "Torna su" a 16px per non accavallarli.
-
-/* Va in un contenitore `relative` dentro un elemento `group`. */
+// Va in un contenitore `relative` dentro un elemento `group`. Il `before` dei
+// comandi allarga i bersagli senza spostarla; "Privacy" e "Torna su" stanno a
+// 16px l'uno dall'altro per non accavallare le due aree.
 function Sottolineatura() {
   return (
     <span

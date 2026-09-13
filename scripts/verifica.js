@@ -40,7 +40,7 @@ const slugVisti = new Set()
 for (const p of archive) {
   const dove = `progetto "${p.slug}"`
 
-  if (slugVisti.has(p.slug)) err(`${dove}: slug ripetuto — gli URL si sovrascriverebbero`)
+  if (slugVisti.has(p.slug)) err(`${dove}: slug ripetuto, gli URL si sovrascriverebbero`)
   slugVisti.add(p.slug)
 
   if (!chiaviArea.has(areaDi(p))) {
@@ -63,7 +63,7 @@ for (const p of archive) {
     const dichiarate = p.photos || 0
     if (suDisco > dichiarate) {
       err(
-        `${dove}: la cartella ha ${suDisco} foto di galleria ma \`photos\` dice ${dichiarate} — le ultime ${suDisco - dichiarate} non compaiono nel sito`,
+        `${dove}: la cartella ha ${suDisco} foto di galleria ma \`photos\` dice ${dichiarate}: le ultime ${suDisco - dichiarate} non compaiono nel sito`,
       )
     }
   }
@@ -85,7 +85,7 @@ for (const p of archive) {
     err(`${dove}: ai.sfondo è dichiarato ma il progetto non ha \`sfondo: true\``)
   }
 
-  if (!progettiEn[p.slug]) avv(`${dove}: nessuna traduzione in contenutiEn.js — resta in italiano`)
+  if (!progettiEn[p.slug]) avv(`${dove}: nessuna traduzione in contenutiEn.js, resta in italiano`)
 }
 
 // Una chiave di troppo in contenutiEn non traduce niente e non protesta: è
@@ -108,7 +108,7 @@ chiediFile(familyBand.src, 'anteprime social dell’archivio')
   const chiaviEn = new Set(aboutEn.competenze.map((c) => c.chiave))
   for (const c of about.competenze) {
     if (!chiaviEn.has(c.chiave)) {
-      avv(`chi sono: la card "${c.chiave}" non ha traduzione in contenutiEn.js — resta in italiano`)
+      avv(`chi sono: la card "${c.chiave}" non ha traduzione in contenutiEn.js, resta in italiano`)
     }
     chiaviEn.delete(c.chiave)
     if (c.foto) chiediFile(c.foto.src, `chi sono, card "${c.chiave}"`)
@@ -143,7 +143,7 @@ for (const nome of attesiOg) {
     ['en', 'en/'],
   ]) {
     const src = `/images/og/${prefisso}${nome}.jpg`
-    if (manca(src)) err(`anteprima social (${lingua}): manca ${src} — rilancia scripts/og-image.js`)
+    if (manca(src)) err(`anteprima social (${lingua}): manca ${src}: rilancia scripts/og-image.js`)
   }
 }
 
@@ -153,7 +153,7 @@ for (const [src, larghezza] of Object.entries(varianti)) {
   const variante = src.replace(/\.webp$/, `${SUFFISSO_VARIANTE}.webp`)
   if (manca(src)) err(`varianti.js: elenca ${src}, che non esiste`)
   if (manca(variante)) {
-    err(`varianti.js: manca ${variante} — rilancia scripts/varianti-foto.js`)
+    err(`varianti.js: manca ${variante}: rilancia scripts/varianti-foto.js`)
   }
   if (!Number.isInteger(larghezza) || larghezza <= 800) {
     err(`varianti.js: ${src} dichiara larghezza ${larghezza}, che non è un originale più grande di 800`)
@@ -173,7 +173,7 @@ if (errori.length) {
 }
 
 console.log(
-  `  ✓ dati verificati — ${archive.length} progetti, ${Object.keys(varianti).length} immagini con variante${
+  `  ✓ dati verificati: ${archive.length} progetti, ${Object.keys(varianti).length} immagini con variante${
     avvisi.length ? `, ${avvisi.length} avvis${avvisi.length === 1 ? 'o' : 'i'}` : ''
   }`,
 )
