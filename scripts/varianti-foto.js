@@ -117,7 +117,7 @@ for (const p of orfane) {
 const ordinato = Object.fromEntries(Object.entries(manifesto).sort(([a], [b]) => a.localeCompare(b)))
 
 const intestazione = `/*
- * Generato da \`node scripts/varianti-foto.js\` — non si modifica a mano.
+ * Generato da \`node scripts/varianti-foto.js\`: non si modifica a mano.
  *
  * Foto con variante da 800 px e larghezza dell'originale, per \`srcSetDi()\`.
  */

@@ -49,9 +49,8 @@ export function RouterProvider({ initialPath = '/', children }) {
 
   const navigate = useCallback((to) => {
     if (typeof window === 'undefined') return
-    // La posizione della pagina che si sta lasciando va scritta nella SUA voce
-    // di cronologia, ed è l'ultimo momento in cui la si conosce: dopo il
-    // pushState quella voce non è più quella corrente e non si può più toccare.
+    // La posizione va scritta nella voce di cronologia della pagina che si
+    // lascia, ed è l'ultimo momento per farlo: dopo il pushState non è più quella corrente.
     window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
     if (to !== window.location.pathname) {
       window.history.pushState({ scrollY: 0 }, '', to)

@@ -27,9 +27,8 @@ export default function App() {
       </ErrorBoundary>
       <Footer />
       <FloatingMailButton />
-      {/* Fuori dalla pagina corrente, così la domanda arriva all'ingresso — in
-          home — e non a chi è già dentro una scheda col reel pronto a partire.
-          Chi arriva da una ricerca atterra sulla scheda: là serve comunque. */}
+      {/* Fuori dalla pagina corrente: la domanda arriva all'ingresso, non a chi
+          è già dentro una scheda col reel pronto a partire. */}
       <BannerPrivacy />
     </div>
   )

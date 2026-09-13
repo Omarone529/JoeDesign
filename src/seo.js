@@ -154,8 +154,7 @@ export function metaForRoute(route) {
       canonical: url('about', {}, lang),
       image: ogImage('chi-sono', lang),
       // L'alt descrive l'ANTEPRIMA social, che `og-image.js` compone ancora con
-      // la foto della lampada — passata in home ma rimasta la sorgente di quella
-      // scheda. Cambiando la sorgente là, va cambiato anche qui.
+      // la foto della lampada: cambiando la sorgente là, va cambiato anche qui.
       imageAlt: manifestoFotoIn(lang).alt,
       preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
@@ -169,9 +168,8 @@ export function metaForRoute(route) {
       // Senza copertina non c'è nemmeno l'anteprima social della scheda:
       // il link condiviso porta quella dell'area, non un riquadro vuoto.
       const areaItem = areeIn(lang).find((a) => a.chiave === areaDi(item))
-      // Un `area` che non corrisponde a nessuna delle aree dichiarate è un
-      // refuso nei dati, e va fermato qui: senza questa riga la build muore più
-      // avanti su un `undefined`, e il messaggio non dice né dove né perché.
+      // Un `area` che non corrisponde a nessuna area dichiarata è un refuso nei
+      // dati: senza questa riga la build muore più avanti su un `undefined`.
       if (!areaItem) {
         throw new Error(
           `seo: il progetto "${item.slug}" dichiara area "${areaDi(item)}", che non esiste in \`aree\` (${areeIn(lang)

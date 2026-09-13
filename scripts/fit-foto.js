@@ -168,9 +168,8 @@ function decidi({ rapporto, sfumati, box }) {
       // Le -800 sono le varianti responsive: stessa inquadratura dell'originale,
       // che è già nel manifesto. Vedi scripts/varianti-foto.js.
       if (!f.endsWith('.webp') || f.endsWith('-800.webp')) continue
-      // `video.webp` e `filmato.webp` sono le miniature dei due video: non
-      // sono slide del carosello, e come si inquadrano lo decidono i loro
-      // riquadri (vedi Carousel e FilmatoProgetto), non una misura presa qui.
+      // Miniature dei due video: come si inquadrano lo decidono i loro riquadri
+      // (vedi Carousel e FilmatoProgetto), non una misura presa qui.
       if (f === 'disegno.webp' || f === 'video.webp' || f === 'filmato.webp') continue
       const chiave = `${slug}/${f}`
       const m = await misura(path.join(RADICE, slug, f))
@@ -182,9 +181,8 @@ function decidi({ rapporto, sfumati, box }) {
       const src = `/images/products/${slug}/${f}`
 
       if (d.fit === 'contain') {
-        // Mostrata intera lascia scoperti i lati della cella: se il suo bordo è
-        // di un colore solo, quel colore riempie lo scoperto e lo spazio vuoto
-        // sparisce. Bordo screziato (una foto al vivo): si lascia il grigio.
+        // Mostrata intera lascia scoperti i lati della cella: un bordo di un
+        // colore solo li riempie, uno screziato lascia il grigio.
         voci[src] = { fit: 'contain', ...(m.pulito > 0.85 ? { fondo: m.fondo } : {}) }
         conto.contain++
       } else if (d.pos) {
@@ -198,7 +196,7 @@ function decidi({ rapporto, sfumati, box }) {
   }
 
   const testo = `/*
- * Generato da \`node scripts/fit-foto.js\` — non si modifica a mano.
+ * Generato da \`node scripts/fit-foto.js\`: non si modifica a mano.
  *
  * Come ogni foto entra nel carosello (assente = riempie centrata).
  *   fit: 'contain' intera · pos: 'x% y%' ritaglio puntato · fondo: colore del bordo

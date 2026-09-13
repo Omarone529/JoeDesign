@@ -46,8 +46,8 @@ function useNavbarNascosta(route) {
   return [nascosta, setNascosta]
 }
 
-// Sottolineatura ancorata allo span interno per restare attaccata alla parola,
-// e in assoluto per non spostare il testo.
+// Sottolineatura ancorata allo span interno, in assoluto: resta attaccata alla
+// parola e non sposta il testo.
 function NavLink({ to, active = false, children }) {
   return (
     <Link
@@ -126,8 +126,7 @@ export default function Navbar({ route }) {
               </NavLink>
             ))}
           </nav>
-          {/* Sotto i 360px cade: i suoi quindici pixel sono quelli che
-              mandano "CHI SONO" fuori schermo. */}
+          {/* Sotto i 360px cade: i suoi quindici pixel mandano "CHI SONO" fuori schermo. */}
           <LinkInstagram lang={lang} className="hidden min-[360px]:flex sm:hidden" />
           <SelettoreLingua route={route} />
         </div>

@@ -16,7 +16,7 @@ const PASSO = 0.04
 const BARRA = '4rem'
 
 /* Di quanto ogni card si ferma più in basso della precedente: è la striscia di
-   quelle sotto che resta in vista, cioè la pila che si vede. */
+   quelle sotto che resta in vista. */
 const SCALINO = '0.85rem'
 
 export default function Competenze() {
@@ -46,9 +46,8 @@ export default function Competenze() {
 
       const avanzamento = Math.min(Math.max(-riquadro.top / corsa, 0), 1)
       carte.forEach((carta, i) => {
-        /* Ogni card comincia a cedere quando tocca a lei — cioè dopo la sua
-           frazione di pila — e continua fino in fondo: è la pila che si
-           comprime, non quattro animazioni che partono e finiscono. */
+        /* Ogni card cede dalla sua frazione di pila fino in fondo: è la pila
+           che si comprime, non quattro animazioni separate. */
         const inizio = i / carte.length
         const quota = avanzamento <= inizio ? 0 : (avanzamento - inizio) / (1 - inizio)
         const scala = 1 - quota * (carte.length - 1 - i) * PASSO
@@ -56,8 +55,6 @@ export default function Competenze() {
       })
     }
 
-    /* Lo scroll arriva molto più spesso di quanto lo schermo si ridisegni:
-       senza il filtro si calcolerebbero decine di volte gli stessi numeri. */
     const alloScroll = () => {
       if (inCoda) return
       inCoda = true
@@ -84,17 +81,15 @@ export default function Competenze() {
         </h2>
       </div>
 
-      {/* Nessuno stacco fra le card: la corsa di scroll di ognuna è la propria
-          altezza, e quello che avanza sotto è già la prossima che arriva. */}
+      {/* Nessuno stacco fra le card: la corsa di scroll di ognuna è la propria altezza. */}
       <div ref={pila}>
         {competenze.map((c, i) => (
           <article
             key={c.chiave}
             style={{
               top: `calc(${BARRA} + ${i} * ${SCALINO})`,
-              /* Chi viene dopo passa sopra: senza, l'ordine di
-                 sovrapposizione lo deciderebbe il DOM e la pila si
-                 rovescerebbe. */
+              /* Chi viene dopo passa sopra: senza, l'ordine lo deciderebbe il
+                 DOM e la pila si rovescerebbe. */
               zIndex: i + 1,
             }}
             className="sticky flex h-[72svh] origin-top flex-col overflow-hidden border-2 border-ink bg-paper [will-change:transform] sm:h-[64svh] sm:flex-row lg:h-[62svh]"
@@ -118,7 +113,6 @@ export default function Competenze() {
               </ul>
             </div>
 
-            {/* Riquadro vuoto finché `foto` è null. */}
             <div className="min-h-0 flex-1 border-t border-line bg-placeholder sm:border-l sm:border-t-0">
               {c.foto && (
                 <img

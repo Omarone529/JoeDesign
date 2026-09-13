@@ -36,8 +36,7 @@ export default function VideoYouTube({ videoId, title, attivo, muto, onAvvia }) 
       className="group/play absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center border-0 bg-transparent p-0"
     >
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-paper/90 transition-transform group-hover/play:scale-105">
-        {/* Triangolo pieno, spostato di un pelo a destra: centrato sul suo
-            riquadro sembrerebbe storto. */}
+        {/* Spostato di un pelo a destra: centrato sul riquadro sembrerebbe storto. */}
         <svg viewBox="0 0 24 24" aria-hidden="true" className="ml-[3px] h-6 w-6 fill-ink">
           <path d="M6 3.5v17l15-8.5z" />
         </svg>

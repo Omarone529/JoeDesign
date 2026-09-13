@@ -1,5 +1,5 @@
 /*
- * Generato da `node scripts/varianti-foto.js` — non si modifica a mano.
+ * Generato da `node scripts/varianti-foto.js`: non si modifica a mano.
  *
  * Foto con variante da 800 px e larghezza dell'originale, per `srcSetDi()`.
  */

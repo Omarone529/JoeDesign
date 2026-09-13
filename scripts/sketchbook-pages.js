@@ -60,9 +60,8 @@ for await (const pagina of await pdf(PDF_PATH, { scale: SCALA })) {
     await sharp(pagina).resize({ width: LARGHEZZA }).sharpen(NITIDEZZA).webp({ quality: QUALITA }).toFile(dest)
     const { width, height } = await sharp(dest).metadata()
 
-    // La mezza si ricava dalla grande già rimpicciolita, non dal render: due
-    // passaggi di lanczos su un render abbondante tengono le lettere più
-    // definite di un salto solo fino a 500.
+    // La mezza si ricava dalla grande già rimpicciolita: due passaggi di lanczos
+    // tengono le lettere più definite di un salto solo fino a 500.
     const mezza = path.join(OUT_DIR, `${tavola.nome}-mezza.webp`)
     await sharp(dest)
       .resize({ width: LARGHEZZA_MEZZA, kernel: 'lanczos3' })

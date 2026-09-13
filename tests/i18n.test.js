@@ -50,7 +50,7 @@ test('nessuna voce è rimasta vuota', () => {
   assert.deepEqual(vuote, [], `voci vuote: ${vuote.join(', ')}`)
 })
 
-/* Segue un percorso puntato — `privacy.sezioni.0.titolo` — fin dentro gli array. */
+/* Segue un percorso puntato (`privacy.sezioni.0.titolo`) fin dentro gli array. */
 function valoreDi(radice, percorso) {
   return percorso.split('.').reduce((o, k) => o[k], radice)
 }
@@ -58,9 +58,8 @@ function valoreDi(radice, percorso) {
 test('ogni lingua dichiara come si chiama, per <html lang> e per i meta', () => {
   for (const lang of LINGUE) {
     const T = testi(lang)
-    // `htmlLang` lo leggono le sintesi vocali, `ogLocale` le anteprime dei
-    // link, `schemaLang` i dati strutturati: mancandone uno il difetto si vede
-    // fuori dal sito, dove non lo si guarda.
+    // `htmlLang` lo leggono le sintesi vocali, `ogLocale` le anteprime dei link,
+    // `schemaLang` i dati strutturati: mancandone uno il difetto si vede fuori dal sito.
     for (const campo of ['htmlLang', 'ogLocale', 'schemaLang', 'etichetta']) {
       assert.equal(typeof T[campo], 'string', `${lang}: manca ${campo}`)
       assert.ok(T[campo].trim(), `${lang}: ${campo} è vuoto`)

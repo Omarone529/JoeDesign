@@ -22,7 +22,7 @@ const STACCO = '2rem'
 const INCASTRO = 0.22
 const MANICA = 0.015
 
-// Larghezza vera del ritratto con object-contain. ⚠️ Proporzioni di joe-hero.webp: rifarle cambiando ritaglio.
+// Larghezza vera del ritratto con object-contain
 const PROPORZIONE_RITRATTO = 1200 / 1364
 const BARRA = '4rem'
 const RIQUADRO = `calc(100svh - ${BARRA})`
@@ -95,9 +95,7 @@ export default function About() {
         />
       </section>
 
-      {/* L'intro esce dalla testata e sta da sola, centrata: la testata è
-          adesso una figura sola — nome e ritratto — e un paragrafo dentro le
-          farebbe da didascalia. */}
+      {/* L'intro sta fuori dalla testata: dentro, farebbe da didascalia al ritratto. */}
       <section id="intro" className="border-b border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
         <p className="mx-auto m-0 max-w-[52ch] text-center text-[clamp(16px,1.6vw,22px)] leading-[1.5]">
           {about.intro}

@@ -15,8 +15,7 @@ export default class ErrorBoundary extends Component {
     console.error('Errore in pagina:', errore, info?.componentStack)
   }
 
-  // Senza reset, una pagina andata in errore lascerebbe il boundary sporco e
-  // ogni navigazione successiva mostrerebbe il messaggio al posto della pagina.
+  // Senza reset, dopo un errore ogni navigazione mostrerebbe il messaggio al posto della pagina.
   componentDidUpdate(propsPrec) {
     if (this.state.errore && propsPrec.rotta !== this.props.rotta) {
       this.setState({ errore: false })

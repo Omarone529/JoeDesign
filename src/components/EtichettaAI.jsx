@@ -17,8 +17,7 @@ export default function EtichettaAI({ tipo, className = '', ...resto }) {
       src={MARCHIO[tipo]}
       alt={T.ai[tipo]}
       decoding="async"
-      // Non intercetta il clic: sulla foto quel clic mette in pausa il
-      // carosello, e una targhetta non può essere un buco nel comando.
+      // Non intercetta il clic: sulla foto quel clic mette in pausa il carosello.
       className={`pointer-events-none absolute bottom-3 left-3 h-[18px] w-auto sm:bottom-4 sm:left-4 sm:h-[22px] ${className}`}
       {...resto}
     />

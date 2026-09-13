@@ -1,5 +1,5 @@
 /*
- * Generato da `node scripts/fit-foto.js` — non si modifica a mano.
+ * Generato da `node scripts/fit-foto.js`: non si modifica a mano.
  *
  * Come ogni foto entra nel carosello (assente = riempie centrata).
  *   fit: 'contain' intera · pos: 'x% y%' ritaglio puntato · fondo: colore del bordo
