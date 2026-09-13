@@ -4,6 +4,7 @@ import { aboutIn } from '../../data/siteData'
 import { testi } from '../../i18n'
 import { useLang } from '../../router'
 import { srcSetDi, MISURE } from '../../immagini'
+import { altezzaSchermo } from '../../altezzaSchermo'
 
 // Card degli strumenti impilate: sticky + scala scritta da un listener di scroll, senza librerie.
 // ⚠️ Niente `window` nel render: le card escono dall'HTML statico a scala 1.
@@ -36,7 +37,8 @@ export default function Competenze() {
       inCoda = false
       const riquadro = contenitore.getBoundingClientRect()
       // Scroll disponibile dentro la pila; senza corsa si esce per non dividere per zero.
-      const corsa = riquadro.height - window.innerHeight
+      // `altezzaSchermo()` e non innerHeight: con le barre che si ritirano la scala saltava.
+      const corsa = riquadro.height - altezzaSchermo()
       if (corsa <= 0) {
         carte.forEach((carta) => {
           carta.style.transform = ''
@@ -92,7 +94,7 @@ export default function Competenze() {
                  DOM e la pila si rovescerebbe. */
               zIndex: i + 1,
             }}
-            className="sticky flex h-[72svh] origin-top flex-col overflow-hidden border-2 border-ink bg-paper [will-change:transform] sm:h-[64svh] sm:flex-row lg:h-[62svh]"
+            className="sticky flex h-[calc(var(--schermo,100svh)*0.72)] origin-top flex-col overflow-hidden border-2 border-ink bg-paper [will-change:transform] sm:h-[calc(var(--schermo,100svh)*0.64)] sm:flex-row lg:h-[calc(var(--schermo,100svh)*0.62)]"
           >
             <div className="flex shrink-0 flex-col justify-center px-6 py-7 sm:w-1/2 sm:px-8 sm:py-9 lg:px-12 lg:py-14">
               <h3 className="m-0 text-[clamp(24px,3.4vw,44px)] font-bold uppercase leading-[0.95] tracking-[-0.02em]">

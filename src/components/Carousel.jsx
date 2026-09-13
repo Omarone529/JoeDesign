@@ -156,7 +156,7 @@ export default function Carousel({ images, title }) {
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={contenitore}
-      className="group relative mx-auto w-full max-w-[calc(100vh-9rem)] md:ml-auto md:mr-0"
+      className="group relative mx-auto w-full max-w-[calc(var(--schermo,100vh)-9rem)] md:ml-auto md:mr-0"
       role="group"
       aria-roledescription="carosello"
       aria-label={T.carosello.immaginiDi(title)}
@@ -259,8 +259,9 @@ export default function Carousel({ images, title }) {
       </div>
 
       {n > 1 && (
-        /* `before` allarga il bersaglio dei pallini; lo stacco di 20px evita che si accavallino. */
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-5">
+        /* `before` allarga il bersaglio dei pallini; lo stacco di 20px evita che si accavallino.
+           `px-2.5` tiene dentro l'allargamento degli estremi, che a fila piena sbordava dallo schermo. */
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-5 px-2.5">
           {images.map((_, i) => (
             <button
               key={i}

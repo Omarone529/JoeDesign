@@ -446,6 +446,24 @@ e in inglese: la frase per intero, e nella lingua della pagina, la dà l'`alt` (
 Il sito si guarda soprattutto sul telefono, e le pagine sono verificate a 320, 360, 390 e
 430px: nessuna sborda in orizzontale e ogni comando si prende col dito.
 
+⚠️ **Le altezze legate allo schermo si scrivono con `var(--schermo, 100svh)`, mai con
+`svh`/`vh` nudi.** Firefox su iPhone e i browser dentro le app (Instagram, WhatsApp)
+ridimensionano davvero la pagina quando le barre si ritirano, e con loro `svh`: la foto di
+"Chi sono", ancorata al fondo di una testata alta quanto lo schermo, scendeva di 86px a ogni
+scorrimento. `src/altezzaSchermo.js` (chiamato in `main.jsx`, prima dell'hydration) fissa
+`--schermo` in px sull'`<html>` e lo ricalcola solo se cambia la larghezza (rotazione,
+finestra), o se cambia l'altezza a pagina ferma e con il mouse. Non si fida del solo
+`pointer: coarse`: un iPad col trackpad risulta "mouse", ma le sue barre si muovono
+scorrendo, e un'altezza che cambia durante lo scorrimento non è mai una finestra
+ridimensionata. La regola è in `daRicalcolare()`, pura e testata
+(`tests/altezzaSchermo.test.js`); chi fa conti in JS usa `altezzaSchermo()`, non
+`innerHeight`. Il ripiego serve all'HTML statico prima del JS.
+
+**Niente deve sbordare in orizzontale, nemmeno di tre pixel**: una pagina più larga dello
+schermo viene rimpicciolita dal browser e scorre di lato. Gli sbordi voluti (il canvas dello
+sketchbook, le aree di tocco allargate) vanno contenuti con `overflow-x-clip`, non `hidden`,
+che taglierebbe anche in verticale e romperebbe gli sticky.
+
 **Bersagli da 24px.** Le icone social sono venti pixel, le due lingue in navbar larghe due
 caratteri, i pallini del carosello sei: col dito non si prendono. L'area sensibile si
 allarga con uno pseudo-elemento — `relative` sul comando e
@@ -612,6 +630,7 @@ src/
 ├── rotte.js              # indirizzi e lettura degli URL (niente React: la usano seo, node, i test)
 ├── router.jsx            # routing History API + <Link> + useRoute/useLang + ripristino scroll
 ├── consenso.js           # la scelta sui video di YouTube (localStorage + hook)
+├── altezzaSchermo.js     # `--schermo`: altezza dello schermo che le barre del browser non muovono
 ├── seo.js                # meta per rotta + elenco rotte (usato dal pre-rendering)
 ├── i18n.js               # testi dell'interfaccia nelle due lingue (it/en)
 ├── entry-server.jsx      # render(path) per la build SSR (mai spedito al browser)
@@ -654,6 +673,7 @@ tests/                   # node:test, nessuna dipendenza — `npm test`
 ├── seo.test.js          # clip(): il taglio delle meta description
 ├── dati.test.js         # titoloLeggibile, aiFoto (etichette AI Act), periodoDi
 ├── geometria.test.js    # la piega del libro dello sketchbook
+├── altezzaSchermo.test.js # quando `--schermo` si ricalcola (mai per le barre del browser)
 └── i18n.test.js         # parità it/en: chiavi, tipi, argomenti, lunghezze
 
 .github/workflows/

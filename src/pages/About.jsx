@@ -25,7 +25,7 @@ const MANICA = 0.015
 // Larghezza vera del ritratto con object-contain
 const PROPORZIONE_RITRATTO = 1200 / 1364
 const BARRA = '4rem'
-const RIQUADRO = `calc(100svh - ${BARRA})`
+const RIQUADRO = `calc(var(--schermo, 100svh) - ${BARRA})`
 const LARGHEZZA_FIGURA = `min(46vw, calc(${RIQUADRO} * ${PROPORZIONE_RITRATTO.toFixed(6)}))`
 const ALTEZZA_FIGURA = `calc(var(--figura) / ${PROPORZIONE_RITRATTO.toFixed(6)})`
 
@@ -61,7 +61,7 @@ export default function About() {
           '--riga-bassa': `calc(${ALTEZZA_RIGA} * var(--figura-alta) - ${PIEDE})`,
           '--testata-minima': `min(${RIQUADRO}, calc(var(--figura-alta) + ${ARIA}))`,
         }}
-        className="relative flex min-h-[calc(100svh-4rem)] flex-col justify-center overflow-hidden border-b-2 border-ink px-5 pt-16 sm:px-8 md:min-h-[var(--testata-minima)] md:pb-28 lg:px-[72px]"
+        className="relative flex min-h-[calc(var(--schermo,100svh)-4rem)] flex-col justify-center overflow-hidden border-b-2 border-ink px-5 pt-16 sm:px-8 md:min-h-[var(--testata-minima)] md:pb-28 lg:px-[72px]"
       >
         <h1
           style={{
