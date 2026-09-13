@@ -533,34 +533,38 @@ percentuale si risolve sul riquadro intero della sezione mentre il margine del t
 risolve sulla colonna di testo: due basi diverse, e lo stacco fra i due si spostava a ogni
 cambio di padding.
 
-⚠️ **Testo e figura NON si sovrappongono, e lo stacco è calcolato, non tarato a occhio.**
+⚠️ **La coda del titolo entra di poco sotto la figura: solo la gamba della R.**
 Titolo e ritratto sono appesi alla stessa misura — `--figura`, cioè `min(46vw, (100svh -
 4rem) * PROPORZIONE_RITRATTO)`: la larghezza con cui `object-contain` disegna DAVVERO il
-ritaglio. Il margine destro del titolo è quella misura **più** quanto la riga piccola
-sporge oltre quella grande (`SPORGENZA`, in em sul corpo del titolo) **più** il respiro
-fisso `STACCO`: si misura dalla coda della frase, che è il bordo destro vero della
-testata, non dal riquadro del titolo. Da `md` il titolo è appeso al **fondo** della
-sezione (`mt-auto` + `--riga-bassa`), non centrato, perché al fondo ci sta anche la
-figura. Le costanti stanno in testa a `About.jsx` con il perché di ciascuna.
+ritaglio. Da `md` il titolo è appeso al **fondo** della sezione (`mt-auto` +
+`--riga-bassa`), non centrato, perché al fondo ci sta anche la figura. Le costanti stanno
+in testa a `About.jsx`; il loro perché è in questa sezione.
 
-Fino a settembre 2026 era il contrario: la coda finiva **sotto** la manica apposta
-(`INCASTRO = 0.22`), ed era l'incastro della reference. Il cliente ha cambiato idea e ora
-il testo non va mai sotto la foto. Chi rimettesse un margine col meno rimette la
-sovrapposizione.
+Grandezza e posizione del titolo sono **due conti separati**, e va tenuto così:
+- il **corpo** è il più piccolo fra quello che sta nello spazio rimasto (la colonna meno
+  la figura, meno `STACCO = 2rem`), la vecchia frazione della colonna e il tetto in
+  pixel. Riempiendo lo spazio, il titolo partirebbe sempre dal bordo sinistro;
+- la **posizione** la dà il margine destro, `--figura` meno `--fuori-figura`: `MANICA`
+  (1.5% della figura, la striscia trasparente fra il bordo del riquadro e la manica
+  all'altezza della riga) più `INCASTRO` (0.22 em della riga piccola). `ml-auto` si
+  prende lo spazio che il corpo ha lasciato e il blocco scivola a destra.
 
-⚠️ Da `md` **anche il corpo del titolo esce da quel conto**: è il più piccolo fra quello
-che sta nello spazio rimasto (la colonna meno la figura e meno lo stacco), la vecchia
-frazione della colonna e il tetto in pixel. Senza il primo dei tre, sotto i ~1700px la
-testata sbatte contro il bordo sinistro, `ml-auto` non ha più margine da distribuire e la
-coda si allunga sotto la figura da sola — cioè torna la sovrapposizione, e per giunta
-dipendente dalla misura della finestra.
+⚠️ Il riquadro del titolo è largo quanto la riga **piccola** (`w-fit` prende la più
+lunga), quindi nel margine la sporgenza non si somma di nuovo. Sommarla, o mettere
+l'incastro dentro il conto del corpo, rende il margine più grande dello spazio: il titolo
+resta inchiodato a sinistra, la scritta si allunga invece di spostarsi, e cambiare i
+numeri sembra non fare niente. È successo, a settembre 2026.
+
+Misurato da 768 a 2560px: sotto la sagoma entrano fra 8 e 26px, cioè sempre circa un
+quinto della R. **Sotto `md` l'incastro non c'è**: la foto sta in colonna sotto il titolo.
+La storia è andata avanti e indietro — prima la coda spariva quasi tutta, poi il testo è
+stato staccato dalla foto, ora l'incastro è leggero.
 
 Prima erano due frazioni indipendenti della finestra — `46vw` per la foto, `39vw` per il
 titolo — e si sfioravano per caso: con `object-contain` la foto si rimpicciolisce quando a
 limitare è l'altezza, e la distanza fra i due cambiava con **la sola altezza della
-finestra**. Misurato su una trentina di formati fra 768 e 3440px, adesso fra la coda della
-frase e il bordo del ritratto restano sempre almeno 38px, e la frase si legge per intero
-in tutte e due le lingue.
+finestra**. Appesi alla stessa misura, l'incastro resta lo stesso a ogni formato invece di
+dipendere dalla finestra.
 
 ⚠️ Due conseguenze che si rompono in silenzio: `PROPORZIONE_RITRATTO` sono le proporzioni
 di `joe-hero.webp` (1200×1364) e **va rifatta cambiando ritaglio**; e la foto è alta

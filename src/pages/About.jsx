@@ -55,16 +55,12 @@ const SPORGENZA = 1.2
  */
 const STACCO = '2rem'
 
-/*
- * Il riquadro in cui vive il ritratto: alto quanto la finestra meno la barra,
- * largo 46vw. Con `object-contain` il ritaglio ne riempie uno dei due lati e
- * viene disegnato largo `min(46vw, altezza * PROPORZIONE)` — su una finestra
- * bassa e larga vince il secondo termine, ed è per questo che la larghezza
- * vera va calcolata invece che data per scontata.
- *
- * ⚠️ PROPORZIONE_RITRATTO sono le proporzioni di `joe-hero.webp` (1200×1364).
- * Cambiando ritaglio va rifatta, o l'incastro si sposta senza che nulla protesti.
- */
+// Posizione del titolo, solo nel margine. INCASTRO: coda sotto la manica, in em della riga
+// piccola. MANICA: rientro della manica nel riquadro della foto, in frazione della figura.
+const INCASTRO = 0.22
+const MANICA = 0.015
+
+// Larghezza vera del ritratto con object-contain. ⚠️ Proporzioni di joe-hero.webp: rifarle cambiando ritaglio.
 const PROPORZIONE_RITRATTO = 1200 / 1364
 const BARRA = '4rem'
 const RIQUADRO = `calc(100svh - ${BARRA})`
@@ -157,7 +153,7 @@ export default function About() {
         <h1
           style={{
             '--nome-em': T.chiSono.heroNomeEm,
-            '--fuori-figura': `calc(${(SPORGENZA - 1).toFixed(4)} * var(--nome-em) * 1em + ${STACCO})`,
+            '--fuori-figura': `calc(${-MANICA} * var(--figura) - ${(INCASTRO * SPORGENZA * T.chiSono.heroNomeEm / T.chiSono.heroRuoloEm).toFixed(4)} * 1em)`,
             '--corpo-md': corpo('4rem', '210px'),
             '--corpo-lg': corpo('9rem', '240px'),
           }}
