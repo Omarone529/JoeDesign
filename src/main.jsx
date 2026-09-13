@@ -2,7 +2,11 @@ import React from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.jsx'
 import { RouterProvider } from './router.jsx'
+import { fissaAltezzaSchermo } from './altezzaSchermo'
 import './index.css'
+
+// Sull'<html>, fuori dall'albero di React: non tocca l'hydration.
+fissaAltezzaSchermo()
 
 const root = document.getElementById('root')
 

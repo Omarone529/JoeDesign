@@ -13,7 +13,8 @@ export default function SelectedWorks() {
       id="lavori"
       className="px-5 pb-4 pt-10 sm:px-8 sm:pt-16 lg:px-[72px] lg:pb-10 lg:pt-20"
     >
-      <div className="mb-5 flex items-baseline justify-between sm:mb-6 lg:mb-8">
+      {/* `flex-wrap`: a 320px titolo e link non stanno su una riga e il link sbordava. */}
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-3 sm:mb-6 lg:mb-8">
         <h2 className="m-0 text-[clamp(22px,3vw,40px)] font-bold uppercase tracking-[-0.01em]">
           {T.home.lavoriSelezionati}
         </h2>

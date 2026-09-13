@@ -15,7 +15,7 @@ export default function App() {
   const route = useRoute()
 
   return (
-    <div id="top" className="min-h-screen bg-paper">
+    <div id="top" className="min-h-[var(--schermo,100vh)] bg-paper">
       <Navbar route={route} />
       <ErrorBoundary rotta={route.path} lang={route.lang}>
         {route.name === 'about' && <About />}

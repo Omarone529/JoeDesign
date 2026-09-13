@@ -132,7 +132,7 @@ export default function ProjectDetail({ slug }) {
                 alt={altDisegno(item, lang)}
                 loading="lazy"
                 decoding="async"
-                className="mt-6 h-[clamp(260px,38vh,420px)] w-full object-contain lg:h-[clamp(300px,46vh,560px)]"
+                className="mt-6 h-[clamp(260px,calc(var(--schermo,100vh)*0.38),420px)] w-full object-contain lg:h-[clamp(300px,calc(var(--schermo,100vh)*0.46),560px)]"
               />
             </figure>
           )}

@@ -403,7 +403,9 @@ export default function Sketchbook() {
   }
 
   return (
-    <section className="border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
+    // `overflow-x-clip` e non `hidden`: taglia lo sbordo laterale del canvas, che sul telefono
+    // allargava la pagina oltre lo schermo, senza tagliare la pagina che gira sopra e sotto.
+    <section className="overflow-x-clip border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
       <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">
         {T.chiSono.sketchbook}
       </div>

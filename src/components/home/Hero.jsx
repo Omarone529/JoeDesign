@@ -10,7 +10,7 @@ const PRIMA_LETTERA = 0.2 // attesa prima che parta il nome
 const PASSO_LETTERA = 0.045 // scarto fra una lettera e la successiva
 const DOPO_NOME = 1.1 // pausa fra la fine del nome e l'invito a scorrere
 
-// `svh` per la barra degli indirizzi mobile; mix-blend-multiply fonde il bianco con `bg-paper`.
+// `--schermo` (altezzaSchermo.js) e non `svh`: le barre del browser non la muovono; mix-blend-multiply fonde il bianco con `bg-paper`.
 // Corpo del nome = larghezza / em della riga (5.99 e 8.10): da ricalcolare se cambiano padding o tracking.
 export default function Hero() {
   const T = testi(useLang())
@@ -38,7 +38,7 @@ export default function Hero() {
   const ritardoScorri = PRIMA_LETTERA + lettereContate * PASSO_LETTERA + DOPO_NOME
 
   return (
-    <section className="relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center overflow-hidden border-b-2 border-ink px-5 py-24 text-center sm:px-8 lg:px-[72px]">
+    <section className="relative flex min-h-[calc(var(--schermo,100svh)-4rem)] flex-col items-center justify-center overflow-hidden border-b-2 border-ink px-5 py-24 text-center sm:px-8 lg:px-[72px]">
       {/* `contain` + `bottom`: figura intera appoggiata alla linea in fondo,
           `cover` mostrerebbe solo la testa. */}
       <div aria-hidden="true" className="absolute inset-0 bg-paper">
