@@ -1,19 +1,7 @@
 /*
- * Decide come ogni foto entra nella cornice quadrata del carosello e scrive
- * `src/data/fotoFit.js`. Da rilanciare quando cambiano le foto di
- * `public/images/products/`; il risultato è versionato.
- *
- *   node scripts/fit-foto.js
- *
- * I formati d'archivio vanno dal 2.4:1 al 1:3, e riempiendo la cornice su
- * qualche scheda il ritaglio mangiava il prodotto. Per ogni immagine: si stima
- * il fondo dai pixel di bordo, si trova il riquadro del soggetto e si punta lì
- * il ritaglio. Se il soggetto non ci sta comunque, una fotografia si lascia
- * tagliare — è quello che farebbe un fotografo — mentre una grafica piatta si
- * mostra intera, o il taglio le mozza il testo.
- *
- * Le due si distinguono dai pixel sfumati: in una foto la luce degrada e uno su
- * cinque sta su una transizione morbida, in una grafica i bordi sono netti.
+ * Decide come ogni foto entra nel carosello e scrive src/data/fotoFit.js (node scripts/fit-foto.js).
+ * Ritaglio puntato sul soggetto; se non ci sta, le foto si tagliano e le grafiche piatte
+ * (pochi pixel sfumati) si mostrano intere.
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -31,10 +19,7 @@ const ESTREMO_STRETTO = 0.4
 
 const FOTOGRAFIA = 0.13 // quota di pixel sfumati sopra cui è uno scatto
 
-/*
- * Quello che la misura non prende: manifesti col fondo sfumato o con dentro una
- * foto, che alla conta dei pixel sembrano scatti. Si aggiunge a mano.
- */
+// Grafiche che la misura scambia per foto: sempre intere.
 const SEMPRE_INTERE = new Set([
   'in-the-box/cover.webp',
   'rilegno/cover.webp',
@@ -44,11 +29,7 @@ const SEMPRE_INTERE = new Set([
   'direzione-tolleranza/cover.webp',
 ])
 
-/*
- * Il ritaglio che la misura non può indovinare: uno scatto dove il soggetto
- * riempie tutto il fotogramma, quindi non c'è un riquadro da puntare, ma il
- * prodotto sta in un punto solo. Chiave '<slug>/<file>' → `object-position`.
- */
+// Ritaglio a mano, '<slug>/<file>' → object-position.
 const FUOCO_A_MANO = {
   // Primo piano del viso: centrata la cornice taglia gli occhi a metà, puntata
   // in basso inquadra bocca e prodotto.
@@ -117,11 +98,7 @@ async function misura(file) {
   }
 }
 
-/*
- * Quota di pixel che stanno su una transizione morbida: alta in una fotografia
- * (la luce degrada), bassa in una grafica piatta, dove si passa di netto da una
- * campitura all'altra.
- */
+// Quota di pixel su transizioni morbide: alta nelle foto, bassa nelle grafiche.
 async function quotaSfumati(file) {
   const { data, info } = await sharp(file)
     .resize(CAMPIONE, CAMPIONE, { fit: 'inside' })
@@ -144,22 +121,14 @@ async function quotaSfumati(file) {
   return sfumati / tot
 }
 
-/*
- * Quanta parte dell'immagine resta visibile riempiendo la cornice, per asse:
- * un'immagine più stretta della cornice si taglia in altezza e si vede tutta in
- * larghezza, una più larga il contrario. Quadrata come la cornice = tutta.
- */
+// Parte visibile dell'immagine per asse, riempiendo la cornice quadrata.
 function finestra(rapporto) {
   return rapporto < R_CORNICE
     ? { x: 1, y: rapporto / R_CORNICE }
     : { x: R_CORNICE / rapporto, y: 1 }
 }
 
-/*
- * Dove centrare la finestra lungo un asse (0–100) perché contenga il soggetto,
- * che sull'immagine va da `da` ad `a`. `ok` è falso quando il soggetto è più
- * grande della finestra: lì non c'è posizione che tenga.
- */
+// Posizione (0–100) che contiene il soggetto fra `da` e `a`; `ok` falso se non ci sta.
 function punta(visibile, da, a) {
   if (visibile >= 1) return { ok: true, pos: 50 }
   const largo = a - da
@@ -231,12 +200,8 @@ function decidi({ rapporto, sfumati, box }) {
   const testo = `/*
  * Generato da \`node scripts/fit-foto.js\` — non si modifica a mano.
  *
- * Come ogni foto entra nella cornice del carosello. Manca da qui tutto ciò che
- * riempie la cornice restando centrato: è il comportamento di base.
- *   fit: 'contain' → mostrata intera, il ritaglio le toglierebbe il soggetto
- *   pos: '<x>% <y>%' → riempie, ma il ritaglio è puntato sul prodotto
- *   fondo: '#rrggbb' → il colore del suo bordo, per coprire lo spazio che
- *     l'immagine intera lascia scoperto nella cella
+ * Come ogni foto entra nel carosello (assente = riempie centrata).
+ *   fit: 'contain' intera · pos: 'x% y%' ritaglio puntato · fondo: colore del bordo
  */
 export const fotoFit = ${JSON.stringify(voci, null, 2)}
 `

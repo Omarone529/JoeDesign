@@ -9,6 +9,9 @@ Estetica editoriale "Direzione A": carta/inchiostro, tipografia grande, molto bi
 griglie con bordi sottili. Mobile-first. Il sito è **bilingue** (italiano e inglese);
 codice e commenti restano in **italiano**.
 
+**Commenti brevi**: una o due righe sul perché non ovvio, niente storia delle decisioni.
+Le spiegazioni lunghe stanno qui, in CLAUDE.md.
+
 Stato: **in sviluppo, incompleto** — ci sono ancora sezioni e pagine da costruire (vedi "Da fare").
 
 ## Stack
@@ -780,9 +783,8 @@ chore: aggiornate le anteprime social dopo i nuovi progetti
 docs: CLAUDE.md, sezione immagini
 ```
 
-Una riga sola basta; il corpo serve solo quando *perché* non si capisce dal codice — e in
-questo progetto il perché sta quasi sempre nei commenti, che è il posto dove resta
-leggibile.
+Una riga sola basta; il corpo serve solo quando *perché* non si capisce dal codice. I
+commenti nel codice sono brevi: il perché esteso va in CLAUDE.md.
 
 **File dell'editor**: `.idea/`, `.vscode/` e `*.iml` sono in `.gitignore`. Erano
 versionati per sbaglio e sono stati tolti dall'indice (restano sul disco di chi ci
@@ -791,7 +793,7 @@ lavora): non rimetterli.
 ## Deploy (Netlify)
 
 - `netlify.toml`: build = `npm run build`, publish = `dist`.
-- **Header di sicurezza**, tutti in `netlify.toml` e commentati lì: oltre a `nosniff`,
+- **Header di sicurezza**, tutti in `netlify.toml`: oltre a `nosniff`,
   `X-Frame-Options`, `Referrer-Policy` e `Permissions-Policy` ci sono
   `Strict-Transport-Security` (un anno, **senza `preload`**: quella è una porta che non si
   richiude, va scelta apposta) e una **CSP** che elenca per intero le origini ammesse.

@@ -1,15 +1,4 @@
-/*
- * Versione inglese dei contenuti. `siteData.js` resta la fonte di verità: qui
- * ci sono solo i campi che cambiano lingua, agganciati per slug o per chiave.
- * Tutto il resto (immagini, anni, numero di foto, aree, ordine) viene da lì.
- *
- * I titoli dei progetti NON si traducono: sono i nomi delle opere, e “Sedia a
- * tempo determinato” su una scheda inglese resta quello che l'autore ha
- * chiamato così. Cambiano categoria, descrizione e voci della tabella.
- *
- * Registro: impersonale come in italiano — niente “I designed”, forme passive
- * o nominali.
- */
+// Campi inglesi, agganciati per slug o chiave. I titoli dei progetti non si traducono. Tono impersonale.
 
 export const profileEn = {
   role: 'Product Designer',
@@ -95,11 +84,7 @@ export const areeEn = {
   },
 }
 
-/*
- * Per slug: `cat`, `desc` e `spec` (con le chiavi già in inglese, così la
- * tabella non ha bisogno di alcuna traduzione a parte). Chi non compare qui
- * resta in italiano — e va tradotto appena il progetto entra in archivio.
- */
+// `cat`, `desc` e `spec` per slug. Un progetto assente resta in italiano.
 export const progettiEn = {
   'directional-arrow': {
     cat: 'Coat rack',

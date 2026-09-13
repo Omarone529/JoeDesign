@@ -1,22 +1,7 @@
 /*
- * Genera la variante da 800 px di ogni foto di `public/images/` e scrive
- * `src/data/varianti.js`, l'elenco che dice al sito quali immagini hanno una
- * seconda misura e quanto è larga l'originale.
- *
- *   node scripts/varianti-foto.js            # applica
- *   node scripts/varianti-foto.js --prova    # mostra e basta
- *
- * Perché: `comprimi-foto.js` porta l'archivio a 1600 px, che è la misura giusta
- * per un desktop retina. Un telefono però mostra quelle stesse foto dentro una
- * colonna da ~400 px CSS, e scaricando il file da 1600 ne butta via i tre
- * quarti. Con la variante da 800 px in `srcset` il browser sceglie da sé: chi
- * ha lo schermo grande continua a ricevere l'originale, chi legge dal telefono
- * scarica un terzo dei byte.
- *
- * Le varianti si riconoscono dal suffisso `-800` e sono escluse da
- * `comprimi-foto.js` e `fit-foto.js`: sono un prodotto derivato, non foto
- * d'archivio. Rilanciarlo è sicuro — una variante già aggiornata si salta, e
- * quelle rimaste orfane si cancellano.
+ * Varianti da 800px (-800) per srcset, e l'elenco in src/data/varianti.js. Rilanciabile: salta
+ * le aggiornate e cancella le orfane.
+ *   node scripts/varianti-foto.js [--prova]
  */
 import sharp from 'sharp'
 import fs from 'node:fs'
@@ -134,10 +119,7 @@ const ordinato = Object.fromEntries(Object.entries(manifesto).sort(([a], [b]) =>
 const intestazione = `/*
  * Generato da \`node scripts/varianti-foto.js\` — non si modifica a mano.
  *
- * Le foto che hanno accanto una variante da 800 px, con la larghezza del loro
- * originale. Serve a \`srcSetDi()\` in \`src/immagini.js\` per scrivere un srcset
- * con i descrittori giusti: senza la larghezza vera il browser non può
- * scegliere, e con una sbagliata sceglie male.
+ * Foto con variante da 800 px e larghezza dell'originale, per \`srcSetDi()\`.
  */
 export const LARGHEZZA_VARIANTE = ${LARGHEZZA}
 export const SUFFISSO_VARIANTE = '${SUFFISSO}'

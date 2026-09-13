@@ -1,12 +1,8 @@
 /*
  * Generato da `node scripts/fit-foto.js` — non si modifica a mano.
  *
- * Come ogni foto entra nella cornice del carosello. Manca da qui tutto ciò che
- * riempie la cornice restando centrato: è il comportamento di base.
- *   fit: 'contain' → mostrata intera, il ritaglio le toglierebbe il soggetto
- *   pos: '<x>% <y>%' → riempie, ma il ritaglio è puntato sul prodotto
- *   fondo: '#rrggbb' → il colore del suo bordo, per coprire lo spazio che
- *     l'immagine intera lascia scoperto nella cella
+ * Come ogni foto entra nel carosello (assente = riempie centrata).
+ *   fit: 'contain' intera · pos: 'x% y%' ritaglio puntato · fondo: colore del bordo
  */
 export const fotoFit = {
   "/images/products/anelli/sfondo.webp": {

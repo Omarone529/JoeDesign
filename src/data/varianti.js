@@ -1,10 +1,7 @@
 /*
  * Generato da `node scripts/varianti-foto.js` — non si modifica a mano.
  *
- * Le foto che hanno accanto una variante da 800 px, con la larghezza del loro
- * originale. Serve a `srcSetDi()` in `src/immagini.js` per scrivere un srcset
- * con i descrittori giusti: senza la larghezza vera il browser non può
- * scegliere, e con una sbagliata sceglie male.
+ * Foto con variante da 800 px e larghezza dell'originale, per `srcSetDi()`.
  */
 export const LARGHEZZA_VARIANTE = 800
 export const SUFFISSO_VARIANTE = '-800'

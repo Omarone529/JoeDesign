@@ -2,15 +2,8 @@ import { Component } from 'react'
 import { testi } from '../i18n'
 import { Link, percorso } from '../router'
 
-/*
- * Le pagine sono pre-renderizzate, quindi l'HTML arriva già leggibile: se un
- * componente lancia durante l'hydration React scarta quel markup buono e
- * lascia la pagina bianca. Il boundary mostra un'uscita invece del vuoto.
- * Avvolge solo la pagina — Navbar e Footer restano navigabili.
- *
- * È una classe, quindi la lingua non può arrivare da un hook: gliela passa App
- * insieme alla rotta.
- */
+// Se un componente lancia in hydration mostra un'uscita invece della pagina bianca. Solo attorno alla
+// pagina: Navbar e Footer restano. Classe, quindi la lingua arriva da App.
 export default class ErrorBoundary extends Component {
   state = { errore: false }
 

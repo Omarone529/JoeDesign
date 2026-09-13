@@ -30,22 +30,9 @@ const PIEGA_TOTALE_MAX = 1.15
 const PIEGA_INERZIA_MS = 40 // costante di tempo con cui la flessione insegue la velocità
 const GUTTER_OPACITA = 0.2 // ombra d'incavo lungo la costa, solo a libro aperto
 /*
- * Libro sfogliabile in 3D. Three.js e Anime.js (~225 kB gzip) si caricano solo
- * quando il widget si avvicina al viewport; finché la scena non è pronta — e
- * per sempre, se manca WebGL — resta la copertina statica.
- *
- * Ogni pagina è una striscia di M_COLONNE quadrilateri che ruota attorno alla
- * costa; al rilascio assesta una molla vera innescata dalla velocità del dito.
- *
- * Il libro è diviso in tre pezzi, e questo è quello che raccoglie il gesto e
- * decide di quanto muovere le pagine:
- *
- *   libro/geometria.js  la forma della piega — matematica pura, ha dei test
- *   libro/scena.js      Three.js: renderer, camera, luci, texture, smaltimento
- *   Sketchbook.jsx      questo: stato, trascinamento, molle, markup
- *
- * La regola per non rimescolarli: `geometria` non sa che esiste una scena,
- * `scena` non sa che esiste un dito, e qui non si scrive mai `new THREE.…`.
+ * Libro sfogliabile 3D: stato, trascinamento, molle, markup. Three.js e Anime.js si caricano
+ * vicino al viewport; senza WebGL resta la copertina. Forma in libro/geometria.js, scena in
+ * libro/scena.js: qui non si scrive mai `new THREE.…`.
  */
 export default function Sketchbook() {
   // Le tavole sono le stesse in entrambe le lingue: cambiano i testi alternativi.
@@ -66,11 +53,7 @@ export default function Sketchbook() {
   const wrapperRef = useRef(null)
   const mountRef = useRef(null) // div in cui Three.js monta il proprio <canvas>
 
-  /*
-   * Libro a riposo per una data apertura (0 = chiuso davanti, N = chiuso
-   * dietro); `salta` è la pagina in volo, che posiziona applicaAngolo. Tutto è
-   * funzione continua dell'apertura, così niente scatta a fine giro.
-   */
+  // Libro a riposo per un'apertura (0 chiuso davanti, N chiuso dietro); `salta` è la pagina in volo.
   const posizionaLibro = (apertura, salta = null) => {
     const tre = treRef.current
     if (!tre) return
@@ -148,10 +131,7 @@ export default function Sketchbook() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagina])
 
-  /*
-   * Ruota la pagina e ne ridisegna la geometria piegata. `verso` (1 avanti, -1
-   * indietro) la inarca dalla parte giusta: i due giri non sono lo stesso.
-   */
+  // Ruota e piega la pagina; `verso` (1 avanti, -1 indietro) sceglie da che parte inarcarla.
   const applicaAngolo = (indice, angolo, verso) => {
     // Oltre 0° e -180° ci sono le pile: la molla in overshoot le attraverserebbe.
     const rotazione = Math.min(0, Math.max(-180, angolo))
@@ -206,10 +186,7 @@ export default function Sketchbook() {
     tre.richiediRender()
   }
 
-  /*
-   * Applica SOLO la flessione residua a una pagina ferma a fine corsa: la usa
-   * il flutter, quando angolo e profondità sono già quelli di riposo.
-   */
+  // Solo la flessione residua di una pagina ferma (per il flutter).
   const applicaPiegaResidua = (indice, extra) => {
     const tre = treRef.current
     if (!tre) return
@@ -222,10 +199,7 @@ export default function Sketchbook() {
     tre.richiediRender()
   }
 
-  /*
-   * Scarica la flessione residua dell'atterraggio con una molla poco smorzata:
-   * il fruscio della carta. Non blocca l'interazione, `inCorso` resta falso.
-   */
+  // Molla poco smorzata che scarica la flessione dell'atterraggio. Non blocca l'interazione.
   const avviaFlutter = (indice) => {
     const daExtra = piega.current.extra
     piega.current.extra = 0
@@ -246,10 +220,7 @@ export default function Sketchbook() {
     flutter.current = { anim, stato, indice }
   }
 
-  /*
-   * Ferma un flutter prima di una nuova interazione. Se riguardava la pagina
-   * che si sta per muovere ne eredita la flessione, o la geometria salterebbe.
-   */
+  // Ferma un flutter; se riguarda la pagina da muovere, ne eredita la flessione.
   const fermaFlutter = (indice) => {
     const f = flutter.current
     if (!f) return
@@ -258,11 +229,7 @@ export default function Sketchbook() {
     flutter.current = null
   }
 
-  /*
-   * Cedimento elastico di TUTTO il libro quando si sfoglia oltre le copertine:
-   * un libro vero non ruota la copertina attraverso la pila, al massimo si
-   * sposta un po' tutto insieme.
-   */
+  // Oltre le copertine cede tutto il libro, non la copertina attraverso la pila.
   const applicaCedimentoLibro = (rad) => {
     const tre = treRef.current
     if (!tre) return
@@ -289,11 +256,7 @@ export default function Sketchbook() {
     })
   }
 
-  /*
-   * Assesta la pagina `indice` fino ad `aAngolo` con una molla fisica reale
-   * (Anime.js `spring`), innescata dalla velocità del gesto — 0 da tastiera o
-   * da clic. La durata la decide la molla, non un tempo fisso.
-   */
+  // Molla Anime.js fino ad `aAngolo`, innescata dalla velocità del gesto.
   const assesta = (indice, verso, aAngolo, cambiaPagina, velocita = 0) => {
     const da = angoli.current[indice]
     const chiudi = () => {
@@ -322,11 +285,7 @@ export default function Sketchbook() {
     })
   }
 
-  /*
-   * Giro completo, da tastiera o da clic. Il controllo su `treRef`: Anime.js
-   * carica prima delle texture, e in quella finestra la molla animerebbe
-   * `pagina` a vuoto — lo stato avanza, la rotazione non si applica.
-   */
+  // Giro completo da tastiera o clic. Serve `treRef`: Anime.js arriva prima delle texture.
   const gira = (verso) => {
     if (!treRef.current) return
     if (inCorso.current || trascinamento.current) return
@@ -466,14 +425,7 @@ export default function Sketchbook() {
           }}
         >
           <div className="relative aspect-square w-full sm:aspect-[2000/1415]">
-            {/* Copertina di scorta, sempre nel markup: senza JS il libro non
-                si sfoglia comunque, quindi mostrarla chiusa è corretto. Sparisce
-                quando la scena è pronta, resta se manca WebGL. Centrata come la
-                inquadra `inquadra()`, e alta quanto MARGINE_CAMERA le concede
-                (≈89.3% del riquadro) più l'1% di prospettiva: sta in cima alla
-                pila, un filo più vicina alla camera. La larghezza viene dal
-                rapporto della tavola, così sta in riga sia sul riquadro
-                quadrato del telefono sia su quello panoramico. */}
+            {/* Copertina di scorta finché la scena non è pronta (o senza WebGL), allineata a `inquadra()`. */}
             <picture>
               {/* Sul telefono anche la scorta prende la tavola a mezza misura:
                   è la stessa che poi userà la scena, quindi è già in cache. */}

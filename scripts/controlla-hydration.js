@@ -1,35 +1,7 @@
 /*
- * Controlla che l'aggancio di React alle pagine pre-renderizzate non si rompa.
- *
- *   npm run hydration          # tutte le rotte
- *   npm run hydration -- --rompi   # autotest: rompe apposta, DEVE fallire
- *
- * Cos'è l'hydration. Il sito viene servito due volte: prima l'HTML statico
- * scritto in build (che è ciò che vede Google e ciò che si legge subito), poi
- * React si aggancia a quel markup invece di ridisegnarlo, per attaccarci i
- * gestori di eventi. L'aggancio riesce a una condizione: quello che React
- * disegna in memoria deve combaciare con l'HTML che trova. Se non combacia,
- * React butta via il markup buono e ridisegna tutto nel browser — la pagina
- * lampeggia, il lavoro del pre-rendering è sprecato, e se un componente lancia
- * durante l'aggancio la pagina resta bianca (per quello c'è `ErrorBoundary`).
- *
- * Perché serve un controllo. Il codice è pieno di decisioni prese apposta per
- * non romperlo, e nessuna di esse è evidente guardando il file: l'anno del
- * copyright fissato alla build (`__ANNO_BUILD__` in vite.config.js), il
- * consenso che in pre-rendering vale sempre `null` (`versioneServer` in
- * consenso.js), il banner che non entra nell'HTML statico (`useMontato`), la
- * navbar che parte visibile, la prima slide del carosello che è l'unica con un
- * `src`. Basta un `new Date()` dentro un componente, o uno stato iniziale che
- * legge `localStorage`, e uno di quei contratti salta senza che nulla protesti.
- *
- * Come li vede. In produzione React non stampa gli avvisi leggibili dello
- * sviluppo: segnala gli errori recuperabili con `reportError`, che emette un
- * evento 'error' su window, e li si riconosce dai codici React #418 (l'HTML
- * non combacia), #423 e #425. Si ascoltano quelli, più le eccezioni.
- *
- * ⚠️ NON è agganciato a `prebuild`: gli serve un browser e un server avviato,
- * che su Netlify non ci sono. Va lanciato a mano dopo aver toccato qualcosa di
- * sensibile all'aggancio. Dura un paio di minuti.
+ * Verifica che React si agganci alle pagine pre-renderizzate senza ridisegnarle (errori #418,
+ * #423, #425). npm run hydration; `-- --rompi` è l'autotest e deve fallire.
+ * Serve build e Chromium: non è in prebuild. Vedi CLAUDE.md.
  */
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
@@ -126,12 +98,7 @@ await cdp('Page.enable')
 // produzione segnala gli errori recuperabili dell'aggancio.
 let iniezione = `window.__hy=[];addEventListener('error',e=>{window.__hy.push('window.error: '+((e.error&&(e.error.message||e.error))||e.message))});`
 if (ROMPI) {
-  /*
-   * Autotest. Altera il DOM pre-renderizzato PRIMA che React si agganci, così
-   * quello che trova non è più quello che si aspetta. Serve a dimostrare che
-   * il rilevatore vede davvero: un controllo che non fallisce mai non
-   * controlla niente. Con `--rompi` OGNI pagina deve risultare rotta.
-   */
+  // Autotest: altera il DOM prima dell'aggancio. Con --rompi ogni pagina deve risultare rotta.
   iniezione += `new MutationObserver((m,o)=>{const r=document.getElementById('root');
     if(r&&r.firstElementChild){const h=r.querySelector('h1,h2,div');
       if(h){h.append(document.createTextNode(' GUASTO'));o.disconnect()}}}).observe(document,{childList:true,subtree:true});`

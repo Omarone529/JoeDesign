@@ -21,12 +21,7 @@ import { srcSetDi, MISURE } from '../immagini'
 const SFONDO_W = 1672
 const SFONDO_H = 941
 
-/*
- * Testo e carosello allineati in cima alla stessa riga di griglia, così la foto
- * parte dall'altezza del titolo e non da quella della descrizione. Da xl la
- * colonna foto pesa più di quella del testo; sotto, metà e metà, o il testo si
- * strozza.
- */
+// Testo e carosello allineati in cima; da xl la colonna foto è più larga.
 export default function ProjectDetail({ slug }) {
   const lang = useLang()
   const T = testi(lang)
@@ -35,18 +30,7 @@ export default function ProjectDetail({ slug }) {
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
   const { gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
-  /*
-   * Il reel sta nel carosello, non in una sezione tutta sua: il formato
-   * verticale è l'unico della pagina e da solo lascerebbe mezza griglia vuota.
-   * La cornice quadrata lo mostra intero su fondo scuro (vedi Carousel).
-   *
-   * Ed è la PRIMA slide, perché parte da sola all'apertura della scheda (vedi
-   * Carousel): un reel che comincia a giocare è il modo in cui questi filmati
-   * si guardano, e in fondo alla galleria non lo vedeva nessuno. L'immagine
-   * misurata come LCP diventa quindi la miniatura del video — non è un danno di
-   * ranking, l'LCP è un tempo e la miniatura pesa quanto una foto, ma è bene
-   * saperlo prima di rimescolare l'ordine.
-   */
+  // Il reel è la prima slide del carosello (parte da solo); diventa quindi l'immagine LCP.
   // `ai`: l'etichetta AI Act della singola foto, quando c'è (vedi `aiFoto`).
   // La numerazione parte da 1, come i file 01.webp…NN.webp.
   const foto = gallery.map((src, i) => ({
@@ -57,10 +41,7 @@ export default function ProjectDetail({ slug }) {
   const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
   const slides = [...reel, ...foto]
 
-  /*
-   * Precedente e successivo restano dentro l'area: uscendo da una griglia di
-   * graphic design, il "successivo" non può essere un appendiabiti.
-   */
+  // Precedente e successivo restano dentro l'area.
   const area = areeIn(lang).find((a) => a.chiave === areaDi(item))
   const vicini = archivio.filter((p) => areaDi(p) === areaDi(item))
   const i = vicini.findIndex((p) => p.slug === slug)
@@ -182,15 +163,7 @@ export default function ProjectDetail({ slug }) {
         </section>
       )}
 
-      {/* Il filmato orizzontale sta qui e non nel carosello: il 16:9 nella
-          cornice quadrata tornerebbe con due bande, e soprattutto è un video da
-          guardare per intero, non una slide fra le altre. Fascia gemella di
-          quella dello sfondo che le sta sotto — stesso filetto, stessa colonna
-          — perché sono le due chiusure della scheda e una cornice diversa le
-          farebbe sembrare di due pagine diverse.
-
-          Parte solo premendo play, anche con il consenso dato: vedi
-          FilmatoProgetto. */}
+      {/* Filmato 16:9 in fondo, fuori dal carosello. Parte solo col play. */}
       {filmatoPoster && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <figure className="m-0 border-t border-line pt-6">

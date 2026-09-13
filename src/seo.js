@@ -1,9 +1,4 @@
-/*
- * Le estensioni `.js` sono esplicite di proposito. Dentro il sito le
- * risolverebbe Vite anche senza, ma questo file lo legge anche Node — i test e
- * gli script — e Node le pretende. È la stessa scelta già fatta in
- * `data/siteData.js`.
- */
+// Estensioni `.js` esplicite: questo file lo legge anche Node (test e script).
 import {
   aboutIn,
   archivioIn,
@@ -26,22 +21,8 @@ import { LINGUE, testi } from './i18n.js'
 import { percorso, percorsoTradotto } from './rotte.js'
 
 /*
- * Metadati per rotta: meta tag, dati strutturati, immagini della sitemap.
- * Li scrive nelle pagine `scripts/prerender.js`, che qui non decide nulla.
- *
- * Il sito è bilingue e ogni pagina esiste due volte, una per lingua: qui la
- * lingua arriva sempre dalla rotta (`route.lang`), e da lì scendono titolo,
- * descrizione, `inLanguage`, l'anteprima social e gli hreflang che legano le
- * due versioni. Nessuna pagina si descrive nella lingua dell'altra.
- *
- * SITE lo passa Netlify al deploy nella env `URL`, quindi segue da sé il
- * dominio vero. Per forzarlo: `SITE_URL=https://miodominio.it npm run build`.
- *
- * Il valore di scorta è il dominio del sito, non quello di Netlify: serve alle
- * build fatte a mano, dove la env non c'è, e scrivere lì l'indirizzo `.netlify`
- * significherebbe pubblicare canonical e sitemap che rimandano altrove. Deve
- * combaciare con il dominio primario impostato su Netlify, apex compreso: se là
- * il primario diventa `www`, va cambiato anche qui.
+ * Metadati per rotta (meta, dati strutturati, sitemap), serializzati da prerender.js.
+ * SITE viene dalla env `URL` di Netlify; il ripiego deve combaciare col dominio primario.
  */
 const ENV_SITE =
   (typeof process !== 'undefined' &&
@@ -61,11 +42,7 @@ const PERIODO = periodoArchivio
     : `${periodoArchivio.primo} · ${periodoArchivio.ultimo}`
   : ''
 
-/*
- * Le schede ancora senza testo (`desc: ''`) avrebbero una meta description
- * vuota, che vale meno di niente: qui il ripiego dice almeno oggetto, anno e
- * autore. Appena la descrizione c'è, vince quella.
- */
+// Ripiego per le schede senza `desc`: oggetto, anno e autore.
 function descrizioneProgetto(item, lang) {
   if (item.desc?.trim()) return item.desc
   const p = profiloIn(lang)
@@ -80,12 +57,7 @@ function descrizioneProgetto(item, lang) {
   )
 }
 
-/*
- * Meta description entro `max` caratteri. Prima si prova a chiudere su una
- * frase intera: nella SERP «…il fulcro del prodotto, conferendogli un forte…»
- * si legge peggio di una frase che finisce. Se nemmeno la prima frase ci sta,
- * allora si taglia sull'ultima parola e si mettono i puntini.
- */
+// Taglia a `max` caratteri, preferendo chiudere su una frase intera.
 export function clip(text, max = 155, min = 80) {
   const t = String(text).replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
@@ -101,20 +73,12 @@ export function clip(text, max = 155, min = 80) {
   return t.slice(0, max - 1).replace(/\s+\S*$/, '').trim() + '…'
 }
 
-/*
- * JPEG e non le WebP del sito: LinkedIn e WhatsApp non le mostrano, e il link
- * condiviso uscirebbe senza immagine. Le prepara `scripts/og-image.js`, che
- * scrive le italiane in /images/og/ e le inglesi in /images/og/en/.
- */
+// JPEG, non WebP: LinkedIn e WhatsApp non mostrano le WebP.
 const ogImage = (nome, lang) => abs(`/images/og/${lang === 'en' ? 'en/' : ''}${nome}.jpg`)
 
 const FIRMA = `${profile.name} “${profile.nick}”`
 
-/*
- * Sempre il nome per esteso: le schede sono la maggior parte del sito, e con
- * il solo "Joe" non risponderebbero a chi cerca "Giovanni Sarchiolla". Oltre i
- * ~62 caratteri Google tronca, quindi la categoria cade per prima.
- */
+// Nome per esteso nel title; oltre ~62 caratteri cade prima la categoria.
 function titoloProgetto(item) {
   const nome = titoloLeggibile(item.title)
   const pieno = `${nome} · ${item.cat} · ${FIRMA}`
@@ -130,12 +94,7 @@ function periodoTesto(periodo) {
     : `${periodo.primo} · ${periodo.ultimo}`
 }
 
-/*
- * Le due versioni della stessa pagina, più `x-default` che indica quale
- * servire a chi non dichiara una lingua: l'italiano, che è la lingua del
- * lavoro e del dominio. Senza queste righe Google vedrebbe due pagine
- * concorrenti sullo stesso contenuto invece di due traduzioni.
- */
+// hreflang delle due lingue, con x-default sull'italiano.
 function alternative(route) {
   if (route.name === 'notfound') return []
   return [
@@ -234,11 +193,7 @@ export function metaForRoute(route) {
     }
   }
 
-  /*
-   * L'anteprima social è quella della home: `og-image.js` non genera un
-   * riquadro per la privacy, e un'informativa non si condivide come un
-   * progetto — ma il link, se qualcuno lo incolla, non deve uscire spoglio.
-   */
+  // Anteprima social della home: og-image.js non ne genera una per la privacy.
   if (route.name === 'privacy') {
     return {
       ...comuni,
@@ -291,16 +246,7 @@ export function allRoutes() {
 
 /* ─────────────────────────── Dati strutturati ─────────────────────────── */
 
-/*
- * Un grafo per pagina. Le entità hanno un `@id` stabile e si richiamano invece
- * di ridescriversi: così tutte le schede risultano di una persona sola, e non
- * di venticinque omonimi.
- *
- * Sito e persona hanno un `@id` unico anche fra le due lingue — la persona è
- * la stessa, e sdoppiarla darebbe due designer omonimi. Cambia solo il testo
- * con cui ogni pagina la descrive. Le raccolte e le opere, che sono pagine,
- * hanno invece un `@id` per lingua: sono due URL distinti e indicizzabili.
- */
+// Un @graph per pagina: sito e persona hanno un @id unico, pagine e opere uno per lingua.
 const ID_SITO = `${SITE}/#sito`
 const ID_PERSONA = `${SITE}/#persona`
 const idArchivio = (lang) => `${url('archive', {}, lang)}#raccolta`
@@ -381,13 +327,7 @@ function nodoProgetto(item, meta) {
   }
 }
 
-/*
- * Copia essenziale del nodo archivio. Le schede e le pagine d'area dichiarano
- * `isPartOf` verso l'archivio della loro lingua, ma quel nodo è descritto per
- * intero solo in /archivio: senza questa copia il rimando resterebbe a vuoto,
- * e un validatore lo segnala. Poche righe, e ogni @id citato nella pagina è
- * anche definito.
- */
+// Copia minima del nodo archivio, così ogni @id citato nella pagina è anche definito.
 function rimandoArchivio(lang) {
   return {
     '@type': 'CollectionPage',
@@ -500,26 +440,11 @@ export function schemaForRoute(route, meta) {
   return { '@context': 'https://schema.org', '@graph': grafo }
 }
 
-/*
- * Per un portfolio Google Immagini vale quanto la ricerca per testo: senza
- * queste righe le foto si scoprono solo passando dalla pagina che le ospita.
- *
- * Prende la rotta già interpretata: le stesse immagini valgono per entrambe le
- * lingue, ma ogni URL dichiara le proprie — la pagina inglese è una pagina a
- * sé, e in sitemap deve portarsi dietro le sue.
- */
+// Immagini per la sitemap: ogni URL, anche inglese, dichiara le proprie.
 export function immaginiPerRotta(route) {
   const lang = route.lang || 'it'
 
-  /*
-   * La foto del manifesto e le anteprime dei lavori selezionati. Il ritratto in cima
-   * alla home invece no: è decorativo e ha `alt` vuoto per questo, e dichiararlo
-   * qui lo proporrebbe a Google Immagini senza la descrizione che Google si
-   * aspetta di trovare nell'alt, un'immagine muta in un indice che vive di
-   * didascalie. Le anteprime dei lavori l'alt ce l'hanno, e da quando non sono
-   * più le copertine d'archivio questa è l'unica pagina che le contiene: senza
-   * questa riga cinque fotografie non entrerebbero in sitemap da nessuna parte.
-   */
+  // Foto del manifesto e anteprime dei selezionati. Il ritratto in cima no: ha alt vuoto.
   if (route.name === 'home') {
     return [manifestoFoto.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
   }

@@ -1,22 +1,8 @@
 import { useSyncExternalStore } from 'react'
 
 /*
- * La scelta sui video di YouTube, tenuta fuori da React perché la leggono più
- * componenti (il carosello e la pagina privacy) e non si passa di padre in
- * figlio: non c'è un padre comune.
- *
- * Tre stati: `null` = non ha ancora scelto, 'si' = i video possono partire da
- * soli, 'no' = restano fermi. In `null` e in 'no' il comportamento è lo stesso
- * — nessun contatto con YouTube finché non si preme play — ma vanno distinti,
- * o il banner tornerebbe a chiedere a chi ha già risposto di no.
- *
- * Sta in `localStorage` e non in un cookie: è una preferenza tecnica, serve a
- * NON caricare roba di terzi, e non segue chi naviga da nessuna parte.
- *
- * `useSyncExternalStore` e non uno `useState` in `useEffect`: il pre-rendering
- * non ha `localStorage`, e `versioneServer` gli dà `null`, cioè lo stato in cui
- * nulla di esterno si carica. L'HTML statico è quindi lo stesso per tutti, e in
- * hydration React passa al valore vero senza disallineamenti.
+ * Scelta sui video YouTube: null (non scelto), 'si', 'no'. In localStorage, letta con
+ * useSyncExternalStore: in pre-rendering vale null, così l'HTML statico è uguale per tutti.
  */
 const CHIAVE = 'joe:consenso-video'
 
@@ -60,14 +46,7 @@ export function useConsensoVideo() {
   return useSyncExternalStore(iscrivi, consensoVideo, versioneServer)
 }
 
-/*
- * `false` in pre-rendering e alla prima resa, `true` dopo l'hydration.
- *
- * Serve al banner: l'HTML statico è uno solo per tutti e non sa cosa si è già
- * risposto, quindi disegnandolo lì chi ha già scelto se lo vedrebbe comparire e
- * sparire a ogni visita. E senza JavaScript non si carica nessun video, quindi
- * non c'è niente da consentire e il banner non ha ragione di esserci.
- */
+// false in pre-rendering e al primo render, true dopo l'hydration.
 const nonCambiaMai = () => () => {}
 const vero = () => true
 const falso = () => false
@@ -76,13 +55,7 @@ export function useMontato() {
   return useSyncExternalStore(nonCambiaMai, vero, falso)
 }
 
-/*
- * Il banner è in pagina finché non si è risposto — e solo dopo l'hydration, per
- * la ragione qui sopra. Sta qui e non dentro il banner perché non è l'unico a
- * doverlo sapere: il tasto mail flottante si toglie di mezzo finché la fascia
- * c'è, o si ritroverebbe sotto, e un dito che va a cercarlo finirebbe su
- * "Accetta". Un consenso preso per sbaglio è peggio di un consenso non chiesto.
- */
+// Banner in pagina (dopo l'hydration, senza risposta). Lo legge anche il tasto mail, che si nasconde.
 export function useBannerAperto() {
   const montato = useMontato()
   const consenso = useConsensoVideo()

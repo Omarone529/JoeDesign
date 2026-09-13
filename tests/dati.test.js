@@ -1,8 +1,4 @@
-/*
- * Gli aiutanti di `siteData` che producono testo visibile o dichiarazioni di
- * legge. La coerenza fra dati e file su disco la controlla
- * `scripts/verifica.js`, che gira prima di ogni build: qui c'è solo la logica.
- */
+// Aiutanti di siteData (titoli, etichette AI, periodi). Dati ↔ file li controlla verifica.js.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { aiFoto, periodoDi, titoloLeggibile } from '../src/data/siteData.js'

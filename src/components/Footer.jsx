@@ -11,12 +11,7 @@ const ANNO = __ANNO_BUILD__
 // fuori scala non genera la classe — il bordo resterebbe pieno.
 const FILETTO = 'border-paper/10'
 
-/*
- * Il testo secondario di questo file è `night-soft` e non `muted`: sono lo
- * stesso ruolo su fondi opposti. `muted` è tarato per leggersi sulla carta e
- * sul nero del footer scenderebbe a 3.77:1, sotto il minimo AA; `night-soft`
- * fa 11.47:1 ed è già il colore delle icone social qui sotto.
- */
+// Testo secondario `night-soft`, non `muted`: sul nero `muted` scende sotto AA.
 
 /* Fa anche da pagina contatti, che come rotta non esiste. */
 export default function Footer() {
@@ -146,16 +141,7 @@ export default function Footer() {
   )
 }
 
-/*
- * I `before` sui link qui sopra allargano il bersaglio senza spostare niente:
- * una riga di testo da 13px è alta venti pixel, le icone social venti per venti,
- * e col dito non si prendono. Il padding non andava bene: la sottolineatura è
- * ancorata al fondo del link e sarebbe scesa sotto lo spazio vuoto.
- *
- * Lo stacco fra "Privacy" e "Torna su" è di 16px e non di 12 perché i due
- * bersagli allargati si toccano esattamente lì: a 12 si sovrapponevano, e nella
- * striscia in comune il tocco finiva sempre sul secondo.
- */
+// `before` allarga i bersagli senza spostare la sottolineatura. "Privacy" e "Torna su" a 16px per non accavallarli.
 
 /* Va in un contenitore `relative` dentro un elemento `group`. */
 function Sottolineatura() {

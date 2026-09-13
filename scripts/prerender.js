@@ -1,15 +1,4 @@
-/*
- * Pre-rendering statico. Per ogni rotta renderizza la pagina React, la inietta
- * nel template di dist/index.html con i suoi meta tag, e la salva al percorso
- * giusto (dist/progetto/flue/index.html). Poi le 404 e la sitemap.
- *
- * Il sito è bilingue: le stesse rotte esistono in italiano nella radice e in
- * inglese sotto /en, e ogni pagina dichiara sé stessa e la propria gemella
- * (hreflang) così Google le tratta come traduzioni e non come doppioni.
- *
- * Così Google e le anteprime dei link vedono il contenuto senza eseguire JS.
- * I meta e i dati strutturati vengono da `src/seo.js`: qui non si decide nulla.
- */
+// Pre-rendering: HTML statico per ogni rotta in it/en, 404 e sitemap. Metadati da src/seo.js.
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -124,12 +113,7 @@ for (const pathname of routes) {
   console.log(`  ✓ ${pathname}  →  ${path.relative(root, file)}`)
 }
 
-/*
- * Fuori da `allRoutes()`, quindi fuori dalla sitemap. Il nome dev'essere questo
- * e stare nella radice: è il file che Netlify serve con status 404. Quella
- * inglese sta in /en/404.html e la serve la regola in netlify.toml: chi sbaglia
- * un indirizzo sotto /en non deve trovarsi davanti una pagina in italiano.
- */
+// 404 fuori dalla sitemap. /en/404.html la serve la regola in netlify.toml.
 fs.writeFileSync(path.join(distDir, '404.html'), buildPage('/404'), 'utf8')
 console.log(`  ✓ 404  →  dist/404.html`)
 
@@ -137,24 +121,11 @@ fs.mkdirSync(path.join(distDir, 'en'), { recursive: true })
 fs.writeFileSync(path.join(distDir, 'en', '404.html'), buildPage('/en/404'), 'utf8')
 console.log(`  ✓ 404 (en)  →  dist/en/404.html`)
 
-/*
- * Niente `changefreq` né `priority`, che Google ignora da anni. Niente
- * `lastmod`: qui varrebbe la data della build, che cambia a ogni deploy anche
- * a contenuti identici, e un "modificato oggi" su tutte le pagine fa scartare
- * il campo per l'intero sito. Quando l'archivio avrà date vere, allora sì.
- *
- * Dentro `<image:image>` va il solo `<image:loc>`: `image:title` e compagnia
- * sono deprecati dal 2022 e ignorati. La descrizione Google la prende dall'alt
- * nella pagina, ed è per questo che gli alt sono scritti bene in `siteData`.
- */
+// Niente changefreq, priority né lastmod. In <image:image> solo <image:loc>: il resto è deprecato.
 const IMG_NS = 'http://www.google.com/schemas/sitemap-image/1.1'
 const XHTML_NS = 'http://www.w3.org/1999/xhtml'
 
-/*
- * Ogni URL porta i propri `xhtml:link`: sono la stessa cosa degli hreflang
- * nell'head, ripetuti qui perché Google li vuole in entrambi i posti per
- * riconoscere due pagine come traduzioni l'una dell'altra.
- */
+// xhtml:link di traduzione, come gli hreflang nell'head.
 const voceSitemap = (r) => {
   const route = parsePath(r)
   const meta = metaForRoute(route)

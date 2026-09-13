@@ -1,14 +1,6 @@
 /*
- * Rimuove lo sfondo da una foto (segmentazione AI) e salva un WebP con
- * trasparenza, ridimensionato per il web.
- *
- * ⚠️ @imgly/background-removal-node NON è in package.json: pesa 174 MB e
- * Netlify lo scaricherebbe a ogni build pur non servendo al sito. Serve solo
- * qui, una tantum, quindi si installa al volo senza salvarlo:
- *
- *   npm i --no-save @imgly/background-removal-node
- *
- * Uso:
+ * Scontorna una foto (segmentazione AI) → WebP con trasparenza.
+ * ⚠️ Libreria fuori da package.json (174 MB): npm i --no-save @imgly/background-removal-node
  *   node scripts/remove-bg.js <sorgente> <destinazione.webp> [larghezzaMax] [qualità]
  */
 import sharp from 'sharp'
@@ -49,21 +41,7 @@ const { data, info } = await sharp(png)
 
 cleanStraySpecks(data, info.width, info.height)
 
-/*
- * Maschera netta.
- *
- * ⚠️ Serve quando il ritaglio finisce SOPRA a qualcosa — un titolo, un'altra
- * foto — e non su fondo pieno. La segmentazione lascia il soggetto opaco al 90%
- * e ne sfuma i bordi morbidi su decine di pixel: su fondo carta non si vede
- * niente, ma con del testo dietro quel testo TRASPARE, e si legge in filigrana
- * attraverso la figura. Nella testata di "Chi sono" il ritratto scavalca il
- * titolo, e senza questo passaggio "ALTRO" si leggeva attraverso la manica.
- *
- * La soglia sta a metà della rampa, non in cima: presa a 190 tagliava il bordo
- * morbido della manica dov'era ancora quasi opaco e lasciava un margine
- * frastagliato. A 110 il taglio cade dove l'occhio vede il bordo, e la
- * sfocatura che segue gli ridà l'antialiasing che la soglia gli aveva tolto.
- */
+// Maschera netta (soglia 110, poi sfocatura): senza, il testo dietro il ritaglio traspare.
 const alpha = Buffer.alloc(info.width * info.height)
 for (let i = 0; i < alpha.length; i += 1) alpha[i] = data[i * 4 + 3] >= 110 ? 255 : 0
 const raw1 = { width: info.width, height: info.height, channels: 1 }
@@ -78,10 +56,7 @@ await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 }
 const kb = (fs.statSync(dest).size / 1024).toFixed(0)
 console.log(`✓ ${path.basename(dest)}  ${kb} KB (con trasparenza)`)
 
-/*
- * Tiene la sola componente connessa più grande, il soggetto: toglie i puntini
- * e gli aloni staccati che la segmentazione si lascia dietro.
- */
+// Tiene solo la componente connessa più grande, il soggetto.
 function cleanStraySpecks(data, W, H) {
   const T = 24 // soglia alpha per considerare un pixel "pieno"
   const N = W * H

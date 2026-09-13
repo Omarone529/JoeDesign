@@ -34,14 +34,7 @@ function Intestazione({ sinistra, destra }) {
   )
 }
 
-/*
- * La forma delle celle della griglia. Le copertine di prodotto sono quadrate o
- * quasi; quelle grafiche sono manifesti verticali (7:10), e in una cella
- * quadrata restavano una striscia stretta fra due fasce vuote. Il bivio invece
- * tiene le due celle quadrate, perché le due carte devono restare uguali: lì
- * il manifesto sta al centro e il colore del suo bordo (`fondo` in `fotoFit`)
- * copre lo spazio che avanza ai lati.
- */
+// Celle grafiche verticali (7:10); nel bivio restano quadrate, con il colore `fondo` ai lati.
 function formaCella(area) {
   return area.chiave === 'graphic' ? 'aspect-[7/10]' : 'aspect-square'
 }
@@ -56,11 +49,7 @@ function Titolo({ children }) {
   )
 }
 
-/*
- * Il bivio: /archivio non mostra più tutto insieme, ma le due aree. La cella
- * porta la copertina del progetto più recente dell'area — la stessa immagine
- * che si ritrova in prima riga entrando, così la scelta è già un'anteprima.
- */
+// /archivio: le due aree, ognuna con la copertina del suo progetto più recente.
 function Bivio() {
   const lang = useLang()
   const T = testi(lang)
@@ -110,12 +99,7 @@ function Bivio() {
                       fit?.fit === 'contain' ? 'object-contain' : 'object-cover'
                     }`}
                   />
-                  {/*
-                   * Il nome dell'area sta sopra la copertina, come il numero di
-                   * tavola nella griglia dei progetti. Dove c'è il puntatore
-                   * compare al passaggio; dove non c'è (touch) resta sempre
-                   * visibile, altrimenti le due carte sarebbero senza nome.
-                   */}
+                  {/* Nome dell'area: al passaggio col puntatore, sempre visibile al tocco. */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/35 opacity-100 transition-all duration-300 hover-fine:bg-ink/0 hover-fine:opacity-0 hover-fine:group-hover:bg-ink/35 hover-fine:group-hover:opacity-100">
                     <h2 className="m-0 px-4 text-center text-[clamp(22px,3.4vw,40px)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-paper">
                       {area.label}

@@ -1,11 +1,4 @@
-/*
- * Testi dell'interfaccia nelle due lingue del sito. I *contenuti* (progetti,
- * bio, manifesto) stanno in `data/siteData.js` e `data/contenutiEn.js`: qui ci
- * sono solo le parole che il sito dice di suo — voci di menù, etichette,
- * frecce, testi di servizio.
- *
- * Questo file non importa niente: lo usano sia i componenti sia `seo.js`.
- */
+// Testi dell'interfaccia in it/en. Non importa niente: lo usano componenti, seo.js e script.
 
 export const LINGUE = ['it', 'en']
 export const LINGUA_PREDEFINITA = 'it'
@@ -65,15 +58,8 @@ const TESTI = {
 
     chiSono: {
       occhiello: 'Chi sono',
-      /* Le due righe della testata. Sono l'unico punto del sito in prima
-         persona: è la firma con cui Joe si presenta, non un testo di pagina.
-         `…Em` è quanto la riga misura in em — Helvetica Neue BOLD maiuscolo con
-         `tracking-[-0.03em]` — e serve a due cose in About.jsx: dare a tutte e
-         due le righe la stessa larghezza, e tenere quella larghezza uguale
-         nelle due lingue nonostante le stringhe siano diverse. ⚠️ Cambiando il
-         testo, il peso o il tracking vanno rimisurate, o le righe si
-         disallineano. Si misurano in pagina con un Range sul contenuto della
-         riga, diviso il suo font-size. */
+      /* Unico testo in prima persona. `…Em` = larghezza della riga in em (Helvetica bold, tracking
+      -0.03em): ⚠️ va rimisurata cambiando testo, peso o tracking. */
       heroNome: 'Sono Joe',
       heroNomeEm: 4.966,
       heroRuolo: 'Product designer',
@@ -114,11 +100,7 @@ const TESTI = {
       tornaSu: 'Torna su',
     },
 
-    /*
-     * Il banner cookie e privacy. Dice quello che davvero succede: «usiamo i
-     * cookie per migliorare la tua esperienza» qui sarebbe falso, perché
-     * cookie non ce ne sono, e non spiegherebbe niente a nessuno.
-     */
+    // Banner cookie e privacy: dice solo ciò che succede davvero.
     banner: {
       occhiello: 'Cookie e privacy',
       aria: 'Cookie e privacy',
@@ -148,22 +130,8 @@ const TESTI = {
 
 
     /*
-     * Informativa privacy. È un testo di servizio come la 404, quindi sta qui
-     * e non in `siteData`: non è un contenuto del portfolio.
-     *
-     * Descrive il sito com'è OGGI: statico, senza statistiche, e con i video di
-     * YouTube che si caricano SOLO dopo un consenso — quello dato al banner
-     * (`components/BannerPrivacy.jsx`) o quello implicito nel premere play su un
-     * singolo filmato. Senza, non viene contattato nessun terzo.
-     *
-     * L'unica cosa salvata nel browser è la risposta al banner, e va detto:
-     * `localStorage`, non un cookie, e non lascia il dispositivo.
-     *
-     * Ogni novità che tocchi i trattamenti — un'analitica, un modulo di
-     * contatto, o il passaggio a uno spezzone video ospitato in proprio —
-     * vuole le sezioni «Cookie e statistiche», «Perché, e con quale diritto»,
-     * «Chi altro li vede» e «Link esterni» riscritte PRIMA che entri in
-     * funzione, e `aggiornato` con esse.
+     * Informativa privacy, allineata al sito di oggi. ⚠️ Ogni nuovo trattamento (analitica, modulo,
+     * video) richiede di riscriverla, e di spostare `aggiornato`, prima di entrare in funzione.
      */
     privacy: {
       occhiello: 'Privacy',
@@ -276,12 +244,7 @@ const TESTI = {
       chiSonoTitolo: (firma, ruolo) => `Chi sono · ${firma} · ${ruolo}`,
       progettoDesc: (titolo, cat, anno, nome, ruolo, luogo) =>
         `${titolo} — ${cat}${anno}. Progetto di ${nome}, ${ruolo} a ${luogo}.`,
-      /*
-       * Firma in fondo all'anteprima social di una scheda: vedi og-image.js.
-       * In inglese anche sulla serie italiana, ed è l'unica eccezione alle due
-       * lingue separate: `designed by` è la formula con cui il design si firma,
-       * e in italiano si usa così. Non è un pezzo di frase rimasto indietro.
-       */
+      // In inglese anche nella serie italiana: "designed by" è la formula d'uso.
       progettoFirma: (nome) => `Designed by ${nome}`,
       privacyTitolo: (firma) => `Informativa privacy · ${firma}`,
       privacyDesc: (firma) =>

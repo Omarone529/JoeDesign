@@ -10,18 +10,8 @@ const PRIMA_LETTERA = 0.2 // attesa prima che parta il nome
 const PASSO_LETTERA = 0.045 // scarto fra una lettera e la successiva
 const DOPO_NOME = 1.1 // pausa fra la fine del nome e l'invito a scorrere
 
-/*
- * `svh` e non `vh`: su mobile la linea in fondo resta a filo invece di finire
- * sotto la barra degli indirizzi.
- *
- * `mix-blend-multiply` fonde il fondo bianco dello scatto con il `bg-paper` del
- * contenitore — per questo il colore sta sul contenitore e non sull'immagine.
- *
- * Il corpo del nome deriva dalla larghezza: "SARCHIOLLA" misura 5.99em e "JOE
- * SARCHIOLLA" 8.10em, quindi corpo = larghezza / quella misura. I coefficienti
- * includono il padding di ogni breakpoint: da ricalcolare se cambiano padding,
- * tracking o peso.
- */
+// `svh` per la barra degli indirizzi mobile; mix-blend-multiply fonde il bianco con `bg-paper`.
+// Corpo del nome = larghezza / em della riga (5.99 e 8.10): da ricalcolare se cambiano padding o tracking.
 export default function Hero() {
   const T = testi(useLang())
 

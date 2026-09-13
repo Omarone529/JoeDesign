@@ -1,26 +1,6 @@
 /*
- * Controlla che i dati di `src/data/siteData.js` corrispondano ai file che
- * stanno davvero su disco. Gira da solo prima di ogni `npm run build` (script
- * `prebuild` in package.json), e si può lanciare a mano:
- *
- *   node scripts/verifica.js
- *
- * Perché esiste. Le immagini non si importano, si nominano: `photos: 8` è una
- * promessa che da qualche parte esistono `01.webp…08.webp`, e nessuno la
- * verifica. Se le foto sono sei, la build passa lo stesso, il pre-rendering
- * scrive tranquillamente due `<img>` verso file inesistenti, e il difetto si
- * scopre guardando il sito pubblicato. Lo stesso vale per una copertina che
- * manca, per un'anteprima social non rigenerata dopo aver aggiunto un
- * progetto, per un indice in `ai` che punta a una foto che non c'è — cioè per
- * un'etichetta AI Act appiccicata alla foto sbagliata — e per una chiave di
- * `contenutiEn.js` scritta con un refuso, che non traduce niente e non lo dice.
- *
- * Sono tutti errori muti: non rompono nulla, escono in produzione. Qui
- * diventano una build che si ferma, con scritto quale file cercare.
- *
- * ERRORE = la build si ferma. AVVISO = si segnala e si prosegue, perché è una
- * scelta legittima (un progetto senza traduzione inglese resta in italiano, e
- * `CLAUDE.md` dice che va bene).
+ * Controlla che siteData.js corrisponda ai file su disco (foto, copertine, anteprime social,
+ * indici `ai`, chiavi di contenutiEn.js). Gira in prebuild. ERRORE ferma la build, AVVISO no.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -76,11 +56,7 @@ for (const p of archive) {
   if (videoPoster) chiediFile(videoPoster, dove)
   if (filmatoPoster) chiediFile(filmatoPoster, dove)
 
-  /*
-   * Il controllo all'incontrario: una foto in più nella cartella non rompe
-   * niente ma non si vede da nessuna parte, ed è quasi sempre un `photos`
-   * dimenticato indietro dopo aver aggiunto uno scatto.
-   */
+  // Al contrario: foto in cartella oltre `photos`, di solito un conteggio non aggiornato.
   const dir = pub(`/images/products/${p.slug}`)
   if (fs.existsSync(dir)) {
     const suDisco = fs.readdirSync(dir).filter((f) => /^\d\d\.webp$/.test(f)).length
@@ -153,11 +129,7 @@ for (const tavola of about.sketchbook) {
   }
 }
 
-/*
- * Anteprime social. È il file che si dimentica più spesso, perché `og-image.js`
- * si lancia a mano e un progetto nuovo non se ne accorge: la scheda esce con un
- * link condiviso senza immagine.
- */
+// Anteprime social: og-image.js si lancia a mano e si dimentica.
 const attesiOg = [
   'home',
   'chi-sono',

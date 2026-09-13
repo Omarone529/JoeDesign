@@ -9,17 +9,7 @@ export default {
         // Palette "Direzione A" — carta / inchiostro
         paper: '#f4f3f1', // sfondo principale
         ink: '#14110f', // testo / nero caldo
-        /*
-         * Grigio del testo secondario. Il valore sta sotto il nero quanto basta
-         * a restare "in tono minore" e non un grado di più: su `paper` fa
-         * 4.76:1, oltre il 4.5 che la WCAG AA chiede per il testo sotto i 18pt.
-         * È la misura che conta qui, perché `muted` finisce quasi sempre su
-         * corpi da 10 a 13 pixel — occhielli, categorie, anni, contatori.
-         *
-         * ⚠️ Vale solo su fondo chiaro. Sul `night` del footer un grigio così
-         * scuro scende a 3.77:1: là il testo secondario è `night-soft`, che è
-         * lo stesso ruolo rovesciato. Non usare `text-muted` dentro `bg-night`.
-         */
+        // 4.76:1 su `paper` (AA). ⚠️ Non su `bg-night`: lì si usa `night-soft`.
         muted: '#6f6b67', // grigio testo secondario (su carta)
         line: '#d7d4cf', // bordi chiari
         'line-soft': '#e4e1dd', // bordi molto chiari
@@ -64,11 +54,7 @@ export default {
     },
   },
   plugins: [
-    // `hover-fine:` = c'è almeno un dispositivo capace di sostare su un
-    // elemento (mouse, trackpad, anche sui portatili con schermo touch).
-    // Sul telefono il :hover non esiste — o peggio resta appiccicato dopo il
-    // tap — quindi gli effetti "al passaggio" valgono solo qui, e lì vengono
-    // sostituiti da uno stato sempre visibile.
+    // `hover-fine:` = dispositivo con puntatore capace di hover; al tocco serve uno stato sempre visibile.
     plugin(({ addVariant }) => {
       addVariant('hover-fine', '@media (any-hover: hover)')
     }),
