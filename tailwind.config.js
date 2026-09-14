@@ -15,7 +15,6 @@ export default {
         'line-soft': '#e4e1dd', // bordi molto chiari
         placeholder: '#e9e7e3', // sfondo immagini
         hover: '#ececE8', // hover celle
-        dot: '#c8c4bf', // separatori ticker
         night: '#0a0908', // sfondo footer
         'night-soft': '#c8c4bf', // testo footer secondario
       },
@@ -26,12 +25,6 @@ export default {
         viewIn: {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
-        },
-        // Ticker: il nastro contiene due copie dell'elenco, quindi -50% = una
-        // copia esatta e il salto a fine ciclo non si vede.
-        marquee: {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' },
         },
         // Ingresso delle lettere del nome in home. Lo scostamento è in em, così
         // resta proporzionato a qualunque corpo assuma il titolo.
@@ -47,7 +40,6 @@ export default {
       },
       animation: {
         viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
-        marquee: 'marquee 38s linear infinite',
         letterIn: 'letterIn .9s cubic-bezier(.2,.7,.2,1) both',
         float: 'float 2.6s ease-in-out infinite',
       },

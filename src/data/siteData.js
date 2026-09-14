@@ -47,7 +47,7 @@ export const manifestoFoto = {
 export const about = {
   intro:
     'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
-  // Elenco piatto per il nastro in home e il JSON-LD. Uno strumento nuovo va anche in `competenze`.
+  // Elenco piatto per il JSON-LD. Uno strumento nuovo va anche in `competenze`.
   skills: [
     'Illustrator',
     'Photoshop',
