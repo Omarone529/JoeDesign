@@ -31,7 +31,6 @@ const TESTI = {
       scorri: 'Scorri',
       lavoriSelezionati: 'Lavori selezionati',
       archivioCompleto: 'Archivio completo →',
-      skills: 'Skills',
     },
 
     archivio: {
@@ -294,7 +293,6 @@ const TESTI = {
       scorri: 'Scroll',
       lavoriSelezionati: 'Selected works',
       archivioCompleto: 'Full archive →',
-      skills: 'Skills',
     },
 
     archivio: {

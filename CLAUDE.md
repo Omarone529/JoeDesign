@@ -198,8 +198,8 @@ Tutti i testi e i dati stanno qui, non nel markup:
   è stata tolta perché restituiva l'archivio italiano anche dentro il sito inglese),
   `areaPerSlug(slug)` risolve l'URL — gli slug non si traducono, quindi non ha `lang`
 - `manifestoFoto` — la foto di Joe con la lampada DADO accesa, in home sotto il
-  manifesto (`profile.manifesto`): la fascia scura che chiude la pagina prima del
-  nastro delle skills. Stava in fondo a "Chi sono", sotto la stessa frase, ed è
+  manifesto (`profile.manifesto`): la fascia scura che chiude la pagina, prima
+  del footer. Stava in fondo a "Chi sono", sotto la stessa frase, ed è
   passata in home con essa; `scripts/og-image.js` la usa ancora per l'anteprima
   social di "Chi sono", che è comunque un ritratto di Joe
 - `familyBand` — la foto della famiglia di prodotti. **Non è più in pagina**: al suo
@@ -207,7 +207,7 @@ Tutti i testi e i dati stanno qui, non nel markup:
   delle anteprime social dell'archivio (`scripts/og-image.js`), che è la pagina dove
   quei prodotti si guardano davvero, quindi il file non si cancella e `verifica.js`
   continua a pretenderlo. Non avendo più un alt da mostrare, non ha una gemella
-  inglese. Il ticker "Skills" in home riusa `about.skills`
+  inglese.
 - `projectImages(item)` — costruisce i percorsi immagine di un progetto
 - `video` (facoltativo, per progetto) — id di uno Short YouTube: il reel apre il
   carosello e parte da solo. Vuole `video.webp` accanto alle foto, vedi sotto
@@ -659,7 +659,7 @@ src/
 │   │       ├── geometria.js  # la forma della piega — matematica pura, ha dei test
 │   │       └── scena.js      # Three.js: renderer, camera, luci, texture, smaltimento
 │   └── home/             # sezioni homepage: Hero, SelectedWorks,
-│                         #   Manifesto (frase + foto di Joe), SkillsTicker
+│                         #   Manifesto (frase + foto di Joe)
 └── pages/
     ├── Home.jsx
     ├── About.jsx         # "Chi sono": testata col ritratto, bio, le card degli

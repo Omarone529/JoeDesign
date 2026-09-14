@@ -1,7 +1,6 @@
 import Hero from '../components/home/Hero'
 import SelectedWorks from '../components/home/SelectedWorks'
 import Manifesto from '../components/home/Manifesto'
-import SkillsTicker from '../components/home/SkillsTicker'
 
 export default function Home() {
   return (
@@ -9,7 +8,6 @@ export default function Home() {
       <Hero />
       <SelectedWorks />
       <Manifesto />
-      <SkillsTicker />
     </main>
   )
 }
