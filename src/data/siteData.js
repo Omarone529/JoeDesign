@@ -67,35 +67,33 @@ export const about = {
      `foto: null` finché le immagini non arrivano, poi `{ src, alt }`. */
   competenze: [
     {
+      chiave: 'stampa',
+      titolo: 'Stampa 3D',
+      testo: 'Dalla progettazione digitale alla realizzazione fisica del prodotto.',
+      strumenti: [],
+      foto: null,
+    },
+    {
       chiave: 'grafica',
-      titolo: 'Grafica ed editoria',
+      titolo: 'Graphic design',
       testo:
-        'Tavole, manifesti e impaginati: il progetto si racconta con la stessa cura con cui è disegnato.',
+        'Sviluppo di progetti grafici, loghi e identità visive per concorsi, bandi e progetti personali.',
       strumenti: ['Illustrator', 'Photoshop', 'InDesign', 'Affinity', 'Canva'],
       foto: null,
     },
     {
       chiave: 'modellazione',
       titolo: 'Modellazione 3D',
-      testo:
-        'Dal volume di massima al modello quotato: la forma si verifica in tre dimensioni prima di diventare un pezzo.',
+      testo: 'Sviluppo e modellazione di prodotti e progetti tridimensionali.',
       strumenti: ['Rhino 3D', 'Shapr3D'],
       foto: null,
     },
     {
-      chiave: 'configuratori',
-      titolo: 'Configuratori d’arredo',
+      chiave: 'prototipi',
+      titolo: 'Prototipi e modellini',
       testo:
-        'Composizioni su misura, disegnate dentro i sistemi con cui i mobilifici mandano in produzione.',
-      strumenti: ['Mobilturi 3D', 'Metron (Imab)', '3CAD', 'GSG'],
-      foto: null,
-    },
-    {
-      chiave: 'presentazione',
-      titolo: 'Presentazione',
-      testo:
-        'Il progetto come arriva al cliente: sequenza, ritmo e gerarchia, come per un impaginato.',
-      strumenti: ['PowerPoint', 'Keynote'],
+        'Realizzazione di prototipi e modelli fisici attraverso la lavorazione del legno e la sperimentazione dei materiali.',
+      strumenti: [],
       foto: null,
     },
   ],

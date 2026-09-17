@@ -103,16 +103,18 @@ export default function Competenze() {
               <p className="m-0 mt-3 max-w-[40ch] text-[clamp(14px,1.4vw,18px)] leading-[1.5] lg:mt-5">
                 {c.testo}
               </p>
-              <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0 lg:mt-8">
-                {c.strumenti.map((s) => (
-                  <li
-                    key={s}
-                    className="border border-line px-3 py-1 text-[13px] tracking-[0.02em] lg:px-4 lg:py-1.5 lg:text-[15px]"
-                  >
-                    {s}
-                  </li>
-                ))}
-              </ul>
+              {c.strumenti.length > 0 && (
+                <ul className="m-0 mt-5 flex list-none flex-wrap gap-2 p-0 lg:mt-8">
+                  {c.strumenti.map((s) => (
+                    <li
+                      key={s}
+                      className="border border-line px-3 py-1 text-[13px] tracking-[0.02em] lg:px-4 lg:py-1.5 lg:text-[15px]"
+                    >
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             <div className="min-h-0 flex-1 border-t border-line bg-placeholder sm:border-l sm:border-t-0">
