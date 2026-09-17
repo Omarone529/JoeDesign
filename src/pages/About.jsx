@@ -88,13 +88,13 @@ export default function About() {
           }}
           className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_+_var(--fuori-figura)_+_var(--rientro))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
         >
-          <span className="block tracking-[-0.03em]">{T.chiSono.heroNome}</span>
+          <span className="block animate-titoloIn tracking-[-0.03em] motion-reduce:animate-none">{T.chiSono.heroNome}</span>
           <span
             style={{
               '--ruolo': T.chiSono.heroNomeEm / T.chiSono.heroRuoloEm,
               '--ruolo-piccola': `${RUOLO}em`,
             }}
-            className="block whitespace-nowrap text-center leading-[1.05] tracking-[-0.03em] text-[calc(var(--ruolo)*var(--ruolo-piccola))]"
+            className="block animate-ruoloIn whitespace-nowrap text-center leading-[1.05] tracking-[-0.03em] text-[calc(var(--ruolo)*var(--ruolo-piccola))] motion-reduce:animate-none"
           >
             {T.chiSono.heroRuolo}
           </span>
@@ -107,7 +107,7 @@ export default function About() {
           width="1200"
           height="1364"
           fetchpriority="high"
-          className="relative z-10 mx-auto mt-auto block w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-[calc(2rem_+_var(--rientro))] md:mx-0 md:mt-0 md:h-[var(--figura-riquadro)] md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[calc(72px_+_var(--rientro))]"
+          className="relative z-10 mx-auto mt-auto block animate-fotoIn motion-reduce:animate-none w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-[calc(2rem_+_var(--rientro))] md:mx-0 md:mt-0 md:h-[var(--figura-riquadro)] md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[calc(72px_+_var(--rientro))]"
         />
       </section>
 
