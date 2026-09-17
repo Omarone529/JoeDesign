@@ -554,7 +554,42 @@ percentuale si risolve sul riquadro intero della sezione mentre il margine del t
 risolve sulla colonna di testo: due basi diverse, e lo stacco fra i due si spostava a ogni
 cambio di padding.
 
-⚠️ **La coda del titolo entra di poco sotto la figura: solo la gamba della R.**
+⚠️ **La testata entra da due parti, e la E di "Sono Joe" finisce dietro la manica.**
+Il titolo arriva da sinistra, il ritratto da destra, sfalsati — keyframe in
+`tailwind.config.js`, ritardi nel blocco `animation` lì accanto:
+
+| | animazione | parte a | dura | da dove |
+| --- | --- | --- | --- | --- |
+| "Sono Joe" | `titoloIn` | .2s | 1.25s | −32% della propria larghezza |
+| "Product designer" | `ruoloIn` | .38s | 1.25s | −32%, un beat dopo la riga grande |
+| ritratto | `fotoIn` | .3s | 1.5s | +34%, più lento perché pesa di più |
+
+Lo scostamento è in **frazione della propria larghezza**, non in pixel, così vale a ogni
+formato.
+
+⚠️ **Tre cose la tengono lontana dal movimento meccanico, e sono tutte e tre necessarie.**
+Una corsa **lunga** (un terzo della larghezza: a 12% il movimento si legge come uno
+scatto); una curva fatta quasi tutta di **decelerazione** (`cubic-bezier(.16,1,.3,1)`: le
+cose si posano invece di fermarsi — dagli ultimi 400ms il titolo guadagna un pixel); e le
+due righe **sfalsate fra loro**, non appese al riquadro del titolo che scorre intero.
+Rimettere l'animazione sull'`h1` invece che sui due `span` fa tornare il blocco rigido.
+
+Le tre partenze sono diverse apposta, e la pagina resta vuota per due decimi prima che
+arrivi qualcosa. **L'opacità si chiude molto prima della corsa** (al 35% per il testo, al
+20% per il ritratto): così le cose sono già tutte lì mentre stanno ancora rallentando, e
+soprattutto il ritratto — che è l'immagine grande sopra la piega, cioè quella su cui si
+misura l'LCP — risulta dipinto quasi da principio invece che alla fine della corsa.
+Allungare quelle due percentuali fino al 100% fa sembrare tutto più lento e ritarda l'LCP.
+
+Le traslazioni escono dal riquadro della sezione, di là e di qua; a contenerle è
+l'`overflow-hidden` che la sezione ha già. Misurato a 320, 390, 430, 768, 1440 e 2560 e in
+otto istanti lungo la sequenza: la pagina non sborda mai in orizzontale, nemmeno mentre si
+muove. **Togliendo quell'`overflow-hidden` compare uno scorrimento laterale che a pagina
+ferma non si vede**, quindi non lo si cerca guardando il risultato.
+
+Chi ha chiesto meno animazioni (`prefers-reduced-motion`) trova tutto già a posto: la
+composizione finale è identica al pixel, cambia solo se la si vede arrivare.
+
 Titolo e ritratto sono appesi alla stessa misura — `--figura`, cioè `min(46vw, (100svh -
 4rem) * PROPORZIONE_RITRATTO)`: la larghezza con cui `object-contain` disegna DAVVERO il
 ritaglio. Da `md` il titolo è appeso al **fondo** della sezione (`mt-auto` +
@@ -566,20 +601,55 @@ Grandezza e posizione del titolo sono **due conti separati**, e va tenuto così:
   la figura, meno `STACCO = 2rem`), la vecchia frazione della colonna e il tetto in
   pixel. Riempiendo lo spazio, il titolo partirebbe sempre dal bordo sinistro;
 - la **posizione** la dà il margine destro, `--figura` meno `--fuori-figura`: `MANICA`
-  (1.5% della figura, la striscia trasparente fra il bordo del riquadro e la manica
-  all'altezza della riga) più `INCASTRO` (0.22 em della riga piccola). `ml-auto` si
-  prende lo spazio che il corpo ha lasciato e il blocco scivola a destra.
+  (1.5% della figura, la striscia trasparente fra il bordo del riquadro e la manica) più
+  `INCASTRO` (0.24 em della riga grande). `ml-auto` si prende lo spazio che il corpo ha
+  lasciato e il blocco si appoggia alla figura, entrandoci fin sotto la manica.
 
-⚠️ Il riquadro del titolo è largo quanto la riga **piccola** (`w-fit` prende la più
-lunga), quindi nel margine la sporgenza non si somma di nuovo. Sommarla, o mettere
-l'incastro dentro il conto del corpo, rende il margine più grande dello spazio: il titolo
-resta inchiodato a sinistra, la scritta si allunga invece di spostarsi, e cambiare i
-numeri sembra non fare niente. È successo, a settembre 2026.
+**`RIENTRO` (2rem) stacca il ritratto dal bordo destro**, e il titolo lo segue della
+stessa misura: muovere la foto non cambia di un pixel quanto entra la E, che è una scelta
+a parte (`INCASTRO`). Sta dentro `STACCO` apposta — è spazio già riservato da `corpo()`,
+quindi il titolo scorre a sinistra senza doversi stringere. **Portandolo oltre quei 2rem
+il titolo comincia a rimpicciolirsi** per restare nella colonna, e la cosa si vede come un
+corpo che cala invece che come una foto che si sposta.
 
-Misurato da 768 a 2560px: sotto la sagoma entrano fra 8 e 26px, cioè sempre circa un
-quinto della R. **Sotto `md` l'incastro non c'è**: la foto sta in colonna sotto il titolo.
-La storia è andata avanti e indietro — prima la coda spariva quasi tutta, poi il testo è
-stato staccato dalla foto, ora l'incastro è leggero.
+⚠️ **I due conti non usano lo stesso numero, ed è voluto.** `corpo()` dimensiona il titolo
+come se dovesse stare tutto **fuori** dalla foto, lasciando `STACCO`; il margine poi lo
+tira **dentro** di `INCASTRO`. Riservare quello spazio e non usarlo è ciò che impedisce al
+titolo di uscire dalla colonna: mettendo l'incastro anche dentro `corpo()`, il margine
+diventa più grande dello spazio e il titolo resta inchiodato a sinistra — la scritta si
+allunga invece di spostarsi, e cambiare i numeri sembra non fare niente. È successo, a
+settembre 2026.
+
+⚠️ **`INCASTRO` è in em perché copre una frazione di lettera, non un numero di pixel.**
+La E è larga **0.618 em**, e da lì si legge tutto: 0.24 ne copre il 39% (il valore di
+adesso), 0.309 la metà, 0.618 la fa sparire, oltre comincia a mangiare la O. Misurato da
+768 a 2560px con un `Range` sull'ultimo carattere, il 39% torna a ogni larghezza e in
+tutte e due le lingue — anche "I'm Joe" finisce in E, e lì la lettera è più grande perché
+il titolo è più corto, quindi in pixel la copertura va da 21 a 58 contro i 15–50
+dell'italiano, ma la frazione è la stessa. In pixel fissi la frazione tornerebbe a una
+sola larghezza. **Sotto `md` l'incastro non c'è**: la foto sta in colonna sotto il titolo.
+
+⚠️ **A muoversi quando cresce `INCASTRO` è il titolo, non la foto.** Il blocco scivola a
+destra dentro la figura; il ritratto resta dov'è. Quello che sposta la foto è `RIENTRO`, e
+siccome il titolo lo segue della stessa misura, `RIENTRO` non cambia la copertura di un
+pixel: una manopola dice dove sta la coppia titolo+foto nella pagina, l'altra quanto si
+incastrano fra loro.
+
+**"Product designer" è centrato sotto "Sono Joe"** (`RUOLO = 0.8`), e ci si centra da sé:
+essendo `RUOLO` minore di 1, la riga grande resta la più larga, quindi il `w-fit` del
+titolo è la sua larghezza e alla riga piccola basta `text-center`. Da ciò discende anche
+che **è la riga grande a toccare la foto**, e infatti l'incastro è in em suoi.
+**Portando `RUOLO` sopra 1 il conto si rovescia** — il riquadro diventa largo quanto la
+riga piccola, "Sono Joe" si centra dentro di lei, e a finire dietro la manica è la R di
+"designer" invece della E. Misurato a 390, 768, 1440 e 2560, nelle due lingue: lo scarto
+fra i due lati è zero.
+
+La storia è andata avanti e indietro — prima la coda del titolo spariva quasi tutta dietro
+la figura, poi il testo è stato staccato dalla foto, poi entrava la sola gamba della R, poi
+"Product designer" ci arrivava scivolando, poi il titolo si staccava di nuovo e compariva
+mettendosi a fuoco, poi entrava di scatto. Ora: pagina vuota, poi due righe centrate fra
+loro che arrivano da sinistra una dopo l'altra mentre la foto arriva da destra, e la E
+coperta per l'ultimo terzo dalla manica.
 
 Prima erano due frazioni indipendenti della finestra — `46vw` per la foto, `39vw` per il
 titolo — e si sfioravano per caso: con `object-contain` la foto si rimpicciolisce quando a
