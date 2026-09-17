@@ -18,28 +18,26 @@ export const aboutEn = {
      traducono. */
   competenze: [
     {
+      chiave: 'stampa',
+      titolo: '3D printing',
+      testo: 'From digital design to the physical making of the product.',
+    },
+    {
       chiave: 'grafica',
-      titolo: 'Graphics and editorial',
+      titolo: 'Graphic design',
       testo:
-        'Boards, posters and layouts: a project is told with the same care it is drawn with.',
+        'Graphic projects, logos and visual identities for competitions, open calls and personal projects.',
     },
     {
       chiave: 'modellazione',
       titolo: '3D modelling',
-      testo:
-        'From the rough volume to the dimensioned model: form is checked in three dimensions before it becomes a part.',
+      testo: 'Development and modelling of three-dimensional products and projects.',
     },
     {
-      chiave: 'configuratori',
-      titolo: 'Furniture configurators',
+      chiave: 'prototipi',
+      titolo: 'Prototypes and models',
       testo:
-        'Made-to-measure compositions, drawn inside the systems furniture makers use to send them into production.',
-    },
-    {
-      chiave: 'presentazione',
-      titolo: 'Presentation',
-      testo:
-        'The project as it reaches the client: sequence, rhythm and hierarchy, as in a layout.',
+        'Physical prototypes and models, made through woodworking and experimentation with materials.',
     },
   ],
   photos: {
