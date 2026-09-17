@@ -6,21 +6,36 @@ import Sketchbook from '../components/about/Sketchbook'
 import { srcSetDi, MISURE } from '../immagini'
 
 /*
- * Testata: la larghezza del titolo è fissa, il corpo si ricava da quanti em misura la riga
- * (`heroNomeEm`), così le due lingue danno testate larghe uguali. Titolo e ritratto
- * dipendono dalla stessa misura, `--figura`.
+ * Testata: il corpo del titolo si ricava da quanti em misura la riga (`heroNomeEm`), così
+ * le due lingue danno testate larghe uguali; la larghezza del riquadro è quella della riga
+ * grande. Titolo e ritratto dipendono dalla stessa misura, `--figura`.
  */
 
-// Quanto la riga piccola sporge oltre quella grande, da md.
-const SPORGENZA = 1.2
+// Corpo della riga piccola, in frazione della grande (1 = larghe uguali): la riga
+// grande resta la più larga, quindi è lei a dare la misura del riquadro e la piccola
+// ci sta dentro centrata.
+const RUOLO = 0.8
 
-// Spazio lasciato libero dal corpo del titolo. In rem: entra in `corpo()`.
+// Spazio che il corpo del titolo lascia libero accanto alla figura. In rem: entra in
+// `corpo()`, che dimensiona come se il titolo dovesse stare tutto fuori dalla foto.
+// Il margine poi lo tira dentro di `INCASTRO`: riservare qui il posto è il modo di non
+// far mai uscire il titolo dalla colonna.
 const STACCO = '2rem'
 
-// Posizione del titolo, solo nel margine. INCASTRO: coda sotto la manica, in em della riga
-// piccola. MANICA: rientro della manica nel riquadro della foto, in frazione della figura.
-const INCASTRO = 0.22
+// Quanto la E di "Sono Joe" entra dietro la figura, in em della riga grande. La E è larga
+// 0.618 em, quindi 0.24 ne copre il 39% e 0.618 la coprirebbe tutta. In em e non in pixel
+// perché è una frazione di lettera, e la lettera cresce col titolo. MANICA è la striscia
+// trasparente fra il bordo del riquadro del ritratto e la manica vera, in frazione della
+// figura.
+const INCASTRO = 0.24
 const MANICA = 0.015
+
+// Quanto il ritratto rientra dal bordo destro. Il titolo lo segue della stessa misura,
+// così l'incastro della E resta quello: muovere la foto non cambia quanto entra la
+// lettera. Lo paga `STACCO`, il posto che `corpo()` tiene libero, più quello che
+// l'incastro restituisce — oltre quella somma il titolo si stringe per stare nella
+// colonna, e si vede come un corpo che cala invece che come una foto che si sposta.
+const RIENTRO = '2rem'
 
 // Larghezza vera del ritratto con object-contain
 const PROPORZIONE_RITRATTO = 1200 / 1364
@@ -31,13 +46,13 @@ const ALTEZZA_FIGURA = `calc(var(--figura) / ${PROPORZIONE_RITRATTO.toFixed(6)})
 
 // Corpo del titolo da md: il minimo fra spazio accanto alla figura, frazione della colonna e tetto.
 const LARGO = 0.43
-const FATTORE = SPORGENZA.toFixed(4)
 const SICUREZZA = '6px'
 const corpo = (colonna, tetto) =>
-  `min(calc((100vw - ${colonna} - var(--figura) - ${STACCO} - ${SICUREZZA}) / ${FATTORE} / var(--nome-em)),` +
+  `min(calc((100vw - ${colonna} - var(--figura) - ${STACCO} - ${SICUREZZA}) / var(--nome-em)),` +
   ` calc((100vw - ${colonna}) * ${LARGO} / var(--nome-em)), ${tetto})`
 
-// Altezza della riga piccola sulla figura (0 piedi, 1 testa): all'altezza della manica.
+// Dove cade la riga piccola sulla figura (0 piedi, 1 testa): all'altezza della manica.
+// Non la tocca più, ma è la quota che tiene titolo e ritratto sulla stessa riga d'occhio.
 const ALTEZZA_RIGA = 0.437
 const PIEDE = '7rem' // il `pb-28` della sezione, da cui il margine va scalato
 
@@ -60,25 +75,26 @@ export default function About() {
           '--figura-riquadro': RIQUADRO,
           '--riga-bassa': `calc(${ALTEZZA_RIGA} * var(--figura-alta) - ${PIEDE})`,
           '--testata-minima': `min(${RIQUADRO}, calc(var(--figura-alta) + ${ARIA}))`,
+          '--rientro': RIENTRO,
         }}
         className="relative flex min-h-[calc(var(--schermo,100svh)-4rem)] flex-col justify-center overflow-hidden border-b-2 border-ink px-5 pt-16 sm:px-8 md:min-h-[var(--testata-minima)] md:pb-28 lg:px-[72px]"
       >
         <h1
           style={{
             '--nome-em': T.chiSono.heroNomeEm,
-            '--fuori-figura': `calc(${-MANICA} * var(--figura) - ${(INCASTRO * SPORGENZA * T.chiSono.heroNomeEm / T.chiSono.heroRuoloEm).toFixed(4)} * 1em)`,
+            '--fuori-figura': `calc(${-MANICA} * var(--figura) - ${INCASTRO} * 1em)`,
             '--corpo-md': corpo('4rem', '210px'),
             '--corpo-lg': corpo('9rem', '240px'),
           }}
-          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_+_var(--fuori-figura))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
+          className="m-0 w-fit font-bold uppercase leading-[0.86] md:ml-auto md:mb-[var(--riga-bassa)] md:mt-auto md:mr-[calc(var(--figura)_+_var(--fuori-figura)_+_var(--rientro))] text-[min(calc((100vw_-_40px)*0.98/var(--nome-em)),150px)] sm:text-[min(calc((100vw_-_64px)*0.82/var(--nome-em)),190px)] md:text-[length:var(--corpo-md)] lg:text-[length:var(--corpo-lg)]"
         >
-          <span className="block tracking-[-0.03em]">{T.chiSono.heroNome}</span>
+          <span className="block animate-titoloIn tracking-[-0.03em] motion-reduce:animate-none">{T.chiSono.heroNome}</span>
           <span
             style={{
               '--ruolo': T.chiSono.heroNomeEm / T.chiSono.heroRuoloEm,
-              '--sporgenza': `${SPORGENZA}em`,
+              '--ruolo-piccola': `${RUOLO}em`,
             }}
-            className="block whitespace-nowrap leading-[1.05] tracking-[-0.03em] text-[calc(var(--ruolo)*1em)] md:text-[calc(var(--ruolo)*var(--sporgenza))]"
+            className="block animate-ruoloIn whitespace-nowrap text-center leading-[1.05] tracking-[-0.03em] text-[calc(var(--ruolo)*var(--ruolo-piccola))] motion-reduce:animate-none"
           >
             {T.chiSono.heroRuolo}
           </span>
@@ -91,7 +107,7 @@ export default function About() {
           width="1200"
           height="1364"
           fetchpriority="high"
-          className="relative z-10 mx-auto mt-auto block w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-8 md:mx-0 md:mt-0 md:h-[var(--figura-riquadro)] md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[72px]"
+          className="relative z-10 mx-auto mt-auto block animate-fotoIn motion-reduce:animate-none w-[88%] max-w-[440px] pt-10 md:absolute md:bottom-0 md:right-[calc(2rem_+_var(--rientro))] md:mx-0 md:mt-0 md:h-[var(--figura-riquadro)] md:w-[46vw] md:max-w-none md:object-contain md:pt-0 md:[object-position:100%_100%] lg:right-[calc(72px_+_var(--rientro))]"
         />
       </section>
 
