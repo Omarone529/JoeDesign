@@ -11,9 +11,7 @@
 # sta in `.nvmrc` ed è la stessa di `netlify.toml` e di `engines`, o si
 # controllerebbe una versione diversa da quella che poi costruisce il sito.
 #
-# NON gira `npm run hydration`: vuole un Chromium e un paio di minuti, e il
-# posto giusto per lanciarlo resta il portatile, dopo aver toccato qualcosa di
-# sensibile all'aggancio (vedi CLAUDE.md).
+# `npm run hydration` gira in un job a parte, dopo che i controlli sono verdi.
 name: Verifica
 
 on:
@@ -54,3 +52,26 @@ jobs:
       # si scrivano davvero.
       - name: Build e pre-rendering
         run: npm run build
+
+  # L'aggancio di React sulle 66 pagine, col Chrome già presente sull'immagine ubuntu.
+  # Prima l'autotest: se non vede il guasto simulato, il verde dopo non vale niente.
+  hydration:
+    needs: controlli
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Autotest del rilevatore
+        run: npm run hydration -- --rompi
+
+      - name: Hydration
+        run: npm run hydration
