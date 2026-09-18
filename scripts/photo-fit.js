@@ -128,14 +128,14 @@ function viewport(ratio) {
     : { x: FRAME_R / ratio, y: 1 }
 }
 
-// Posizione (0–100) che contiene il soggetto fra `fromValue` e `a`; `ok` falso se non ci sta.
-function aim(visible, fromValue, a) {
+// Posizione (0–100) che contiene il soggetto fra `from` e `to`; `ok` falso se non ci sta.
+function aim(visible, from, to) {
   if (visible >= 1) return { ok: true, pos: 50 }
-  const wide = a - fromValue
-  const center = (fromValue + a) / 2
+  const span = to - from
+  const center = (from + to) / 2
   const start = Math.min(Math.max(center - visible / 2, 0), 1 - visible)
   return {
-    ok: wide <= visible + TOLERANCE,
+    ok: span <= visible + TOLERANCE,
     pos: Math.round((start / (1 - visible)) * 100),
   }
 }

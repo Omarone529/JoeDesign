@@ -3,22 +3,21 @@ import plugin from 'tailwindcss/plugin'
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
-  // `!visible` nel JSX non è una classe: Tailwind lo leggerebbe come `visible` con !important.
+  // `if (!visible)` nel JSX: Tailwind lo prenderebbe per una classe.
   blocklist: ['!visible', '!container'],
   theme: {
     extend: {
       colors: {
-        // Palette "Direzione A" — carta / inchiostro
-        paper: '#f4f3f1', // sfondo principale
-        ink: '#14110f', // testo / nero caldo
-        // 4.76:1 su `paper` (AA). ⚠️ Non su `bg-night`: lì si usa `night-soft`.
-        muted: '#6f6b67', // grigio testo secondario (su carta)
-        line: '#d7d4cf', // bordi chiari
-        'line-soft': '#e4e1dd', // bordi molto chiari
-        placeholder: '#e9e7e3', // sfondo immagini
-        hover: '#ececE8', // hover celle
-        night: '#0a0908', // sfondo footer
-        'night-soft': '#c8c4bf', // testo footer secondario
+        paper: '#f4f3f1',
+        ink: '#14110f',
+        // 4.76:1 su `paper`. Su `night` si usa `night-soft`.
+        muted: '#6f6b67',
+        line: '#d7d4cf',
+        'line-soft': '#e4e1dd',
+        placeholder: '#e9e7e3',
+        hover: '#ececE8',
+        night: '#0a0908',
+        'night-soft': '#c8c4bf',
       },
       fontFamily: {
         sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
@@ -28,34 +27,24 @@ export default {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
-        // Ingresso delle lettere del nome in home. Lo scostamento è in em, così
-        // resta proporzionato a qualunque corpo assuma il titolo.
+        // In em: segue il corpo del titolo.
         letterIn: {
           from: { opacity: '0', transform: 'translateY(.26em)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
-        // Comparsa della testata di "Chi sono": il titolo entra da sinistra, il ritratto
-        // da destra. Lo scostamento è in frazione della propria larghezza, così vale a
-        // ogni formato. Il titolo sfuma entrando; il ritratto no, perché è l'immagine
-        // grande sopra la piega, cioè quella su cui si misura l'LCP: da `opacity: 0`
-        // risulterebbe dipinta quasi un secondo più tardi. A farlo comparire basta
-        // `viewIn`, che copre già tutta la pagina.
-        // L'opacità si chiude presto e la corsa continua: le cose sono già tutte lì
-        // mentre stanno ancora rallentando. Al contrario — dissolvenza lunga quanto la
-        // corsa — il movimento si vede solo a metà e sembra meccanico.
+        // Testata di "Chi sono". L'opacità finisce molto prima della corsa: con una
+        // dissolvenza lunga quanto il movimento, l'ingresso sembra meccanico.
         fromLeft: {
           '0%': { opacity: '0', transform: 'translateX(-32%)' },
           '35%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
-        // Il ritratto arriva da fuori e si scopre subito: l'opacità è finita al 20%,
-        // così è dipinto quasi da principio e l'LCP non aspetta la fine della corsa.
+        // Opaco già al 20%: il ritratto è l'LCP, non deve aspettare la fine della corsa.
         fromRight: {
           '0%': { opacity: '0', transform: 'translateX(34%)' },
           '20%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
-        // Respiro della freccia in fondo alla hero.
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(6px)' },
@@ -64,9 +53,7 @@ export default {
       animation: {
         viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
         letterIn: 'letterIn .9s cubic-bezier(.2,.7,.2,1) both',
-        // Quattro tempi diversi apposta: pagina vuota per due decimi, poi le due righe
-        // una dopo l'altra e il ritratto che arriva più lento, perché pesa di più.
-        // La curva è quasi tutta decelerazione: le cose si posano invece di fermarsi.
+        // Partenze sfalsate apposta; la curva è quasi tutta decelerazione.
         titleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .2s both',
         roleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .38s both',
         photoIn: 'fromRight 1.5s cubic-bezier(.16,1,.3,1) .3s both',
@@ -75,7 +62,7 @@ export default {
     },
   },
   plugins: [
-    // `hover-fine:` = dispositivo con puntatore capace di hover; al tocco serve uno stato sempre visibile.
+    // Al tocco non c'è hover: lì serve uno stato sempre visibile.
     plugin(({ addVariant }) => {
       addVariant('hover-fine', '@media (any-hover: hover)')
     }),

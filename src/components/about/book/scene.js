@@ -7,48 +7,35 @@ import {
   computeColumns,
 } from './geometry'
 
-// Scena Three.js del libro: renderer, camera, luci, texture e `dispose()`. Niente React né gesti.
+// Renderer, camera, luci, texture e `dispose()`. Niente React né gesti.
 
-const VERTICAL_FOV = 18 // obiettivo leggermente tele: meno "bombatura" prospettica della pagina in volo
+const VERTICAL_FOV = 18 // quasi tele: meno deformazione della pagina in volo
 const BOOK_ROT_X = -0.1
 export const BOOK_ROT_Y = 0.07
-// Deve combaciare con l'aspect-ratio CSS del widget: la camera è fissa e il
-// libro non cambia mai scala.
+// Uguale all'aspect-ratio CSS del riquadro.
 const BOOK_ASPECT = 2000 / 1415
 const K_WIDTH = 2 * Math.tan((VERTICAL_FOV * Math.PI) / 360) * BOOK_ASPECT
-// Esportata: la serve anche il trascinamento, per convertire i pixel del
-// dito in unità del mondo (vedi `worldPerPx` in Sketchbook.jsx).
+// Anche il gesto la usa, per convertire i pixel del dito in unità del mondo.
 export const CAMERA_MARGIN = 1.12
-// Il canvas sborda (-inset-[12%] nel JSX): a metà giro la pagina si proietta
-// più grande del libro e senza sbordo verrebbe tagliata sopra e sotto.
+// Il canvas sborda (-inset-[12%]): a metà giro la pagina esce dal libro.
 const CANVAS_MARGIN = 1.24
 const CAMERA_DISTANCE = (2 * WORLD_WIDTH * CAMERA_MARGIN * CANVAS_MARGIN) / K_WIDTH
-// Nitidezza delle tavole. Una pagina occupa sempre questa frazione della
-// larghezza del canvas (la camera è fissa): da qui si ricava in quanti pixel
-// reali viene disegnata, e quindi come conviene filtrarne la texture.
-const PAGE_ELEVATION = WORLD_WIDTH / (2 * WORLD_WIDTH * CAMERA_MARGIN * CANVAS_MARGIN)
-// Tavole da 1000px col mouse, mezze da 500px col dito (un terzo della memoria video).
+// Frazione del canvas occupata da una pagina: dà i pixel reali, e quindi il filtro della texture.
+const PAGE_SHARE = WORLD_WIDTH / (2 * WORLD_WIDTH * CAMERA_MARGIN * CANVAS_MARGIN)
 const PLATE_WIDTH = { finger: 500, mouse: 1000 }
 export const plateFor = (src, finger) => (finger ? src.replace(/\.webp$/, '-half.webp') : src)
-// Rapporto texture/schermo sotto il quale i mipmap tolgono solo dettaglio:
-// il livello scelto cade tra 0 e 1 e il trilineare ci mescola dentro una copia
-// a metà risoluzione. Vicino all'1:1 conviene campionare la texture piena.
+// Sotto questo rapporto texture/schermo i mipmap tolgono solo dettaglio.
 const MIPMAP_THRESHOLD = 1.4
 
-// `pointer: coarse` = GPU da telefono: ombre, pixel ratio, anisotropia e tavole si abbassano.
+// `pointer: coarse` = GPU da telefono: le misure qui sotto si abbassano.
 export const onTouch = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true
 
-// Mappa d'ombra: è un secondo render dell'intera scena, a ogni fotogramma.
-// A 2048² sono quattro milioni di texel per un libro che sullo schermo di un
-// telefono ne occupa settantamila: il quarto basta e non si vede la differenza.
+// La mappa d'ombra è un secondo render della scena a ogni fotogramma.
 const SHADOW_PX = { finger: 1024, mouse: 2048 }
-// Campioni per pixel sulle tavole. Il libro si guarda quasi di faccia, quindi
-// l'anisotropia serve poco: sedici prelievi per frammento sono soldi buttati.
+// Il libro si guarda quasi di faccia: l'anisotropia serve poco.
 const ANISOTROPY = { finger: 4, mouse: 16 }
-// Il canvas sborda del 24%, quindi su un telefono a 3x un riquadro da 350px
-// diventerebbe 1300 pixel per lato. 1.5 è comunque il minimo che il testo
-// piccolo delle tavole richiede (vedi `pixelRatio`).
+// 1.5 è il minimo per il testo piccolo delle tavole.
 const PIXEL_MAX = { finger: 1.5, mouse: 2 }
 
 // Monta la scena; `null` se manca WebGL o il componente è stato smontato.
@@ -57,7 +44,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' })
   } catch {
-    return null // niente WebGL: resta la copertina statica di scorta
+    return null
   }
 
   const scene = new THREE.Scene()
@@ -71,14 +58,12 @@ export async function createScene({ THREE, container, plates, initialPage, activ
   renderer.setPixelRatio(pixelRatio)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.shadowMap.enabled = true
-  // Il filtro morbido moltiplica i prelievi sulla mappa: sul telefono il PCF
-  // semplice, che ha il bordo appena più netto e costa una frazione.
+  // Il PCF morbido moltiplica i prelievi: sul telefono basta quello semplice.
   renderer.shadowMap.type = finger ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
   renderer.setClearColor(0x000000, 0)
   container.appendChild(renderer.domElement)
 
-  // Un render per frame: col mouse arrivano 125–1000 eventi al secondo, e
-  // senza coalescenza si renderizza più volte per frame e scatta.
+  // Un render per frame: il mouse manda fino a 1000 eventi al secondo.
   let frameRequested = 0
   const requestRender = () => {
     if (frameRequested) return
@@ -91,8 +76,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.55))
   scene.add(new THREE.HemisphereLight(0xfff7ee, 0xd7d4cf, 0.4))
-  // Quasi frontale: angolata, la pagina a metà giro sparerebbe un'ombra
-  // lontano dal libro.
+  // Quasi frontale: angolata, l'ombra della pagina in volo finirebbe lontano dal libro.
   const directional = new THREE.DirectionalLight(0xfff9f0, 1.35)
   directional.position.set(0.9, 1.4, 4.0)
   directional.castShadow = true
@@ -100,8 +84,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
     finger ? SHADOW_PX.finger : SHADOW_PX.mouse,
     finger ? SHADOW_PX.finger : SHADOW_PX.mouse,
   )
-  // Deve contenere la pila girata a sinistra e la pagina in volo: più
-  // stretto e le ombre spariscono ai bordi, più largo e si sprecano texel.
+  // Contiene pila e pagina in volo: più stretto perde le ombre ai bordi.
   directional.shadow.camera.left = -WORLD_WIDTH * 1.8
   directional.shadow.camera.right = WORLD_WIDTH * 1.1
   directional.shadow.camera.top = WORLD_HEIGHT * 0.8
@@ -118,9 +101,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
   bookGroup.rotation.y = BOOK_ROT_Y
   scene.add(bookGroup)
 
-  // Alone pre-sfumato e non un piano che riceve le ombre vere: quella della
-  // pagina in volo finirebbe lontano dal libro. Nemmeno un drop-shadow CSS,
-  // che va ricalcolato a ogni frame e su mobile scatta.
+  // Alone pre-sfumato: un piano con le ombre vere mostrerebbe quella della pagina in volo lontano dal libro.
   const haloCanvas = document.createElement('canvas')
   haloCanvas.width = 256
   haloCanvas.height = 256
@@ -176,9 +157,8 @@ export async function createScene({ THREE, container, plates, initialPage, activ
   spineGroup.position.x = -WORLD_WIDTH / 2
   bookGroup.add(spineGroup)
 
-  // Pixel reali di una pagina, misurati una volta all'avvio.
   const plateWidth = finger ? PLATE_WIDTH.finger : PLATE_WIDTH.mouse
-  const pagePx = (container.getBoundingClientRect().width || 0) * pixelRatio * PAGE_ELEVATION
+  const pagePx = (container.getBoundingClientRect().width || 0) * pixelRatio * PAGE_SHARE
   const noMipmap = pagePx > 0 && plateWidth < pagePx * MIPMAP_THRESHOLD
 
   const loader = new THREE.TextureLoader()
@@ -193,8 +173,6 @@ export async function createScene({ THREE, container, plates, initialPage, activ
         finger ? ANISOTROPY.finger : ANISOTROPY.mouse,
       )
       if (noMipmap) {
-        // Vicino all'1:1 il mipmap è solo una copia sfocata in più:
-        // meglio campionare la tavola piena.
         tex.generateMipmaps = false
         tex.minFilter = THREE.LinearFilter
       }
@@ -214,9 +192,9 @@ export async function createScene({ THREE, container, plates, initialPage, activ
     for (let v = 0; v <= M_COLUMNS; v += 1) {
       const u = mirrorU ? 1 - v / M_COLUMNS : v / M_COLUMNS
       uv[v * 4 + 0] = u
-      uv[v * 4 + 1] = 1 // riga alta
+      uv[v * 4 + 1] = 1
       uv[v * 4 + 2] = u
-      uv[v * 4 + 3] = 0 // riga bassa
+      uv[v * 4 + 3] = 0
     }
     geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
     const indices = []
@@ -228,11 +206,10 @@ export async function createScene({ THREE, container, plates, initialPage, activ
       indices.push(a, b, c, c, b, d)
     }
     geo.setIndex(indices)
-    geo.setDrawRange(0, 0) // niente da disegnare finché applicaGeometria non la riempie
+    geo.setDrawRange(0, 0) // vuota finché `applyGeometry` non la riempie
     return geo
   }
 
-  // Fronte e retro condividono la forma: questa riempie una faccia sola.
   const applyGeometry = (geo, posX, posZ, vertexAngles) => {
     const pos = geo.attributes.position.array
     const norm = geo.attributes.normal.array
@@ -265,7 +242,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
 
   const pageColor = new THREE.Color('#f4f3f1')
 
-  // Dichiarate qui: `resize()` le legge subito, più in basso sarebbero nella zona morta del `let`.
+  // Qui e non più in basso: `resize()` le legge subito.
   let resizeObserver = null
   let ready = false
 
@@ -295,15 +272,14 @@ export async function createScene({ THREE, container, plates, initialPage, activ
     renderer.setSize(rect.width, rect.height, true)
     camera.aspect = rect.width / rect.height
     camera.updateProjectionMatrix()
-    // Il rapporto del riquadro cambia da `sm` in giù: lo zoom va rifatto,
-    // o il libro resta inquadrato per il formato di prima.
+    // Sotto `sm` il riquadro cambia rapporto: lo zoom va rifatto.
     fitCamera(lastOpening)
     if (ready) requestRender()
   }
   resize()
 
 
-  // Memoria video da liberare a mano: prima il fotogramma in coda, il renderer per ultimo.
+  // Memoria video da liberare a mano; il renderer per ultimo.
   const dispose = () => {
     resizeObserver?.disconnect()
     stopRender()
@@ -337,7 +313,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
   const pages = pageTextures.map((tex, i) => {
       const group = new THREE.Group()
       group.rotation.y = i < initialPage ? -Math.PI : 0
-      spineGroup.add(group) // la z la mette posizionaLibro, qui sotto
+      spineGroup.add(group) // la z la mette `positionBook`
 
       const frontGeo = createFaceGeometry(false)
       const frontMat = new THREE.MeshStandardMaterial({
@@ -360,7 +336,6 @@ export async function createScene({ THREE, container, plates, initialPage, activ
       rearMesh.receiveShadow = true
       group.add(rearMesh)
 
-      // Applicato subito: niente frame vuoto prima della prima interazione.
       const { posX, posZ, segmentAngles } = computeColumns(0)
       const vertexAngles = toVertexAngles(segmentAngles)
       applyGeometry(frontGeo, posX, posZ, vertexAngles)

@@ -26,23 +26,23 @@ const NAME = horizontal ? 'film.webp' : 'video.webp'
 const WIDTH = Number(maxWidth ?? (horizontal ? 1280 : 720))
 
 async function download(id) {
-  for (const measure of SIZES) {
-    const res = await fetch(`https://i.ytimg.com/vi/${id}/${measure}.jpg`)
-    if (res.ok) return { measure, buf: Buffer.from(await res.arrayBuffer()) }
+  for (const size of SIZES) {
+    const res = await fetch(`https://i.ytimg.com/vi/${id}/${size}.jpg`)
+    if (res.ok) return { size, buf: Buffer.from(await res.arrayBuffer()) }
   }
   throw new Error(`Nessuna miniatura trovata per il video ${id}`)
 }
 
-const { measure, buf } = await download(id)
+const { size, buf } = await download(id)
 const meta = await sharp(buf).metadata()
 
 if (horizontal && meta.width < meta.height) {
   console.warn(
-    `⚠ ${measure}.jpg è ${meta.width}×${meta.height}, non orizzontale: la cornice 16:9 lo taglierà.`,
+    `⚠ ${size}.jpg è ${meta.width}×${meta.height}, non orizzontale: la cornice 16:9 lo taglierà.`,
   )
 } else if (!horizontal && meta.width >= meta.height) {
   console.warn(
-    `⚠ ${measure}.jpg è ${meta.width}×${meta.height}, non verticale: la cornice 9:16 lo taglierà.`,
+    `⚠ ${size}.jpg è ${meta.width}×${meta.height}, non verticale: la cornice 9:16 lo taglierà.`,
   )
 }
 
@@ -56,4 +56,4 @@ await sharp(buf)
   .toFile(dest)
 
 const kb = (fs.statSync(dest).size / 1024).toFixed(0)
-console.log(`✓ ${dest}  ${measure}  ${targetW}px  ${kb} KB`)
+console.log(`✓ ${dest}  ${size}  ${targetW}px  ${kb} KB`)

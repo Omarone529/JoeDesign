@@ -1,18 +1,11 @@
-// Forma di una pagina piegata: matematica pura, niente React/Three/DOM. Test in tests/geometry.test.js.
+// Forma di una pagina piegata: matematica pura, niente React/Three/DOM.
 
-/* ── Le misure del mondo, condivise con la scena e col gesto ── */
-
-// In quanti quadrilateri è divisa una pagina: è la risoluzione della piega.
 export const M_COLUMNS = 48
 export const WORLD_WIDTH = 2
 export const WORLD_HEIGHT = WORLD_WIDTH * (1415 / 1000)
-// Distanza fra un foglio e il successivo nelle due pile.
 export const STACK_GAP = 0.02
 
-/* ── I parametri della piega, che non escono da qui ── */
-
 const CURVE_MAX = (22 * Math.PI) / 180 // arco sobrio: una pagina vera non si piega a tubo
-// Verso giusto per un giro all'indietro; andando avanti lo ribalta `arcDirection`.
 const CURVE_SIGN = -1
 const COVER_STIFFNESS = 0.35 // le copertine sono cartone: si flettono molto meno della carta
 

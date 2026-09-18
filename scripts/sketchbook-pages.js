@@ -7,7 +7,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pdf } from 'pdf-to-img'
 
-// Override, poi le due posizioni note (Mac e Windows).
 const candidates = [
   process.env.SKETCHBOOK_PDF,
   '/Users/omar/Desktop/ARCHIVE JOE SARCHIOLLA.pdf',
@@ -21,18 +20,15 @@ if (!PDF_PATH) {
 
 // Render abbondante e riduzione con lanczos: il testo piccolo resta nitido.
 const SCALE = 4
-// Una pagina nel widget occupa al massimo ~1000 pixel reali.
 const WIDTH = 1000
-// Mezza misura per il telefono (vedi `plateFor`).
 const HALF_WIDTH = 500
-// Ogni rimpicciolimento ammorbidisce: una maschera di contrasto leggera
-// restituisce il filo alle lettere senza gli aloni dello sharpen aggressivo.
+// Leggera: uno sharpen forte lascia aloni attorno alle lettere.
 const SHARPNESS = { sigma: 0.6, m1: 0.4, m2: 0.9 }
 const QUALITY = 88
 
 const OUT_DIR = 'public/images/about/sketchbook'
 
-/* Numerazione di rendering (1 = prima pagina del PDF, non il folio stampato). */
+// `page` conta dalla prima pagina del PDF, non dal numero stampato.
 const PLATES = [
   { page: 1, name: '01' }, // Copertina "Personal Archive 2024-2026"
   { page: 3, name: '02' }, // Frontespizio "Vol.1 Archivio"
@@ -50,7 +46,6 @@ fs.mkdirSync(OUT_DIR, { recursive: true })
 const fromPage = new Map(PLATES.map((t) => [t.page, t]))
 const last = Math.max(...PLATES.map((t) => t.page))
 
-// Le pagine arrivano in sequenza: si scorre una volta sola fino all'ultima utile.
 let n = 0
 for await (const page of await pdf(PDF_PATH, { scale: SCALE })) {
   n += 1
@@ -60,8 +55,7 @@ for await (const page of await pdf(PDF_PATH, { scale: SCALE })) {
     await sharp(page).resize({ width: WIDTH }).sharpen(SHARPNESS).webp({ quality: QUALITY }).toFile(dest)
     const { width, height } = await sharp(dest).metadata()
 
-    // La mezza si ricava dalla grande già rimpicciolita: due passaggi di lanczos
-    // tengono le lettere più definite di un salto solo fino a 500.
+    // Dalla grande, non dal PDF: due passaggi di lanczos tengono le lettere più nitide.
     const half = path.join(OUT_DIR, `${plate.name}-half.webp`)
     await sharp(dest)
       .resize({ width: HALF_WIDTH, kernel: 'lanczos3' })

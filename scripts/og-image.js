@@ -286,12 +286,12 @@ for (const lang of LANGS) {
   for (const area of areasIn(lang)) {
     const projects = areaProjectsIn(area.key, lang)
     const period = periodOf(projects)
-    const arc = period
+    const span = period
       ? period.first === period.last
         ? `${period.first}`
         : `${period.first}–${period.last}`
       : ''
-    const areaEyebrow = [countProjects(projects.length, lang), arc].filter(Boolean).join(' · ')
+    const areaEyebrow = [countProjects(projects.length, lang), span].filter(Boolean).join(' · ')
     const name = `archive-${area.slug}.jpg`
 
     if (area.key === 'product') {

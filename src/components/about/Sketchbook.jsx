@@ -20,38 +20,32 @@ const COMPLETION_THRESHOLD = 0.32
 const MAX_VELOCITY = 3.2 // gradi/ms
 const STALE_VELOCITY_MS = 90 // dito fermo da più di così al rilascio → niente slancio
 const BOOK_SAG = (3 * Math.PI) / 180 // oltre le copertine cede tutto il libro, non la pagina
-// Quanto il corpo della pagina si alza a metà giro, per scavalcare le pile.
+// Alzata a metà giro, per scavalcare le pile.
 const FLIGHT_LIFT = 0.28
-// Piega dinamica: il foglio si flette in proporzione alla velocità del gesto,
-// oltre alla campana geometrica del giro, e con lo stesso segno.
-const BEND_GAIN = 0.2 // flessione extra per (grado/ms) di velocità
+// Flessione extra proporzionale alla velocità del gesto, sopra la campana del giro.
+const BEND_GAIN = 0.2 // per grado/ms
 const BEND_MAX = 0.32
 const BEND_TOTAL_MAX = 1.15
-const BEND_INERTIA_MS = 40 // costante di tempo con cui la flessione insegue la velocità
-const GUTTER_OPACITY = 0.2 // ombra d'incavo lungo la costa, solo a libro aperto
-/*
- * Libro sfogliabile 3D: stato, trascinamento, molle, markup. Three.js e Anime.js si caricano
- * vicino al viewport; senza WebGL resta la copertina. Forma in book/geometry.js, scena in
- * book/scene.js: qui non si scrive mai `new THREE.…`.
- */
+const BEND_INERTIA_MS = 40
+const GUTTER_OPACITY = 0.2 // ombra lungo la costa, solo a libro aperto
+// Stato, gesto e molle. Forma in book/geometry.js, scena in book/scene.js: qui mai `new THREE.…`.
 export default function Sketchbook() {
-  // Le tavole sono le stesse in entrambe le lingue: cambiano i testi alternativi.
   const lang = useLang()
   const T = texts(lang)
   const plates = aboutIn(lang).sketchbook
 
   const [page, setPage] = useState(0) // quante pagine sono già girate a sinistra
-  const [ready, setReady] = useState(false) // scena 3D montata: si può nascondere la copertina di scorta
+  const [ready, setReady] = useState(false)
   const animateRef = useRef(null)
   const springRef = useRef(null)
-  const threeRef = useRef(null) // tutta la scena Three.js, montata da avvia()
-  const angles = useRef(Array(N).fill(0)) // angolo rotateY corrente di ogni pagina
-  const inProgress = useRef(false) // un assestamento (molla) è in corso
-  const drag = useRef(null) // { indice, verso, startX, mosso, velocita, ... }
-  const bend = useRef({ extra: 0, lastAngle: 0, lastTime: 0 }) // flessione dinamica della pagina attiva
-  const flutter = useRef(null) // { anim, stato, indice }: la vibrazione di assestamento in corso
+  const threeRef = useRef(null)
+  const angles = useRef(Array(N).fill(0)) // rotateY di ogni pagina
+  const inProgress = useRef(false) // una molla è in corso
+  const drag = useRef(null)
+  const bend = useRef({ extra: 0, lastAngle: 0, lastTime: 0 })
+  const flutter = useRef(null)
   const wrapperRef = useRef(null)
-  const mountRef = useRef(null) // div in cui Three.js monta il proprio <canvas>
+  const mountRef = useRef(null)
 
   // Libro a riposo per un'apertura (0 chiuso davanti, N chiuso dietro); `skip` è la pagina in volo.
   const positionBook = (opening, skip = null) => {
@@ -114,15 +108,13 @@ export default function Sketchbook() {
       flutter.current?.anim?.cancel?.()
       flutter.current = null
       const three = threeRef.current
-      // Azzerato prima dello smaltimento: gli onUpdate ancora vivi trovano
-      // treRef nullo e non toccano il renderer già smontato.
+      // Prima di smaltire: gli onUpdate ancora vivi trovano il ref vuoto.
       threeRef.current = null
       three?.dispose()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // La pagina appena girata è già alla z giusta: non scatta niente.
   useEffect(() => {
     const three = threeRef.current
     if (!three) return
@@ -142,8 +134,7 @@ export default function Sketchbook() {
     const progress = -rotation / 180
     const fullness = Math.sin(progress * Math.PI) // 0→1→0: quanto si è "a metà giro" ora
 
-    // Con un po' di inerzia, la carta non scatta. Prende il segno della
-    // velocità istantanea: tornando indietro col dito, l'imbarcatura si inverte.
+    // Col segno della velocità istantanea: tornando indietro col dito, l'arco si inverte.
     const now = performance.now()
     const dt = now - bend.current.lastTime
     if (dt > 0 && dt < 200) {
@@ -155,8 +146,6 @@ export default function Sketchbook() {
     bend.current.lastTime = now
     angles.current[index] = rotation
 
-    // Apertura continua del libro: guida il travaso di spessore tra le pile,
-    // la quota della pagina in volo e l'ombra d'incavo.
     const basePage = index === page ? page : page - 1
     const opening = basePage + progress
     positionBook(opening, index)
@@ -164,8 +153,6 @@ export default function Sketchbook() {
     const p = three.pages[index]
     if (p) {
       p.group.rotation.y = (rotation * Math.PI) / 180
-      // Interpola tra le due pile. La cerniera non si alza mai, quindi decollo
-      // e atterraggio cadono esatti.
       const zRight = (N - index) * STACK_GAP
       const zLeft = (index + 1) * STACK_GAP
       p.group.position.z = zRight + (zLeft - zRight) * progress
@@ -185,7 +172,6 @@ export default function Sketchbook() {
     three.requestRender()
   }
 
-  // Solo la flessione residua di una pagina ferma (per il flutter).
   const applyResidualBend = (index, extra) => {
     const three = threeRef.current
     if (!three) return
@@ -198,7 +184,7 @@ export default function Sketchbook() {
     three.requestRender()
   }
 
-  // Molla poco smorzata che scarica la flessione dell'atterraggio. Non blocca l'interazione.
+  // Molla poco smorzata che scarica la flessione dell'atterraggio.
   const startFlutter = (index) => {
     const fromExtra = bend.current.extra
     bend.current.extra = 0
@@ -255,7 +241,6 @@ export default function Sketchbook() {
     })
   }
 
-  // Molla Anime.js fino ad `toAngle`, innescata dalla velocità del gesto.
   const settle = (index, direction, toAngle, changePage, velocity = 0) => {
     const fromValue = angles.current[index]
     const close = () => {
@@ -284,7 +269,7 @@ export default function Sketchbook() {
     })
   }
 
-  // Giro completo da tastiera o clic. Serve `threeRef`: Anime.js arriva prima delle texture.
+  // Serve `threeRef`: Anime.js arriva prima delle texture.
   const turn = (direction) => {
     if (!threeRef.current) return
     if (inProgress.current || drag.current) return
@@ -297,7 +282,7 @@ export default function Sketchbook() {
   }
 
   const startDrag = (e) => {
-    if (!threeRef.current) return // vedi il commento in gira()
+    if (!threeRef.current) return
     if (inProgress.current || drag.current) return
     if (e.pointerType === 'mouse' && e.button !== 0) return
     const rect = e.currentTarget.getBoundingClientRect()
@@ -305,8 +290,7 @@ export default function Sketchbook() {
     const index = direction === 1 ? page : page - 1
     e.currentTarget.setPointerCapture?.(e.pointerId)
     if (index < 0 || index >= N) {
-      // Oltre la copertina o l'ultima pagina: nessun giro, ma un cedimento
-      // elastico di tutto il libro invece del nulla.
+      // Oltre le copertine: niente giro, ma un cedimento elastico del libro.
       drag.current = {
         pointerId: e.pointerId,
         limit: true,
@@ -331,13 +315,12 @@ export default function Sketchbook() {
       initialEdgeX: WORLD_WIDTH * Math.cos((Math.abs(angles.current[index]) * Math.PI) / 180),
       progress: 0,
       moved: false,
-      velocity: 0, // gradi/ms, media mobile presa durante il trascinamento
+      velocity: 0, // gradi/ms, media mobile
       lastAngle: angles.current[index],
       lastTime: performance.now(),
     }
   }
 
-  /* Progresso 0→1 del gesto ai limiti del libro (solo caso `limit`). */
   const dragProgress = (t, clientX) => {
     const dx = clientX - t.startX
     const raw = t.direction === 1 ? -dx : dx
@@ -359,8 +342,7 @@ export default function Sketchbook() {
     const edgeX = Math.max(-WORLD_WIDTH, Math.min(WORLD_WIDTH, t.initialEdgeX + dx * t.worldPerPx))
     const angle = (-Math.acos(edgeX / WORLD_WIDTH) * 180) / Math.PI
     t.progress = t.direction === 1 ? -angle / 180 : 1 + angle / 180
-    // Velocità reale del gesto, per il rilascio "al volo". Campionata al
-    // massimo a ~60fps, o salterebbe tra due eventi troppo vicini.
+    // Campionata a ~60fps al massimo: fra due eventi troppo vicini salterebbe.
     const now = performance.now()
     const dt = now - t.lastTime
     if (dt > 8) {
@@ -402,8 +384,7 @@ export default function Sketchbook() {
   }
 
   return (
-    // `overflow-x-clip` e non `hidden`: taglia lo sbordo laterale del canvas, che sul telefono
-    // allargava la pagina oltre lo schermo, senza tagliare la pagina che gira sopra e sotto.
+    // `clip` e non `hidden`: taglia lo sbordo del canvas ai lati, non la pagina che gira sopra e sotto.
     <section className="overflow-x-clip border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
       <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">
         {T.about.sketchbook}
@@ -426,10 +407,9 @@ export default function Sketchbook() {
           }}
         >
           <div className="relative aspect-square w-full sm:aspect-[2000/1415]">
-            {/* Copertina di scorta finché la scena non è pronta (o senza WebGL), allineata a `fitCamera()`. */}
+            {/* Scorta finché la scena non è pronta, o senza WebGL. */}
             <picture>
-              {/* Sul telefono anche la scorta prende la tavola a mezza misura:
-                  è la stessa che poi userà la scena, quindi è già in cache. */}
+              {/* La mezza misura: è quella che poi carica la scena, quindi resta in cache. */}
               <source media="(pointer: coarse)" srcSet={plateFor(plates[0].front.src, true)} />
               <img
                 src={plates[0].front.src}
@@ -444,9 +424,7 @@ export default function Sketchbook() {
               />
             </picture>
 
-            {/* Three.js monta qui il suo <canvas>. Sborda del 12% per lato
-                (vedi MARGINE_TELA) e non riceve eventi: quelli li prende il
-                livello sotto, grande quanto il libro. */}
+            {/* Il canvas sborda del 12% per lato (CANVAS_MARGIN) e non riceve eventi. */}
             <div
               ref={mountRef}
               className={`pointer-events-none absolute -inset-[12%] ${ready ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}

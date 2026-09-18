@@ -57,8 +57,8 @@ export default function Skills() {
         /* Ogni card cede dalla sua frazione di pila fino in fondo: è la pila
            che si comprime, non quattro animazioni separate. */
         const start = i / cards.length
-        const elevation = advance <= start ? 0 : (advance - start) / (1 - start)
-        const scale = 1 - elevation * (cards.length - 1 - i) * STEP
+        const share = advance <= start ? 0 : (advance - start) / (1 - start)
+        const scale = 1 - share * (cards.length - 1 - i) * STEP
         paper.style.transform = scale === 1 ? '' : `scale(${scale.toFixed(4)})`
       })
     }

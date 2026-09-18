@@ -24,10 +24,10 @@ const opaqueIcon = (side) =>
 
 // .ico con un PNG dentro: 6 byte di testata e 16 per la voce.
 function ico(pngBuffer, side) {
-  const masthead = Buffer.alloc(6)
-  masthead.writeUInt16LE(0, 0) // riservato
-  masthead.writeUInt16LE(1, 2) // 1 = icona
-  masthead.writeUInt16LE(1, 4) // una sola immagine
+  const header = Buffer.alloc(6)
+  header.writeUInt16LE(0, 0) // riservato
+  header.writeUInt16LE(1, 2) // 1 = icona
+  header.writeUInt16LE(1, 4) // una sola immagine
 
   const entry = Buffer.alloc(16)
   entry.writeUInt8(side, 0) // larghezza
@@ -39,7 +39,7 @@ function ico(pngBuffer, side) {
   entry.writeUInt32LE(pngBuffer.length, 8)
   entry.writeUInt32LE(22, 12) // i dati iniziano dopo testata + voce
 
-  return Buffer.concat([masthead, entry, pngBuffer])
+  return Buffer.concat([header, entry, pngBuffer])
 }
 
 const logoBase64 = fs.readFileSync(logoPath).toString('base64')
