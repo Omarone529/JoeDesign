@@ -663,6 +663,29 @@ di `joe-hero.webp` (1200×1364) e **va rifatta cambiando ritaglio**; e la foto �
 finestra — su una finestra alta e stretta si accorcia fino alla figura invece di lasciare
 mezzo schermo vuoto sopra a un titolo schiacciato in fondo.
 
+### Le card degli strumenti (`about/Competenze.jsx`)
+
+Si impilano con `position: sticky`: ognuna si ferma `SCALINO` (0.85rem) più in basso della
+precedente, e chi viene dopo passa sopra. Quei 13 pixel di scarto sono le strisce che
+restano in vista, ed è da lì che si conta quante card ci sono senza averle ancora viste.
+
+⚠️ **In fondo alla pila c'è un elemento vuoto alto `CODA` (mezzo schermo), e non è spazio
+decorativo.** Senza, la corsa della pila finiva nell'istante esatto in cui l'ultima card
+arrivava: quella non si posava mai al suo `top`, restava qualche pixel più su e copriva le
+strisce di tutte le altre, poi il blocco scorreva via. La pila completa non si vedeva mai.
+
+⚠️ **La coda dev'essere un elemento vero, non `padding-bottom` sul contenitore.** Lo sticky
+di un figlio è limitato dal **content box** del padre, e il padding gli sta fuori: col
+padding la corsa non si allunga di un pixel, e in più le card vengono spinte tutte sullo
+stesso punto invece che ai loro scalini — cioè proprio il guasto che si voleva togliere,
+ma anticipato. Provato e misurato: con `padding-bottom: 450px` le tre card finivano tutte a
+65px invece che a 78, 91 e 105.
+
+`aggiorna()` sconta la coda dalla corsa (`contenitore.lastElementChild`), o la pila
+continuerebbe a comprimersi mentre è già ferma; e legge le card con `:scope > article`, così
+la coda non finisce fra quelle da scalare. **Aggiungendo un figlio alla pila, va messo prima
+della coda**, che deve restare l'ultimo.
+
 ## Design system (`tailwind.config.js`)
 
 Palette "carta / inchiostro":
@@ -678,6 +701,13 @@ Palette "carta / inchiostro":
 | `placeholder` | `#e9e7e3` | sfondo immagini         |
 | `hover`       | `#ececE8` | hover celle             |
 | `night`       | `#0a0908` | sfondo footer           |
+
+⚠️ **Togliendo un token dalla palette, cercalo prima in tutto `src/`.** Tailwind non genera
+la classe di un colore che non esiste e **non protesta**: ESLint non conosce i token e i
+test non guardano il CSS, quindi la classe sparisce e basta. È successo con `dot`, tolto
+insieme al ticker della home ma ancora usato dai pallini del carosello, rimasti senza fondo
+— invisibili su ogni scheda con più di una foto finché non ci passavi sopra col mouse. Si
+scopre con `grep -c bg-<token> dist/assets/*.css`: se è 0, quella classe non esiste.
 
 ⚠️ **`muted` e `night-soft` sono lo stesso ruolo su fondi opposti, e non si scambiano.**
 `muted` finisce quasi sempre su corpi da 10 a 13 pixel, dove la WCAG AA chiede 4.5:1: sulla
@@ -850,10 +880,17 @@ persona "Giovanni fa"): costruzioni con "si", passive o nominali. Es. «Product 
 
 ## Controlli automatici e commit
 
-**CI**: `.github/workflows/verifica.yml` gira a ogni push e a ogni pull request su `main`,
-su Node 20 come `netlify.toml`. Fa `npm ci` → `lint` → `test` → `verifica` → `build`: gli
-stessi comandi che si lanciano in locale, così se passa qui passa sul portatile e
-viceversa. **Non** lancia `npm run hydration`, che vuole un Chromium e un paio di minuti:
+**CI**: `.github/workflows/verifica.yml` gira a ogni push e a ogni pull request su `main`.
+Fa `npm ci` → `lint` → `test` → `verifica` → `build`: gli stessi comandi che si lanciano in
+locale, così se passa qui passa sul portatile e viceversa.
+
+⚠️ **La versione di Node sta in `.nvmrc`, e in un posto solo**: la legge la CI
+(`node-version-file`), la legge Netlify da sé, e `engines` in `package.json` la ripete come
+requisito. Prima il numero era scritto sia nel workflow sia in `netlify.toml`, e infatti i
+due si erano separati: la CI costruiva su Node 20 mentre in locale girava il 24, dove
+`verifica.js` non partiva nemmeno — un guasto che fermava la build sul portatile e non si
+vedeva in nessun log rosso. **Cambiando versione si tocca `.nvmrc`**, non i tre posti che
+lo rileggono. **Non** lancia `npm run hydration`, che vuole un Chromium e un paio di minuti:
 quello resta un controllo da fare a mano dopo aver toccato qualcosa di sensibile
 all'aggancio.
 
@@ -911,11 +948,9 @@ lavora): non rimetterli.
 ## Da fare (noto)
 
 - Il sito è ancora in costruzione: aspettarsi nuove sezioni, contenuti e progetti.
-- Le gallerie sono **complete** (cover + `01.webp…NN.webp`) per tutti tranne
-  **`direzione-tolleranza`**, pubblicato con `senzaFoto: true` in attesa del manifesto:
-  quando il file arriva, basta creare `public/images/products/direzione-tolleranza/`
-  con `cover.webp` (più eventuali `01.webp…`), togliere `senzaFoto`, mettere il numero
-  giusto in `photos` e rilanciare `fit-foto.js` e `og-image.js`.
+- Le gallerie sono **complete** (cover + `01.webp…NN.webp`) per tutti i progetti
+  dell'archivio: `senzaFoto` non è più usato da nessuno, resta solo il ramo in
+  `projectImages()` per il prossimo progetto pubblicato prima delle sue foto.
 - **IN-SICUREZZA** (manifesto per il Congresso UIL Ravenna 2026): l'immagine era in
   archivio ma il progetto non è mai stato descritto, quindi è rimasto fuori. Il file
   sta in `ARCHIVIO WEBP` e nella storia di git (era `products/grafica/06.webp`).

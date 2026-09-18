@@ -14,21 +14,41 @@ const ROMPI = process.argv.includes('--rompi')
 const attesa = (ms) => new Promise((r) => setTimeout(r, ms))
 
 /* Un Chromium qualsiasi: quello di Playwright se c'è, o CHROME_PATH, o Chrome. */
+const CACHE_PLAYWRIGHT = [
+  path.join(os.homedir(), 'Library/Caches/ms-playwright'),
+  path.join(process.env.LOCALAPPDATA || os.homedir(), 'ms-playwright'),
+  path.join(os.homedir(), '.cache/ms-playwright'),
+]
+const DENTRO_CACHE = [
+  'chrome-headless-shell-mac-arm64/chrome-headless-shell',
+  'chrome-headless-shell-mac-x64/chrome-headless-shell',
+  'chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+  'chrome-headless-shell-win64/chrome-headless-shell.exe',
+  'chrome-win64/chrome.exe',
+  'chrome-win/chrome.exe',
+  'chrome-headless-shell-linux/chrome-headless-shell',
+  'chrome-linux/chrome',
+]
+const CHROME_DI_SISTEMA = [
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium',
+]
+
 function trovaBrowser() {
   if (process.env.CHROME_PATH && fs.existsSync(process.env.CHROME_PATH)) return process.env.CHROME_PATH
-  const cache = path.join(os.homedir(), 'Library/Caches/ms-playwright')
-  if (fs.existsSync(cache)) {
+  for (const cache of CACHE_PLAYWRIGHT) {
+    if (!fs.existsSync(cache)) continue
     for (const d of fs.readdirSync(cache)) {
-      for (const rel of ['chrome-headless-shell-mac-arm64/chrome-headless-shell',
-                         'chrome-headless-shell-mac-x64/chrome-headless-shell',
-                         'chrome-mac/Chromium.app/Contents/MacOS/Chromium']) {
+      for (const rel of DENTRO_CACHE) {
         const p = path.join(cache, d, rel)
         if (fs.existsSync(p)) return p
       }
     }
   }
-  const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-  return fs.existsSync(chrome) ? chrome : null
+  return CHROME_DI_SISTEMA.find((p) => fs.existsSync(p)) || null
 }
 
 const BIN = trovaBrowser()
@@ -47,7 +67,9 @@ const { allRoutes } = await import(pathToFileURL(distSsr).href)
 const rotte = allRoutes()
 
 /* Server di anteprima: lo avvia e lo spegne da sé. */
-const server = spawn('npx', ['vite', 'preview', '--port', '4178', '--strictPort'], { cwd: root, stdio: 'ignore' })
+// Il bin di Vite con questo stesso Node, non `npx`: su Windows npx è un .cmd, che Node rifiuta di eseguire.
+const VITE = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js')
+const server = spawn(process.execPath, [VITE, 'preview', '--port', '4178', '--strictPort'], { cwd: root, stdio: 'ignore' })
 const BASE = 'http://localhost:4178'
 let su = false
 for (let i = 0; i < 60 && !su; i += 1) {

@@ -4,8 +4,9 @@
   command = "npm run build"
   publish = "dist"
 
-[build.environment]
-  NODE_VERSION = "20"
+# La versione di Node sta in `.nvmrc`, che Netlify legge da sé: dichiararla
+# anche qui vorrebbe dire due numeri da tenere allineati a mano, ed è proprio
+# così che la CI è rimasta a Node 20 mentre in locale girava il 24.
 
 # Intestazioni di sicurezza, valide per tutte le pagine.
 # Il sito è statico e non raccoglie dati, ma queste tre righe chiudono gli

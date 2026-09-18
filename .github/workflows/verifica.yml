@@ -7,9 +7,9 @@
 # produzione senza che niente si fermasse.
 #
 # Quello che gira qui è la stessa cosa che gira in locale, con gli stessi
-# comandi: se passa qui passa sul portatile, e viceversa. Node 20 come in
-# `netlify.toml`, o si controllerebbe una versione diversa da quella che poi
-# costruisce il sito davvero.
+# comandi: se passa qui passa sul portatile, e viceversa. La versione di Node
+# sta in `.nvmrc` ed è la stessa di `netlify.toml` e di `engines`, o si
+# controllerebbe una versione diversa da quella che poi costruisce il sito.
 #
 # NON gira `npm run hydration`: vuole un Chromium e un paio di minuti, e il
 # posto giusto per lanciarlo resta il portatile, dopo aver toccato qualcosa di
@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: .nvmrc
           cache: npm
 
       # `ci` e non `install`: installa esattamente le versioni del lockfile,
