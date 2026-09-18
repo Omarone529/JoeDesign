@@ -102,9 +102,9 @@ const TEXTS = {
     banner: {
       eyebrow: 'Cookie e privacy',
       aria: 'Cookie e privacy',
-      text: 'Il sito non usa cookie propri e non raccoglie statistiche: nulla di quanto si fa qui viene misurato.',
+      text: 'Il sito non usa cookie propri e non raccoglie statistiche. Il consenso serve solo per mostrare i video di YouTube in alcune schede di progetto.',
       detail:
-        'Una cosa sola ha bisogno di un consenso: alcune schede di progetto contengono reel ospitati da YouTube. Accettando si aprono da sé, e Google può conservare informazioni nel browser. Rifiutando restano figure del sito, e ogni filmato parte lo stesso premendo play. La risposta si cambia quando si vuole.',
+        'Accettando, i video partono da soli e Google riceve l’indirizzo IP e può salvare tracker nel browser. Rifiutando, al loro posto resta un’immagine e ogni video parte solo premendo play. La scelta si cambia in qualsiasi momento dall’informativa.',
       enable: 'Accetta',
       decline: 'Rifiuta',
       policy: 'Informativa privacy',
@@ -119,11 +119,11 @@ const TEXTS = {
       error404: 'Errore 404',
       title404: ['Pagina', 'non trovata'],
       text404:
-        "L'indirizzo non corrisponde a nessuna pagina del sito: può essere stato spostato, oppure non è mai esistito. Da qui si torna all'indice o all'archivio completo dei progetti.",
+        "L'indirizzo non corrisponde a nessuna pagina del sito. Può essere stato spostato, oppure non è mai esistito. Da qui si torna all'indice o all'archivio completo dei progetti.",
       error: 'Errore',
       errorTitle: ['Qualcosa', 'non ha funzionato'],
       errorText:
-        "Questa pagina non è riuscita a caricarsi. Il resto del sito funziona: da qui si torna all'indice o all'archivio completo dei progetti.",
+        "Questa pagina non è riuscita a caricarsi. Il resto del sito funziona, e da qui si torna all'indice o all'archivio completo dei progetti.",
     },
 
 
@@ -135,91 +135,140 @@ const TEXTS = {
       eyebrow: 'Privacy',
       title: ['Informativa', 'privacy'],
       intro:
-        'Il sito non usa cookie propri, non raccoglie statistiche e non chiede dati a chi lo visita. Restano tre cose: i log tecnici del server, i video di YouTube che si aprono nelle schede di progetto solo se lo si consente, e le email che qualcuno decide di scrivere. Qui c’è spiegato come vengono trattate.',
-      updated: 'Ultimo aggiornamento: 3 settembre 2026',
+        'In breve, il sito non usa cookie propri, non raccoglie statistiche e non ha moduli. Si trattano soltanto i log tecnici del server, le email che qualcuno sceglie di scrivere e, solo con il consenso o premendo play, i dati che riceve YouTube per mostrare i video. Qui sotto si trova il dettaglio di ogni trattamento.',
+      updated: 'Ultimo aggiornamento: 18 settembre 2026',
       choice: {
-        on: 'I video sono attivi: si aprono da soli nelle schede che ne hanno uno.',
-        off: 'I video sono spenti: partono solo premendo play.',
-        notChosen: 'Non è ancora stata data una risposta: i video restano spenti, e partono solo premendo play.',
+        on: 'I video sono attivi e si aprono da soli nelle schede che ne hanno uno.',
+        off: 'I video sono spenti e partono solo premendo play.',
+        notChosen: 'Non è ancora stata data una risposta, quindi i video restano spenti e partono solo premendo play.',
         enable: 'Attiva i video',
         turnOff: 'Spegni i video',
       },
       sections: [
         {
-          title: 'Chi tratta i dati',
+          title: 'Titolare del trattamento',
           body: [
-            'Il titolare del trattamento è Giovanni Sarchiolla, Reggio Emilia (Italia). Per far valere i propri diritti, o per qualsiasi domanda su questa pagina, si può scrivere a:',
+            'Giovanni Sarchiolla, Reggio Emilia (Italia). Per esercitare i propri diritti, o per qualsiasi domanda su questa informativa, si scrive all’indirizzo qui sotto.',
           ],
           contact: true,
         },
         {
-          title: 'Cosa raccoglie il sito',
+          title: 'Tipi di dati raccolti',
           body: [
-            'Il sito è statico: non ha moduli da compilare, né aree riservate, né registrazione. A chi lo visita non chiede niente.',
-            'Come ogni sito, il server che lo ospita registra da sé i dati tecnici di ogni visita: indirizzo IP, tipo di browser e di dispositivo, data, ora e pagina aperta. Sono i normali log di funzionamento. Non servono a identificare nessuno e non vengono incrociati con altre informazioni.',
-            'I dati sono trattati con strumenti informatici, protetti dalle misure di sicurezza che chiede l’articolo 32 del Regolamento perché nessuno vi acceda, li diffonda, li cambi o li distrugga senza averne titolo. Scrivere al titolare resta libero: non c’è nessun campo obbligatorio, perché non c’è nessun modulo, e di una persona arriva solo quello che sceglie di scrivere.',
+            'Il sito è statico. Non ha moduli, aree riservate né registrazione, e a chi lo visita non chiede niente.',
+            'I dati trattati sono di tre tipi. Ci sono i dati di utilizzo che il server registra da sé a ogni visita, quelli contenuti nelle email scritte al titolare e, solo se si attiva un video, quelli che il browser invia a YouTube. Ogni trattamento è descritto più sotto, con la sua finalità.',
+            'Nessun dato è obbligatorio. Scrivere al titolare è una scelta, e di una persona arriva solo quello che decide di scrivere; senza email non c’è risposta, ma il sito resta interamente consultabile.',
           ],
         },
         {
-          title: 'Cookie e statistiche',
+          title: 'Modalità e luogo del trattamento',
           body: [
-            'Il sito non usa cookie, né tecnici né di profilazione. L’unica cosa che salva nella memoria del browser è la risposta alla domanda sui video, per non doverla richiedere a ogni pagina. Resta sul dispositivo, non va a nessuno e non serve a riconoscere chi torna.',
-            'Non c’è nessuno strumento di statistica o di tracciamento. Anche i caratteri tipografici, i fogli di stile e gli script con cui le pagine sono composte arrivano tutti dal sito, mai da domini di terze parti.',
-            'Alcune schede di progetto contengono un breve video ospitato da YouTube, l’unico contenuto che arriverebbe da fuori. Non si carica da sé: al suo posto c’è una figura del sito. YouTube viene contattato in due soli casi. Il primo è se lo si è consentito rispondendo alla domanda che compare aprendo il sito, e allora il filmato parte da solo, muto, a pagina caricata. Il secondo è premendo play su quel singolo video. Chi non fa né l’una né l’altra cosa guarda tutto il sito senza che nessun terzo ne sappia niente.',
-            'Il player si carica nella modalità senza cookie che YouTube mette a disposizione, la quale rimanda gli identificatori pubblicitari ma non li toglie. Da quel momento vale l’informativa di Google.',
-            'Le pagine senza video, cioè la home, l’archivio, «Chi sono» e questa stessa, restano fatte con i soli file del sito, e lì nessun terzo viene contattato.',
+            'I dati sono trattati con strumenti informatici e protetti con le misure di sicurezza richieste dall’art. 32 del Regolamento UE 2016/679 (GDPR), perché nessuno vi acceda, li diffonda, li modifichi o li distrugga senza averne titolo. Non sono ceduti né venduti, e non servono a prendere decisioni automatizzate o a profilare nessuno.',
+            'Il titolare opera in Italia. I fornitori elencati nelle schede di ciascun trattamento possono conservare i dati anche fuori dallo Spazio economico europeo, e in quel caso il trasferimento avviene con le garanzie indicate nella scheda.',
+            'I dati si conservano per il tempo necessario alla finalità per cui sono raccolti, indicato trattamento per trattamento. Trascorso quel tempo si cancellano.',
           ],
         },
         {
-          title: 'La scelta sui video',
+          title: 'Finalità e basi giuridiche',
+          body: ['Ogni trattamento ha una sola finalità e poggia su una base giuridica dell’art. 6 del GDPR.'],
+          facts: [
+            ['Funzionamento e sicurezza del sito', 'Log di sistema · legittimo interesse (art. 6, par. 1, lett. f)'],
+            ['Risposta alle richieste', 'Email · misure precontrattuali e legittimo interesse (art. 6, par. 1, lett. b e f)'],
+            ['Visualizzazione dei video', 'YouTube · consenso (art. 6, par. 1, lett. a)'],
+          ],
+        },
+        {
+          title: 'Log di sistema e manutenzione',
           body: [
-            'La risposta alla domanda sui video resta nel browser di chi visita e non va da nessuna parte: serve solo a ricordare di non caricare YouTube senza permesso. Si cambia da qui quando si vuole, e cancellando i dati del sito dal browser sparisce con essi.',
-            'Il consenso si può dare, negare o ritirare liberamente, e negarlo non costa niente: il sito resta intero. Il ritiro vale da quel momento in avanti e non rende illecito quello che è già successo mentre il consenso c’era (art. 7, par. 3 del Regolamento). La risposta non scade: resta finché non la si cambia.',
+            'Come ogni sito, il server che lo ospita registra i dati tecnici di ogni richiesta. Servono a far funzionare il sito e a difenderlo dagli abusi; non vengono usati per identificare nessuno né incrociati con altre informazioni. Ci si può opporre in qualsiasi momento, indicando il motivo.',
+          ],
+          facts: [
+            ['Fornitore', 'Netlify, Inc., responsabile del trattamento'],
+            ['Dati trattati', 'Indirizzo IP, tipo di browser e di dispositivo, data, ora e pagina richiesta'],
+            ['Base giuridica', 'Legittimo interesse del titolare'],
+            ['Luogo', 'Stati Uniti · clausole contrattuali standard della Commissione europea'],
+            ['Conservazione', 'Il breve periodo fissato dal fornitore, poi cancellazione automatica'],
+          ],
+        },
+        {
+          title: 'Contatto via email',
+          body: [
+            'Chi scrive all’indirizzo del titolare gli comunica i dati contenuti nel messaggio, che servono solo a rispondere e, se ne nasce una collaborazione, a portarla avanti.',
+          ],
+          facts: [
+            ['Fornitore', 'Google Ireland Limited (Gmail)'],
+            ['Dati trattati', 'Nome, indirizzo email e quanto scritto nel messaggio'],
+            ['Base giuridica', 'Misure precontrattuali richieste dall’interessato e legittimo interesse a rispondere'],
+            ['Luogo', 'Irlanda; eventuali trasferimenti negli Stati Uniti rientrano nel Data Privacy Framework UE–USA'],
+            ['Conservazione', 'Il tempo necessario a rispondere e, se ne nasce un lavoro, a documentarlo'],
+          ],
+        },
+        {
+          title: 'Video da YouTube',
+          body: [
+            'Alcune schede di progetto contengono un breve video ospitato da YouTube, l’unico contenuto che arriva da fuori. Al suo posto, finché non si attiva, c’è un’immagine del sito. Il player si carica solo in due casi. Il primo è il consenso dato rispondendo alla domanda che compare aprendo il sito, e allora il video parte da solo e muto. Il secondo è premere play su quel singolo video.',
+            'Il player usa la modalità a privacy avanzata (youtube-nocookie.com), che rimanda gli identificatori pubblicitari ma non li elimina. Da quel momento Google riceve i dati sotto indicati e ne risponde secondo la propria informativa, senza che il titolare abbia alcun controllo su di essi. Senza consenso e senza clic non accade niente di tutto questo.',
+          ],
+          facts: [
+            ['Fornitore', 'Google Ireland Limited (YouTube), titolare autonomo'],
+            ['Dati trattati', 'Indirizzo IP, dati tecnici della richiesta, pagina di provenienza e tracker salvati nel browser'],
+            ['Base giuridica', 'Consenso, revocabile in qualsiasi momento'],
+            ['Luogo', 'Irlanda; eventuali trasferimenti negli Stati Uniti rientrano nel Data Privacy Framework UE–USA'],
+            ['Informativa', 'policies.google.com/privacy'],
+          ],
+        },
+        {
+          title: 'Cookie e altri tracker',
+          body: [
+            'Il sito non installa cookie, né tecnici né di profilazione, e non usa strumenti di statistica. Caratteri, fogli di stile e script arrivano tutti dal sito stesso, mai da domini di terzi.',
+            'Nella memoria locale del browser resta soltanto la risposta alla domanda sui video, per non doverla ripetere a ogni pagina. Non lascia il dispositivo, non scade e si cancella con i dati del sito.',
+            'Il consenso si può dare, negare o revocare liberamente, e negarlo non toglie niente, perché fotografie, disegni e testi restano interi. La revoca vale da quel momento in avanti e non rende illecito il trattamento già avvenuto (art. 7, par. 3 del GDPR). La scelta si cambia con il pulsante qui sotto.',
           ],
           choice: true,
         },
         {
-          title: 'Perché, e con quale diritto',
-          body: [
-            'I log tecnici servono a far funzionare il sito e a difenderlo dagli abusi. La base giuridica è il legittimo interesse del titolare (art. 6, par. 1, lett. f del Regolamento UE 2016/679).',
-            'Quello che si scrive in un’email, cioè il nome, l’indirizzo e il resto del messaggio, serve solo a rispondere e, se ne nasce una collaborazione, a portarla avanti (art. 6, par. 1, lett. b ed f).',
-            'Il player di YouTube, e i dati che ne derivano, poggiano sul consenso (art. 6, par. 1, lett. a). Lo si dà rispondendo alla domanda che compare aprendo il sito, oppure premendo play su un singolo filmato, e si può ritirare quando si vuole dalla sezione «La scelta sui video». Negandolo non si perde nient’altro: fotografie, disegno tecnico e testi restano interi.',
+          title: 'Diritti dell’interessato',
+          body: ['Alle condizioni degli articoli da 15 a 22 del GDPR, chi visita il sito ha i diritti elencati qui sotto.'],
+          facts: [
+            ['Revocare il consenso', 'In qualsiasi momento, dalla sezione sui cookie qui sopra'],
+            ['Opporsi al trattamento', 'Quando si fonda sul legittimo interesse, indicandone il motivo'],
+            ['Accedere ai dati', 'Sapere se e quali dati sono trattati, e riceverne copia'],
+            ['Rettificarli', 'Farli correggere o completare'],
+            ['Limitarne il trattamento', 'Farli conservare senza altro uso'],
+            ['Farli cancellare', 'Quando non servono più o il trattamento non è lecito'],
+            ['Riceverli o trasferirli', 'In un formato strutturato e leggibile da dispositivo automatico'],
+            ['Proporre reclamo', 'Al Garante per la protezione dei dati personali (garanteprivacy.it) o all’autorità del proprio paese'],
           ],
         },
         {
-          title: 'Chi altro li vede',
+          title: 'Come esercitarli',
           body: [
-            'Il sito è ospitato da Netlify, Inc. (Stati Uniti), che è responsabile del trattamento ed è chi conserva i log del server. I dati escono dallo Spazio economico europeo sulla base delle clausole contrattuali standard approvate dalla Commissione europea.',
-            'La posta elettronica è gestita da Google Ireland Limited (Gmail).',
-            'I video delle schede di progetto sono su YouTube (Google Ireland Limited). Quando il player si carica, dopo il consenso o premendo play, il browser si collega ai server di Google. Google riceve l’indirizzo IP, i dati tecnici della richiesta e l’indirizzo della pagina da cui si arriva, e può conservare informazioni nel dispositivo secondo la propria informativa. Su questi dati il titolare non ha alcun controllo: valgono le condizioni di Google. Senza consenso e senza clic non accade niente di tutto questo.',
-            'Nessun dato viene ceduto o venduto, e non c’è nessuna decisione presa in automatico.',
+            'Basta scrivere al titolare, all’indirizzo in cima a questa pagina. La richiesta è gratuita e riceve risposta entro un mese (art. 12 del GDPR); se è complessa il termine può allungarsi di due mesi, comunicandolo prima.',
           ],
         },
         {
-          title: 'Per quanto tempo',
+          title: 'Ulteriori informazioni',
           body: [
-            'I log del server restano per il breve periodo previsto da chi ospita il sito, poi si cancellano da soli. Le email si conservano il tempo che serve a rispondere e, se ne nasce un lavoro, a documentarlo.',
+            'I dati possono essere usati per difendere i diritti del titolare in giudizio o nelle fasi che lo precedono, e comunicati alle autorità che li richiedano per legge.',
+            'Le icone in fondo a ogni pagina portano ai profili Instagram, YouTube, TikTok e LinkedIn. Sono semplici collegamenti, e finché non si clicca nessun dato raggiunge quelle piattaforme. Una volta usciti dal sito valgono le loro informative.',
           ],
         },
         {
-          title: 'Cosa si può chiedere',
+          title: 'Modifiche all’informativa',
           body: [
-            'A chi visita il sito spettano i diritti degli articoli da 15 a 22 del Regolamento: sapere quali dati ci sono, farli correggere, farli cancellare, limitarne l’uso, opporsi al trattamento e farseli consegnare in un formato leggibile. Per esercitarli basta scrivere al titolare, all’indirizzo in cima a questa pagina.',
-            'Dove il trattamento poggia sul legittimo interesse, e qui riguarda i soli log tecnici, ci si può opporre quando si vuole, spiegando il motivo. Il titolare risponde entro un mese, come chiede l’articolo 12. Se la richiesta è complicata il termine può allungarsi di due mesi, dicendolo prima.',
-            'Resta sempre la possibilità di presentare reclamo al Garante per la protezione dei dati personali (garanteprivacy.it), o di rivolgersi a un giudice.',
+            'Se il sito cambierà, per esempio con statistiche di visita o un modulo di contatto, questa pagina sarà aggiornata prima che la novità entri in funzione, e la data in fondo lo indicherà. Dove serve un nuovo consenso, verrà chiesto di nuovo. Vale sempre la versione pubblicata qui.',
           ],
         },
         {
-          title: 'Link esterni',
-          body: [
-            'Le icone in fondo a ogni pagina portano ai profili Instagram, YouTube, TikTok e LinkedIn. Sono collegamenti normali: finché non si clicca, nessun dato li raggiunge. Il video delle schede di progetto è invece un contenuto incorporato, e finché non lo si consente resta una figura del sito.',
-            'Una volta usciti dal sito, o avviato il video, valgono le informative di quelle piattaforme, sulle quali il titolare non può niente.',
-          ],
-        },
-        {
-          title: 'Se qualcosa cambia',
-          body: [
-            'Se il sito cambierà, per esempio con delle statistiche di visita o un modulo di contatto, questa pagina verrà aggiornata prima che la novità entri in funzione. Vale sempre la versione pubblicata qui.',
+          title: 'Definizioni',
+          body: ['I termini usati in questa pagina hanno il significato che gli dà il GDPR.'],
+          facts: [
+            ['Dati personali', 'Qualunque informazione che riguarda una persona fisica identificata o identificabile'],
+            ['Dati di utilizzo', 'Le informazioni tecniche che il browser invia a ogni richiesta, come IP, data e pagina'],
+            ['Tracker', 'Qualunque tecnologia, cookie compresi, che salva o legge informazioni nel dispositivo'],
+            ['Interessato', 'La persona a cui i dati si riferiscono'],
+            ['Titolare', 'Chi decide finalità e mezzi del trattamento'],
+            ['Responsabile', 'Chi tratta i dati per conto del titolare'],
           ],
         },
       ],
@@ -358,9 +407,9 @@ const TEXTS = {
     banner: {
       eyebrow: 'Cookies and privacy',
       aria: 'Cookies and privacy',
-      text: 'The site sets no cookies of its own and collects no statistics: nothing done here is measured.',
+      text: 'The site sets no cookies of its own and collects no statistics. Consent is needed only to show YouTube videos on some project pages.',
       detail:
-        'One thing alone needs consent: some project pages carry reels hosted on YouTube. Accepted, they open by themselves, and Google may store information in the browser. Refused, they stay images belonging to the site, and each clip still starts when play is pressed. The answer can be changed whenever you like.',
+        'If you accept, the videos start by themselves and Google receives your IP address and may store trackers in the browser. If you refuse, an image stays in their place and each video starts only when play is pressed. The choice can be changed at any time from the privacy policy.',
       enable: 'Accept',
       decline: 'Refuse',
       policy: 'Privacy policy',
@@ -374,102 +423,151 @@ const TEXTS = {
       error404: 'Error 404',
       title404: ['Page', 'not found'],
       text404:
-        'This address matches no page on the site: it may have been moved, or it never existed. From here the way back leads to the index or to the full project archive.',
+        'This address matches no page on the site. It may have been moved, or it never existed. From here the way back leads to the index or to the full project archive.',
       error: 'Error',
       errorTitle: ['Something', 'went wrong'],
       errorText:
-        'This page failed to load. The rest of the site works: from here the way back leads to the index or to the full project archive.',
+        'This page failed to load. The rest of the site works, and from here the way back leads to the index or to the full project archive.',
     },
 
     privacy: {
       eyebrow: 'Privacy',
       title: ['Privacy', 'policy'],
       intro:
-        'This site sets no cookies of its own, collects no statistics and asks visitors for no data. Three things remain: the server’s technical logs, the YouTube videos that open on the project pages only if you allow them, and any email someone decides to write. This page explains how they are handled.',
-      updated: 'Last updated: 3 September 2026',
+        'In short, the site sets no cookies of its own, collects no statistics and has no forms. The only data processed is the server’s technical logs, the emails someone chooses to write and, only with consent or on pressing play, what YouTube receives to show the videos. Each processing activity is detailed below.',
+      updated: 'Last updated: 18 September 2026',
       choice: {
-        on: 'Videos are on: they open by themselves on the pages that have one.',
-        off: 'Videos are off: they start only when play is pressed.',
-        notChosen: 'No answer has been given yet: videos stay off, and start only when play is pressed.',
+        on: 'Videos are on and open by themselves on the pages that have one.',
+        off: 'Videos are off and start only when play is pressed.',
+        notChosen: 'No answer has been given yet, so videos stay off and start only when play is pressed.',
         enable: 'Turn videos on',
         turnOff: 'Turn videos off',
       },
       sections: [
         {
-          title: 'Who handles the data',
+          title: 'Data controller',
           body: [
-            'The data controller is Giovanni Sarchiolla, Reggio Emilia (Italy). To exercise your rights, or for any question about this page, write to:',
+            'Giovanni Sarchiolla, Reggio Emilia (Italy). To exercise your rights, or for any question about this policy, write to the address below.',
           ],
           contact: true,
         },
         {
-          title: 'What the site collects',
+          title: 'Types of data collected',
           body: [
-            'The site is static: no forms to fill in, no private areas, no sign-up. It asks visitors for nothing.',
-            'As with any website, the server hosting it records the technical details of each visit by itself: IP address, browser and device type, date, time and page opened. These are ordinary operational logs. They identify no one and are never cross-referenced with other information.',
-            'The data is handled with electronic tools and protected by the security measures article 32 of the Regulation requires, so that no one may access, disclose, alter or destroy it without being entitled to. Writing to the controller stays entirely free: there is no required field, because there is no form at all, and nothing of a person arrives beyond what they choose to write.',
+            'The site is static. It has no forms, no private areas and no sign-up, and it asks visitors for nothing.',
+            'Three kinds of data are processed. There is the usage data the server records by itself on each visit, the data contained in emails written to the controller and, only if a video is started, the data the browser sends to YouTube. Each activity is described below, with its purpose.',
+            'No data is mandatory. Writing to the controller is a choice, and nothing of a person arrives beyond what they decide to write; without an email there can be no reply, but the whole site stays available.',
           ],
         },
         {
-          title: 'Cookies and statistics',
+          title: 'Mode and place of processing',
           body: [
-            'The site sets no cookies, neither technical nor profiling ones. The only thing it keeps in the browser’s memory is your answer to the question about videos, so it need not be asked on every page. It stays on the device, goes to no one, and is not used to recognise anyone who returns.',
-            'There is no analytics or tracking tool of any kind. The typefaces, stylesheets and scripts the pages are built from all come from the site itself, never from third-party domains.',
-            'Some project pages carry a short video hosted by YouTube, the only content that would come from outside. It does not load by itself: in its place there is an image belonging to the site. YouTube is contacted in two cases only. The first is if you have allowed it by answering the question that appears when the site opens, and then the clip starts by itself, muted, once the page has loaded. The second is by pressing play on that single video. Anyone who does neither browses the whole site without any third party learning anything.',
-            'The player loads in the cookie-free mode YouTube provides, which defers advertising identifiers but does not remove them. From that moment Google’s own policy applies.',
-            'The pages without a video, that is the home, the archive, “About” and this one, are built from the site’s own files alone, and there no third party is contacted.',
+            'Data is processed with electronic tools and protected by the security measures required by art. 32 of Regulation (EU) 2016/679 (GDPR), so that no one may access, disclose, alter or destroy it without being entitled to. It is never sold or handed over, and it is not used for automated decisions or to profile anyone.',
+            'The controller operates in Italy. The providers listed for each activity may store data outside the European Economic Area as well, and where they do the transfer relies on the safeguards stated for that activity.',
+            'Data is kept for as long as the purpose it was collected for requires, stated activity by activity. After that it is deleted.',
           ],
         },
         {
-          title: 'Your choice about videos',
+          title: 'Purposes and legal bases',
+          body: ['Each activity has a single purpose and rests on a legal basis under art. 6 GDPR.'],
+          facts: [
+            ['Running and securing the site', 'System logs · legitimate interest (art. 6(1)(f))'],
+            ['Replying to enquiries', 'Email · pre-contractual steps and legitimate interest (art. 6(1)(b) and (f))'],
+            ['Showing videos', 'YouTube · consent (art. 6(1)(a))'],
+          ],
+        },
+        {
+          title: 'System logs and maintenance',
           body: [
-            'The answer you give to the question about videos stays in your browser and goes nowhere: it serves only to remember not to load YouTube without permission. You can change it here whenever you like, and clearing the site’s data from the browser clears it too.',
-            'Consent may be freely given, refused or withdrawn, and refusing it costs nothing: the site stays whole. Withdrawal takes effect from that moment onwards and does not make unlawful what already happened while consent was in place (art. 7(3) of the Regulation). The answer does not expire: it stays until you change it.',
+            'As with any website, the server hosting it records the technical details of every request. They keep the site running and protect it from abuse; they are not used to identify anyone and are never cross-referenced with other information. You may object at any time, giving your reason.',
+          ],
+          facts: [
+            ['Provider', 'Netlify, Inc., data processor'],
+            ['Data processed', 'IP address, browser and device type, date, time and page requested'],
+            ['Legal basis', 'Legitimate interest of the controller'],
+            ['Place', 'United States · European Commission standard contractual clauses'],
+            ['Retention', 'The short period set by the provider, then automatic deletion'],
+          ],
+        },
+        {
+          title: 'Contact by email',
+          body: [
+            'Whoever writes to the controller’s address shares the data contained in the message, which serves only to reply and, should a collaboration follow, to carry it forward.',
+          ],
+          facts: [
+            ['Provider', 'Google Ireland Limited (Gmail)'],
+            ['Data processed', 'Name, email address and whatever the message contains'],
+            ['Legal basis', 'Pre-contractual steps requested by the data subject and legitimate interest in replying'],
+            ['Place', 'Ireland; any transfer to the United States falls under the EU–US Data Privacy Framework'],
+            ['Retention', 'As long as it takes to reply and, should work follow, to document it'],
+          ],
+        },
+        {
+          title: 'YouTube videos',
+          body: [
+            'Some project pages carry a short video hosted by YouTube, the only content that comes from outside. Until it is started, an image belonging to the site stands in its place. The player loads in two cases only. The first is consent given by answering the question that appears when the site opens, and then the video starts by itself, muted. The second is pressing play on that single video.',
+            'The player uses privacy-enhanced mode (youtube-nocookie.com), which defers advertising identifiers but does not remove them. From that moment Google receives the data listed below and handles it under its own policy, and the controller has no control over it. Without consent and without a click, none of this happens.',
+          ],
+          facts: [
+            ['Provider', 'Google Ireland Limited (YouTube), independent controller'],
+            ['Data processed', 'IP address, technical details of the request, referring page and trackers stored in the browser'],
+            ['Legal basis', 'Consent, which may be withdrawn at any time'],
+            ['Place', 'Ireland; any transfer to the United States falls under the EU–US Data Privacy Framework'],
+            ['Privacy policy', 'policies.google.com/privacy'],
+          ],
+        },
+        {
+          title: 'Cookies and other trackers',
+          body: [
+            'The site sets no cookies, neither technical nor profiling ones, and uses no analytics tools. Typefaces, stylesheets and scripts all come from the site itself, never from third-party domains.',
+            'The browser’s local storage keeps only your answer to the question about videos, so it need not be asked on every page. It never leaves the device, does not expire and is erased along with the site’s data.',
+            'Consent may be freely given, refused or withdrawn, and refusing it takes nothing away, since photographs, drawings and text stay whole. Withdrawal applies from that moment onwards and does not make earlier processing unlawful (art. 7(3) GDPR). The choice can be changed with the button below.',
           ],
           choice: true,
         },
         {
-          title: 'Why, and on what basis',
-          body: [
-            'The technical logs keep the site running and protect it from abuse. The legal basis is the controller’s legitimate interest (art. 6(1)(f) of Regulation (EU) 2016/679).',
-            'What you write in an email, that is your name, your address and the rest of the message, serves only to reply and, should a collaboration follow, to carry it forward (art. 6(1)(b) and (f)).',
-            'The YouTube player, and the data that follows from it, rest on consent (art. 6(1)(a)). You give it by answering the question that appears when the site opens, or by pressing play on a single clip, and you can withdraw it whenever you like from the “Your choice about videos” section. Refusing costs nothing else: photographs, technical drawing and text stay whole.',
+          title: 'Rights of the data subject',
+          body: ['Under the conditions of articles 15 to 22 GDPR, visitors hold the rights listed below.'],
+          facts: [
+            ['Withdraw consent', 'At any time, from the cookies section above'],
+            ['Object to processing', 'Where it rests on legitimate interest, giving the reason'],
+            ['Access the data', 'Learn whether and which data is processed, and receive a copy'],
+            ['Rectify it', 'Have it corrected or completed'],
+            ['Restrict processing', 'Have it stored without any other use'],
+            ['Have it erased', 'Where it is no longer needed or the processing is unlawful'],
+            ['Receive or transfer it', 'In a structured, machine-readable format'],
+            ['Lodge a complaint', 'With the Italian Garante per la protezione dei dati personali (garanteprivacy.it) or the authority of one’s own country'],
           ],
         },
         {
-          title: 'Who else sees it',
+          title: 'How to exercise them',
           body: [
-            'The site is hosted by Netlify, Inc. (United States), which acts as data processor and is the party keeping the server logs. Data leaves the European Economic Area on the basis of the standard contractual clauses approved by the European Commission.',
-            'Email is handled by Google Ireland Limited (Gmail).',
-            'The videos on the project pages are on YouTube (Google Ireland Limited). When the player loads, after consent or on pressing play, the browser connects to Google’s servers. Google receives the IP address, the technical details of the request and the address of the page you come from, and may keep information on the device under its own policy. The controller has no control over this data: Google’s terms apply. Without consent and without a click, none of it happens.',
-            'No data is sold or handed over, and nothing is decided automatically.',
+            'Write to the controller at the address at the top of this page. Requests are free of charge and answered within one month (art. 12 GDPR); where a request is complex, that term may be extended by two months, with notice given beforehand.',
           ],
         },
         {
-          title: 'How long it is kept',
+          title: 'Further information',
           body: [
-            'Server logs stay for the short period set by whoever hosts the site, then delete themselves. Emails are kept for as long as it takes to reply and, should work follow, to document it.',
+            'Data may be used to defend the controller’s rights in court or in the steps leading up to it, and disclosed to public authorities that request it by law.',
+            'The icons at the foot of every page lead to the Instagram, YouTube, TikTok and LinkedIn profiles. They are plain links, and until one is clicked no data reaches those platforms. Once you leave the site, their own policies apply.',
           ],
         },
         {
-          title: 'What you can ask for',
+          title: 'Changes to this policy',
           body: [
-            'Visitors hold the rights set out in articles 15 to 22 of the Regulation: to know what data there is, to have it corrected, to have it erased, to limit its use, to object to the processing and to be handed it in a readable format. To exercise them, write to the controller at the address at the top of this page.',
-            'Where processing rests on legitimate interest, which here means the technical logs alone, you may object whenever you like, giving your reason. The controller answers within one month, as article 12 requires. Where a request is complicated that term may be extended by two months, said so in advance.',
-            'It is always possible to lodge a complaint with the Italian Data Protection Authority, the Garante per la protezione dei dati personali (garanteprivacy.it), or to go before a court.',
+            'Should the site change, by adding visit statistics or a contact form for instance, this page will be updated before the new feature goes live, and the date at the bottom will show it. Where new consent is needed, it will be asked for again. The version published here is always the one that applies.',
           ],
         },
         {
-          title: 'External links',
-          body: [
-            'The icons at the foot of every page lead to the Instagram, YouTube, TikTok and LinkedIn profiles. They are ordinary links: until one is clicked, no data reaches them. The video on the project pages is embedded content, and until it is allowed it stays an image belonging to the site.',
-            'Once you leave the site, or start the video, the policies of those platforms apply, over which the controller can do nothing.',
-          ],
-        },
-        {
-          title: 'If something changes',
-          body: [
-            'Should the site change, by adding visit statistics or a contact form for instance, this page will be updated before the new feature goes live. The version published here is always the one that applies.',
+          title: 'Definitions',
+          body: ['The terms used on this page carry the meaning the GDPR gives them.'],
+          facts: [
+            ['Personal data', 'Any information relating to an identified or identifiable natural person'],
+            ['Usage data', 'The technical details the browser sends with each request, such as IP, date and page'],
+            ['Tracker', 'Any technology, cookies included, that stores or reads information on the device'],
+            ['Data subject', 'The person the data relates to'],
+            ['Controller', 'Whoever decides the purposes and means of processing'],
+            ['Processor', 'Whoever processes data on the controller’s behalf'],
           ],
         },
       ],
