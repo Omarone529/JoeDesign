@@ -1,35 +1,36 @@
+import { Suspense } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingMailButton from './components/FloatingMailButton'
 import ErrorBoundary from './components/ErrorBoundary'
-import BannerPrivacy from './components/BannerPrivacy'
-import Home from './pages/Home'
-import About from './pages/About'
-import Archive from './pages/Archive'
-import ProjectDetail from './pages/ProjectDetail'
-import Privacy from './pages/Privacy'
-import NotFound from './pages/NotFound'
+import PrivacyBanner from './components/PrivacyBanner'
 import { useRoute } from './router'
+import { loadPage, loadedPage } from './pageLoader'
+
+// Già caricata prima dell'hydration e di ogni cambio pagina: la sospensione è solo una rete.
+function CurrentPage({ route }) {
+  const Page = loadedPage(route.name)
+  if (!Page) throw loadPage(route.name)
+  // Riferimento stabile preso da una cache, non creato qui.
+  // eslint-disable-next-line react-hooks/static-components
+  return <Page area={route.area} slug={route.slug} />
+}
 
 export default function App() {
   const route = useRoute()
 
   return (
-    <div id="top" className="min-h-[var(--schermo,100vh)] bg-paper">
+    <div id="top" className="min-h-[var(--screen-height,100vh)] bg-paper">
       <Navbar route={route} />
-      <ErrorBoundary rotta={route.path} lang={route.lang}>
-        {route.name === 'about' && <About />}
-        {route.name === 'archive' && <Archive area={route.area} />}
-        {route.name === 'project' && <ProjectDetail slug={route.slug} />}
-        {route.name === 'privacy' && <Privacy />}
-        {route.name === 'notfound' && <NotFound />}
-        {route.name === 'home' && <Home />}
+      <ErrorBoundary route={route.path} lang={route.lang}>
+        <Suspense fallback={null}>
+          <CurrentPage route={route} />
+        </Suspense>
       </ErrorBoundary>
       <Footer />
       <FloatingMailButton />
-      {/* Fuori dalla pagina corrente: la domanda arriva all'ingresso, non a chi
-          è già dentro una scheda col reel pronto a partire. */}
-      <BannerPrivacy />
+      {/* Su tutte le pagine: la domanda va fatta all'ingresso. */}
+      <PrivacyBanner />
     </div>
   )
 }

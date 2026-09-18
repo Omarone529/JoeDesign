@@ -1,48 +1,45 @@
-import { profiloIn } from '../data/siteData'
-import { testi } from '../i18n'
-import { scorrimento } from '../motion'
-import { Link, percorso, useLang } from '../router'
+import { profileIn } from '../data/siteData'
+import { texts } from '../i18n'
+import { scrolling } from '../motion'
+import { Link, pathFor, useLang } from '../router'
 
-// Fissato a build-time. Con `getFullYear()` al render, il primo gennaio l'HTML
-// statico e il browser direbbero anni diversi e l'hydration si romperebbe.
-const ANNO = __ANNO_BUILD__
+// Fissato alla build: con `getFullYear()` a Capodanno HTML statico e browser non combacerebbero.
+const YEAR = __BUILD_YEAR__
 
-// `/10` e non `/12`: l'opacità Tailwind va di cinque in cinque, e un valore
-// fuori scala non genera la classe.
-const FILETTO = 'border-paper/10'
+// `/10` e non `/12`: un'opacità fuori scala non genera la classe.
+const RULE = 'border-paper/10'
 
 // Fa anche da pagina contatti, che come rotta non esiste.
 // Testo secondario `night-soft`, non `muted`: sul nero `muted` scende sotto AA.
 export default function Footer() {
   const lang = useLang()
-  const T = testi(lang)
-  const profile = profiloIn(lang)
+  const T = texts(lang)
+  const profile = profileIn(lang)
 
-  const pagine = [
-    { label: T.nav.home, to: percorso('home', {}, lang) },
-    { label: T.nav.archivio, to: percorso('archive', {}, lang) },
-    { label: T.nav.chiSono, to: percorso('about', {}, lang) },
+  const pages = [
+    { label: T.nav.home, to: pathFor('home', {}, lang) },
+    { label: T.nav.archive, to: pathFor('archive', {}, lang) },
+    { label: T.nav.about, to: pathFor('about', {}, lang) },
   ]
 
   return (
-    /* Destinazione del salto "Contatti". Senza contorno di focus: su un
-       elemento così largo sarebbe enorme. */
+    /* Destinazione del salto "Contatti": niente contorno di focus, sarebbe enorme. */
     <footer
-      id="contatti"
+      id="contact"
       tabIndex={-1}
       className="scroll-mt-16 bg-night text-paper focus:outline-none"
     >
       <div className="flex flex-col items-center px-5 py-14 text-center sm:px-8 sm:py-16 lg:px-[72px] lg:py-20">
-        <nav aria-label={T.footer.pagine}>
+        <nav aria-label={T.footer.pages}>
           <ul className="m-0 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 p-0 list-none">
-            {pagine.map((p) => (
+            {pages.map((p) => (
               <li key={p.to}>
                 <Link
                   to={p.to}
                   className="group relative inline-block text-[13px] uppercase tracking-[0.16em] text-night-soft transition-colors duration-300 before:absolute before:-inset-x-2 before:-inset-y-1.5 before:content-[''] hover:text-paper"
                 >
                   {p.label}
-                  <Sottolineatura />
+                  <Underline />
                 </Link>
               </li>
             ))}
@@ -54,7 +51,7 @@ export default function Footer() {
             href={profile.emailHref}
             target="_blank"
             rel="noreferrer"
-            aria-label={T.footer.scriviA(profile.email)}
+            aria-label={T.footer.writeTo(profile.email)}
             className="relative text-night-soft transition-colors duration-300 ease-[cubic-bezier(.2,.7,.2,1)] before:absolute before:-inset-1.5 before:content-[''] hover:text-paper"
           >
             <LogoGmail className="h-5 w-5" />
@@ -102,32 +99,32 @@ export default function Footer() {
         </div>
 
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-night-soft">
-          {T.footer.riga(profile.role, profile.place)}
+          {T.footer.row(profile.role, profile.place)}
         </p>
       </div>
 
       <div
-        className={`flex flex-col items-center gap-4 border-t ${FILETTO} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
+        className={`flex flex-col items-center gap-4 border-t ${RULE} px-5 py-6 text-center sm:px-8 lg:px-[72px]`}
       >
         <div className="flex flex-wrap items-center justify-center gap-x-2 text-[10px] uppercase tracking-[0.2em] text-night-soft">
           <span>
-            © {ANNO} {profile.name} · {T.footer.diritti}
+            © {YEAR} {profile.name} · {T.footer.rights}
           </span>
           <span aria-hidden="true">·</span>
           <Link
-            to={percorso('privacy', {}, lang)}
+            to={pathFor('privacy', {}, lang)}
             className="group relative inline-block transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
           >
             {T.footer.privacy}
-            <Sottolineatura />
+            <Underline />
           </Link>
         </div>
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: scorrimento() })}
+          onClick={() => window.scrollTo({ top: 0, behavior: scrolling() })}
           className="group relative flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-night-soft transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-paper"
         >
-          {T.footer.tornaSu}
+          {T.footer.backToTop}
           <span
             aria-hidden="true"
             className="transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-translate-y-0.5"
@@ -140,10 +137,8 @@ export default function Footer() {
   )
 }
 
-// Va in un contenitore `relative` dentro un elemento `group`. Il `before` dei
-// comandi allarga i bersagli senza spostarla; "Privacy" e "Torna su" stanno a
-// 16px l'uno dall'altro per non accavallare le due aree.
-function Sottolineatura() {
+// "Privacy" e "Torna su" a 16px: le aree di tocco allargate non si accavallano.
+function Underline() {
   return (
     <span
       aria-hidden="true"

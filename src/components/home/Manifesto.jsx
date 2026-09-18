@@ -1,12 +1,12 @@
-import { manifestoFotoIn, profiloIn } from '../../data/siteData'
+import { manifestoPhotoIn, profileIn } from '../../data/siteData'
 import { useLang } from '../../router'
-import { srcSetDi, MISURE } from '../../immagini'
+import { srcSetDi, SIZES } from '../../images'
 
 // Manifesto su carta e foto di Joe con la lampada su `bg-night`.
 export default function Manifesto() {
   const lang = useLang()
-  const profile = profiloIn(lang)
-  const foto = manifestoFotoIn(lang)
+  const profile = profileIn(lang)
+  const photos = manifestoPhotoIn(lang)
 
   return (
     <>
@@ -18,14 +18,14 @@ export default function Manifesto() {
 
       <section className="bg-night">
         <img
-          src={foto.src}
-          srcSet={srcSetDi(foto.src)}
-          sizes={MISURE.piena}
-          alt={foto.alt}
+          src={photos.src}
+          srcSet={srcSetDi(photos.src)}
+          sizes={SIZES.filled}
+          alt={photos.alt}
           loading="lazy"
           decoding="async"
-          width={foto.width}
-          height={foto.height}
+          width={photos.width}
+          height={photos.height}
           className="block aspect-[16/9] w-full object-cover object-top"
         />
       </section>

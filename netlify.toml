@@ -1,52 +1,41 @@
-# Deploy su Netlify: build, pubblica dist/, passa l'URL del sito al pre-rendering (env URL).
-
 [build]
   command = "npm run build"
   publish = "dist"
 
-# La versione di Node sta in `.nvmrc`, che Netlify legge da sé: dichiararla
-# anche qui vorrebbe dire due numeri da tenere allineati a mano, ed è proprio
-# così che la CI è rimasta a Node 20 mentre in locale girava il 24.
+# Node viene da `.nvmrc`: ripeterlo qui farebbe due numeri da tenere allineati.
 
-# Intestazioni di sicurezza, valide per tutte le pagine.
-# Il sito è statico e non raccoglie dati, ma queste tre righe chiudono gli
-# abusi classici e sono ciò che qualunque analisi del sito va a cercare.
 [[headers]]
   for = "/*"
   [headers.values]
-    # Impedisce al browser di "indovinare" il tipo di un file ignorando quello
-    # dichiarato: è il trucco con cui un file caricato può farsi eseguire.
     X-Content-Type-Options = "nosniff"
-    # Vieta di incorniciare il sito dentro un altro sito (clickjacking).
     X-Frame-Options = "DENY"
-    # Verso l'esterno passa solo il dominio, non la pagina precisa da cui si
-    # arriva. Tra pagine interne il percorso completo resta disponibile.
     Referrer-Policy = "strict-origin-when-cross-origin"
-    # Il sito non usa fotocamera, microfono né posizione: negarli in partenza.
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
-    # HTTPS per un anno. Volutamente senza `preload`, difficile da revocare.
+    # Senza `preload`: è una scelta che non si ritira.
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-    # Solo risorse proprie, più il player youtube-nocookie in frame-src. 'unsafe-inline' negli stili
-    # serve agli attributi `style=` di React. ⚠️ Una risorsa esterna nuova va aggiunta qui.
+    # ⚠️ Una risorsa esterna nuova va aggiunta qui, o il browser la blocca in silenzio.
+    # 'unsafe-inline' negli stili serve agli attributi `style=` di React.
     # Per diagnosticare: rinominare in Content-Security-Policy-Report-Only.
     Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
 
-# I bundle in /assets/ hanno l'hash del contenuto nel nome: contenuto nuovo,
-# nome nuovo. Possono quindi restare in cache a tempo indeterminato.
+# Nomi con l'hash del contenuto: in cache per sempre.
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Le immagini conservano il nome anche quando vengono sostituite (cover.webp
-# resta cover.webp), quindi la cache è a termine. Con stale-while-revalidate il
-# browser mostra la copia scaduta e scarica la nuova in sottofondo.
+# Immagini e font tengono il nome anche quando cambiano: cache a termine.
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
 
-# Indirizzi inesistenti → 404 vera (non un 200 sulla home). Prima quella inglese per /en.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+# 404 vera, non un 200 sulla home. Prima quella inglese.
 [[redirects]]
   from = "/en/*"
   to = "/en/404.html"

@@ -15,7 +15,7 @@ const {
   allRoutes,
   metaForRoute,
   schemaForRoute,
-  immaginiPerRotta,
+  imagesForRoute,
   parsePath,
   SITE,
   profile,
@@ -28,21 +28,44 @@ const esc = (s) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 
-const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
+// Copia intatta dell'index.html di Vite: dist/index.html qui sotto diventa la home.
+const templateFile = path.join(distDir, '.vite', 'index.html')
+if (!fs.existsSync(templateFile)) fs.copyFileSync(path.join(distDir, 'index.html'), templateFile)
+const template = fs.readFileSync(templateFile, 'utf8')
+
+// Le pagine sono caricate a richiesta: renderToString non aspetta, quindi vanno pronte prima.
+await server.loadAllPages()
+
+// Il file della pagina e quelli che importa partono insieme al bundle, non dopo.
+const manifesto = JSON.parse(fs.readFileSync(path.join(distDir, '.vite', 'manifest.json'), 'utf8'))
+function dependencies(key, seen = new Set()) {
+  if (seen.has(key)) return seen
+  seen.add(key)
+  ;(manifesto[key].imports || []).forEach((k) => dependencies(k, seen))
+  return seen
+}
+// Il bundle principale e i suoi import sono già nell'HTML scritto da Vite.
+const inBundle = dependencies(Object.keys(manifesto).find((k) => manifesto[k].isEntry))
+
+function preloadTags(routeName) {
+  const own = [...dependencies(server.SOURCES[routeName])].filter((k) => !inBundle.has(k))
+  return own.flatMap((k) => [
+    `<link rel="modulepreload" crossorigin href="/${manifesto[k].file}" />`,
+    ...(manifesto[k].css || []).map((css) => `<link rel="stylesheet" crossorigin href="/${css}" />`),
+  ])
+}
 
 function headTags(meta, route) {
   const tags = [
+    ...preloadTags(route.name),
     `<meta name="author" content="${esc(profile.name)}" />`,
     // La 404 è l'unica senza canonical: non ha un indirizzo proprio.
     ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
     ...(meta.canonical ? [`<link rel="canonical" href="${meta.canonical}" />`] : []),
-    // Le due lingue della stessa pagina, più x-default. Ogni pagina elenca
-    // anche sé stessa: è la forma che Google chiede.
+    // Ogni pagina elenca anche sé stessa: è la forma che Google chiede.
     ...(meta.alternate || []).map(
       (a) => `<link rel="alternate" hreflang="${a.lang}" href="${a.href}" />`,
     ),
-    // Immagine principale nota in anticipo: il preload la mette in coda leggendo
-    // l'head, senza aspettare il layout.
     ...(meta.preload ? [`<link rel="preload" as="image" href="${meta.preload}" fetchpriority="high" />`] : []),
     `<meta property="og:type" content="${meta.type}" />`,
     `<meta property="og:site_name" content="Giovanni “Joe” Sarchiolla" />`,
@@ -54,8 +77,7 @@ function headTags(meta, route) {
     `<meta property="og:description" content="${esc(meta.description)}" />`,
     ...(meta.canonical ? [`<meta property="og:url" content="${meta.canonical}" />`] : []),
     `<meta property="og:image" content="${meta.image}" />`,
-    // Senza le dimensioni, alla prima condivisione la piattaforma scarica il
-    // file per impaginarlo e spesso mostra l'anteprima vuota.
+    // Senza, alla prima condivisione l'anteprima esce spesso vuota.
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
     `<meta property="og:image:type" content="image/jpeg" />`,
@@ -66,7 +88,6 @@ function headTags(meta, route) {
     `<meta name="twitter:image" content="${meta.image}" />`,
     ...(meta.imageAlt ? [`<meta name="twitter:image:alt" content="${esc(meta.imageAlt)}" />`] : []),
   ]
-  // Non sulla 404: descrivere un errore a un motore di ricerca non ha senso.
   if (!meta.noindex) {
     const schema = JSON.stringify(schemaForRoute(route, meta))
     // `</script>` dentro una stringa chiuderebbe il tag: va spezzato.
@@ -83,8 +104,6 @@ function buildPage(pathname) {
   const { html } = render(pathname)
 
   return template
-    // La lingua del documento: con `it` su una pagina inglese, le sintesi
-    // vocali leggerebbero l'inglese con la pronuncia italiana.
     .replace(/<html lang="[^"]*"/, `<html lang="${meta.htmlLang}"`)
     .replace(
       /<title>[\s\S]*?<\/title>/,
@@ -124,8 +143,7 @@ console.log(`  ✓ 404 (en)  →  dist/en/404.html`)
 const IMG_NS = 'http://www.google.com/schemas/sitemap-image/1.1'
 const XHTML_NS = 'http://www.w3.org/1999/xhtml'
 
-// xhtml:link di traduzione, come gli hreflang nell'head.
-const voceSitemap = (r) => {
+const sitemapEntry = (r) => {
   const route = parsePath(r)
   const meta = metaForRoute(route)
   const loc = `${SITE}${r === '/' ? '/' : r}`
@@ -135,22 +153,21 @@ const voceSitemap = (r) => {
         `\n    <xhtml:link rel="alternate" hreflang="${a.lang}" href="${esc(a.href)}" />`,
     )
     .join('')
-  const immagini = immaginiPerRotta(route)
+  const images = imagesForRoute(route)
     .map((src) => `\n    <image:image><image:loc>${esc(src)}</image:loc></image:image>`)
     .join('')
-  const dentro = alternative + immagini
-  return `  <url><loc>${loc}</loc>${dentro}${dentro ? '\n  ' : ''}</url>`
+  const inside = alternative + images
+  return `  <url><loc>${loc}</loc>${inside}${inside ? '\n  ' : ''}</url>`
 }
 
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="${IMG_NS}" xmlns:xhtml="${XHTML_NS}">\n` +
-  routes.map(voceSitemap).join('\n') +
+  routes.map(sitemapEntry).join('\n') +
   `\n</urlset>\n`
 fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8')
 console.log(`  ✓ sitemap.xml (${routes.length} URL)`)
 
-/* robots.txt: punta alla sitemap sul dominio reale del build. */
 const robots = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
 fs.writeFileSync(path.join(distDir, 'robots.txt'), robots, 'utf8')
 console.log(`  ✓ robots.txt`)

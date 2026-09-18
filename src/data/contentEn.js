@@ -3,46 +3,46 @@
 export const profileEn = {
   role: 'Product Designer',
   place: 'Reggio Emilia, Italy',
-  formazione: 'Academy of Fine Arts, Bologna',
+  education: 'Academy of Fine Arts, Bologna',
   manifesto:
     'Inspiration comes from art, fashion and graphics, and from there the product takes shape. The search is always for the form that needs no words.',
-  sintesi:
+  summary:
     'Lamps, seating and everyday objects: forms that bring together aesthetics, function and an emotional dimension.',
 }
 
 export const aboutEn = {
   intro:
     'Product designer from Reggio Emilia. Objects that bring together aesthetics, function and an emotional dimension, with attention to production and to the relationship between form and user.',
-  /* Le card di "Chi sono", agganciate per `chiave` a quelle di `siteData.js`.
+  /* Le card di "Chi sono", agganciate per `key` a quelle di `siteData.js`.
      Gli strumenti non passano di qui: sono nomi propri di software e non si
      traducono. */
-  competenze: [
+  skillCards: [
     {
-      chiave: 'stampa',
-      titolo: '3D printing',
-      testo: 'From digital design to the physical making of the product.',
+      key: 'printing',
+      title: '3D printing',
+      text: 'From digital design to the physical making of the product.',
     },
     {
-      chiave: 'grafica',
-      titolo: 'Graphic design',
-      testo:
+      key: 'graphics',
+      title: 'Graphic design',
+      text:
         'Graphic projects, logos and visual identities for competitions, open calls and personal projects.',
     },
     {
-      chiave: 'modellazione',
-      titolo: '3D modelling',
-      testo: 'Development and modelling of three-dimensional products and projects.',
+      key: 'modeling',
+      title: '3D modelling',
+      text: 'Development and modelling of three-dimensional products and projects.',
     },
     {
-      chiave: 'prototipi',
-      titolo: 'Prototypes and models',
-      testo:
+      key: 'prototypes',
+      title: 'Prototypes and models',
+      text:
         'Physical prototypes and models, made through woodworking and experimentation with materials.',
     },
   ],
   photos: {
     hero: 'Portrait of Joe Sarchiolla, cap and glasses',
-    schizzi: 'Sheet of hand sketches: lamps, seats, vases, upholstery and lighting systems',
+    sketches: 'Sheet of hand sketches: lamps, seats, vases, upholstery and lighting systems',
   },
   // Stesso ordine delle tavole in `about.sketchbook`.
   sketchbook: [
@@ -69,9 +69,9 @@ export const aboutEn = {
   ],
 }
 
-export const manifestoFotoEn = { alt: 'The DADO lamp lit, held in one hand' }
+export const manifestoPhotoEn = { alt: 'The DADO lamp lit, held in one hand' }
 
-export const areeEn = {
+export const areasEn = {
   'product-design': {
     label: 'Product design',
     desc: 'Furniture, jewellery, lighting and packaging.',
@@ -83,7 +83,7 @@ export const areeEn = {
 }
 
 // `cat`, `desc` e `spec` per slug. Un progetto assente resta in italiano.
-export const progettiEn = {
+export const projectsEn = {
   'directional-arrow': {
     cat: 'Coat rack',
     desc: 'Arrow is a project for those who love industrial style and essential design. The directional arrow, a recurring graphic element, becomes the core of the product, giving it a strong geometric, graphic and industrial value.',

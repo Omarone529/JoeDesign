@@ -1,10 +1,10 @@
-// Indirizzi e lingue. Il test chiave: ogni rotta generata da `percorso()` si rilegge con `parsePath()`.
+// Indirizzi e lingue. Il test chiave: ogni rotta generata da `pathFor()` si rilegge con `parsePath()`.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parsePath, percorso, percorsoTradotto } from '../src/rotte.js'
-import { archive, aree, areaDi } from '../src/data/siteData.js'
+import { parsePath, pathFor, translatedPath } from '../src/routes.js'
+import { archive, areas, areaOf } from '../src/data/siteData.js'
 
-const LINGUE = ['it', 'en']
+const LANGS = ['it', 'en']
 
 test('la radice è la home italiana, /en la home inglese', () => {
   assert.equal(parsePath('/').name, 'home')
@@ -50,47 +50,47 @@ test('gli slug percent-encoded si decodificano', () => {
 
 test('percorsoTradotto dà la gemella, e per la 404 la home', () => {
   const it = parsePath('/chi-sono')
-  assert.equal(percorsoTradotto(it, 'en'), '/en/about')
-  assert.equal(percorsoTradotto(parsePath('/en/refuso'), 'it'), '/')
+  assert.equal(translatedPath(it, 'en'), '/en/about')
+  assert.equal(translatedPath(parsePath('/en/refuso'), 'it'), '/')
 })
 
 test('una lingua non valida ripiega sull’italiano invece di rompere', () => {
-  assert.equal(percorso('about', {}, 'de'), '/chi-sono')
-  assert.equal(percorso('about', {}, undefined), '/chi-sono')
+  assert.equal(pathFor('about', {}, 'de'), '/chi-sono')
+  assert.equal(pathFor('about', {}, undefined), '/chi-sono')
 })
 
 test('ogni indirizzo generato viene riletto come la pagina che è', () => {
-  for (const lang of LINGUE) {
-    const casi = [
+  for (const lang of LANGS) {
+    const cases = [
       ['home', {}],
       ['about', {}],
       ['archive', {}],
       ['privacy', {}],
-      ...aree.map((a) => ['archive', { area: a.slug }]),
+      ...areas.map((a) => ['archive', { area: a.slug }]),
       ...archive.map((p) => ['project', { slug: p.slug }]),
     ]
-    for (const [nome, params] of casi) {
-      const url = percorso(nome, params, lang)
-      const letta = parsePath(url)
-      assert.equal(letta.name, nome, `${url} letta come "${letta.name}" invece di "${nome}"`)
-      assert.equal(letta.lang, lang, `${url} letta in "${letta.lang}" invece di "${lang}"`)
-      if (params.area) assert.equal(letta.area, params.area, url)
-      if (params.slug) assert.equal(letta.slug, params.slug, url)
+    for (const [name, params] of cases) {
+      const url = pathFor(name, params, lang)
+      const wasRead = parsePath(url)
+      assert.equal(wasRead.name, name, `${url} letta come "${wasRead.name}" invece di "${name}"`)
+      assert.equal(wasRead.lang, lang, `${url} letta in "${wasRead.lang}" invece di "${lang}"`)
+      if (params.area) assert.equal(wasRead.area, params.area, url)
+      if (params.slug) assert.equal(wasRead.slug, params.slug, url)
     }
   }
 })
 
 test('nessuno slug di progetto collide con un segmento di pagina', () => {
   // Uno slug "privacy" o "about" renderebbe irraggiungibile quella pagina.
-  const riservati = new Set(['chi-sono', 'about', 'archivio', 'archive', 'privacy', 'progetto', 'project', 'en'])
+  const reserved = new Set(['chi-sono', 'about', 'archivio', 'archive', 'privacy', 'progetto', 'project', 'en'])
   for (const p of archive) {
-    assert.ok(!riservati.has(p.slug), `lo slug "${p.slug}" è anche un segmento di pagina`)
+    assert.ok(!reserved.has(p.slug), `lo slug "${p.slug}" è anche un segmento di pagina`)
   }
 })
 
 test('ogni progetto sta in un’area che esiste', () => {
-  const chiavi = new Set(aree.map((a) => a.chiave))
+  const keyList = new Set(areas.map((a) => a.key))
   for (const p of archive) {
-    assert.ok(chiavi.has(areaDi(p)), `"${p.slug}" dichiara l'area "${areaDi(p)}"`)
+    assert.ok(keyList.has(areaOf(p)), `"${p.slug}" dichiara l'area "${areaOf(p)}"`)
   }
 })

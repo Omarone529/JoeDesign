@@ -14,32 +14,32 @@ const logoPath = path.join(publicDir, 'images', 'navbar', 'logo.webp')
 
 const PAPER = '#f4f3f1'
 
-const iconTrasparente = (lato) => sharp(logoPath).resize(lato, lato).png({ compressionLevel: 9 })
+const transparentIcon = (side) => sharp(logoPath).resize(side, side).png({ compressionLevel: 9 })
 
-const iconOpaca = (lato) =>
+const opaqueIcon = (side) =>
   sharp(logoPath)
-    .resize(lato, lato)
+    .resize(side, side)
     .flatten({ background: PAPER })
     .png({ compressionLevel: 9 })
 
 // .ico con un PNG dentro: 6 byte di testata e 16 per la voce.
-function ico(pngBuffer, lato) {
-  const testata = Buffer.alloc(6)
-  testata.writeUInt16LE(0, 0) // riservato
-  testata.writeUInt16LE(1, 2) // 1 = icona
-  testata.writeUInt16LE(1, 4) // una sola immagine
+function ico(pngBuffer, side) {
+  const header = Buffer.alloc(6)
+  header.writeUInt16LE(0, 0) // riservato
+  header.writeUInt16LE(1, 2) // 1 = icona
+  header.writeUInt16LE(1, 4) // una sola immagine
 
-  const voce = Buffer.alloc(16)
-  voce.writeUInt8(lato, 0) // larghezza
-  voce.writeUInt8(lato, 1) // altezza
-  voce.writeUInt8(0, 2) // nessuna tavolozza
-  voce.writeUInt8(0, 3) // riservato
-  voce.writeUInt16LE(1, 4) // piani di colore
-  voce.writeUInt16LE(32, 6) // bit per pixel
-  voce.writeUInt32LE(pngBuffer.length, 8)
-  voce.writeUInt32LE(22, 12) // i dati iniziano dopo testata + voce
+  const entry = Buffer.alloc(16)
+  entry.writeUInt8(side, 0) // larghezza
+  entry.writeUInt8(side, 1) // altezza
+  entry.writeUInt8(0, 2) // nessuna tavolozza
+  entry.writeUInt8(0, 3) // riservato
+  entry.writeUInt16LE(1, 4) // piani di colore
+  entry.writeUInt16LE(32, 6) // bit per pixel
+  entry.writeUInt32LE(pngBuffer.length, 8)
+  entry.writeUInt32LE(22, 12) // i dati iniziano dopo testata + voce
 
-  return Buffer.concat([testata, voce, pngBuffer])
+  return Buffer.concat([header, entry, pngBuffer])
 }
 
 const logoBase64 = fs.readFileSync(logoPath).toString('base64')
@@ -49,13 +49,13 @@ fs.writeFileSync(
   'utf8',
 )
 
-await (await iconOpaca(180)).toFile(path.join(publicDir, 'apple-touch-icon.png'))
-await (await iconOpaca(192)).toFile(path.join(publicDir, 'icon-192.png'))
-await (await iconOpaca(512)).toFile(path.join(publicDir, 'icon-512.png'))
+await (await opaqueIcon(180)).toFile(path.join(publicDir, 'apple-touch-icon.png'))
+await (await opaqueIcon(192)).toFile(path.join(publicDir, 'icon-192.png'))
+await (await opaqueIcon(512)).toFile(path.join(publicDir, 'icon-512.png'))
 
 fs.writeFileSync(
   path.join(publicDir, 'favicon.ico'),
-  ico(await (await iconTrasparente(32)).toBuffer(), 32),
+  ico(await (await transparentIcon(32)).toBuffer(), 32),
 )
 
 // `display: browser`: è un sito da leggere, la barra serve a condividere.

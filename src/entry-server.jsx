@@ -11,6 +11,7 @@ export function render(path) {
   return { html }
 }
 
-export { allRoutes, immaginiPerRotta, metaForRoute, schemaForRoute, SITE } from './seo.js'
+export { allRoutes, imagesForRoute, metaForRoute, schemaForRoute, SITE } from './seo.js'
 export { profile } from './data/siteData'
 export { parsePath }
+export { loadAllPages, SOURCES } from './pageLoader.js'

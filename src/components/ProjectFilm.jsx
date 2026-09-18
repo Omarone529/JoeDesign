@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import VideoYouTube from './VideoYouTube'
-import { srcSetDi, MISURE } from '../immagini'
+import { srcSetDi, SIZES } from '../images'
 
 /*
  * Filmato orizzontale in fondo alla scheda. ⚠️ Parte solo premendo play, anche col consenso:
@@ -9,17 +9,16 @@ import { srcSetDi, MISURE } from '../immagini'
 const POSTER_W = 1280
 const POSTER_H = 720
 
-export default function FilmatoProgetto({ videoId, title, poster, alt }) {
-  const [attivo, setAttivo] = useState(false)
+export default function ProjectFilm({ videoId, title, poster, alt }) {
+  const [active, setActive] = useState(false)
 
   return (
     <div className="relative aspect-video w-full overflow-hidden bg-night">
-      {/* Il poster resta sotto il player, che lo copre per intero: togliendolo
-          dal DOM il fondo scuro lampeggerebbe mentre YouTube carica. */}
+      {/* Resta sotto il player: toglierlo farebbe lampeggiare il fondo mentre YouTube carica. */}
       <img
         src={poster}
         srcSet={srcSetDi(poster)}
-        sizes={MISURE.piena}
+        sizes={SIZES.filled}
         alt={alt}
         loading="lazy"
         decoding="async"
@@ -30,10 +29,10 @@ export default function FilmatoProgetto({ videoId, title, poster, alt }) {
       <VideoYouTube
         videoId={videoId}
         title={title}
-        attivo={attivo}
+        active={active}
         /* Sempre con il sonoro: qui la partenza muta del reel non esiste. */
-        muto={false}
-        onAvvia={() => setAttivo(true)}
+        muted={false}
+        onStart={() => setActive(true)}
       />
     </div>
   )

@@ -1,12 +1,13 @@
 import React from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.jsx'
-import { RouterProvider } from './router.jsx'
-import { fissaAltezzaSchermo } from './altezzaSchermo'
+import { RouterProvider, parsePath } from './router.jsx'
+import { loadPage } from './pageLoader'
+import { setScreenHeight } from './screenHeight'
 import './index.css'
 
 // Sull'<html>, fuori dall'albero di React: non tocca l'hydration.
-fissaAltezzaSchermo()
+setScreenHeight()
 
 const root = document.getElementById('root')
 
@@ -18,8 +19,11 @@ const app = (
   </React.StrictMode>
 )
 
-if (root.hasChildNodes()) {
-  hydrateRoot(root, app)
-} else {
-  createRoot(root).render(app)
-}
+// Prima la pagina aperta: se l'aggancio la trovasse da scaricare, React ridisegnerebbe.
+loadPage(parsePath(window.location.pathname).name).then(() => {
+  if (root.hasChildNodes()) {
+    hydrateRoot(root, app)
+  } else {
+    createRoot(root).render(app)
+  }
+})

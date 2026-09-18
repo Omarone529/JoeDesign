@@ -1,53 +1,49 @@
 import { Fragment, useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
-import { LINGUE, testi } from '../i18n'
-import { Link, percorso, percorsoTradotto } from '../router'
+import { LANGS, texts } from '../i18n'
+import { Link, pathFor, translatedPath } from '../router'
 
-const SOGLIA = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
-const MOVIMENTO_MINIMO = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
+const THRESHOLD = 96 // px: sopra, la barra resta sempre visibile
+const MIN_MOVEMENT = 6 // px: contro il rimbalzo elastico
 
-// Parte visibile perché è così nell'HTML statico: altrimenti mismatch in
-// hydration. Lo scroll è accorpato in rAF, un render al massimo per frame.
-function useNavbarNascosta(route) {
-  const [nascosta, setNascosta] = useState(false)
+// Parte visibile come nell'HTML statico, o l'aggancio non combacia.
+function useNavbarHidden(route) {
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
-    let ultimaY = window.scrollY
-    let inCoda = false
+    let lastY = window.scrollY
+    let queued = false
 
-    const aggiorna = () => {
+    const update = () => {
       const y = window.scrollY
-      const delta = y - ultimaY
-      if (Math.abs(delta) > MOVIMENTO_MINIMO) {
-        setNascosta(delta > 0 && y > SOGLIA)
-        ultimaY = y
+      const delta = y - lastY
+      if (Math.abs(delta) > MIN_MOVEMENT) {
+        setHidden(delta > 0 && y > THRESHOLD)
+        lastY = y
       }
-      inCoda = false
+      queued = false
     }
 
     const onScroll = () => {
-      if (inCoda) return
-      inCoda = true
-      requestAnimationFrame(aggiorna)
+      if (queued) return
+      queued = true
+      requestAnimationFrame(update)
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Riesposta a ogni navigazione. Corretta durante il render e non in un
-  // effetto, o si vedrebbe un frame con la pagina nuova e la barra nascosta.
-  const [rottaPrec, setRottaPrec] = useState(route)
-  if (route !== rottaPrec) {
-    setRottaPrec(route)
-    setNascosta(false)
+  // Durante il render e non in un effetto: niente frame con la pagina nuova e la barra nascosta.
+  const [prevRoute, setPrevRoute] = useState(route)
+  if (route !== prevRoute) {
+    setPrevRoute(route)
+    setHidden(false)
   }
 
-  return [nascosta, setNascosta]
+  return [hidden, setHidden]
 }
 
-// Sottolineatura ancorata allo span interno, in assoluto: resta attaccata alla
-// parola e non sposta il testo.
 function NavLink({ to, active = false, children }) {
   return (
     <Link
@@ -72,32 +68,31 @@ function NavLink({ to, active = false, children }) {
 export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const lang = route?.lang ?? 'it'
-  const T = testi(lang)
-  // Sulla `path` e non sul nome: cambiando lingua la rotta resta la stessa, e
-  // la barra deve riesporsi lo stesso.
-  const [nascosta, setNascosta] = useNavbarNascosta(route?.path ?? '/')
+  const T = texts(lang)
+  // Sulla `path`: cambiando lingua il nome della rotta non cambia.
+  const [hidden, setHidden] = useNavbarHidden(route?.path ?? '/')
 
   const links = [
-    { label: T.nav.home, to: percorso('home', {}, lang), active: name === 'home' },
+    { label: T.nav.home, to: pathFor('home', {}, lang), active: name === 'home' },
     {
-      label: T.nav.archivio,
-      to: percorso('archive', {}, lang),
+      label: T.nav.archive,
+      to: pathFor('archive', {}, lang),
       active: name === 'archive' || name === 'project',
     },
-    { label: T.nav.chiSono, to: percorso('about', {}, lang), active: name === 'about' },
+    { label: T.nav.about, to: pathFor('about', {}, lang), active: name === 'about' },
   ]
 
   return (
     <header
-      onFocusCapture={() => setNascosta(false)}
+      onFocusCapture={() => setHidden(false)}
       className={`sticky top-0 z-50 border-b border-ink bg-paper/90 backdrop-blur-md transition-transform duration-300 ease-[cubic-bezier(.2,.7,.2,1)] motion-reduce:transition-none ${
-        nascosta ? '-translate-y-full' : 'translate-y-0'
+        hidden ? '-translate-y-full' : 'translate-y-0'
       }`}
     >
       {/* Sotto md il gruppo di destra è `contents`, così `justify-between` distribuisce menù, IG e lingue. */}
       <div className="relative flex h-16 items-center justify-between gap-3 px-5 sm:px-8 lg:px-[72px]">
         <Link
-          to={percorso('home', {}, lang)}
+          to={pathFor('home', {}, lang)}
           aria-label={T.nav.logo}
           className="flex shrink-0 items-center"
         >
@@ -110,7 +105,6 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Nome visibile da sm, centrato da md: sul telefono la barra tiene solo la navigazione. */}
         <div className="hidden shrink-0 items-center gap-2 sm:flex sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="hidden whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:inline-block sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
@@ -128,21 +122,21 @@ export default function Navbar({ route }) {
           </nav>
           {/* Sotto i 360px cade: i suoi quindici pixel mandano "CHI SONO" fuori schermo. */}
           <LinkInstagram lang={lang} className="hidden min-[360px]:flex sm:hidden" />
-          <SelettoreLingua route={route} />
+          <LanguageSwitcher route={route} />
         </div>
       </div>
     </header>
   )
 }
 
-// `before` allarga il bersaglio dell'icona. Compare due volte, mai insieme (sm e sotto sm).
+// Compare due volte, mai insieme (sopra e sotto sm).
 function LinkInstagram({ lang, className = '' }) {
   return (
     <a
       href={profile.instagram}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={testi(lang).nav.instagram(profile.handle)}
+      aria-label={texts(lang).nav.instagram(profile.handle)}
       className={`relative shrink-0 items-center text-ink transition-colors hover:text-muted before:absolute before:-inset-1.5 before:content-[''] ${className}`}
     >
       <LogoInstagram className="h-[15px] w-[15px] sm:h-[17px] sm:w-[17px] lg:h-[19px] lg:w-[19px]" />
@@ -150,16 +144,15 @@ function LinkInstagram({ lang, className = '' }) {
   )
 }
 
-// Le lingue sono due link alla pagina gemella, non un interruttore. Visibili entrambe.
-function SelettoreLingua({ route }) {
-  const attuale = route?.lang ?? 'it'
+function LanguageSwitcher({ route }) {
+  const currentLang = route?.lang ?? 'it'
 
   return (
     <div
-      aria-label={testi(attuale).nav.lingua}
+      aria-label={texts(currentLang).nav.language}
       className="flex shrink-0 items-center gap-1 border-l border-line pl-2 text-[10px] uppercase tracking-[0.08em] sm:gap-1.5 sm:pl-3 sm:tracking-[0.14em] lg:text-[11px]"
     >
-      {LINGUE.map((l, i) => (
+      {LANGS.map((l, i) => (
         <Fragment key={l}>
           {i > 0 && (
             <span aria-hidden="true" className="pointer-events-none text-line">
@@ -167,11 +160,11 @@ function SelettoreLingua({ route }) {
             </span>
           )}
           <Link
-            to={percorsoTradotto(route, l)}
+            to={translatedPath(route, l)}
             hrefLang={l}
-            aria-current={l === attuale ? 'true' : undefined}
+            aria-current={l === currentLang ? 'true' : undefined}
             className={`relative py-2 transition-colors before:absolute before:-inset-x-2 before:content-[''] ${
-              l === attuale ? 'font-bold text-ink' : 'text-muted hover:text-ink'
+              l === currentLang ? 'font-bold text-ink' : 'text-muted hover:text-ink'
             }`}
           >
             {l}
@@ -182,7 +175,6 @@ function SelettoreLingua({ route }) {
   )
 }
 
-/* Tratto leggero: a 15–19px uno pieno annerirebbe il segno. */
 function LogoInstagram({ className = '' }) {
   return (
     <svg

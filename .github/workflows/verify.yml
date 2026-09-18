@@ -1,0 +1,57 @@
+# Gli stessi comandi che si lanciano in locale. Node viene da `.nvmrc`.
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Passi separati: si vede subito quale si è rotto.
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Data and images
+        run: npm run verify
+
+      - name: Build and prerender
+        run: npm run build
+
+  # Col Chrome già presente sull'immagine ubuntu.
+  hydration:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # Se non vede il guasto simulato, il verde del passo dopo non vale niente.
+      - name: Detector self-test
+        run: npm run hydration -- --break
+
+      - name: Hydration
+        run: npm run hydration

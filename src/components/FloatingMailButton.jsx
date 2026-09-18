@@ -1,37 +1,36 @@
 import { useEffect, useState } from 'react'
 import { profile } from '../data/siteData'
-import { testi } from '../i18n'
+import { texts } from '../i18n'
 import { useLang } from '../router'
-import { useBannerAperto } from '../consenso'
+import { useBannerOpen } from '../consent'
 
 /* Duplica il contatto del footer; sparisce quando il footer entra in schermo. */
 export default function FloatingMailButton() {
-  const T = testi(useLang())
-  const [sopraFooter, setSopraFooter] = useState(true)
-  // Sotto il banner questo tasto è irraggiungibile: chi lo cercasse col dito
-  // premerebbe "Accetta". Sparisce finché la fascia è in pagina.
-  const bannerAperto = useBannerAperto()
+  const T = texts(useLang())
+  const [aboveFooter, setAboveFooter] = useState(true)
+  // Sparisce col banner in pagina: chi lo cercasse col dito premerebbe "Accetta".
+  const bannerOpen = useBannerOpen()
 
   useEffect(() => {
-    const footer = document.getElementById('contatti')
+    const footer = document.getElementById('contact')
     if (!footer) return
-    const observer = new IntersectionObserver(([entry]) => setSopraFooter(!entry.isIntersecting))
+    const observer = new IntersectionObserver(([entry]) => setAboveFooter(!entry.isIntersecting))
     observer.observe(footer)
     return () => observer.disconnect()
   }, [])
 
-  const visibile = sopraFooter && !bannerAperto
+  const visible = aboveFooter && !bannerOpen
 
   return (
     <a
       href={profile.emailHref}
       target="_blank"
       rel="noreferrer"
-      aria-label={T.footer.scriviA(profile.email)}
-      aria-hidden={!visibile}
-      tabIndex={visibile ? 0 : -1}
+      aria-label={T.footer.writeTo(profile.email)}
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
       className={`fixed bottom-6 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-ink text-paper shadow-lg transition-all duration-300 ease-[cubic-bezier(.2,.7,.2,1)] hover:bg-night sm:right-8 lg:right-[72px] ${
-        visibile ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
+        visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
       }`}
     >
       <LogoGmail className="h-5 w-5" />

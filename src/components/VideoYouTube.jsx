@@ -1,25 +1,25 @@
-import { testi } from '../i18n'
+import { texts } from '../i18n'
 import { useLang } from '../router'
 
 /*
  * Player YouTube, controllato da chi lo monta (miniatura compresa). L'iframe (nocookie) compare
- * solo dopo il play: ⚠️ nell'HTML statico non deve finire nessun iframe. `muto` per l'autoplay,
+ * solo dopo il play: ⚠️ nell'HTML statico non deve finire nessun iframe. `muted` per l'autoplay,
  * che i browser consentono solo senza audio; `loop` vuole anche `playlist`.
  */
-export default function VideoYouTube({ videoId, title, attivo, muto, onAvvia }) {
-  const T = testi(useLang()).progetto
+export default function VideoYouTube({ videoId, title, active, muted, onStart }) {
+  const T = texts(useLang()).project
 
-  if (attivo) {
-    const parametri = [
+  if (active) {
+    const parameters = [
       'autoplay=1',
       'rel=0',
       'playsinline=1',
-      ...(muto ? ['mute=1', 'loop=1', `playlist=${videoId}`] : []),
+      ...(muted ? ['mute=1', 'loop=1', `playlist=${videoId}`] : []),
     ].join('&')
     return (
       <iframe
-        src={`https://www.youtube-nocookie.com/embed/${videoId}?${parametri}`}
-        title={T.videoTitolo(title)}
+        src={`https://www.youtube-nocookie.com/embed/${videoId}?${parameters}`}
+        title={T.videoTitle(title)}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         className="absolute inset-0 h-full w-full border-0"
@@ -31,7 +31,7 @@ export default function VideoYouTube({ videoId, title, attivo, muto, onAvvia }) 
   return (
     <button
       type="button"
-      onClick={onAvvia}
+      onClick={onStart}
       aria-label={T.videoPlay(title)}
       className="group/play absolute inset-0 flex h-full w-full cursor-pointer items-center justify-center border-0 bg-transparent p-0"
     >
