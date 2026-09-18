@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Portfolio di Giovanni \"Joe\" Sarchiolla — Direzione A",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "vite",
     "verifica": "node scripts/verifica.js",
