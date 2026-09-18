@@ -43,7 +43,12 @@ sottili.
 | `hover`       | `#ececE8` | hover celle                          |
 | `night`       | `#0a0908` | sfondo footer                        |
 
-- Font: Helvetica Neue / Helvetica / Arial (`font-sans`).
+- Font: **Helvetica Neue ovunque**, pesi 400, 500 e 700. I `@font-face` in `src/index.css`
+  usano quella installata (Apple) e altrimenti i WOFF2 in `public/fonts/`
+  (`HelveticaNeue-Roman`, `-Medium`, `-Bold`), che richiedono una licenza web.
+  Senza i file, fuori da Apple esce Arial e `npm run verify` lo segnala.
+- `og-image.js` disegna il testo col font di sistema: va lanciato su un Mac, o le
+  anteprime escono in Arial.
 - Titoli grandi fluidi con `text-[clamp(...)]`, uppercase, tracking stretto.
 - Padding orizzontale delle sezioni: `px-5 sm:px-8 lg:px-[72px]`.
 - Ingresso pagina: `animate-viewIn`. Animazioni con curva di decelerazione

@@ -24,9 +24,14 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Le immagini tengono il nome anche quando cambiano: cache a termine.
+# Immagini e font tengono il nome anche quando cambiano: cache a termine.
 [[headers]]
   for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
 

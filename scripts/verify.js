@@ -145,6 +145,12 @@ for (const name of expectedOg) {
   }
 }
 
+// Font: senza i file, fuori da Apple il sito esce in Arial.
+const css = fs.readFileSync(path.join(root, 'src', 'index.css'), 'utf8')
+for (const [, font] of css.matchAll(/url\('(\/fonts\/[^']+)'\)/g)) {
+  if (missing(font)) warn(`font: manca ${font}, fuori da iPhone e Mac il sito usa Arial`)
+}
+
 // Varianti da 800px
 
 for (const [src, width] of Object.entries(variants)) {

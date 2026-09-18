@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prima quella installata (Apple), poi il file del sito: su Windows e Android non c'è. */
+@font-face {
+  font-family: 'Helvetica Neue';
+  font-weight: 400;
+  font-display: swap;
+  src: local('Helvetica Neue'), local('HelveticaNeue'), url('/fonts/HelveticaNeue-Roman.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  font-weight: 500;
+  font-display: swap;
+  src: local('Helvetica Neue Medium'), local('HelveticaNeue-Medium'), url('/fonts/HelveticaNeue-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Helvetica Neue';
+  font-weight: 700;
+  font-display: swap;
+  src: local('Helvetica Neue Bold'), local('HelveticaNeue-Bold'), url('/fonts/HelveticaNeue-Bold.woff2') format('woff2');
+}
+
 @layer base {
   html,
   body {
