@@ -45,9 +45,9 @@ cleanStraySpecks(data, info.width, info.height)
 const alpha = Buffer.alloc(info.width * info.height)
 for (let i = 0; i < alpha.length; i += 1) alpha[i] = data[i * 4 + 3] >= 110 ? 255 : 0
 const raw1 = { width: info.width, height: info.height, channels: 1 }
-const maschera = await sharp(alpha, { raw: raw1 }).blur(1.2).toColourspace('b-w').raw().toBuffer()
+const mask = await sharp(alpha, { raw: raw1 }).blur(1.2).toColourspace('b-w').raw().toBuffer()
 
-for (let i = 0; i < alpha.length; i += 1) data[i * 4 + 3] = maschera[i]
+for (let i = 0; i < alpha.length; i += 1) data[i * 4 + 3] = mask[i]
 
 await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
   .webp({ quality: Number(quality), alphaQuality: 100 })

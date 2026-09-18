@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 
 export default [
-  { ignores: ['dist', 'dist-ssr', 'node_modules', 'src/data/fotoFit.js'] },
+  { ignores: ['dist', 'dist-ssr', 'node_modules', 'src/data/photoFit.js'] },
   { files: ['**/*.{js,jsx}'] }, // senza, ESLint 9 salta i .jsx in silenzio
   js.configs.recommended,
   react.configs.flat.recommended,
@@ -18,7 +18,7 @@ export default [
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        __ANNO_BUILD__: 'readonly', // inlineata da Vite
+        __BUILD_YEAR__: 'readonly', // inlineata da Vite
         process: 'readonly', // seo.js lo legge con la guardia `typeof process`
       },
     },

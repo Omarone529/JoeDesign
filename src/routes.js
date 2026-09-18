@@ -1,20 +1,20 @@
 // Estensioni `.js` esplicite: questo file lo legge anche Node (test e script).
-import { archive, areaPerSlug } from './data/siteData.js'
-import { LINGUA_PREDEFINITA, normalizzaLingua } from './i18n.js'
+import { archive, areaBySlug } from './data/siteData.js'
+import { DEFAULT_LANG, normalizeLang } from './i18n.js'
 
 // Indirizzi nelle due lingue (italiano alla radice, inglese sotto /en). Gli slug non si traducono.
-const SEGMENTI = {
+const SEGMENTS = {
   it: { about: 'chi-sono', archive: 'archivio', project: 'progetto', privacy: 'privacy' },
   en: { about: 'about', archive: 'archive', project: 'project', privacy: 'privacy' },
 }
 
-const PREFISSO = { it: '', en: '/en' }
+const PREFIX = { it: '', en: '/en' }
 
 /* L'indirizzo di una pagina, nella lingua chiesta. Da usare in ogni <Link>. */
-export function percorso(name, params = {}, lang = LINGUA_PREDEFINITA) {
-  const l = normalizzaLingua(lang)
-  const base = PREFISSO[l]
-  const seg = SEGMENTI[l]
+export function pathFor(name, params = {}, lang = DEFAULT_LANG) {
+  const l = normalizeLang(lang)
+  const base = PREFIX[l]
+  const seg = SEGMENTS[l]
   switch (name) {
     case 'about':
       return `${base}/${seg.about}`
@@ -33,34 +33,34 @@ export function percorso(name, params = {}, lang = LINGUA_PREDEFINITA) {
 
 /* La stessa pagina nell'altra lingua: è il link del selettore in navbar e il
    valore degli hreflang. Una 404 non ha gemella: si va alla home. */
-export function percorsoTradotto(route, lang) {
-  if (!route || route.name === 'notfound') return percorso('home', {}, lang)
-  return percorso(route.name, { area: route.area, slug: route.slug }, lang)
+export function translatedPath(route, lang) {
+  if (!route || route.name === 'notfound') return pathFor('home', {}, lang)
+  return pathFor(route.name, { area: route.area, slug: route.slug }, lang)
 }
 
 export function parsePath(pathname) {
-  const intero = (pathname || '/').replace(/\/+$/, '') || '/'
+  const full = (pathname || '/').replace(/\/+$/, '') || '/'
 
-  const inglese = intero === '/en' || intero.startsWith('/en/')
-  const lang = inglese ? 'en' : LINGUA_PREDEFINITA
-  const p = inglese ? intero.slice(3) || '/' : intero
-  const seg = SEGMENTI[lang]
+  const english = full === '/en' || full.startsWith('/en/')
+  const lang = english ? 'en' : DEFAULT_LANG
+  const p = english ? full.slice(3) || '/' : full
+  const seg = SEGMENTS[lang]
 
-  if (p === '/') return { name: 'home', lang, path: intero }
-  if (p === `/${seg.about}`) return { name: 'about', lang, path: intero }
-  if (p === `/${seg.privacy}`) return { name: 'privacy', lang, path: intero }
-  if (p === `/${seg.archive}`) return { name: 'archive', area: null, lang, path: intero }
+  if (p === '/') return { name: 'home', lang, path: full }
+  if (p === `/${seg.about}`) return { name: 'about', lang, path: full }
+  if (p === `/${seg.privacy}`) return { name: 'privacy', lang, path: full }
+  if (p === `/${seg.archive}`) return { name: 'archive', area: null, lang, path: full }
   if (p.startsWith(`/${seg.archive}/`)) {
     const slug = decodeURIComponent(p.slice(seg.archive.length + 2))
-    if (areaPerSlug(slug)) return { name: 'archive', area: slug, lang, path: intero }
+    if (areaBySlug(slug)) return { name: 'archive', area: slug, lang, path: full }
   }
   if (p.startsWith(`/${seg.project}/`)) {
     const slug = decodeURIComponent(p.slice(seg.project.length + 2))
     if (archive.some((item) => item.slug === slug)) {
-      return { name: 'project', slug, lang, path: intero }
+      return { name: 'project', slug, lang, path: full }
     }
   }
   // 404 (Netlify la serve con lo status giusto). La lingua resta quella del
   // prefisso: chi sbaglia un indirizzo sotto /en vede la 404 in inglese.
-  return { name: 'notfound', lang, path: intero }
+  return { name: 'notfound', lang, path: full }
 }

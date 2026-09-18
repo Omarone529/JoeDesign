@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   // Il manifest dice a prerender.js quale file precaricare per ogni pagina.
   build: { manifest: true },
-  // __ANNO_BUILD__: anno del copyright fissato alla build, così HTML statico e hydration coincidono.
+  // __BUILD_YEAR__: anno del copyright fissato alla build, così HTML statico e hydration coincidono.
   define: {
-    __ANNO_BUILD__: new Date().getFullYear(),
+    __BUILD_YEAR__: new Date().getFullYear(),
   },
 })

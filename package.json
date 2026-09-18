@@ -9,10 +9,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "verifica": "node scripts/verifica.js",
+    "verify": "node scripts/verify.js",
     "test": "node --test tests/*.test.js",
-    "hydration": "node scripts/controlla-hydration.js",
-    "prebuild": "npm test && node scripts/verifica.js",
+    "hydration": "node scripts/check-hydration.js",
+    "prebuild": "npm test && node scripts/verify.js",
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.js",
     "prerender": "node scripts/prerender.js",
     "preview": "vite preview",

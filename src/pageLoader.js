@@ -1,5 +1,5 @@
-// Una pagina = un file JS, caricato quando serve. Le chiavi sono i nomi di rotta di rotte.js.
-const caricatori = {
+// Una pagina = un file JS, caricato quando serve. Le chiavi sono i nomi di rotta di routes.js.
+const loaders = {
   home: () => import('./pages/Home.jsx'),
   about: () => import('./pages/About.jsx'),
   archive: () => import('./pages/Archive.jsx'),
@@ -9,7 +9,7 @@ const caricatori = {
 }
 
 // I sorgenti, per il modulepreload che prerender.js mette nell'HTML.
-export const SORGENTI = {
+export const SOURCES = {
   home: 'src/pages/Home.jsx',
   about: 'src/pages/About.jsx',
   archive: 'src/pages/Archive.jsx',
@@ -18,26 +18,26 @@ export const SORGENTI = {
   notfound: 'src/pages/NotFound.jsx',
 }
 
-const caricate = {}
-const inCorso = {}
+const loaded = {}
+const inProgress = {}
 
-export function paginaCaricata(nome) {
-  return caricate[nome]
+export function loadedPage(name) {
+  return loaded[name]
 }
 
-export function caricaPagina(nome) {
-  inCorso[nome] ??= caricatori[nome]().then(
-    (m) => (caricate[nome] = m.default),
-    (errore) => {
+export function loadPage(name) {
+  inProgress[name] ??= loaders[name]().then(
+    (m) => (loaded[name] = m.default),
+    (error) => {
       // Dopo un deploy i file vecchi non ci sono più: si ricarica l'indirizzo, già aggiornato.
-      if (typeof window === 'undefined') throw errore
+      if (typeof window === 'undefined') throw error
       window.location.reload()
       return new Promise(() => {})
     },
   )
-  return inCorso[nome]
+  return inProgress[name]
 }
 
-export function caricaTutte() {
-  return Promise.all(Object.keys(caricatori).map(caricaPagina))
+export function loadAllPages() {
+  return Promise.all(Object.keys(loaders).map(loadPage))
 }

@@ -15,7 +15,7 @@ const {
   allRoutes,
   metaForRoute,
   schemaForRoute,
-  immaginiPerRotta,
+  imagesForRoute,
   parsePath,
   SITE,
   profile,
@@ -29,27 +29,27 @@ const esc = (s) =>
     .replace(/"/g, '&quot;')
 
 // Copia intatta dell'index.html di Vite: dist/index.html qui sotto diventa la home.
-const stampo = path.join(distDir, '.vite', 'index.html')
-if (!fs.existsSync(stampo)) fs.copyFileSync(path.join(distDir, 'index.html'), stampo)
-const template = fs.readFileSync(stampo, 'utf8')
+const templateFile = path.join(distDir, '.vite', 'index.html')
+if (!fs.existsSync(templateFile)) fs.copyFileSync(path.join(distDir, 'index.html'), templateFile)
+const template = fs.readFileSync(templateFile, 'utf8')
 
 // Le pagine sono caricate a richiesta: renderToString non aspetta, quindi vanno pronte prima.
-await server.caricaTutte()
+await server.loadAllPages()
 
 // Il file della pagina e quelli che importa partono insieme al bundle, non dopo.
 const manifesto = JSON.parse(fs.readFileSync(path.join(distDir, '.vite', 'manifest.json'), 'utf8'))
-function dipendenze(chiave, visti = new Set()) {
-  if (visti.has(chiave)) return visti
-  visti.add(chiave)
-  ;(manifesto[chiave].imports || []).forEach((k) => dipendenze(k, visti))
-  return visti
+function dependencies(key, seen = new Set()) {
+  if (seen.has(key)) return seen
+  seen.add(key)
+  ;(manifesto[key].imports || []).forEach((k) => dependencies(k, seen))
+  return seen
 }
 // Il bundle principale e i suoi import sono già nell'HTML scritto da Vite.
-const nelBundle = dipendenze(Object.keys(manifesto).find((k) => manifesto[k].isEntry))
+const inBundle = dependencies(Object.keys(manifesto).find((k) => manifesto[k].isEntry))
 
-function precarica(nomeRotta) {
-  const propri = [...dipendenze(server.SORGENTI[nomeRotta])].filter((k) => !nelBundle.has(k))
-  return propri.flatMap((k) => [
+function preloadTags(routeName) {
+  const own = [...dependencies(server.SOURCES[routeName])].filter((k) => !inBundle.has(k))
+  return own.flatMap((k) => [
     `<link rel="modulepreload" crossorigin href="/${manifesto[k].file}" />`,
     ...(manifesto[k].css || []).map((css) => `<link rel="stylesheet" crossorigin href="/${css}" />`),
   ])
@@ -57,7 +57,7 @@ function precarica(nomeRotta) {
 
 function headTags(meta, route) {
   const tags = [
-    ...precarica(route.name),
+    ...preloadTags(route.name),
     `<meta name="author" content="${esc(profile.name)}" />`,
     // La 404 è l'unica senza canonical: non ha un indirizzo proprio.
     ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
@@ -151,7 +151,7 @@ const IMG_NS = 'http://www.google.com/schemas/sitemap-image/1.1'
 const XHTML_NS = 'http://www.w3.org/1999/xhtml'
 
 // xhtml:link di traduzione, come gli hreflang nell'head.
-const voceSitemap = (r) => {
+const sitemapEntry = (r) => {
   const route = parsePath(r)
   const meta = metaForRoute(route)
   const loc = `${SITE}${r === '/' ? '/' : r}`
@@ -161,17 +161,17 @@ const voceSitemap = (r) => {
         `\n    <xhtml:link rel="alternate" hreflang="${a.lang}" href="${esc(a.href)}" />`,
     )
     .join('')
-  const immagini = immaginiPerRotta(route)
+  const images = imagesForRoute(route)
     .map((src) => `\n    <image:image><image:loc>${esc(src)}</image:loc></image:image>`)
     .join('')
-  const dentro = alternative + immagini
-  return `  <url><loc>${loc}</loc>${dentro}${dentro ? '\n  ' : ''}</url>`
+  const inside = alternative + images
+  return `  <url><loc>${loc}</loc>${inside}${inside ? '\n  ' : ''}</url>`
 }
 
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n` +
   `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="${IMG_NS}" xmlns:xhtml="${XHTML_NS}">\n` +
-  routes.map(voceSitemap).join('\n') +
+  routes.map(sitemapEntry).join('\n') +
   `\n</urlset>\n`
 fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemap, 'utf8')
 console.log(`  ✓ sitemap.xml (${routes.length} URL)`)

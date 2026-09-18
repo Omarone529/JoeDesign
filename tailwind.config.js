@@ -3,6 +3,8 @@ import plugin from 'tailwindcss/plugin'
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
+  // `!visible` nel JSX non è una classe: Tailwind lo leggerebbe come `visible` con !important.
+  blocklist: ['!visible', '!container'],
   theme: {
     extend: {
       colors: {
@@ -41,14 +43,14 @@ export default {
         // L'opacità si chiude presto e la corsa continua: le cose sono già tutte lì
         // mentre stanno ancora rallentando. Al contrario — dissolvenza lunga quanto la
         // corsa — il movimento si vede solo a metà e sembra meccanico.
-        daSinistra: {
+        fromLeft: {
           '0%': { opacity: '0', transform: 'translateX(-32%)' },
           '35%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         // Il ritratto arriva da fuori e si scopre subito: l'opacità è finita al 20%,
         // così è dipinto quasi da principio e l'LCP non aspetta la fine della corsa.
-        daDestra: {
+        fromRight: {
           '0%': { opacity: '0', transform: 'translateX(34%)' },
           '20%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
@@ -65,9 +67,9 @@ export default {
         // Quattro tempi diversi apposta: pagina vuota per due decimi, poi le due righe
         // una dopo l'altra e il ritratto che arriva più lento, perché pesa di più.
         // La curva è quasi tutta decelerazione: le cose si posano invece di fermarsi.
-        titoloIn: 'daSinistra 1.25s cubic-bezier(.16,1,.3,1) .2s both',
-        ruoloIn: 'daSinistra 1.25s cubic-bezier(.16,1,.3,1) .38s both',
-        fotoIn: 'daDestra 1.5s cubic-bezier(.16,1,.3,1) .3s both',
+        titleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .2s both',
+        roleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .38s both',
+        photoIn: 'fromRight 1.5s cubic-bezier(.16,1,.3,1) .3s both',
         float: 'float 2.6s ease-in-out infinite',
       },
     },

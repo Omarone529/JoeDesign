@@ -2,7 +2,7 @@
 #
 # Perché esiste. `npm test` e `npm run lint` erano comandi da lanciare a mano,
 # e nessuno li lanciava al momento giusto: il deploy su Netlify parte dal push,
-# non dal terminale di chi ha scritto il codice. Una rotta rotta in `rotte.js`
+# non dal terminale di chi ha scritto il codice. Una rotta rotta in `routes.js`
 # — che è il file da cui dipendono tutte e 66 le pagine — sarebbe uscita in
 # produzione senza che niente si fermasse.
 #
@@ -21,7 +21,7 @@ on:
     branches: [main]
 
 jobs:
-  controlli:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
       # ma tenerlo separato serve a leggere quale dei due si è rotto senza
       # aprire il log della build.
       - name: Verifica dati e immagini
-        run: npm run verifica
+        run: npm run verify
 
       # L'ultimo perché è il più lento, e perché è quello che ripete tutto:
       # se i tre passi sopra sono verdi, qui si controlla solo che le 66 pagine
@@ -56,7 +56,7 @@ jobs:
   # L'aggancio di React sulle 66 pagine, col Chrome già presente sull'immagine ubuntu.
   # Prima l'autotest: se non vede il guasto simulato, il verde dopo non vale niente.
   hydration:
-    needs: controlli
+    needs: checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
       - run: npm run build
 
       - name: Autotest del rilevatore
-        run: npm run hydration -- --rompi
+        run: npm run hydration -- --break
 
       - name: Hydration
         run: npm run hydration

@@ -1,24 +1,24 @@
 // Estensioni `.js` esplicite: questo file lo legge anche Node (test e script).
 import {
   aboutIn,
-  archivioIn,
-  areaDi,
-  areaPerSlugIn,
-  areeIn,
-  contaProgetti,
+  archiveIn,
+  areaOf,
+  areaBySlugIn,
+  areasIn,
+  countProjects,
   focusItemsIn,
-  periodoArchivio,
-  periodoDi,
+  archivePeriod,
+  periodOf,
   profile,
-  profiloIn,
-  progettiAreaIn,
-  manifestoFoto,
-  manifestoFotoIn,
+  profileIn,
+  areaProjectsIn,
+  manifestoPhoto,
+  manifestoPhotoIn,
   projectImages,
-  titoloLeggibile,
+  readableTitle,
 } from './data/siteData.js'
-import { LINGUE, testi } from './i18n.js'
-import { percorso, percorsoTradotto } from './rotte.js'
+import { LANGS, texts } from './i18n.js'
+import { pathFor, translatedPath } from './routes.js'
 
 /*
  * Metadati per rotta (meta, dati strutturati, sitemap), serializzati da prerender.js.
@@ -34,23 +34,23 @@ export const SITE = (ENV_SITE || 'https://joesarchiolla.com').replace(/\/+$/, ''
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
 /* L'URL assoluto di una pagina, nella lingua chiesta. */
-const url = (name, params, lang) => SITE + percorso(name, params, lang)
+const url = (name, params, lang) => SITE + pathFor(name, params, lang)
 
-const PERIODO = periodoArchivio
-  ? periodoArchivio.primo === periodoArchivio.ultimo
-    ? `${periodoArchivio.primo}`
-    : `${periodoArchivio.primo} · ${periodoArchivio.ultimo}`
+const PERIOD = archivePeriod
+  ? archivePeriod.first === archivePeriod.last
+    ? `${archivePeriod.first}`
+    : `${archivePeriod.first} · ${archivePeriod.last}`
   : ''
 
 // Ripiego per le schede senza `desc`: oggetto, anno e autore.
-function descrizioneProgetto(item, lang) {
+function projectDescription(item, lang) {
   if (item.desc?.trim()) return item.desc
-  const p = profiloIn(lang)
-  const anno = item.year ? `, ${item.year}` : ''
-  return testi(lang).seo.progettoDesc(
-    titoloLeggibile(item.title),
+  const p = profileIn(lang)
+  const year = item.year ? `, ${item.year}` : ''
+  return texts(lang).seo.projectDesc(
+    readableTitle(item.title),
     item.cat,
-    anno,
+    year,
     p.name,
     p.role,
     p.place,
@@ -62,85 +62,85 @@ export function clip(text, max = 155, min = 80) {
   const t = String(text).replace(/\s+/g, ' ').trim()
   if (t.length <= max) return t
 
-  let intero = ''
-  for (const frase of t.match(/[^.!?]+[.!?]+(\s|$)/g) || []) {
-    if ((intero + frase).trim().length > max) break
-    intero += frase
+  let full = ''
+  for (const sentence of t.match(/[^.!?]+[.!?]+(\s|$)/g) || []) {
+    if ((full + sentence).trim().length > max) break
+    full += sentence
   }
-  intero = intero.trim()
-  if (intero.length >= min) return intero
+  full = full.trim()
+  if (full.length >= min) return full
 
   return t.slice(0, max - 1).replace(/\s+\S*$/, '').trim() + '…'
 }
 
 // JPEG, non WebP: LinkedIn e WhatsApp non mostrano le WebP.
-const ogImage = (nome, lang) => abs(`/images/og/${lang === 'en' ? 'en/' : ''}${nome}.jpg`)
+const ogImage = (name, lang) => abs(`/images/og/${lang === 'en' ? 'en/' : ''}${name}.jpg`)
 
-const FIRMA = `${profile.name} “${profile.nick}”`
+const SIGNATURE = `${profile.name} “${profile.nick}”`
 
 // Nome per esteso nel title; oltre ~62 caratteri cade prima la categoria.
-function titoloProgetto(item) {
-  const nome = titoloLeggibile(item.title)
-  const pieno = `${nome} · ${item.cat} · ${FIRMA}`
-  if (pieno.length <= 62) return pieno
-  const senzaCategoria = `${nome} · ${FIRMA}`
-  return senzaCategoria.length <= 62 ? senzaCategoria : `${nome} · ${profile.name}`
+function projectTitle(item) {
+  const name = readableTitle(item.title)
+  const fullness = `${name} · ${item.cat} · ${SIGNATURE}`
+  if (fullness.length <= 62) return fullness
+  const noCategory = `${name} · ${SIGNATURE}`
+  return noCategory.length <= 62 ? noCategory : `${name} · ${profile.name}`
 }
 
-function periodoTesto(periodo) {
-  if (!periodo) return ''
-  return periodo.primo === periodo.ultimo
-    ? `${periodo.primo}`
-    : `${periodo.primo} · ${periodo.ultimo}`
+function periodLabel(period) {
+  if (!period) return ''
+  return period.first === period.last
+    ? `${period.first}`
+    : `${period.first} · ${period.last}`
 }
 
 // hreflang delle due lingue, con x-default sull'italiano.
 function alternative(route) {
   if (route.name === 'notfound') return []
   return [
-    ...LINGUE.map((l) => ({ lang: l, href: SITE + percorsoTradotto(route, l) })),
-    { lang: 'x-default', href: SITE + percorsoTradotto(route, 'it') },
+    ...LANGS.map((l) => ({ lang: l, href: SITE + translatedPath(route, l) })),
+    { lang: 'x-default', href: SITE + translatedPath(route, 'it') },
   ]
 }
 
 export function metaForRoute(route) {
   const lang = route.lang || 'it'
-  const T = testi(lang)
-  const p = profiloIn(lang)
-  const comuni = { lang, htmlLang: T.htmlLang, ogLocale: T.ogLocale, alternate: alternative(route) }
+  const T = texts(lang)
+  const p = profileIn(lang)
+  const common = { lang, htmlLang: T.htmlLang, ogLocale: T.ogLocale, alternate: alternative(route) }
 
   if (route.name === 'archive') {
     // Pagina d'area: /archivio/product-design, /en/archive/graphic-design.
-    const area = route.area ? areaPerSlugIn(route.area, lang) : null
+    const area = route.area ? areaBySlugIn(route.area, lang) : null
     if (area) {
-      const progetti = progettiAreaIn(area.chiave, lang)
+      const projects = areaProjectsIn(area.key, lang)
       return {
-        ...comuni,
-        title: T.seo.areaTitolo(area.label, FIRMA),
+        ...common,
+        title: T.seo.areaTitle(area.label, SIGNATURE),
         description: clip(
           T.seo.areaDesc(
-            contaProgetti(progetti.length, lang),
+            countProjects(projects.length, lang),
             area.label.toLowerCase(),
-            FIRMA,
-            periodoTesto(periodoDi(progetti)),
+            SIGNATURE,
+            periodLabel(periodOf(projects)),
             area.desc,
           ),
         ),
         canonical: url('archive', { area: area.slug }, lang),
-        image: ogImage(`archivio-${area.slug}`, lang),
-        imageAlt: T.seo.areaImmagineAlt(area.label, p.displayName),
+        image: ogImage(`archive-${area.slug}`, lang),
+        imageAlt: T.seo.areaImageAlt(area.label, p.displayName),
         type: 'website',
         area,
       }
     }
 
     return {
-      ...comuni,
-      title: T.seo.archivioTitolo(FIRMA),
-      description: T.seo.archivioDesc(archivioIn(lang).length, FIRMA, PERIODO),
+      ...common,
+      title: T.seo.archiveTitle(SIGNATURE),
+      description: T.seo.archiveDesc(archiveIn(lang).length, SIGNATURE, PERIOD),
       canonical: url('archive', {}, lang),
-      image: ogImage('archivio', lang),
-      imageAlt: T.seo.areaImmagineAlt(T.seo.archivioNome, p.displayName),
+      image: ogImage('archive', lang),
+      imageAlt: T.seo.areaImageAlt(T.seo.archiveName, p.displayName),
       type: 'website',
     }
   }
@@ -148,41 +148,41 @@ export function metaForRoute(route) {
   if (route.name === 'about') {
     const about = aboutIn(lang)
     return {
-      ...comuni,
-      title: T.seo.chiSonoTitolo(FIRMA, p.role),
+      ...common,
+      title: T.seo.aboutTitle(SIGNATURE, p.role),
       description: clip(about.intro),
       canonical: url('about', {}, lang),
-      image: ogImage('chi-sono', lang),
+      image: ogImage('about', lang),
       // L'alt descrive l'ANTEPRIMA social, che `og-image.js` compone ancora con
       // la foto della lampada: cambiando la sorgente là, va cambiato anche qui.
-      imageAlt: manifestoFotoIn(lang).alt,
+      imageAlt: manifestoPhotoIn(lang).alt,
       preload: about.photos.hero.src, // elemento più grande della pagina
       type: 'profile',
     }
   }
 
   if (route.name === 'project') {
-    const item = archivioIn(lang).find((x) => x.slug === route.slug)
+    const item = archiveIn(lang).find((x) => x.slug === route.slug)
     if (item) {
       const { cover, gallery } = projectImages(item)
       // Senza copertina non c'è nemmeno l'anteprima social della scheda:
       // il link condiviso porta quella dell'area, non un riquadro vuoto.
-      const areaItem = areeIn(lang).find((a) => a.chiave === areaDi(item))
+      const areaItem = areasIn(lang).find((a) => a.key === areaOf(item))
       // Un `area` che non corrisponde a nessuna area dichiarata è un refuso nei
       // dati: senza questa riga la build muore più avanti su un `undefined`.
       if (!areaItem) {
         throw new Error(
-          `seo: il progetto "${item.slug}" dichiara area "${areaDi(item)}", che non esiste in \`aree\` (${areeIn(lang)
-            .map((a) => a.chiave)
+          `seo: il progetto "${item.slug}" dichiara area "${areaOf(item)}", che non esiste in \`aree\` (${areasIn(lang)
+            .map((a) => a.key)
             .join(', ')})`,
         )
       }
       return {
-        ...comuni,
-        title: titoloProgetto(item),
-        description: clip(descrizioneProgetto(item, lang)),
+        ...common,
+        title: projectTitle(item),
+        description: clip(projectDescription(item, lang)),
         canonical: url('project', { slug: item.slug }, lang),
-        image: ogImage(cover ? item.slug : `archivio-${areaItem.slug}`, lang),
+        image: ogImage(cover ? item.slug : `archive-${areaItem.slug}`, lang),
         imageAlt: `${item.title} · ${item.cat}`,
         preload: gallery[0], // prima diapositiva del carosello
         type: 'article',
@@ -194,9 +194,9 @@ export function metaForRoute(route) {
   // Anteprima social della home: og-image.js non ne genera una per la privacy.
   if (route.name === 'privacy') {
     return {
-      ...comuni,
-      title: T.seo.privacyTitolo(FIRMA),
-      description: T.seo.privacyDesc(FIRMA),
+      ...common,
+      title: T.seo.privacyTitle(SIGNATURE),
+      description: T.seo.privacyDesc(SIGNATURE),
       canonical: url('privacy', {}, lang),
       image: ogImage('home', lang),
       imageAlt: aboutIn(lang).photos.hero.alt,
@@ -208,9 +208,9 @@ export function metaForRoute(route) {
   // indicarne uno "giusto" direbbe a Google che è un'altra pagina del sito.
   if (route.name === 'notfound') {
     return {
-      ...comuni,
-      title: T.seo.nonTrovataTitolo(FIRMA),
-      description: T.seo.nonTrovataDesc(FIRMA),
+      ...common,
+      title: T.seo.notFoundTitle(SIGNATURE),
+      description: T.seo.notFoundDesc(SIGNATURE),
       image: ogImage('home', lang),
       imageAlt: aboutIn(lang).photos.hero.alt,
       type: 'website',
@@ -220,9 +220,9 @@ export function metaForRoute(route) {
 
   // Nome, ruolo e città: le chiavi delle ricerche realistiche.
   return {
-    ...comuni,
-    title: T.seo.homeTitolo(FIRMA, p.role),
-    description: T.seo.homeDesc(FIRMA, p.role, p.place, PERIODO),
+    ...common,
+    title: T.seo.homeTitle(SIGNATURE, p.role),
+    description: T.seo.homeDesc(SIGNATURE, p.role, p.place, PERIOD),
     canonical: url('home', {}, lang),
     image: ogImage('home', lang),
     imageAlt: aboutIn(lang).photos.hero.alt,
@@ -232,48 +232,48 @@ export function metaForRoute(route) {
 
 /* Tutte le pagine da generare: le stesse rotte in tutte e due le lingue. */
 export function allRoutes() {
-  return LINGUE.flatMap((lang) => [
-    percorso('home', {}, lang),
-    percorso('about', {}, lang),
-    percorso('archive', {}, lang),
-    percorso('privacy', {}, lang),
-    ...areeIn(lang).map((a) => percorso('archive', { area: a.slug }, lang)),
-    ...archivioIn(lang).map((p) => percorso('project', { slug: p.slug }, lang)),
+  return LANGS.flatMap((lang) => [
+    pathFor('home', {}, lang),
+    pathFor('about', {}, lang),
+    pathFor('archive', {}, lang),
+    pathFor('privacy', {}, lang),
+    ...areasIn(lang).map((a) => pathFor('archive', { area: a.slug }, lang)),
+    ...archiveIn(lang).map((p) => pathFor('project', { slug: p.slug }, lang)),
   ])
 }
 
 /* ─────────────────────────── Dati strutturati ─────────────────────────── */
 
 // Un @graph per pagina: sito e persona hanno un @id unico, pagine e opere uno per lingua.
-const ID_SITO = `${SITE}/#sito`
-const ID_PERSONA = `${SITE}/#persona`
-const idArchivio = (lang) => `${url('archive', {}, lang)}#raccolta`
+const SITE_ID = `${SITE}/#site`
+const PERSON_ID = `${SITE}/#person`
+const archiveId = (lang) => `${url('archive', {}, lang)}#raccolta`
 
 /* `sameAs` lega il nome ai profili: vanno elencati tutti. */
 const SOCIAL = [profile.instagram, profile.youtube, profile.tiktok, profile.linkedin].filter(
   Boolean,
 )
 
-function nodoSito(lang) {
-  const T = testi(lang)
-  const p = profiloIn(lang)
+function siteNode(lang) {
+  const T = texts(lang)
+  const p = profileIn(lang)
   return {
     '@type': 'WebSite',
-    '@id': ID_SITO,
+    '@id': SITE_ID,
     url: `${SITE}/`,
     name: `${profile.name} “${profile.nick}”`,
-    description: T.seo.sitoDesc(p.name, p.role, p.place),
+    description: T.seo.siteDesc(p.name, p.role, p.place),
     inLanguage: T.schemaLang,
-    publisher: { '@id': ID_PERSONA },
+    publisher: { '@id': PERSON_ID },
   }
 }
 
-function nodoPersona(lang) {
-  const p = profiloIn(lang)
+function personNode(lang) {
+  const p = profileIn(lang)
   const about = aboutIn(lang)
   return {
     '@type': 'Person',
-    '@id': ID_PERSONA,
+    '@id': PERSON_ID,
     name: p.name,
     alternateName: [p.displayName, p.nick],
     jobTitle: p.role,
@@ -287,72 +287,72 @@ function nodoPersona(lang) {
       addressRegion: 'Emilia-Romagna',
       addressCountry: 'IT',
     },
-    alumniOf: { '@type': 'CollegeOrUniversity', name: p.formazione },
+    alumniOf: { '@type': 'CollegeOrUniversity', name: p.education },
     hasOccupation: {
       '@type': 'Occupation',
       name: p.role,
       occupationLocation: { '@type': 'City', name: p.place.split(',')[0].trim() },
     },
     // Discipline più gli strumenti, che `about.skills` tiene già aggiornati.
-    knowsAbout: [...testi(lang).seo.discipline, ...about.skills],
+    knowsAbout: [...texts(lang).seo.disciplines, ...about.skills],
     sameAs: SOCIAL,
   }
 }
 
-function nodoProgetto(item, meta) {
+function projectNode(item, meta) {
   const { cover, gallery, drawing } = projectImages(item)
-  const nome = titoloLeggibile(item.title)
-  const anni = String(item.year || '').match(/\d{4}/g)
+  const name = readableTitle(item.title)
+  const years = String(item.year || '').match(/\d{4}/g)
   // `spec` cambia lingua e con essa le chiavi: il materiale è la seconda voce
   // in italiano e in inglese, e va cercato per l'una o per l'altra.
-  const materiale = item.spec?.Materiale || item.spec?.Material
+  const material = item.spec?.Materiale || item.spec?.Material
 
   return {
     '@type': 'CreativeWork',
     '@id': `${meta.canonical}#opera`,
-    name: nome,
+    name: name,
     description: meta.description,
     url: meta.canonical,
-    inLanguage: testi(meta.lang).schemaLang,
+    inLanguage: texts(meta.lang).schemaLang,
     // La copertina per prima: è quella che finisce accanto al risultato.
     image: [cover, ...gallery, drawing].filter(Boolean).map(abs),
-    ...(anni ? { dateCreated: anni[anni.length - 1] } : {}),
-    ...(materiale ? { material: materiale } : {}),
+    ...(years ? { dateCreated: years[years.length - 1] } : {}),
+    ...(material ? { material: material } : {}),
     keywords: [...new Set([item.cat, ...Object.values(item.spec || {})])].join(', '),
-    creator: { '@id': ID_PERSONA },
-    isPartOf: { '@id': idArchivio(meta.lang) },
+    creator: { '@id': PERSON_ID },
+    isPartOf: { '@id': archiveId(meta.lang) },
     mainEntityOfPage: meta.canonical,
   }
 }
 
 // Copia minima del nodo archivio, così ogni @id citato nella pagina è anche definito.
-function rimandoArchivio(lang) {
+function archiveLink(lang) {
   return {
     '@type': 'CollectionPage',
-    '@id': idArchivio(lang),
+    '@id': archiveId(lang),
     url: url('archive', {}, lang),
-    name: testi(lang).seo.archivioNome,
-    isPartOf: { '@id': ID_SITO },
+    name: texts(lang).seo.archiveName,
+    isPartOf: { '@id': SITE_ID },
   }
 }
 
 /* Sito e persona ci sono sempre, più l'entità propria della pagina. */
 export function schemaForRoute(route, meta) {
   const lang = meta.lang || 'it'
-  const T = testi(lang)
-  const grafo = [nodoSito(lang), nodoPersona(lang)]
-  const briciole = (voci) => ({ '@type': 'BreadcrumbList', itemListElement: voci })
+  const T = texts(lang)
+  const graph = [siteNode(lang), personNode(lang)]
+  const breadcrumbs = (entries) => ({ '@type': 'BreadcrumbList', itemListElement: entries })
 
   if (route.name === 'project') {
-    const item = archivioIn(lang).find((p) => p.slug === route.slug)
+    const item = archiveIn(lang).find((p) => p.slug === route.slug)
     if (item) {
-      const area = areeIn(lang).find((a) => a.chiave === areaDi(item))
-      grafo.push(rimandoArchivio(lang), nodoProgetto(item, meta), briciole([
-        { '@type': 'ListItem', position: 1, name: T.seo.briciolaHome, item: url('home', {}, lang) },
+      const area = areasIn(lang).find((a) => a.key === areaOf(item))
+      graph.push(archiveLink(lang), projectNode(item, meta), breadcrumbs([
+        { '@type': 'ListItem', position: 1, name: T.seo.breadcrumbHome, item: url('home', {}, lang) },
         {
           '@type': 'ListItem',
           position: 2,
-          name: T.seo.briciolaArchivio,
+          name: T.seo.breadcrumbArchive,
           item: url('archive', {}, lang),
         },
         ...(area
@@ -365,47 +365,47 @@ export function schemaForRoute(route, meta) {
               },
             ]
           : []),
-        { '@type': 'ListItem', position: area ? 4 : 3, name: titoloLeggibile(item.title) },
+        { '@type': 'ListItem', position: area ? 4 : 3, name: readableTitle(item.title) },
       ]))
     }
   } else if (route.name === 'archive') {
     // La pagina d'area è una raccolta a sé, parte dell'archivio.
     const area = meta.area
-    const progetti = area ? progettiAreaIn(area.chiave, lang) : archivioIn(lang)
-    if (area) grafo.push(rimandoArchivio(lang))
-    grafo.push({
+    const projects = area ? areaProjectsIn(area.key, lang) : archiveIn(lang)
+    if (area) graph.push(archiveLink(lang))
+    graph.push({
       '@type': 'CollectionPage',
-      '@id': area ? `${meta.canonical}#raccolta` : idArchivio(lang),
+      '@id': area ? `${meta.canonical}#raccolta` : archiveId(lang),
       url: meta.canonical,
-      name: area ? T.seo.areaNome(area.label) : T.seo.archivioNome,
+      name: area ? T.seo.areaName(area.label) : T.seo.archiveName,
       description: meta.description,
       inLanguage: T.schemaLang,
-      isPartOf: { '@id': area ? idArchivio(lang) : ID_SITO },
-      about: { '@id': ID_PERSONA },
+      isPartOf: { '@id': area ? archiveId(lang) : SITE_ID },
+      about: { '@id': PERSON_ID },
       mainEntity: {
         '@type': 'ItemList',
-        numberOfItems: progetti.length,
-        itemListElement: progetti.map((p, i) => ({
+        numberOfItems: projects.length,
+        itemListElement: projects.map((p, i) => ({
           '@type': 'ListItem',
           position: i + 1,
           url: url('project', { slug: p.slug }, lang),
-          name: titoloLeggibile(p.title),
+          name: readableTitle(p.title),
         })),
       },
     })
     if (area) {
-      grafo.push(
-        briciole([
+      graph.push(
+        breadcrumbs([
           {
             '@type': 'ListItem',
             position: 1,
-            name: T.seo.briciolaHome,
+            name: T.seo.breadcrumbHome,
             item: url('home', {}, lang),
           },
           {
             '@type': 'ListItem',
             position: 2,
-            name: T.seo.briciolaArchivio,
+            name: T.seo.breadcrumbArchive,
             item: url('archive', {}, lang),
           },
           { '@type': 'ListItem', position: 3, name: area.label },
@@ -414,58 +414,58 @@ export function schemaForRoute(route, meta) {
     }
   } else if (route.name === 'privacy') {
     // Nessun `about`: l'informativa parla del sito, non della persona.
-    grafo.push({
+    graph.push({
       '@type': 'WebPage',
       '@id': `${meta.canonical}#pagina`,
       url: meta.canonical,
       name: meta.title,
       description: meta.description,
       inLanguage: T.schemaLang,
-      isPartOf: { '@id': ID_SITO },
+      isPartOf: { '@id': SITE_ID },
     })
   } else if (route.name === 'about') {
-    grafo.push({
+    graph.push({
       '@type': 'ProfilePage',
       '@id': `${url('about', {}, lang)}#pagina`,
       url: url('about', {}, lang),
       name: meta.title,
       inLanguage: T.schemaLang,
-      isPartOf: { '@id': ID_SITO },
-      mainEntity: { '@id': ID_PERSONA },
+      isPartOf: { '@id': SITE_ID },
+      mainEntity: { '@id': PERSON_ID },
     })
   }
 
-  return { '@context': 'https://schema.org', '@graph': grafo }
+  return { '@context': 'https://schema.org', '@graph': graph }
 }
 
 // Immagini per la sitemap: ogni URL, anche inglese, dichiara le proprie.
-export function immaginiPerRotta(route) {
+export function imagesForRoute(route) {
   const lang = route.lang || 'it'
 
   // Foto del manifesto e anteprime dei selezionati. Il ritratto in cima no: ha alt vuoto.
   if (route.name === 'home') {
-    return [manifestoFoto.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
+    return [manifestoPhoto.src, ...focusItemsIn(lang).map((p) => p.cover)].map(abs)
   }
 
   if (route.name === 'about') {
     const about = aboutIn(lang)
-    const tavole = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
-    const foto = [about.photos.hero.src, about.photos.schizzi.src]
-    return [...foto, ...tavole].filter(Boolean).map(abs)
+    const plates = about.sketchbook.flatMap((t) => [t.front?.src, t.back?.src])
+    const photos = [about.photos.hero.src, about.photos.sketches.src]
+    return [...photos, ...plates].filter(Boolean).map(abs)
   }
 
-  const copertine = (lista) =>
-    lista.map((p) => projectImages(p).cover).filter(Boolean).map(abs)
+  const covers = (items) =>
+    items.map((p) => projectImages(p).cover).filter(Boolean).map(abs)
 
   if (route.name === 'archive') {
-    if (!route.area) return copertine(archivioIn(lang))
-    const area = areaPerSlugIn(route.area, lang)
-    return area ? copertine(progettiAreaIn(area.chiave, lang)) : []
+    if (!route.area) return covers(archiveIn(lang))
+    const area = areaBySlugIn(route.area, lang)
+    return area ? covers(areaProjectsIn(area.key, lang)) : []
   }
 
   if (route.name !== 'project') return []
-  const item = archivioIn(lang).find((p) => p.slug === route.slug)
+  const item = archiveIn(lang).find((p) => p.slug === route.slug)
   if (!item) return []
-  const { cover, gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
-  return [cover, ...gallery, drawing, sfondo, videoPoster, filmatoPoster].filter(Boolean).map(abs)
+  const { cover, gallery, drawing, backdrop, videoPoster, filmPoster } = projectImages(item)
+  return [cover, ...gallery, drawing, backdrop, videoPoster, filmPoster].filter(Boolean).map(abs)
 }

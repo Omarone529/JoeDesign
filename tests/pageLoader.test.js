@@ -2,14 +2,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
-import { SORGENTI } from '../src/pagine.js'
+import { SOURCES } from '../src/pageLoader.js'
 
-const ROTTE = ['home', 'about', 'privacy', 'archive', 'project', 'notfound']
+const ROUTES = ['home', 'about', 'privacy', 'archive', 'project', 'notfound']
 
 test('ogni nome di rotta ha una pagina, e nessuna pagina è orfana', () => {
-  assert.deepEqual(Object.keys(SORGENTI).sort(), [...ROTTE].sort())
+  assert.deepEqual(Object.keys(SOURCES).sort(), [...ROUTES].sort())
 })
 
 test('i sorgenti dichiarati per il precaricamento esistono', () => {
-  for (const file of Object.values(SORGENTI)) assert.ok(fs.existsSync(file), file)
+  for (const file of Object.values(SOURCES)) assert.ok(fs.existsSync(file), file)
 })

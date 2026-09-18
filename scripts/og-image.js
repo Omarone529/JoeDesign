@@ -8,17 +8,17 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import {
   aboutIn,
-  archivioIn,
-  areeIn,
-  contaProgetti,
-  manifestoFoto,
-  periodoArchivio,
-  periodoDi,
-  profiloIn,
-  progettiAreaIn,
+  archiveIn,
+  areasIn,
+  countProjects,
+  manifestoPhoto,
+  archivePeriod,
+  periodOf,
+  profileIn,
+  areaProjectsIn,
   projectImages,
 } from '../src/data/siteData.js'
-import { LINGUE, testi } from '../src/i18n.js'
+import { LANGS, texts } from '../src/i18n.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
@@ -47,7 +47,7 @@ const ADV = {
 }
 
 // Le stesse in Helvetica regular, per la descrizione.
-const ADV_TESTO = {
+const ADV_TEXT = {
   a: 556, b: 556, c: 500, d: 556, e: 556, f: 278, g: 556, h: 556, i: 222,
   j: 222, k: 500, l: 222, m: 833, n: 556, o: 556, p: 556, q: 556, r: 333,
   s: 500, t: 278, u: 556, v: 500, w: 722, x: 500, y: 500, z: 500,
@@ -61,167 +61,167 @@ const ADV_TESTO = {
 }
 
 /* `tracking` in em (negativo = lettere più strette, come nei titoli del sito). */
-function larghezza(testo, fontSize, tracking = 0, tabella = ADV) {
+function width(text, fontSize, tracking = 0, table = ADV) {
   let em = 0
-  for (const ch of String(testo)) em += (tabella[ch] ?? 700) / 1000 + tracking
+  for (const ch of String(text)) em += (table[ch] ?? 700) / 1000 + tracking
   return em * fontSize
 }
 
-function aCapo(testo, fontSize, maxW, tracking, tabella = ADV) {
-  const righe = []
-  let corrente = ''
-  for (const parola of String(testo).split(/\s+/)) {
-    const prova = corrente ? `${corrente} ${parola}` : parola
-    if (corrente && larghezza(prova, fontSize, tracking, tabella) > maxW) {
-      righe.push(corrente)
-      corrente = parola
+function wrapLines(text, fontSize, maxW, tracking, table = ADV) {
+  const rows = []
+  let current = ''
+  for (const word of String(text).split(/\s+/)) {
+    const attempt = current ? `${current} ${word}` : word
+    if (current && width(attempt, fontSize, tracking, table) > maxW) {
+      rows.push(current)
+      current = word
     } else {
-      corrente = prova
+      current = attempt
     }
   }
-  if (corrente) righe.push(corrente)
-  return righe
+  if (current) rows.push(current)
+  return rows
 }
 
-// Il corpo più grande con cui il titolo sta in `maxRighe`.
-function titoloAdattato(testo, { maxW, maxRighe = 3, max = 78, min = 34 }) {
+// Il corpo più grande con cui il titolo sta in `maxLines`.
+function fittedTitle(text, { maxW, maxLines = 3, max = 78, min = 34 }) {
   const tracking = -0.02
   for (let size = max; size >= min; size -= 2) {
-    const righe = aCapo(testo, size, maxW, tracking)
-    if (righe.length <= maxRighe && righe.every((r) => larghezza(r, size, tracking) <= maxW)) {
-      return { size, righe, tracking }
+    const rows = wrapLines(text, size, maxW, tracking)
+    if (rows.length <= maxLines && rows.every((r) => width(r, size, tracking) <= maxW)) {
+      return { size, rows, tracking }
     }
   }
-  return { size: min, righe: aCapo(testo, min, maxW, tracking), tracking }
+  return { size: min, rows: wrapLines(text, min, maxW, tracking), tracking }
 }
 
-function occhiello(testo, x, y, colore = MUTED) {
+function eyebrow(text, x, y, color = MUTED) {
   return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="15" font-weight="400"
-    letter-spacing="3.4" fill="${colore}">${esc(String(testo).toUpperCase())}</text>`
+    letter-spacing="3.4" fill="${color}">${esc(String(text).toUpperCase())}</text>`
 }
 
 // Impianto 1: testo a sinistra, immagine contenuta a destra (schede, "Chi sono", home).
-async function schedaConImmagine({
-  sorgente,
-  categoria,
-  titolo,
-  descrizione,
-  coda,
-  ancoraInBasso = false,
+async function cardWithImage({
+  source,
+  category,
+  title,
+  description,
+  tail,
+  anchoredBottom = false,
   dest,
 }) {
-  const TESTO_X = 72
-  const TESTO_MAX = 452
+  const TEXT_X = 72
+  const TEXT_MAX = 452
   const BOX = { x: 596, y: 46, w: 556, h: 538 } // area dell'immagine
 
-  const { size, righe, tracking } = titoloAdattato(titolo.toUpperCase(), {
-    maxW: TESTO_MAX,
+  const { size, rows, tracking } = fittedTitle(title.toUpperCase(), {
+    maxW: TEXT_MAX,
     // Con la descrizione sotto, il titolo lascia spazio invece di prendersi
     // tutta l'altezza: due righe al massimo, corpo un po' più contenuto.
-    ...(descrizione ? { maxRighe: 2, max: 68 } : null),
+    ...(description ? { maxLines: 2, max: 68 } : null),
   })
 
   const DESC_SIZE = 21
-  const DESC_INTERLINEA = 30
-  const righeDesc = descrizione
-    ? aCapo(descrizione, DESC_SIZE, TESTO_MAX, 0, ADV_TESTO)
+  const DESC_LEADING = 30
+  const descRows = description
+    ? wrapLines(description, DESC_SIZE, TEXT_MAX, 0, ADV_TEXT)
     : []
-  const altezzaDesc = righeDesc.length
-    ? 34 + (righeDesc.length - 1) * DESC_INTERLINEA + DESC_SIZE * 0.72
+  const descHeight = descRows.length
+    ? 34 + (descRows.length - 1) * DESC_LEADING + DESC_SIZE * 0.72
     : 0
 
   // Altezze calcolate prima, per centrare il blocco. `capH` = altezza delle maiuscole (y SVG = linea di base).
   const capH = size * 0.72
-  const interlinea = size * 0.92
-  const altezzaTitolo = (righe.length - 1) * interlinea + capH
-  const blocco = 15 + 30 + altezzaTitolo + altezzaDesc + 44 + 32 + 15
+  const leading = size * 0.92
+  const titleHeight = (rows.length - 1) * leading + capH
+  const block = 15 + 30 + titleHeight + descHeight + 44 + 32 + 15
 
-  let y = (H - blocco) / 2
-  const occhielloY = y + 15
-  const primaBaseline = y + 15 + 30 + capH
-  const primaDesc = y + 15 + 30 + altezzaTitolo + 34 + DESC_SIZE * 0.72
-  const filettoY = y + 15 + 30 + altezzaTitolo + altezzaDesc + 44
-  const codaY = filettoY + 32 + 15
+  let y = (H - block) / 2
+  const eyebrowY = y + 15
+  const firstBaseline = y + 15 + 30 + capH
+  const firstDesc = y + 15 + 30 + titleHeight + 34 + DESC_SIZE * 0.72
+  const ruleY = y + 15 + 30 + titleHeight + descHeight + 44
+  const tailY = ruleY + 32 + 15
 
-  const righeSvg = righe
+  const svgRows = rows
     .map(
       (r, i) =>
-        `<text x="${TESTO_X}" y="${primaBaseline + i * interlinea}" font-family="${FONT}"
+        `<text x="${TEXT_X}" y="${firstBaseline + i * leading}" font-family="${FONT}"
           font-size="${size}" font-weight="700" letter-spacing="${(tracking * size).toFixed(2)}"
           fill="${INK}">${esc(r)}</text>`,
     )
     .join('\n')
 
-  const descSvg = righeDesc
+  const descSvg = descRows
     .map(
       (r, i) =>
-        `<text x="${TESTO_X}" y="${primaDesc + i * DESC_INTERLINEA}" font-family="${FONT}"
+        `<text x="${TEXT_X}" y="${firstDesc + i * DESC_LEADING}" font-family="${FONT}"
           font-size="${DESC_SIZE}" font-weight="400" fill="${INK}">${esc(r)}</text>`,
     )
     .join('\n')
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
     <rect width="${W}" height="${H}" fill="${PAPER}"/>
-    ${occhiello(categoria, TESTO_X, occhielloY)}
-    ${righeSvg}
+    ${eyebrow(category, TEXT_X, eyebrowY)}
+    ${svgRows}
     ${descSvg}
-    <line x1="${TESTO_X}" y1="${filettoY}" x2="${TESTO_X + 300}" y2="${filettoY}" stroke="${LINE}" stroke-width="1"/>
-    ${occhiello(coda, TESTO_X, codaY, INK)}
+    <line x1="${TEXT_X}" y1="${ruleY}" x2="${TEXT_X + 300}" y2="${ruleY}" stroke="${LINE}" stroke-width="1"/>
+    ${eyebrow(tail, TEXT_X, tailY, INK)}
     <line x1="${BOX.x - 48}" y1="0" x2="${BOX.x - 48}" y2="${H}" stroke="${LINE}" stroke-width="1"/>
   </svg>`
 
-  // Immagine intera su carta; il ritratto (`ancoraInBasso`) va rifilato e appoggiato al fondo.
-  const immagine = ancoraInBasso
-    ? await sharp(sorgente)
+  // Immagine intera su carta; il ritratto (`anchoredBottom`) va rifilato e appoggiato al fondo.
+  const image = anchoredBottom
+    ? await sharp(source)
         .trim({ threshold: 1 })
         .resize(BOX.w, H - 34, { fit: 'inside' })
         .toBuffer({ resolveWithObject: true })
-    : await sharp(sorgente)
+    : await sharp(source)
         .resize(BOX.w, BOX.h, { fit: 'inside', withoutEnlargement: false })
         .toBuffer({ resolveWithObject: true })
 
-  const left = BOX.x + Math.round((BOX.w - immagine.info.width) / 2)
-  const top = ancoraInBasso
-    ? H - immagine.info.height
-    : BOX.y + Math.round((BOX.h - immagine.info.height) / 2)
+  const left = BOX.x + Math.round((BOX.w - image.info.width) / 2)
+  const top = anchoredBottom
+    ? H - image.info.height
+    : BOX.y + Math.round((BOX.h - image.info.height) / 2)
 
   await sharp(Buffer.from(svg))
-    .composite([{ input: immagine.data, left, top }])
+    .composite([{ input: image.data, left, top }])
     .jpeg({ quality: 84, mozjpeg: true, chromaSubsampling: '4:4:4' })
     .toFile(dest)
 }
 
 // Impianto 2: immagine a tutta pagina, testo in alto a sinistra (archivio).
-async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
-  const TESTO_X = 72
-  const { size, righe, tracking } = titoloAdattato(titolo.toUpperCase(), {
+async function fullCard({ source, eyebrowText, title, tail, dest }) {
+  const TEXT_X = 72
+  const { size, rows, tracking } = fittedTitle(title.toUpperCase(), {
     maxW: 700,
     max: 72,
-    maxRighe: 2,
+    maxLines: 2,
   })
 
   const capH = size * 0.72
-  const interlinea = size * 0.92
-  const primaBaseline = 118 + capH
-  const codaY = primaBaseline + (righe.length - 1) * interlinea + 46
+  const leading = size * 0.92
+  const firstBaseline = 118 + capH
+  const tailY = firstBaseline + (rows.length - 1) * leading + 46
 
-  const righeSvg = righe
+  const svgRows = rows
     .map(
       (r, i) =>
-        `<text x="${TESTO_X}" y="${primaBaseline + i * interlinea}" font-family="${FONT}"
+        `<text x="${TEXT_X}" y="${firstBaseline + i * leading}" font-family="${FONT}"
           font-size="${size}" font-weight="700" letter-spacing="${(tracking * size).toFixed(2)}"
           fill="${INK}">${esc(r)}</text>`,
     )
     .join('\n')
 
-  const testo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
-    ${occhiello(occhielloTesto, TESTO_X, 86)}
-    ${righeSvg}
-    ${occhiello(coda, TESTO_X, codaY, INK)}
+  const text = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+    ${eyebrow(eyebrowText, TEXT_X, 86)}
+    ${svgRows}
+    ${eyebrow(tail, TEXT_X, tailY, INK)}
   </svg>`)
 
   // Foto su bianco pieno: entra intera, col margine che libera l'angolo per il testo.
-  const immagine = await sharp(sorgente)
+  const image = await sharp(source)
     .resize(W - 96, H - 150, { fit: 'inside' })
     .flatten({ background: '#ffffff' })
     .toBuffer({ resolveWithObject: true })
@@ -230,8 +230,8 @@ async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
     create: { width: W, height: H, channels: 3, background: '#ffffff' },
   })
     .composite([
-      { input: immagine.data, left: Math.round((W - immagine.info.width) / 2), top: H - 24 - immagine.info.height },
-      { input: testo, left: 0, top: 0 },
+      { input: image.data, left: Math.round((W - image.info.width) / 2), top: H - 24 - image.info.height },
+      { input: text, left: 0, top: 0 },
     ])
     .jpeg({ quality: 84, mozjpeg: true, chromaSubsampling: '4:4:4' })
     .toFile(dest)
@@ -239,113 +239,113 @@ async function schedaPiena({ sorgente, occhielloTesto, titolo, coda, dest }) {
 
 /* ------------------------------------------------------------------------- */
 
-const PERIODO = periodoArchivio
-  ? periodoArchivio.primo === periodoArchivio.ultimo
-    ? `${periodoArchivio.primo}`
-    : `${periodoArchivio.primo}–${periodoArchivio.ultimo}`
+const PERIOD = archivePeriod
+  ? archivePeriod.first === archivePeriod.last
+    ? `${archivePeriod.first}`
+    : `${archivePeriod.first}–${archivePeriod.last}`
   : ''
 
-const generati = []
+const generatedFiles = []
 
-for (const lang of LINGUE) {
-  const T = testi(lang)
-  const profile = profiloIn(lang)
+for (const lang of LANGS) {
+  const T = texts(lang)
+  const profile = profileIn(lang)
   const about = aboutIn(lang)
-  const archive = archivioIn(lang)
+  const archive = archiveIn(lang)
   // Le italiane in og/, le inglesi in og/en/: `seo.js` le cerca lì.
-  const dirLingua = lang === 'en' ? path.join(outDir, 'en') : outDir
-  fs.mkdirSync(dirLingua, { recursive: true })
+  const langDir = lang === 'en' ? path.join(outDir, 'en') : outDir
+  fs.mkdirSync(langDir, { recursive: true })
 
-  const firma = `${profile.displayName} · ${profile.role}`
-  const dove = (nome) => path.join(dirLingua, nome)
-  const fatto = (nome) => generati.push(path.join(lang === 'en' ? 'en' : '', nome))
+  const signature = `${profile.displayName} · ${profile.role}`
+  const where = (name) => path.join(langDir, name)
+  const done = (name) => generatedFiles.push(path.join(lang === 'en' ? 'en' : '', name))
 
   // Home: il ritratto, con nome, mestiere e una riga sul lavoro.
-  await schedaConImmagine({
-    sorgente: path.join(root, 'public', about.photos.hero.src),
-    categoria: profile.place,
-    titolo: profile.displayName,
-    descrizione: profile.sintesi,
-    coda: profile.role,
-    ancoraInBasso: true,
-    dest: dove('home.jpg'),
+  await cardWithImage({
+    source: path.join(root, 'public', about.photos.hero.src),
+    category: profile.place,
+    title: profile.displayName,
+    description: profile.summary,
+    tail: profile.role,
+    anchoredBottom: true,
+    dest: where('home.jpg'),
   })
-  fatto('home.jpg')
+  done('home.jpg')
 
   /* Archivio */
-  await schedaPiena({
-    sorgente: path.join(root, 'public/images/home/family-band.webp'),
-    occhielloTesto: `${contaProgetti(archive.length, lang)} · ${PERIODO}`,
-    titolo: T.seo.archivioNome,
-    coda: firma,
-    dest: dove('archivio.jpg'),
+  await fullCard({
+    source: path.join(root, 'public/images/home/family-band.webp'),
+    eyebrowText: `${countProjects(archive.length, lang)} · ${PERIOD}`,
+    title: T.seo.archiveName,
+    tail: signature,
+    dest: where('archive.jpg'),
   })
-  fatto('archivio.jpg')
+  done('archive.jpg')
 
   // Una per area: product riusa la famiglia di prodotti, graphic il manifesto più recente.
-  for (const area of areeIn(lang)) {
-    const progetti = progettiAreaIn(area.chiave, lang)
-    const periodo = periodoDi(progetti)
-    const arco = periodo
-      ? periodo.primo === periodo.ultimo
-        ? `${periodo.primo}`
-        : `${periodo.primo}–${periodo.ultimo}`
+  for (const area of areasIn(lang)) {
+    const projects = areaProjectsIn(area.key, lang)
+    const period = periodOf(projects)
+    const arc = period
+      ? period.first === period.last
+        ? `${period.first}`
+        : `${period.first}–${period.last}`
       : ''
-    const occhielloArea = [contaProgetti(progetti.length, lang), arco].filter(Boolean).join(' · ')
-    const nome = `archivio-${area.slug}.jpg`
+    const areaEyebrow = [countProjects(projects.length, lang), arc].filter(Boolean).join(' · ')
+    const name = `archive-${area.slug}.jpg`
 
-    if (area.chiave === 'product') {
-      await schedaPiena({
-        sorgente: path.join(root, 'public/images/home/family-band.webp'),
-        occhielloTesto: occhielloArea,
-        titolo: area.label,
-        coda: firma,
-        dest: dove(nome),
+    if (area.key === 'product') {
+      await fullCard({
+        source: path.join(root, 'public/images/home/family-band.webp'),
+        eyebrowText: areaEyebrow,
+        title: area.label,
+        tail: signature,
+        dest: where(name),
       })
     } else {
       // Il più recente FRA QUELLI con la copertina: una scheda in attesa di foto
       // non ha immagine da mettere qui.
-      const vetrina = progetti.find((p) => projectImages(p).cover)
-      await schedaConImmagine({
-        sorgente: path.join(root, 'public', projectImages(vetrina).cover),
-        categoria: occhielloArea,
-        titolo: area.label,
-        coda: firma,
-        dest: dove(nome),
+      const showcase = projects.find((p) => projectImages(p).cover)
+      await cardWithImage({
+        source: path.join(root, 'public', projectImages(showcase).cover),
+        category: areaEyebrow,
+        title: area.label,
+        tail: signature,
+        dest: where(name),
       })
     }
-    fatto(nome)
+    done(name)
   }
 
   /* Chi sono */
-  await schedaConImmagine({
-    sorgente: path.join(root, 'public', manifestoFoto.src),
-    categoria: profile.place,
-    titolo: T.chiSono.occhiello,
-    coda: firma,
-    dest: dove('chi-sono.jpg'),
+  await cardWithImage({
+    source: path.join(root, 'public', manifestoPhoto.src),
+    category: profile.place,
+    title: T.about.eyebrow,
+    tail: signature,
+    dest: where('about.jpg'),
   })
-  fatto('chi-sono.jpg')
+  done('about.jpg')
 
   /* Una per progetto */
   for (const item of archive) {
     const { cover } = projectImages(item)
     // Scheda ancora senza immagini: `seo.js` le fa usare l'anteprima dell'area.
     if (!cover) continue
-    await schedaConImmagine({
-      sorgente: path.join(root, 'public', cover),
-      categoria: item.cat,
-      titolo: item.title,
-      coda: T.seo.progettoFirma(profile.displayName),
-      dest: dove(`${item.slug}.jpg`),
+    await cardWithImage({
+      source: path.join(root, 'public', cover),
+      category: item.cat,
+      title: item.title,
+      tail: T.seo.projectSignature(profile.displayName),
+      dest: where(`${item.slug}.jpg`),
     })
-    fatto(`${item.slug}.jpg`)
+    done(`${item.slug}.jpg`)
   }
 }
 
-const peso = generati.reduce((t, f) => t + fs.statSync(path.join(outDir, f)).size, 0)
+const weight = generatedFiles.reduce((t, f) => t + fs.statSync(path.join(outDir, f)).size, 0)
 console.log(
-  `✓ ${generati.length} immagini social in public/images/og/ ` +
-    `(${(peso / 1024 / 1024).toFixed(1)} MB totali, ` +
-    `~${Math.round(peso / generati.length / 1024)} KB l'una)`,
+  `✓ ${generatedFiles.length} immagini social in public/images/og/ ` +
+    `(${(weight / 1024 / 1024).toFixed(1)} MB totali, ` +
+    `~${Math.round(weight / generatedFiles.length / 1024)} KB l'una)`,
 )

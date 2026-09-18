@@ -1,58 +1,58 @@
 import {
-  aiFoto,
-  altDisegno,
-  altGalleria,
-  altSfondo,
+  aiPhoto,
+  altDrawing,
+  altGallery,
+  altBackdrop,
   altVideo,
-  archivioIn,
-  areaDi,
-  areeIn,
+  archiveIn,
+  areaOf,
+  areasIn,
   projectImages,
 } from '../data/siteData'
 import Carousel from '../components/Carousel'
-import EtichettaAI from '../components/EtichettaAI'
-import FilmatoProgetto from '../components/FilmatoProgetto'
-import { testi } from '../i18n'
-import { Link, percorso, useLang } from '../router'
-import { srcSetDi, MISURE } from '../immagini'
+import AiLabel from '../components/AiLabel'
+import ProjectFilm from '../components/ProjectFilm'
+import { texts } from '../i18n'
+import { Link, pathFor, useLang } from '../router'
+import { srcSetDi, SIZES } from '../images'
 
-// Formato comune a tutti gli sfondo.webp: dichiararlo riserva lo spazio e la
+// Formato comune a tutti gli backdrop.webp: dichiararlo riserva lo spazio e la
 // navigazione sotto non salta a caricamento avvenuto.
-const SFONDO_W = 1672
-const SFONDO_H = 941
+const BACKDROP_W = 1672
+const BACKDROP_H = 941
 
 export default function ProjectDetail({ slug }) {
   const lang = useLang()
-  const T = testi(lang)
-  const archivio = archivioIn(lang)
-  const item = archivio.find((p) => p.slug === slug)
+  const T = texts(lang)
+  const archive = archiveIn(lang)
+  const item = archive.find((p) => p.slug === slug)
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
-  const { gallery, drawing, sfondo, videoPoster, filmatoPoster } = projectImages(item)
-  // `ai` è l'etichetta AI Act della singola foto (vedi `aiFoto`): la numerazione
+  const { gallery, drawing, backdrop, videoPoster, filmPoster } = projectImages(item)
+  // `ai` è l'etichetta AI Act della singola foto (vedi `aiPhoto`): la numerazione
   // parte da 1, come i file 01.webp…NN.webp.
-  const foto = gallery.map((src, i) => ({
+  const photos = gallery.map((src, i) => ({
     src,
-    alt: altGalleria(item, i, gallery.length, lang),
-    ai: aiFoto(item, i + 1),
+    alt: altGallery(item, i, gallery.length, lang),
+    ai: aiPhoto(item, i + 1),
   }))
   const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
-  const slides = [...reel, ...foto]
+  const slides = [...reel, ...photos]
 
   // Precedente e successivo restano dentro l'area.
-  const area = areeIn(lang).find((a) => a.chiave === areaDi(item))
-  const vicini = archivio.filter((p) => areaDi(p) === areaDi(item))
-  const i = vicini.findIndex((p) => p.slug === slug)
-  const prev = vicini[(i - 1 + vicini.length) % vicini.length]
-  const next = vicini[(i + 1) % vicini.length]
-  const soloUno = vicini.length < 2
+  const area = areasIn(lang).find((a) => a.key === areaOf(item))
+  const siblings = archive.filter((p) => areaOf(p) === areaOf(item))
+  const i = siblings.findIndex((p) => p.slug === slug)
+  const prev = siblings[(i - 1 + siblings.length) % siblings.length]
+  const next = siblings[(i + 1) % siblings.length]
+  const onlyOne = siblings.length < 2
 
   // Le chiavi della tabella arrivano già nella lingua giusta da `spec`
   // (Oggetto → Object): anno e designer sono le sole righe aggiunte qui.
   const specRows = [
-    ...(item.year ? [[T.progetto.anno, item.year]] : []),
+    ...(item.year ? [[T.project.year, item.year]] : []),
     ...Object.entries(item.spec || {}),
-    [T.progetto.designer, item.designer || 'Giovanni Sarchiolla'],
+    [T.project.designer, item.designer || 'Giovanni Sarchiolla'],
   ]
 
   return (
@@ -60,10 +60,10 @@ export default function ProjectDetail({ slug }) {
       <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:items-start md:gap-x-10 lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
         <div className="px-5 pt-8 sm:px-8 sm:pt-12 lg:px-[72px] lg:pt-12">
           <Link
-            to={percorso('archive', { area: area?.slug }, lang)}
+            to={pathFor('archive', { area: area?.slug }, lang)}
             className="relative inline-block text-[11px] uppercase tracking-[0.2em] text-muted transition-colors before:absolute before:-inset-x-2 before:-inset-y-2 before:content-[''] hover:text-ink"
           >
-            ← {area ? area.label : T.progetto.archivio}
+            ← {area ? area.label : T.project.archive}
           </Link>
 
           <h1 className="mt-6 text-[clamp(36px,6vw,88px)] font-bold uppercase leading-[0.9] tracking-[-0.02em] lg:mt-6">
@@ -91,7 +91,7 @@ export default function ProjectDetail({ slug }) {
                di lasciare la colonna a metà. */
             <div className="flex aspect-square w-full items-center justify-center bg-placeholder">
               <span className="text-[11px] uppercase tracking-[0.24em] text-muted">
-                {T.progetto.fotoInArrivo}
+                {T.project.incomingPhoto}
               </span>
             </div>
           )}
@@ -104,7 +104,7 @@ export default function ProjectDetail({ slug }) {
               della colonna accanto, si centra sul disegno tecnico. */}
           <div className="flex flex-col border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
-              {T.progetto.scheda}
+              {T.project.card}
             </div>
             <div className="mt-6 flex flex-1 items-center">
               <dl className="grid w-full grid-cols-1 gap-0 border-t border-line-soft">
@@ -128,11 +128,11 @@ export default function ProjectDetail({ slug }) {
               <img
                 src={drawing}
                 srcSet={srcSetDi(drawing)}
-                sizes={MISURE.mezza}
-                alt={altDisegno(item, lang)}
+                sizes={SIZES.half}
+                alt={altDrawing(item, lang)}
                 loading="lazy"
                 decoding="async"
-                className="mt-6 h-[clamp(260px,calc(var(--schermo,100vh)*0.38),420px)] w-full object-contain lg:h-[clamp(300px,calc(var(--schermo,100vh)*0.46),560px)]"
+                className="mt-6 h-[clamp(260px,calc(var(--screen-height,100vh)*0.38),420px)] w-full object-contain lg:h-[clamp(300px,calc(var(--screen-height,100vh)*0.46),560px)]"
               />
             </figure>
           )}
@@ -142,7 +142,7 @@ export default function ProjectDetail({ slug }) {
       {item.works && item.works.length > 0 && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <h2 className="mb-8 border-t border-line pt-6 text-[clamp(18px,2.2vw,28px)] font-bold uppercase tracking-[-0.01em]">
-            {T.progetto.iLavori}
+            {T.project.iWorks}
           </h2>
           <div className="grid grid-cols-1 gap-x-16 gap-y-10 md:grid-cols-2">
             {item.works.map((w) => (
@@ -161,71 +161,71 @@ export default function ProjectDetail({ slug }) {
       )}
 
       {/* Filmato 16:9 in fondo, fuori dal carosello. Parte solo col play. */}
-      {filmatoPoster && (
+      {filmPoster && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <figure className="m-0 border-t border-line pt-6">
-            <FilmatoProgetto
-              videoId={item.filmato}
+            <ProjectFilm
+              videoId={item.film}
               title={item.title}
-              poster={filmatoPoster}
+              poster={filmPoster}
               alt={altVideo(item, lang)}
             />
           </figure>
         </section>
       )}
 
-      {sfondo && (
+      {backdrop && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <figure className="relative m-0 border-t border-line pt-6">
             <img
-              src={sfondo}
-              srcSet={srcSetDi(sfondo)}
-              sizes={MISURE.piena}
-              alt={altSfondo(item, lang)}
+              src={backdrop}
+              srcSet={srcSetDi(backdrop)}
+              sizes={SIZES.filled}
+              alt={altBackdrop(item, lang)}
               loading="lazy"
               decoding="async"
-              width={SFONDO_W}
-              height={SFONDO_H}
+              width={BACKDROP_W}
+              height={BACKDROP_H}
               className="h-auto w-full object-cover"
             />
-            <EtichettaAI tipo={item.ai?.sfondo} />
+            <AiLabel kind={item.ai?.backdrop} />
           </figure>
         </section>
       )}
 
-      {soloUno ? (
+      {onlyOne ? (
         <section className="mt-14 border-t border-line sm:mt-20 lg:mt-28">
           <Link
-            to={percorso('archive', { area: area?.slug }, lang)}
+            to={pathFor('archive', { area: area?.slug }, lang)}
             className="group block px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
           >
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
-              {T.progetto.tornaA}
+              {T.project.backTo}
             </div>
             <div className="mt-2 text-[clamp(16px,2vw,26px)] font-bold uppercase tracking-[-0.01em]">
-              {area ? area.label : T.progetto.archivio}
+              {area ? area.label : T.project.archive}
             </div>
           </Link>
         </section>
       ) : (
       <section className="mt-14 grid grid-cols-2 border-t border-line sm:mt-20 lg:mt-28">
         <Link
-          to={percorso('project', { slug: prev.slug }, lang)}
+          to={pathFor('project', { slug: prev.slug }, lang)}
           className="group border-r border-line px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
         >
           <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
-            {T.progetto.precedente}
+            {T.project.previous}
           </div>
           <div className="mt-2 text-[clamp(16px,2vw,26px)] font-bold uppercase tracking-[-0.01em]">
             {prev.title}
           </div>
         </Link>
         <Link
-          to={percorso('project', { slug: next.slug }, lang)}
+          to={pathFor('project', { slug: next.slug }, lang)}
           className="group px-5 py-10 text-right transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
         >
           <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
-            {T.progetto.successivo}
+            {T.project.next}
           </div>
           <div className="mt-2 text-[clamp(16px,2vw,26px)] font-bold uppercase tracking-[-0.01em]">
             {next.title}

@@ -1,6 +1,6 @@
 /*
  * Verifica che React si agganci alle pagine pre-renderizzate senza ridisegnarle (errori #418,
- * #423, #425). npm run hydration; `-- --rompi` è l'autotest e deve fallire.
+ * #423, #425). npm run hydration; `-- --break` è l'autotest e deve fallire.
  * Serve build e Chromium: non è in prebuild. Vedi CLAUDE.md.
  */
 import { spawn } from 'node:child_process'
@@ -10,8 +10,8 @@ import os from 'node:os'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const ROMPI = process.argv.includes('--rompi')
-const attesa = (ms) => new Promise((r) => setTimeout(r, ms))
+const BREAK = process.argv.includes('--break')
+const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 
 /* Un Chromium qualsiasi: quello di Playwright se c'è, o CHROME_PATH, o Chrome. */
 const CACHE_PLAYWRIGHT = [
@@ -19,7 +19,7 @@ const CACHE_PLAYWRIGHT = [
   path.join(process.env.LOCALAPPDATA || os.homedir(), 'ms-playwright'),
   path.join(os.homedir(), '.cache/ms-playwright'),
 ]
-const DENTRO_CACHE = [
+const INSIDE_CACHE = [
   'chrome-headless-shell-mac-arm64/chrome-headless-shell',
   'chrome-headless-shell-mac-x64/chrome-headless-shell',
   'chrome-mac/Chromium.app/Contents/MacOS/Chromium',
@@ -29,7 +29,7 @@ const DENTRO_CACHE = [
   'chrome-headless-shell-linux/chrome-headless-shell',
   'chrome-linux/chrome',
 ]
-const CHROME_DI_SISTEMA = [
+const SYSTEM_CHROME = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
@@ -37,21 +37,21 @@ const CHROME_DI_SISTEMA = [
   '/usr/bin/chromium',
 ]
 
-function trovaBrowser() {
+function findBrowser() {
   if (process.env.CHROME_PATH && fs.existsSync(process.env.CHROME_PATH)) return process.env.CHROME_PATH
   for (const cache of CACHE_PLAYWRIGHT) {
     if (!fs.existsSync(cache)) continue
     for (const d of fs.readdirSync(cache)) {
-      for (const rel of DENTRO_CACHE) {
+      for (const rel of INSIDE_CACHE) {
         const p = path.join(cache, d, rel)
         if (fs.existsSync(p)) return p
       }
     }
   }
-  return CHROME_DI_SISTEMA.find((p) => fs.existsSync(p)) || null
+  return SYSTEM_CHROME.find((p) => fs.existsSync(p)) || null
 }
 
-const BIN = trovaBrowser()
+const BIN = findBrowser()
 if (!BIN) {
   console.error('Nessun browser trovato. Indicane uno con CHROME_PATH=/percorso/al/binario,')
   console.error('oppure installa Chromium: npx --yes playwright install chromium')
@@ -64,52 +64,52 @@ if (!fs.existsSync(distSsr) || !fs.existsSync(path.join(root, 'dist', 'index.htm
   process.exit(2)
 }
 const { allRoutes } = await import(pathToFileURL(distSsr).href)
-const rotte = allRoutes()
+const routes = allRoutes()
 
 /* Server di anteprima: lo avvia e lo spegne da sé. */
 // Il bin di Vite con questo stesso Node, non `npx`: su Windows npx è un .cmd, che Node rifiuta di eseguire.
 const VITE = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js')
 const server = spawn(process.execPath, [VITE, 'preview', '--port', '4178', '--strictPort'], { cwd: root, stdio: 'ignore' })
 const BASE = 'http://localhost:4178'
-let su = false
-for (let i = 0; i < 60 && !su; i += 1) {
-  await attesa(250)
-  try { su = (await fetch(BASE + '/')).ok } catch { /* non ancora */ }
+let isUp = false
+for (let i = 0; i < 60 && !isUp; i += 1) {
+  await wait(250)
+  try { isUp = (await fetch(BASE + '/')).ok } catch { /* non ancora */ }
 }
-if (!su) { server.kill(); console.error('Il server di anteprima non è partito.'); process.exit(2) }
+if (!isUp) { server.kill(); console.error('Il server di anteprima non è partito.'); process.exit(2) }
 
 const browser = spawn(BIN, ['--remote-debugging-port=9351', '--headless=new', '--no-sandbox',
   '--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader',
   `--user-data-dir=${path.join(os.tmpdir(), 'joe-hydration')}`, '--window-size=1400,1000', 'about:blank'], { stdio: 'ignore' })
 
-const chiudi = (codice) => {
+const close = (code) => {
   try { browser.kill() } catch { /* già morto */ }
   try { server.kill() } catch { /* già morto */ }
-  process.exit(codice)
+  process.exit(code)
 }
 
-let bersaglio
-for (let i = 0; i < 40 && !bersaglio; i += 1) {
-  await attesa(250)
-  try { bersaglio = (await (await fetch('http://127.0.0.1:9351/json/list')).json()).find((x) => x.type === 'page') } catch { /* non ancora */ }
+let debugTarget
+for (let i = 0; i < 40 && !debugTarget; i += 1) {
+  await wait(250)
+  try { debugTarget = (await (await fetch('http://127.0.0.1:9351/json/list')).json()).find((x) => x.type === 'page') } catch { /* non ancora */ }
 }
-if (!bersaglio) { console.error('Il browser non risponde.'); chiudi(2) }
+if (!debugTarget) { console.error('Il browser non risponde.'); close(2) }
 
-const ws = new WebSocket(bersaglio.webSocketDebuggerUrl)
+const ws = new WebSocket(debugTarget.webSocketDebuggerUrl)
 await new Promise((r) => { ws.onopen = r })
 let id = 0
-const pendenti = new Map()
-let raccolta = []
+const pending = new Map()
+let collected = []
 ws.onmessage = (e) => {
   const m = JSON.parse(e.data)
-  if (m.id && pendenti.has(m.id)) { pendenti.get(m.id)(m); pendenti.delete(m.id); return }
+  if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); return }
   if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error')
-    raccolta.push('console.error: ' + m.params.args.map((a) => a.value ?? a.description ?? '').join(' '))
+    collected.push('console.error: ' + m.params.args.map((a) => a.value ?? a.description ?? '').join(' '))
   if (m.method === 'Runtime.exceptionThrown')
-    raccolta.push('eccezione: ' + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text))
+    collected.push('eccezione: ' + (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text))
 }
-const cdp = (metodo, params = {}) =>
-  new Promise((res) => { const n = ++id; pendenti.set(n, res); ws.send(JSON.stringify({ id: n, method: metodo, params })) })
+const cdp = (method, params = {}) =>
+  new Promise((res) => { const n = ++id; pending.set(n, res); ws.send(JSON.stringify({ id: n, method: method, params })) })
 const js = async (e) =>
   (await cdp('Runtime.evaluate', { expression: e, awaitPromise: true, returnByValue: true })).result?.result?.value
 
@@ -118,44 +118,44 @@ await cdp('Page.enable')
 
 // `reportError` emette un evento 'error' su window: è lì che React 18 in
 // produzione segnala gli errori recuperabili dell'aggancio.
-let iniezione = `window.__hy=[];addEventListener('error',e=>{window.__hy.push('window.error: '+((e.error&&(e.error.message||e.error))||e.message))});`
-if (ROMPI) {
-  // Autotest: altera il DOM prima dell'aggancio. Con --rompi ogni pagina deve risultare rotta.
-  iniezione += `new MutationObserver((m,o)=>{const r=document.getElementById('root');
+let injection = `window.__hy=[];addEventListener('error',e=>{window.__hy.push('window.error: '+((e.error&&(e.error.message||e.error))||e.message))});`
+if (BREAK) {
+  // Autotest: altera il DOM prima dell'aggancio. Con --break ogni pagina deve risultare rotta.
+  injection += `new MutationObserver((m,o)=>{const r=document.getElementById('root');
     if(r&&r.firstElementChild){const h=r.querySelector('h1,h2,div');
       if(h){h.append(document.createTextNode(' GUASTO'));o.disconnect()}}}).observe(document,{childList:true,subtree:true});`
 }
-await cdp('Page.addScriptToEvaluateOnNewDocument', { source: iniezione })
+await cdp('Page.addScriptToEvaluateOnNewDocument', { source: injection })
 
 // I codici con cui React 18 minificato segnala un aggancio fallito.
-const SEGNALE = /hydrat|did not match|Minified React error #(418|422|423|425)|text content|server.*client/i
+const SIGNAL = /hydrat|did not match|Minified React error #(418|422|423|425)|text content|server.*client/i
 
-const rotti = []
-for (const r of rotte) {
-  raccolta = []
+const broken = []
+for (const r of routes) {
+  collected = []
   await cdp('Page.navigate', { url: BASE + (r === '/' ? '/' : r + '/') })
   for (let i = 0; i < 60; i += 1) {
-    await attesa(100)
+    await wait(100)
     if (await js('document.readyState==="complete"')) break
   }
-  await attesa(700) // margine perché l'aggancio finisca
-  const daPagina = JSON.parse((await js('JSON.stringify(window.__hy||[])')) || '[]')
-  const problemi = [...raccolta, ...daPagina].filter((m) => SEGNALE.test(m))
-  if (problemi.length) rotti.push({ rotta: r, problemi })
+  await wait(700) // margine perché l'aggancio finisca
+  const fromPage = JSON.parse((await js('JSON.stringify(window.__hy||[])')) || '[]')
+  const problems = [...collected, ...fromPage].filter((m) => SIGNAL.test(m))
+  if (problems.length) broken.push({ route: r, problems })
 }
 
-console.log(`  pagine controllate: ${rotte.length}`)
-if (rotti.length) {
-  console.error(`  ✗ aggancio rotto su ${rotti.length} pagine:`)
-  for (const x of rotti.slice(0, 10)) console.error(`      ${x.rotta}\n        ${x.problemi[0].slice(0, 160)}`)
-  if (rotti.length > 10) console.error(`      … e altre ${rotti.length - 10}`)
-  if (ROMPI) { console.log('\n  (autotest: il rilevatore vede il guasto simulato, è il risultato atteso)'); chiudi(0) }
-  chiudi(1)
+console.log(`  pagine controllate: ${routes.length}`)
+if (broken.length) {
+  console.error(`  ✗ aggancio rotto su ${broken.length} pagine:`)
+  for (const x of broken.slice(0, 10)) console.error(`      ${x.route}\n        ${x.problems[0].slice(0, 160)}`)
+  if (broken.length > 10) console.error(`      … e altre ${broken.length - 10}`)
+  if (BREAK) { console.log('\n  (autotest: il rilevatore vede il guasto simulato, è il risultato atteso)'); close(0) }
+  close(1)
 }
-if (ROMPI) {
+if (BREAK) {
   console.error('\n  ✗ AUTOTEST FALLITO: il guasto è stato iniettato e nessuno se n’è accorto.')
   console.error('    Il rilevatore non funziona più: non fidarsi dei suoi esiti verdi.')
-  chiudi(1)
+  close(1)
 }
 console.log('  ✓ nessun disallineamento: React si aggancia a tutte le pagine pre-renderizzate')
-chiudi(0)
+close(0)

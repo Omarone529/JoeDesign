@@ -9,47 +9,47 @@ import {
   useState,
   useTransition,
 } from 'react'
-import { parsePath } from './rotte'
+import { parsePath } from './routes'
 
-// Parte React del routing. Gli indirizzi stanno in rotte.js (senza React), riesportati qui.
-export { parsePath, percorso, percorsoTradotto } from './rotte'
+// Parte React del routing. Gli indirizzi stanno in routes.js (senza React), riesportati qui.
+export { parsePath, pathFor, translatedPath } from './routes'
 
 const RouterContext = createContext(null)
 
 // useLayoutEffect nel browser (scroll ripristinato prima del paint), useEffect in SSR.
-const useEffettoDiLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 export function RouterProvider({ initialPath = '/', children }) {
   const [path, setPath] = useState(initialPath)
   // In transizione: la pagina vecchia resta in vista finché il file della nuova non arriva.
-  const [, avviaTransizione] = useTransition()
-  const cambiaPath = useCallback((p) => avviaTransizione(() => setPath(p)), [])
+  const [, startTransition] = useTransition()
+  const changePath = useCallback((p) => startTransition(() => setPath(p)), [])
   // Scroll da applicare quando la pagina nuova è in vista. Quello del browser
   // arriva prima del render e sbaglia. Regge perché le immagini riservano la loro altezza.
-  const scrollDaRipristinare = useRef(null)
+  const scrollToRestore = useRef(null)
 
   useEffect(() => {
     if (!window.history.scrollRestoration) return
-    const precedente = window.history.scrollRestoration
+    const previous = window.history.scrollRestoration
     window.history.scrollRestoration = 'manual'
     return () => {
-      window.history.scrollRestoration = precedente
+      window.history.scrollRestoration = previous
     }
   }, [])
 
   useEffect(() => {
     const onPop = (e) => {
-      scrollDaRipristinare.current = e.state?.scrollY ?? 0
-      cambiaPath(window.location.pathname)
+      scrollToRestore.current = e.state?.scrollY ?? 0
+      changePath(window.location.pathname)
     }
     window.addEventListener('popstate', onPop)
     // Recupera un popstate arrivato prima dell'hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPath((corrente) =>
-      corrente === window.location.pathname ? corrente : window.location.pathname,
+    setPath((current) =>
+      current === window.location.pathname ? current : window.location.pathname,
     )
     return () => window.removeEventListener('popstate', onPop)
-  }, [cambiaPath])
+  }, [changePath])
 
   const navigate = useCallback((to) => {
     if (typeof window === 'undefined') return
@@ -61,15 +61,15 @@ export function RouterProvider({ initialPath = '/', children }) {
       return
     }
     window.history.pushState({ scrollY: 0 }, '', to)
-    scrollDaRipristinare.current = 0
-    cambiaPath(to)
-  }, [cambiaPath])
+    scrollToRestore.current = 0
+    changePath(to)
+  }, [changePath])
 
   // Alla prima apertura non c'è niente da ripristinare.
-  useEffettoDiLayout(() => {
-    const y = scrollDaRipristinare.current
+  useIsomorphicLayoutEffect(() => {
+    const y = scrollToRestore.current
     if (y === null) return
-    scrollDaRipristinare.current = null
+    scrollToRestore.current = null
     window.scrollTo(0, y)
   }, [path])
 
