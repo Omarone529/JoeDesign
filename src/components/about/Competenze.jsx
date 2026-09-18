@@ -20,6 +20,10 @@ const BARRA = '4rem'
    quelle sotto che resta in vista. */
 const SCALINO = '0.85rem'
 
+/* Sosta dopo che l'ultima card si è posata. Elemento vero e non padding: lo sticky
+   è limitato dal content box del padre. */
+const CODA = 'calc(var(--schermo,100svh)*0.5)'
+
 export default function Competenze() {
   const lang = useLang()
   const T = testi(lang)
@@ -30,7 +34,7 @@ export default function Competenze() {
     const contenitore = pila.current
     if (!contenitore) return
 
-    const carte = Array.from(contenitore.children)
+    const carte = Array.from(contenitore.querySelectorAll(':scope > article'))
     let inCoda = false
 
     const aggiorna = () => {
@@ -38,7 +42,9 @@ export default function Competenze() {
       const riquadro = contenitore.getBoundingClientRect()
       // Scroll disponibile dentro la pila; senza corsa si esce per non dividere per zero.
       // `altezzaSchermo()` e non innerHeight: con le barre che si ritirano la scala saltava.
-      const corsa = riquadro.height - altezzaSchermo()
+      // La coda è sosta, non corsa: contandola la pila si comprimerebbe da ferma.
+      const coda = contenitore.lastElementChild?.getBoundingClientRect().height || 0
+      const corsa = riquadro.height - coda - altezzaSchermo()
       if (corsa <= 0) {
         carte.forEach((carta) => {
           carta.style.transform = ''
@@ -131,6 +137,9 @@ export default function Competenze() {
             </div>
           </article>
         ))}
+
+        {/* Va tenuto ultimo: `aggiorna` lo sconta dalla corsa. */}
+        <div aria-hidden="true" style={{ height: CODA }} />
       </div>
     </section>
   )
