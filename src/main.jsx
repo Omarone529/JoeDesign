@@ -1,7 +1,8 @@
 import React from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.jsx'
-import { RouterProvider } from './router.jsx'
+import { RouterProvider, parsePath } from './router.jsx'
+import { caricaPagina } from './pagine'
 import { fissaAltezzaSchermo } from './altezzaSchermo'
 import './index.css'
 
@@ -18,8 +19,11 @@ const app = (
   </React.StrictMode>
 )
 
-if (root.hasChildNodes()) {
-  hydrateRoot(root, app)
-} else {
-  createRoot(root).render(app)
-}
+// Prima la pagina aperta: se l'aggancio la trovasse da scaricare, React ridisegnerebbe.
+caricaPagina(parsePath(window.location.pathname).name).then(() => {
+  if (root.hasChildNodes()) {
+    hydrateRoot(root, app)
+  } else {
+    createRoot(root).render(app)
+  }
+})

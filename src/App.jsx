@@ -1,15 +1,20 @@
+import { Suspense } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import FloatingMailButton from './components/FloatingMailButton'
 import ErrorBoundary from './components/ErrorBoundary'
 import BannerPrivacy from './components/BannerPrivacy'
-import Home from './pages/Home'
-import About from './pages/About'
-import Archive from './pages/Archive'
-import ProjectDetail from './pages/ProjectDetail'
-import Privacy from './pages/Privacy'
-import NotFound from './pages/NotFound'
 import { useRoute } from './router'
+import { caricaPagina, paginaCaricata } from './pagine'
+
+// Già caricata prima dell'hydration e di ogni cambio pagina: la sospensione è solo una rete.
+function PaginaCorrente({ route }) {
+  const Pagina = paginaCaricata(route.name)
+  if (!Pagina) throw caricaPagina(route.name)
+  // Riferimento stabile preso da una cache, non creato qui.
+  // eslint-disable-next-line react-hooks/static-components
+  return <Pagina area={route.area} slug={route.slug} />
+}
 
 export default function App() {
   const route = useRoute()
@@ -18,12 +23,9 @@ export default function App() {
     <div id="top" className="min-h-[var(--schermo,100vh)] bg-paper">
       <Navbar route={route} />
       <ErrorBoundary rotta={route.path} lang={route.lang}>
-        {route.name === 'about' && <About />}
-        {route.name === 'archive' && <Archive area={route.area} />}
-        {route.name === 'project' && <ProjectDetail slug={route.slug} />}
-        {route.name === 'privacy' && <Privacy />}
-        {route.name === 'notfound' && <NotFound />}
-        {route.name === 'home' && <Home />}
+        <Suspense fallback={null}>
+          <PaginaCorrente route={route} />
+        </Suspense>
       </ErrorBoundary>
       <Footer />
       <FloatingMailButton />

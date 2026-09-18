@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useTransition,
 } from 'react'
 import { parsePath } from './rotte'
 
@@ -20,7 +21,10 @@ const useEffettoDiLayout = typeof window === 'undefined' ? useEffect : useLayout
 
 export function RouterProvider({ initialPath = '/', children }) {
   const [path, setPath] = useState(initialPath)
-  // Scroll da ripristinare: numero tornando indietro, null andando avanti. Quello del browser
+  // In transizione: la pagina vecchia resta in vista finché il file della nuova non arriva.
+  const [, avviaTransizione] = useTransition()
+  const cambiaPath = useCallback((p) => avviaTransizione(() => setPath(p)), [])
+  // Scroll da applicare quando la pagina nuova è in vista. Quello del browser
   // arriva prima del render e sbaglia. Regge perché le immagini riservano la loro altezza.
   const scrollDaRipristinare = useRef(null)
 
@@ -36,7 +40,7 @@ export function RouterProvider({ initialPath = '/', children }) {
   useEffect(() => {
     const onPop = (e) => {
       scrollDaRipristinare.current = e.state?.scrollY ?? 0
-      setPath(window.location.pathname)
+      cambiaPath(window.location.pathname)
     }
     window.addEventListener('popstate', onPop)
     // Recupera un popstate arrivato prima dell'hydration.
@@ -45,23 +49,23 @@ export function RouterProvider({ initialPath = '/', children }) {
       corrente === window.location.pathname ? corrente : window.location.pathname,
     )
     return () => window.removeEventListener('popstate', onPop)
-  }, [])
+  }, [cambiaPath])
 
   const navigate = useCallback((to) => {
     if (typeof window === 'undefined') return
     // La posizione va scritta nella voce di cronologia della pagina che si
     // lascia, ed è l'ultimo momento per farlo: dopo il pushState non è più quella corrente.
     window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
-    if (to !== window.location.pathname) {
-      window.history.pushState({ scrollY: 0 }, '', to)
+    if (to === window.location.pathname) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+      return
     }
-    scrollDaRipristinare.current = null
-    setPath(to)
-    window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [])
+    window.history.pushState({ scrollY: 0 }, '', to)
+    scrollDaRipristinare.current = 0
+    cambiaPath(to)
+  }, [cambiaPath])
 
-  // Solo tornando indietro o avanti: andando avanti `navigate` ha già portato
-  // in cima, e alla prima apertura non c'è niente da ripristinare.
+  // Alla prima apertura non c'è niente da ripristinare.
   useEffettoDiLayout(() => {
     const y = scrollDaRipristinare.current
     if (y === null) return

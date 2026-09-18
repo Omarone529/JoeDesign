@@ -28,10 +28,36 @@ const esc = (s) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 
-const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8')
+// Copia intatta dell'index.html di Vite: dist/index.html qui sotto diventa la home.
+const stampo = path.join(distDir, '.vite', 'index.html')
+if (!fs.existsSync(stampo)) fs.copyFileSync(path.join(distDir, 'index.html'), stampo)
+const template = fs.readFileSync(stampo, 'utf8')
+
+// Le pagine sono caricate a richiesta: renderToString non aspetta, quindi vanno pronte prima.
+await server.caricaTutte()
+
+// Il file della pagina e quelli che importa partono insieme al bundle, non dopo.
+const manifesto = JSON.parse(fs.readFileSync(path.join(distDir, '.vite', 'manifest.json'), 'utf8'))
+function dipendenze(chiave, visti = new Set()) {
+  if (visti.has(chiave)) return visti
+  visti.add(chiave)
+  ;(manifesto[chiave].imports || []).forEach((k) => dipendenze(k, visti))
+  return visti
+}
+// Il bundle principale e i suoi import sono già nell'HTML scritto da Vite.
+const nelBundle = dipendenze(Object.keys(manifesto).find((k) => manifesto[k].isEntry))
+
+function precarica(nomeRotta) {
+  const propri = [...dipendenze(server.SORGENTI[nomeRotta])].filter((k) => !nelBundle.has(k))
+  return propri.flatMap((k) => [
+    `<link rel="modulepreload" crossorigin href="/${manifesto[k].file}" />`,
+    ...(manifesto[k].css || []).map((css) => `<link rel="stylesheet" crossorigin href="/${css}" />`),
+  ])
+}
 
 function headTags(meta, route) {
   const tags = [
+    ...precarica(route.name),
     `<meta name="author" content="${esc(profile.name)}" />`,
     // La 404 è l'unica senza canonical: non ha un indirizzo proprio.
     ...(meta.noindex ? [`<meta name="robots" content="noindex,follow" />`] : []),
