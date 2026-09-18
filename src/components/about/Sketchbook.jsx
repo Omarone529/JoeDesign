@@ -128,7 +128,6 @@ export default function Sketchbook() {
     if (!tre) return
     posizionaLibro(pagina)
     tre.richiediRender()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagina])
 
   // Ruota e piega la pagina; `verso` (1 avanti, -1 indietro) sceglie da che parte inarcarla.
