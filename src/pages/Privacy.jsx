@@ -43,6 +43,19 @@ export default function Privacy() {
                   {p}
                 </p>
               ))}
+              {s.facts && (
+                <dl className="m-0 border-b border-line-soft">
+                  {s.facts.map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="grid grid-cols-1 gap-x-6 gap-y-1 border-t border-line-soft py-3 sm:grid-cols-[minmax(0,.34fr)_minmax(0,.66fr)]"
+                    >
+                      <dt className="pt-[3px] text-[11px] uppercase tracking-[0.16em] text-muted">{label}</dt>
+                      <dd className="m-0 break-words">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
               {/* Il consenso ai video si ritira qui, e lo stato attuale è sempre mostrato. */}
               {s.choice && mounted && (
                 <div className="flex flex-col items-start gap-4 pt-1">
