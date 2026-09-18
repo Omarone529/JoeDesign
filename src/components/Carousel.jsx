@@ -270,7 +270,7 @@ export default function Carousel({ images, title }) {
               aria-label={T.carosello.vaiA(i + 1)}
               aria-current={i === index}
               className={`relative h-1.5 rounded-full transition-all before:absolute before:-inset-x-2.5 before:-inset-y-3 before:content-[''] ${
-                i === index ? 'w-6 bg-ink' : 'w-1.5 bg-dot hover:bg-muted'
+                i === index ? 'w-6 bg-ink' : 'w-1.5 bg-muted hover:bg-ink'
               }`}
             />
           ))}
