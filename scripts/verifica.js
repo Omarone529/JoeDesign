@@ -4,10 +4,12 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const pub = (p) => path.join(root, 'public', p)
+// import() dinamico: su Windows un percorso assoluto non è un URL valido, serve file://
+const mod = (p) => pathToFileURL(path.join(root, p)).href
 
 const {
   archive,
@@ -19,9 +21,9 @@ const {
   familyBand,
   manifestoFoto,
   projectImages,
-} = await import(path.join(root, 'src/data/siteData.js'))
-const { progettiEn, aboutEn } = await import(path.join(root, 'src/data/contenutiEn.js'))
-const { varianti, SUFFISSO_VARIANTE } = await import(path.join(root, 'src/data/varianti.js'))
+} = await import(mod('src/data/siteData.js'))
+const { progettiEn, aboutEn } = await import(mod('src/data/contenutiEn.js'))
+const { varianti, SUFFISSO_VARIANTE } = await import(mod('src/data/varianti.js'))
 
 const errori = []
 const avvisi = []
