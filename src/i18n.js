@@ -67,8 +67,7 @@ const TEXTS = {
       sketchbook: 'Sketchbook',
       sketchbookAria: 'Tavole dello sketchbook personale di Joe Sarchiolla',
       sketchbookRole: 'sketchbook sfogliabile',
-      /* Il manifesto sotto lo sketchbook: prima riga in grassetto, seconda in
-         tondo. Sono due frasi, non due paragrafi: vanno di seguito. */
+      // Due frasi di seguito, non due paragrafi.
       drawingTitle: 'Il disegno è la visione del prodotto finale.',
       drawingText:
         'È il luogo in cui prende forma, viene modificato e perfezionato, fino a definire ciò che il prodotto diventerà.',
@@ -226,7 +225,6 @@ const TEXTS = {
       ],
     },
 
-    /* Titoli e descrizioni delle pagine (meta tag e dati strutturati). */
     seo: {
       homeTitle: (signature, role) => `${signature} · ${role} a Reggio Emilia`,
       homeDesc: (signature, role, place, period) =>

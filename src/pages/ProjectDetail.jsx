@@ -16,8 +16,7 @@ import { texts } from '../i18n'
 import { Link, pathFor, useLang } from '../router'
 import { srcSetDi, SIZES } from '../images'
 
-// Formato comune a tutti gli backdrop.webp: dichiararlo riserva lo spazio e la
-// navigazione sotto non salta a caricamento avvenuto.
+// Formato di tutti i backdrop.webp: riserva lo spazio prima del caricamento.
 const BACKDROP_W = 1672
 const BACKDROP_H = 941
 
@@ -29,8 +28,7 @@ export default function ProjectDetail({ slug }) {
 
   // `cover` è solo l'anteprima di griglia/home: non entra nel carosello.
   const { gallery, drawing, backdrop, videoPoster, filmPoster } = projectImages(item)
-  // `ai` è l'etichetta AI Act della singola foto (vedi `aiPhoto`): la numerazione
-  // parte da 1, come i file 01.webp…NN.webp.
+  // Da 1, come i file 01.webp…NN.webp.
   const photos = gallery.map((src, i) => ({
     src,
     alt: altGallery(item, i, gallery.length, lang),
@@ -39,7 +37,6 @@ export default function ProjectDetail({ slug }) {
   const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
   const slides = [...reel, ...photos]
 
-  // Precedente e successivo restano dentro l'area.
   const area = areasIn(lang).find((a) => a.key === areaOf(item))
   const siblings = archive.filter((p) => areaOf(p) === areaOf(item))
   const i = siblings.findIndex((p) => p.slug === slug)
@@ -47,8 +44,6 @@ export default function ProjectDetail({ slug }) {
   const next = siblings[(i + 1) % siblings.length]
   const onlyOne = siblings.length < 2
 
-  // Le chiavi della tabella arrivano già nella lingua giusta da `spec`
-  // (Oggetto → Object): anno e designer sono le sole righe aggiunte qui.
   const specRows = [
     ...(item.year ? [[T.project.year, item.year]] : []),
     ...Object.entries(item.spec || {}),
@@ -87,8 +82,7 @@ export default function ProjectDetail({ slug }) {
           {slides.length > 0 ? (
             <Carousel key={item.slug} images={slides} title={item.title} />
           ) : (
-            /* Scheda pubblicata prima delle immagini: la cornice resta, invece
-               di lasciare la colonna a metà. */
+            /* Senza immagini la cornice resta, o la colonna rimane a metà. */
             <div className="flex aspect-square w-full items-center justify-center bg-placeholder">
               <span className="text-[11px] uppercase tracking-[0.24em] text-muted">
                 {T.project.incomingPhoto}
@@ -100,8 +94,6 @@ export default function ProjectDetail({ slug }) {
 
       <section className="px-5 sm:px-8 lg:px-[72px]">
         <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 md:mt-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-y-14 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-12">
-          {/* L'occhiello resta appeso al filetto; la tabella, molto più corta
-              della colonna accanto, si centra sul disegno tecnico. */}
           <div className="flex flex-col border-t border-line pt-6">
             <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
               {T.project.card}
@@ -121,8 +113,7 @@ export default function ProjectDetail({ slug }) {
             </div>
           </div>
 
-          {/* Altezza fissa: le proporzioni variano da un disegno all'altro, e
-              senza, la pagina si assesta a caricamento avvenuto. */}
+          {/* Altezza fissa: i disegni hanno proporzioni diverse, la pagina salterebbe. */}
           {drawing && (
             <figure className="m-0 border-t border-line pt-6">
               <img
@@ -160,7 +151,7 @@ export default function ProjectDetail({ slug }) {
         </section>
       )}
 
-      {/* Filmato 16:9 in fondo, fuori dal carosello. Parte solo col play. */}
+      {/* Parte solo col play, anche col consenso: quaggiù si arriva scorrendo. */}
       {filmPoster && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
           <figure className="m-0 border-t border-line pt-6">

@@ -5,27 +5,24 @@ import { scrolling } from '../../motion'
 import { useLang } from '../../router'
 import { srcSetDi, SIZES } from '../../images'
 
-/* Tempi dell'ingresso, in secondi. */
-const FIRST_LETTER = 0.2 // attesa prima che parta il nome
-const LETTER_STEP = 0.045 // scarto fra una lettera e la successiva
-const AFTER_NAME = 1.1 // pausa fra la fine del nome e l'invito a scorrere
+// Secondi.
+const FIRST_LETTER = 0.2
+const LETTER_STEP = 0.045
+const AFTER_NAME = 1.1
 
-// `--screen-height` (screenHeight.js) e non `svh`: le barre del browser non la muovono; mix-blend-multiply fonde il bianco con `bg-paper`.
 // Corpo del nome = larghezza / em della riga (5.99 e 8.10): da ricalcolare se cambiano padding o tracking.
 export default function Hero() {
   const T = texts(useLang())
 
-  // Salto a mano per rispettare la preferenza animazioni. L'href resta valido
-  // per il tasto centrale e per "copia indirizzo".
+  // A mano, per rispettare `prefers-reduced-motion`; l'href resta per il tasto centrale.
   const goToWorks = (e) => {
     const works = document.getElementById('works')
-    if (!works) return // senza la sezione in pagina resta il salto nativo
+    if (!works) return
     e.preventDefault()
     works.scrollIntoView({ behavior: scrolling(), block: 'start' })
   }
 
-  // Contato sull'intero nome, non sulla parola: le lettere entrano in fila
-  // anche a cavallo dell'a capo.
+  // Sull'intero nome: le lettere entrano in fila anche a cavallo dell'a capo.
   let countedLetters = 0
   const words = profile.displayName.split(' ').map((word) => ({
     word,
@@ -39,8 +36,6 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-[calc(var(--screen-height,100svh)-4rem)] flex-col items-center justify-center overflow-hidden border-b-2 border-ink px-5 py-24 text-center sm:px-8 lg:px-[72px]">
-      {/* `contain` + `bottom`: figura intera appoggiata alla linea in fondo,
-          `cover` mostrerebbe solo la testa. */}
       <div aria-hidden="true" className="absolute inset-0 bg-paper">
         <img
           src={homeHero.src}
@@ -96,8 +91,7 @@ export default function Hero() {
         ))}
       </h1>
 
-      {/* Contenitore = centraggio, link = animazione: sullo stesso elemento le
-          due transform si annullerebbero. */}
+      {/* Due elementi: sullo stesso, centraggio e animazione si annullerebbero. */}
       <div className="absolute inset-x-0 bottom-7 flex justify-center">
         <a
           href="#works"
@@ -118,7 +112,6 @@ export default function Hero() {
   )
 }
 
-/* Disegnata e non il carattere ↗, che ingrandito non regge come segno. */
 function DiagonalArrow({ className = '', style }) {
   return (
     <svg

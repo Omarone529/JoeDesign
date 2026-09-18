@@ -24,7 +24,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 const outDir = path.join(root, 'public', 'images', 'og')
 
-/* 1200×630 (1.91:1): il formato che tutte le piattaforme trattano uguale. */
 const W = 1200
 const H = 630
 
@@ -112,12 +111,11 @@ async function cardWithImage({
 }) {
   const TEXT_X = 72
   const TEXT_MAX = 452
-  const BOX = { x: 596, y: 46, w: 556, h: 538 } // area dell'immagine
+  const BOX = { x: 596, y: 46, w: 556, h: 538 }
 
   const { size, rows, tracking } = fittedTitle(title.toUpperCase(), {
     maxW: TEXT_MAX,
-    // Con la descrizione sotto, il titolo lascia spazio invece di prendersi
-    // tutta l'altezza: due righe al massimo, corpo un po' più contenuto.
+    // Con la descrizione sotto, due righe al massimo.
     ...(description ? { maxLines: 2, max: 68 } : null),
   })
 
@@ -237,7 +235,6 @@ async function fullCard({ source, eyebrowText, title, tail, dest }) {
     .toFile(dest)
 }
 
-/* ------------------------------------------------------------------------- */
 
 const PERIOD = archivePeriod
   ? archivePeriod.first === archivePeriod.last
@@ -260,7 +257,6 @@ for (const lang of LANGS) {
   const where = (name) => path.join(langDir, name)
   const done = (name) => generatedFiles.push(path.join(lang === 'en' ? 'en' : '', name))
 
-  // Home: il ritratto, con nome, mestiere e una riga sul lavoro.
   await cardWithImage({
     source: path.join(root, 'public', about.photos.hero.src),
     category: profile.place,
@@ -303,8 +299,7 @@ for (const lang of LANGS) {
         dest: where(name),
       })
     } else {
-      // Il più recente FRA QUELLI con la copertina: una scheda in attesa di foto
-      // non ha immagine da mettere qui.
+      // Il più recente fra quelli con la copertina.
       const showcase = projects.find((p) => projectImages(p).cover)
       await cardWithImage({
         source: path.join(root, 'public', projectImages(showcase).cover),

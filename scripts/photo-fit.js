@@ -36,8 +36,8 @@ const MANUAL_FOCUS = {
   'dose/05.webp': '50% 100%',
 }
 
-const TOLERANCE = 0.04 // quanto il soggetto può debordare dalla finestra
-const SAMPLE = 200 // lato massimo su cui si misura: basta e avanza
+const TOLERANCE = 0.04 // quanto il soggetto può uscire dalla finestra
+const SAMPLE = 200 // lato su cui si misura
 const DIFF = 26 // distanza dal fondo oltre cui il pixel è soggetto
 const SOFT_STEP = [2, 30] // salto di luminosità che segna una transizione morbida
 
@@ -121,7 +121,6 @@ async function softShare(file) {
   return soft / tot
 }
 
-// Parte visibile dell'immagine per asse, riempiendo la cornice quadrata.
 function viewport(ratio) {
   return ratio < FRAME_R
     ? { x: 1, y: ratio / FRAME_R }
@@ -149,8 +148,7 @@ function decide({ ratio, soft, box }) {
   const y = aim(visible.y, box.y0, box.y1)
   const x = aim(visible.x, box.x0, box.x1)
 
-  // Il soggetto non entra nella finestra: una foto regge lo stesso il taglio,
-  // una grafica no.
+  // Soggetto troppo grande: una foto regge il taglio, una grafica no.
   if ((!y.ok || !x.ok) && soft < PHOTO_THRESHOLD) {
     return { fit: 'contain', reason: 'grafica da non tagliare' }
   }
@@ -165,11 +163,9 @@ function decide({ ratio, soft, box }) {
 
   for (const slug of fs.readdirSync(ROOT).sort()) {
     for (const f of fs.readdirSync(path.join(ROOT, slug)).sort()) {
-      // Le -800 sono le varianti responsive: stessa inquadratura dell'originale,
-      // che è già nel manifesto. Vedi scripts/photo-variants.js.
+      // Le -800 hanno l'inquadratura dell'originale.
       if (!f.endsWith('.webp') || f.endsWith('-800.webp')) continue
-      // Miniature dei due video: come si inquadrano lo decidono i loro riquadri
-      // (vedi Carousel e FilmatoProgetto), non una misura presa qui.
+      // Miniature dei video: le inquadrano i loro riquadri.
       if (f === 'drawing.webp' || f === 'video.webp' || f === 'film.webp') continue
       const key = `${slug}/${f}`
       const m = await measure(path.join(ROOT, slug, f))
@@ -181,15 +177,14 @@ function decide({ ratio, soft, box }) {
       const src = `/images/products/${slug}/${f}`
 
       if (d.fit === 'contain') {
-        // Mostrata intera lascia scoperti i lati della cella: un bordo di un
-        // colore solo li riempie, uno screziato lascia il grigio.
+        // I lati scoperti prendono il colore del bordo, se è uniforme.
         entries[src] = { fit: 'contain', ...(m.clean > 0.85 ? { bg: m.bg } : {}) }
         tally.contain++
       } else if (d.pos) {
         entries[src] = { pos: d.pos }
         tally.shifted++
       } else {
-        tally.cover++ // riempie e resta centrata: è il comportamento di base
+        tally.cover++
       }
       console.log(`${src.padEnd(46)} ${d.fit}${d.pos ? ' ' + d.pos : ''} · ${d.reason}`)
     }

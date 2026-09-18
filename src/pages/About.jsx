@@ -5,42 +5,28 @@ import Skills from '../components/about/Skills'
 import Sketchbook from '../components/about/Sketchbook'
 import { srcSetDi, SIZES } from '../images'
 
-/*
- * Testata: il corpo del titolo si ricava da quanti em misura la riga (`heroNameEm`), così
- * le due lingue danno testate larghe uguali; la larghezza del riquadro è quella della riga
- * grande. Titolo e ritratto dipendono dalla stessa misura, `--figure`.
- */
+// Titolo e ritratto dipendono dalla stessa misura, `--figure`: l'incastro resta uguale a ogni formato.
 
-// Corpo della riga piccola, in frazione della grande (1 = larghe uguali): la riga
-// grande resta la più larga, quindi è lei a dare la misura del riquadro e la piccola
-// ci sta dentro centrata.
+// Riga piccola in frazione della grande. Sopra 1 la più larga diventa lei, e dietro la manica finisce la R.
 const ROLE = 0.8
 
-// Spazio che il corpo del titolo lascia libero accanto alla figura. In rem: entra in
-// `body()`, che dimensiona come se il titolo dovesse stare tutto fuori dalla foto.
-// Il margine poi lo tira dentro di `OVERLAP`: riservare qui il posto è il modo di non
-// far mai uscire il titolo dalla colonna.
+// Spazio riservato da `body()` accanto alla figura. L'incastro va solo nel margine: messo
+// anche qui, il titolo resta inchiodato a sinistra.
 const GAP = '2rem'
 
-// Quanto la E di "Sono Joe" entra dietro la figura, in em della riga grande. La E è larga
-// 0.618 em, quindi 0.24 ne copre il 39% e 0.618 la coprirebbe tutta. In em e non in pixel
-// perché è una frazione di lettera, e la lettera cresce col titolo. MANICA è la striscia
-// trasparente fra il bordo del riquadro del ritratto e la manica vera, in frazione della
-// figura.
+// Quanto la E entra dietro la manica, in em (la E è 0.618 em: 0.24 ne copre il 39%).
+// SLEEVE: la striscia trasparente fra il bordo del ritaglio e la manica, in frazione della figura.
 const OVERLAP = 0.24
 const SLEEVE = 0.015
 
-// Quanto il ritratto rientra dal bordo destro. Il titolo lo segue della stessa misura,
-// così l'incastro della E resta quello: muovere la foto non cambia quanto entra la
-// lettera. Lo paga `GAP`, il posto che `body()` tiene libero, più quello che
-// l'incastro restituisce — oltre quella somma il titolo si stringe per stare nella
-// colonna, e si vede come un corpo che cala invece che come una foto che si sposta.
+// Rientro del ritratto; il titolo lo segue. Oltre `GAP` il titolo comincia a rimpicciolire.
 const INSET = '2rem'
 
-// Larghezza vera del ritratto con object-contain
+// Proporzioni di joe-hero.webp: vanno rifatte cambiando ritaglio.
 const PORTRAIT_RATIO = 1200 / 1364
 const BAR = '4rem'
 const FRAME = `calc(var(--screen-height, 100svh) - ${BAR})`
+// La larghezza che `object-contain` disegna davvero.
 const FIGURE_WIDTH = `min(46vw, calc(${FRAME} * ${PORTRAIT_RATIO.toFixed(6)}))`
 const FIGURE_HEIGHT = `calc(var(--figure) / ${PORTRAIT_RATIO.toFixed(6)})`
 
@@ -51,10 +37,9 @@ const body = (column, cap) =>
   `min(calc((100vw - ${column} - var(--figure) - ${GAP} - ${SAFETY}) / var(--name-em)),` +
   ` calc((100vw - ${column}) * ${WIDE} / var(--name-em)), ${cap})`
 
-// Dove cade la riga piccola sulla figura (0 piedi, 1 testa): all'altezza della manica.
-// Non la tocca più, ma è la quota che tiene titolo e ritratto sulla stessa riga d'occhio.
+// Altezza della manica sulla figura (0 piedi, 1 testa).
 const ROW_HEIGHT = 0.437
-const FOOT = '7rem' // il `pb-28` della sezione, da cui il margine va scalato
+const FOOT = '7rem' // il `pb-28` della sezione
 
 // Carta sopra la testa quando la figura non arriva in cima.
 const BREATHING_ROOM = '8rem'

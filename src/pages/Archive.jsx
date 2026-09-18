@@ -68,11 +68,9 @@ function AreaChooser() {
         <div className="mx-auto mt-4 grid grid-cols-1 gap-10 sm:mt-8 sm:max-w-[980px] sm:grid-cols-2 sm:gap-8 lg:max-w-[1200px] lg:gap-10">
           {areasIn(lang).map((area, i) => {
             const projects = areaProjectsIn(area.key, lang)
-            // Il più recente FRA QUELLI con la copertina: una scheda in attesa
-            // di foto non può fare da vetrina all'area.
+            // Il più recente fra quelli con la copertina.
             const first = projects.find((x) => projectImages(x).cover) ?? projects[0]
-            // Un'area dichiarata prima del suo primo progetto non si annuncia:
-            // la carta sarebbe un invito a una griglia vuota.
+            // Un'area ancora senza progetti non si annuncia.
             if (!first) return null
             const { cover } = projectImages(first)
             const fit = photoFit[cover]
@@ -143,8 +141,6 @@ function AreaGrid({ area }) {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
           {projects.map((p, i) => {
             const { cover } = projectImages(p)
-            // I manifesti sono verticali e il ritaglio quadrato gli mozzerebbe il
-            // testo: `photoFit` dice quali vanno mostrati interi.
             const fit = photoFit[cover]
             // Prime due righe (8 celle): in viewport all'apertura, richieste subito.
             const immediate = i < 8

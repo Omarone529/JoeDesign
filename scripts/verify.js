@@ -30,11 +30,10 @@ const warnings = []
 const err = (m) => errors.push(m)
 const warn = (m) => warnings.push(m)
 
-/* `src` è sempre un percorso assoluto del sito, come lo scrive `siteData`. */
 const missing = (src) => !fs.existsSync(pub(src))
 const requireFile = (src, where) => missing(src) && err(`${where}: manca ${src}`)
 
-/* ───────────────────────────── progetti ───────────────────────────── */
+// Progetti
 
 const areaKeys = new Set(areas.map((a) => a.key))
 const seenSlugs = new Set()
@@ -70,8 +69,7 @@ for (const p of archive) {
     }
   }
 
-  // Un'etichetta AI Act che punta a una foto inesistente è peggio di una che
-  // manca: dichiara come sintetica una foto che nel sito è un'altra.
+  // Un'etichetta che punta alla foto sbagliata dichiara sintetica una foto vera.
   for (const [field, list] of [
     ['generated', p.ai?.generated],
     ['modified', p.ai?.modified],
@@ -90,20 +88,19 @@ for (const p of archive) {
   if (!projectsEn[p.slug]) warn(`${where}: nessuna traduzione in contentEn.js, resta in italiano`)
 }
 
-// Una chiave di troppo in contenutiEn non traduce niente e non protesta: è
-// sempre un refuso nello slug.
+// Una chiave di troppo in contentEn non protesta: è sempre un refuso nello slug.
 for (const slug of Object.keys(projectsEn)) {
   if (!seenSlugs.has(slug)) {
     err(`contentEn.js: la chiave "${slug}" non corrisponde a nessun progetto dell'archivio`)
   }
 }
 
-/* ─────────────────────── home, chi sono, anteprime ─────────────────────── */
+// Home, chi sono, anteprime
 
 focusItems.forEach((f) => requireFile(f.cover, `home, lavoro selezionato "${f.slug}"`))
 requireFile(homeHero.src, 'home')
 requireFile(manifestoPhoto.src, 'home')
-// Non è più in pagina, ma è la sorgente delle anteprime social dell'archivio.
+// Non è in pagina: è la sorgente delle anteprime dell'archivio.
 requireFile(familyBand.src, 'anteprime social dell’archivio')
 // Card di "Chi sono" senza traduzione (avviso) o traduzioni senza card (errore).
 {
@@ -126,12 +123,11 @@ for (const plate of about.sketchbook) {
   for (const face of [plate.front, plate.back]) {
     if (!face) continue
     requireFile(face.src, 'sketchbook')
-    // La misura ridotta la usa il telefono: senza, la tavola non si vede là.
     requireFile(face.src.replace(/\.webp$/, '-half.webp'), 'sketchbook (mezza misura)')
   }
 }
 
-// Anteprime social: og-image.js si lancia a mano e si dimentica.
+// og-image.js si lancia a mano, e ci si dimentica.
 const expectedOg = [
   'home',
   'about',
@@ -149,7 +145,7 @@ for (const name of expectedOg) {
   }
 }
 
-/* ────────────────────────── varianti da 800px ────────────────────────── */
+// Varianti da 800px
 
 for (const [src, width] of Object.entries(variants)) {
   const variant = src.replace(/\.webp$/, `${VARIANT_SUFFIX}.webp`)
@@ -162,7 +158,7 @@ for (const [src, width] of Object.entries(variants)) {
   }
 }
 
-/* ──────────────────────────────── esito ──────────────────────────────── */
+// Esito
 
 for (const a of warnings) console.log(`  ~ ${a}`)
 for (const e of errors) console.error(`  ✗ ${e}`)

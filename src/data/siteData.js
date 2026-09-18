@@ -63,8 +63,7 @@ export const about = {
     'Keynote',
     'Canva',
   ],
-  /* Card di "Chi sono". Traduzione in `aboutEn.competenze`, agganciata per `key`.
-     `photos: null` finché le immagini non arrivano, poi `{ src, alt }`. */
+  // Traduzione in `aboutEn.skillCards`, per `key`. `photos: null` finché mancano le foto.
   skillCards: [
     {
       key: 'printing',
@@ -614,12 +613,10 @@ export const archive = [...projects].sort(
   (a, b) => latestYear(b) - latestYear(a) || (b.plate ?? 0) - (a.plate ?? 0),
 )
 
-/* "1 progetto" / "19 progetti": il singolare capita, e "1 progetti" no. */
 export function countProjects(n, lang) {
   return texts(lang).archive.count(n)
 }
 
-/* Il periodo coperto da un gruppo di progetti, o null se nessuno ha un anno. */
 export function periodOf(items) {
   const years = items.flatMap(yearsOf)
   return years.length ? { first: Math.min(...years), last: Math.max(...years) } : null
@@ -665,9 +662,7 @@ export function projectImages(item) {
     gallery,
     drawing: item.drawing ? `${base}/drawing.webp` : null,
     backdrop: item.backdrop ? `${base}/backdrop.webp` : null,
-    // Fotogramma del reel, mostrato al posto del player finché non si clicca.
     videoPoster: item.video ? `${base}/video.webp` : null,
-    // Lo stesso per il filmato orizzontale della fascia in fondo alla scheda.
     filmPoster: item.film ? `${base}/film.webp` : null,
   }
 }
@@ -726,9 +721,7 @@ export const focusItems = focusSlugs.map((slug) => {
 // Accessori per lingua: calcolati una volta, così React riceve sempre lo stesso oggetto.
 const english = (lang) => lang === 'en'
 
-/* `cat`, `desc` e `spec` si sostituiscono in blocco: nella tabella cambiano
-   anche le chiavi (Oggetto → Object), quindi fondere le due `spec` darebbe
-   una riga per lingua. Un progetto non ancora tradotto resta in italiano. */
+// `spec` si sostituisce in blocco: le sue chiavi cambiano lingua, fonderle darebbe righe doppie.
 function englishProject(item) {
   const en = projectsEn[item.slug]
   return en ? { ...item, ...en } : item

@@ -3,12 +3,10 @@ import { texts } from '../i18n'
 import { scrolling } from '../motion'
 import { Link, pathFor, useLang } from '../router'
 
-// Fissato a build-time. Con `getFullYear()` al render, il primo gennaio l'HTML
-// statico e il browser direbbero anni diversi e l'hydration si romperebbe.
+// Fissato alla build: con `getFullYear()` a Capodanno HTML statico e browser non combacerebbero.
 const YEAR = __BUILD_YEAR__
 
-// `/10` e non `/12`: l'opacità Tailwind va di cinque in cinque, e un valore
-// fuori scala non genera la classe.
+// `/10` e non `/12`: un'opacità fuori scala non genera la classe.
 const RULE = 'border-paper/10'
 
 // Fa anche da pagina contatti, che come rotta non esiste.
@@ -25,8 +23,7 @@ export default function Footer() {
   ]
 
   return (
-    /* Destinazione del salto "Contatti". Senza contorno di focus: su un
-       elemento così largo sarebbe enorme. */
+    /* Destinazione del salto "Contatti": niente contorno di focus, sarebbe enorme. */
     <footer
       id="contact"
       tabIndex={-1}
@@ -140,9 +137,7 @@ export default function Footer() {
   )
 }
 
-// Va in un contenitore `relative` dentro un elemento `group`. Il `before` dei
-// comandi allarga i bersagli senza spostarla; "Privacy" e "Torna su" stanno a
-// 16px l'uno dall'altro per non accavallare le due aree.
+// "Privacy" e "Torna su" a 16px: le aree di tocco allargate non si accavallano.
 function Underline() {
   return (
     <span

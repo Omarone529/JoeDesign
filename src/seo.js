@@ -20,10 +20,7 @@ import {
 import { LANGS, texts } from './i18n.js'
 import { pathFor, translatedPath } from './routes.js'
 
-/*
- * Metadati per rotta (meta, dati strutturati, sitemap), serializzati da prerender.js.
- * SITE viene dalla env `URL` di Netlify; il ripiego deve combaciare col dominio primario.
- */
+// Il ripiego di SITE deve combaciare col dominio primario su Netlify.
 const ENV_SITE =
   (typeof process !== 'undefined' &&
     process.env &&
@@ -33,7 +30,6 @@ export const SITE = (ENV_SITE || 'https://joesarchiolla.com').replace(/\/+$/, ''
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
-/* L'URL assoluto di una pagina, nella lingua chiesta. */
 const url = (name, params, lang) => SITE + pathFor(name, params, lang)
 
 const PERIOD = archivePeriod
@@ -110,7 +106,6 @@ export function metaForRoute(route) {
   const common = { lang, htmlLang: T.htmlLang, ogLocale: T.ogLocale, alternate: alternative(route) }
 
   if (route.name === 'archive') {
-    // Pagina d'area: /archivio/product-design, /en/archive/graphic-design.
     const area = route.area ? areaBySlugIn(route.area, lang) : null
     if (area) {
       const projects = areaProjectsIn(area.key, lang)
@@ -153,10 +148,9 @@ export function metaForRoute(route) {
       description: clip(about.intro),
       canonical: url('about', {}, lang),
       image: ogImage('about', lang),
-      // L'alt descrive l'ANTEPRIMA social, che `og-image.js` compone ancora con
-      // la foto della lampada: cambiando la sorgente là, va cambiato anche qui.
+      // Descrive l'anteprima di og-image.js: se là cambia la foto, cambia anche qui.
       imageAlt: manifestoPhotoIn(lang).alt,
-      preload: about.photos.hero.src, // elemento più grande della pagina
+      preload: about.photos.hero.src,
       type: 'profile',
     }
   }
@@ -165,11 +159,9 @@ export function metaForRoute(route) {
     const item = archiveIn(lang).find((x) => x.slug === route.slug)
     if (item) {
       const { cover, gallery } = projectImages(item)
-      // Senza copertina non c'è nemmeno l'anteprima social della scheda:
-      // il link condiviso porta quella dell'area, non un riquadro vuoto.
+      // Senza copertina non c'è anteprima della scheda: si usa quella dell'area.
       const areaItem = areasIn(lang).find((a) => a.key === areaOf(item))
-      // Un `area` che non corrisponde a nessuna area dichiarata è un refuso nei
-      // dati: senza questa riga la build muore più avanti su un `undefined`.
+      // Un'area inesistente è un refuso nei dati: meglio fermarsi qui che su un `undefined`.
       if (!areaItem) {
         throw new Error(
           `seo: il progetto "${item.slug}" dichiara area "${areaOf(item)}", che non esiste in \`aree\` (${areasIn(lang)
@@ -184,7 +176,7 @@ export function metaForRoute(route) {
         canonical: url('project', { slug: item.slug }, lang),
         image: ogImage(cover ? item.slug : `archive-${areaItem.slug}`, lang),
         imageAlt: `${item.title} · ${item.cat}`,
-        preload: gallery[0], // prima diapositiva del carosello
+        preload: gallery[0],
         type: 'article',
         project: item,
       }
@@ -204,8 +196,7 @@ export function metaForRoute(route) {
     }
   }
 
-  // Nessun canonical: l'URL che mostra la 404 è per definizione sbagliato, e
-  // indicarne uno "giusto" direbbe a Google che è un'altra pagina del sito.
+  // Nessun canonical: l'URL di una 404 è sbagliato per definizione.
   if (route.name === 'notfound') {
     return {
       ...common,
@@ -218,7 +209,6 @@ export function metaForRoute(route) {
     }
   }
 
-  // Nome, ruolo e città: le chiavi delle ricerche realistiche.
   return {
     ...common,
     title: T.seo.homeTitle(SIGNATURE, p.role),
@@ -230,7 +220,6 @@ export function metaForRoute(route) {
   }
 }
 
-/* Tutte le pagine da generare: le stesse rotte in tutte e due le lingue. */
 export function allRoutes() {
   return LANGS.flatMap((lang) => [
     pathFor('home', {}, lang),
@@ -241,8 +230,6 @@ export function allRoutes() {
     ...archiveIn(lang).map((p) => pathFor('project', { slug: p.slug }, lang)),
   ])
 }
-
-/* ─────────────────────────── Dati strutturati ─────────────────────────── */
 
 // Un @graph per pagina: sito e persona hanno un @id unico, pagine e opere uno per lingua.
 const SITE_ID = `${SITE}/#site`
@@ -303,8 +290,7 @@ function projectNode(item, meta) {
   const { cover, gallery, drawing } = projectImages(item)
   const name = readableTitle(item.title)
   const years = String(item.year || '').match(/\d{4}/g)
-  // `spec` cambia lingua e con essa le chiavi: il materiale è la seconda voce
-  // in italiano e in inglese, e va cercato per l'una o per l'altra.
+  // Le chiavi di `spec` cambiano lingua: il materiale si cerca per tutte e due.
   const material = item.spec?.Materiale || item.spec?.Material
 
   return {
@@ -336,7 +322,6 @@ function archiveLink(lang) {
   }
 }
 
-/* Sito e persona ci sono sempre, più l'entità propria della pagina. */
 export function schemaForRoute(route, meta) {
   const lang = meta.lang || 'it'
   const T = texts(lang)
@@ -369,7 +354,6 @@ export function schemaForRoute(route, meta) {
       ]))
     }
   } else if (route.name === 'archive') {
-    // La pagina d'area è una raccolta a sé, parte dell'archivio.
     const area = meta.area
     const projects = area ? areaProjectsIn(area.key, lang) : archiveIn(lang)
     if (area) graph.push(archiveLink(lang))

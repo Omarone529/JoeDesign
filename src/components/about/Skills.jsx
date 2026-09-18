@@ -6,22 +6,18 @@ import { useLang } from '../../router'
 import { srcSetDi, SIZES } from '../../images'
 import { screenHeight } from '../../screenHeight'
 
-// Card degli strumenti impilate: sticky + scala scritta da un listener di scroll, senza librerie.
 // ⚠️ Niente `window` nel render: le card escono dall'HTML statico a scala 1.
 
 // Riduzione per ogni card sopra; l'ultima arriva all'88%, quella in cima non si tocca.
 const STEP = 0.04
 
-/* L'altezza della navbar: le card si fermano sotto, non sotto di lei. La barra
-   si ritira scorrendo in giù ma torna scorrendo in su, ed è sopra di loro. */
+// La navbar torna scorrendo in su: le card si fermano sotto di lei.
 const BAR = '4rem'
 
-/* Di quanto ogni card si ferma più in basso della precedente: è la striscia di
-   quelle sotto che resta in vista. */
+// La striscia di ogni card sotto che resta in vista.
 const STEP_OFFSET = '0.85rem'
 
-/* Sosta dopo che l'ultima card si è posata. Elemento vero e non padding: lo sticky
-   è limitato dal content box del padre. */
+// Sosta finale. Elemento vero e non padding: lo sticky si ferma al content box del padre.
 const TAIL = 'calc(var(--screen-height,100svh)*0.5)'
 
 export default function Skills() {
@@ -40,9 +36,8 @@ export default function Skills() {
     const update = () => {
       queued = false
       const frame = stackEl.getBoundingClientRect()
-      // Scroll disponibile dentro la pila; senza corsa si esce per non dividere per zero.
       // `screenHeight()` e non innerHeight: con le barre che si ritirano la scala saltava.
-      // La coda è sosta, non corsa: contandola la pila si comprimerebbe da ferma.
+      // La coda è sosta, non corsa: contandola, la pila si comprimerebbe da ferma.
       const tail = stackEl.lastElementChild?.getBoundingClientRect().height || 0
       const travel = frame.height - tail - screenHeight()
       if (travel <= 0) {
@@ -54,8 +49,6 @@ export default function Skills() {
 
       const advance = Math.min(Math.max(-frame.top / travel, 0), 1)
       cards.forEach((paper, i) => {
-        /* Ogni card cede dalla sua frazione di pila fino in fondo: è la pila
-           che si comprime, non quattro animazioni separate. */
         const start = i / cards.length
         const share = advance <= start ? 0 : (advance - start) / (1 - start)
         const scale = 1 - share * (cards.length - 1 - i) * STEP
@@ -80,8 +73,7 @@ export default function Skills() {
 
   return (
     <section className="px-5 pb-16 pt-14 sm:px-8 lg:px-[72px] lg:pb-24 lg:pt-20">
-      {/* La freccia porta U+FE0E (VS-15), che forza la resa testuale: le
-          diagonali hanno una variante emoji e su iOS uscirebbero a colori. */}
+      {/* U+FE0E forza la freccia testuale: su iOS uscirebbe come emoji a colori. */}
       <div className="mb-8 flex items-center gap-2 lg:mb-12">
         <span aria-hidden className="text-[15px] leading-none lg:text-[17px]">{'↘︎'}</span>
         <h2 className="m-0 text-[13px] font-bold uppercase tracking-[0.22em] lg:text-[15px]">
@@ -89,15 +81,13 @@ export default function Skills() {
         </h2>
       </div>
 
-      {/* Nessuno stacco fra le card: la corsa di scroll di ognuna è la propria altezza. */}
       <div ref={stack}>
         {skillCards.map((c, i) => (
           <article
             key={c.key}
             style={{
               top: `calc(${BAR} + ${i} * ${STEP_OFFSET})`,
-              /* Chi viene dopo passa sopra: senza, l'ordine lo deciderebbe il
-                 DOM e la pila si rovescerebbe. */
+              /* Chi viene dopo passa sopra, o la pila si rovescia. */
               zIndex: i + 1,
             }}
             className="sticky flex h-[calc(var(--screen-height,100svh)*0.72)] origin-top flex-col overflow-hidden border-2 border-ink bg-paper [will-change:transform] sm:h-[calc(var(--screen-height,100svh)*0.64)] sm:flex-row lg:h-[calc(var(--screen-height,100svh)*0.62)]"

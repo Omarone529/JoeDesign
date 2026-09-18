@@ -3,11 +3,10 @@ import { profile } from '../data/siteData'
 import { LANGS, texts } from '../i18n'
 import { Link, pathFor, translatedPath } from '../router'
 
-const THRESHOLD = 96 // px di scorrimento sotto i quali la barra resta comunque visibile
-const MIN_MOVEMENT = 6 // px di soglia contro micro-scostamenti e rimbalzo elastico
+const THRESHOLD = 96 // px: sopra, la barra resta sempre visibile
+const MIN_MOVEMENT = 6 // px: contro il rimbalzo elastico
 
-// Parte visibile perché è così nell'HTML statico: altrimenti mismatch in
-// hydration. Lo scroll è accorpato in rAF, un render al massimo per frame.
+// Parte visibile come nell'HTML statico, o l'aggancio non combacia.
 function useNavbarHidden(route) {
   const [hidden, setHidden] = useState(false)
 
@@ -35,8 +34,7 @@ function useNavbarHidden(route) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Riesposta a ogni navigazione. Corretta durante il render e non in un
-  // effetto, o si vedrebbe un frame con la pagina nuova e la barra nascosta.
+  // Durante il render e non in un effetto: niente frame con la pagina nuova e la barra nascosta.
   const [prevRoute, setPrevRoute] = useState(route)
   if (route !== prevRoute) {
     setPrevRoute(route)
@@ -46,8 +44,6 @@ function useNavbarHidden(route) {
   return [hidden, setHidden]
 }
 
-// Sottolineatura ancorata allo span interno, in assoluto: resta attaccata alla
-// parola e non sposta il testo.
 function NavLink({ to, active = false, children }) {
   return (
     <Link
@@ -73,8 +69,7 @@ export default function Navbar({ route }) {
   const name = route?.name ?? 'home'
   const lang = route?.lang ?? 'it'
   const T = texts(lang)
-  // Sulla `path` e non sul nome: cambiando lingua la rotta resta la stessa, e
-  // la barra deve riesporsi lo stesso.
+  // Sulla `path`: cambiando lingua il nome della rotta non cambia.
   const [hidden, setHidden] = useNavbarHidden(route?.path ?? '/')
 
   const links = [
@@ -110,7 +105,6 @@ export default function Navbar({ route }) {
           />
         </Link>
 
-        {/* Nome visibile da sm, centrato da md: sul telefono la barra tiene solo la navigazione. */}
         <div className="hidden shrink-0 items-center gap-2 sm:flex sm:gap-2.5 md:absolute md:left-1/2 md:-translate-x-1/2">
           <span className="hidden whitespace-nowrap text-[13px] font-bold uppercase tracking-[-0.05em] sm:inline-block sm:text-[15px] sm:tracking-[-0.06em] lg:text-[17px] lg:tracking-[-0.075em]">
             {profile.displayName}
@@ -135,7 +129,7 @@ export default function Navbar({ route }) {
   )
 }
 
-// `before` allarga il bersaglio dell'icona. Compare due volte, mai insieme (sm e sotto sm).
+// Compare due volte, mai insieme (sopra e sotto sm).
 function LinkInstagram({ lang, className = '' }) {
   return (
     <a
@@ -150,7 +144,6 @@ function LinkInstagram({ lang, className = '' }) {
   )
 }
 
-// Le lingue sono due link alla pagina gemella, non un interruttore. Visibili entrambe.
 function LanguageSwitcher({ route }) {
   const currentLang = route?.lang ?? 'it'
 
@@ -182,7 +175,6 @@ function LanguageSwitcher({ route }) {
   )
 }
 
-/* Tratto leggero: a 15–19px uno pieno annerirebbe il segno. */
 function LogoInstagram({ className = '' }) {
   return (
     <svg

@@ -24,8 +24,7 @@ export function RouterProvider({ initialPath = '/', children }) {
   // In transizione: la pagina vecchia resta in vista finché il file della nuova non arriva.
   const [, startTransition] = useTransition()
   const changePath = useCallback((p) => startTransition(() => setPath(p)), [])
-  // Scroll da applicare quando la pagina nuova è in vista. Quello del browser
-  // arriva prima del render e sbaglia. Regge perché le immagini riservano la loro altezza.
+  // Applicato a pagina nuova in vista: quello del browser arriva prima del render e sbaglia.
   const scrollToRestore = useRef(null)
 
   useEffect(() => {
@@ -53,8 +52,7 @@ export function RouterProvider({ initialPath = '/', children }) {
 
   const navigate = useCallback((to) => {
     if (typeof window === 'undefined') return
-    // La posizione va scritta nella voce di cronologia della pagina che si
-    // lascia, ed è l'ultimo momento per farlo: dopo il pushState non è più quella corrente.
+    // Ultimo momento per salvarla nella voce che si lascia: dopo il pushState è un'altra.
     window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
     if (to === window.location.pathname) {
       window.scrollTo({ top: 0, behavior: 'auto' })

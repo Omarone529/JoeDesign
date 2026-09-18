@@ -22,8 +22,7 @@ export function pathFor(name, params = {}, lang = DEFAULT_LANG) {
       return params.area ? `${base}/${seg.archive}/${params.area}` : `${base}/${seg.archive}`
     case 'project':
       return `${base}/${seg.project}/${params.slug}`
-    // Unico segmento uguale nelle due lingue: "privacy" è la parola che si usa
-    // anche in italiano, e tradurla darebbe un indirizzo che nessuno cerca.
+    // "privacy" si dice così anche in italiano.
     case 'privacy':
       return `${base}/${seg.privacy}`
     default:
@@ -31,8 +30,7 @@ export function pathFor(name, params = {}, lang = DEFAULT_LANG) {
   }
 }
 
-/* La stessa pagina nell'altra lingua: è il link del selettore in navbar e il
-   valore degli hreflang. Una 404 non ha gemella: si va alla home. */
+// La stessa pagina nell'altra lingua; una 404 porta alla home.
 export function translatedPath(route, lang) {
   if (!route || route.name === 'notfound') return pathFor('home', {}, lang)
   return pathFor(route.name, { area: route.area, slug: route.slug }, lang)
@@ -60,7 +58,6 @@ export function parsePath(pathname) {
       return { name: 'project', slug, lang, path: full }
     }
   }
-  // 404 (Netlify la serve con lo status giusto). La lingua resta quella del
-  // prefisso: chi sbaglia un indirizzo sotto /en vede la 404 in inglese.
+  // La lingua resta quella del prefisso: sotto /en la 404 è inglese.
   return { name: 'notfound', lang, path: full }
 }

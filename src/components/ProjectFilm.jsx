@@ -14,8 +14,7 @@ export default function ProjectFilm({ videoId, title, poster, alt }) {
 
   return (
     <div className="relative aspect-video w-full overflow-hidden bg-night">
-      {/* Il poster resta sotto il player, che lo copre per intero: togliendolo
-          dal DOM il fondo scuro lampeggerebbe mentre YouTube carica. */}
+      {/* Resta sotto il player: toglierlo farebbe lampeggiare il fondo mentre YouTube carica. */}
       <img
         src={poster}
         srcSet={srcSetDi(poster)}

@@ -29,8 +29,7 @@ export default function App() {
       </ErrorBoundary>
       <Footer />
       <FloatingMailButton />
-      {/* Fuori dalla pagina corrente: la domanda arriva all'ingresso, non a chi
-          è già dentro una scheda col reel pronto a partire. */}
+      {/* Su tutte le pagine: la domanda va fatta all'ingresso. */}
       <PrivacyBanner />
     </div>
   )

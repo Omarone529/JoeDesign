@@ -13,7 +13,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const BREAK = process.argv.includes('--break')
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 
-/* Un Chromium qualsiasi: quello di Playwright se c'è, o CHROME_PATH, o Chrome. */
 const CACHE_PLAYWRIGHT = [
   path.join(os.homedir(), 'Library/Caches/ms-playwright'),
   path.join(process.env.LOCALAPPDATA || os.homedir(), 'ms-playwright'),
@@ -66,7 +65,6 @@ if (!fs.existsSync(distSsr) || !fs.existsSync(path.join(root, 'dist', 'index.htm
 const { allRoutes } = await import(pathToFileURL(distSsr).href)
 const routes = allRoutes()
 
-/* Server di anteprima: lo avvia e lo spegne da sé. */
 // Il bin di Vite con questo stesso Node, non `npx`: su Windows npx è un .cmd, che Node rifiuta di eseguire.
 const VITE = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js')
 const server = spawn(process.execPath, [VITE, 'preview', '--port', '4178', '--strictPort'], { cwd: root, stdio: 'ignore' })
@@ -116,8 +114,7 @@ const js = async (e) =>
 await cdp('Runtime.enable')
 await cdp('Page.enable')
 
-// `reportError` emette un evento 'error' su window: è lì che React 18 in
-// produzione segnala gli errori recuperabili dell'aggancio.
+// React 18 in produzione segnala gli errori recuperabili dell'aggancio con `reportError`.
 let injection = `window.__hy=[];addEventListener('error',e=>{window.__hy.push('window.error: '+((e.error&&(e.error.message||e.error))||e.message))});`
 if (BREAK) {
   // Autotest: altera il DOM prima dell'aggancio. Con --break ogni pagina deve risultare rotta.

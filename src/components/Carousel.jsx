@@ -11,28 +11,22 @@ import AiLabel from './AiLabel'
 const INTERVAL = 2000
 // Sulla slide del reel: a due secondi il tasto play non è colpibile.
 const INTERVAL_VIDEO = 6000
-const SWIPE = 45 // spostamento minimo del dito perché valga come cambio foto
+const SWIPE = 45 // px
 
 // `night`: un verticale su fondo chiaro sembra una foto tagliata male.
 const VIDEO_BACKGROUND = '#0a0908'
 
-/*
- * Carosello della scheda: `images` è `[{ src, alt }]`, una slide può avere `video`.
- * Le slide sono impilate, quindi `loading=lazy` non basta: i `src` li dà `loaded`.
- * Va montato con `key` sullo slug, o `index` resta quello della scheda precedente.
- */
+// Va montato con `key` sullo slug, o `index` resta quello della scheda precedente.
 export default function Carousel({ images, title }) {
   const T = texts(useLang())
   const consent = useVideoConsent()
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
-  // Slide con il `src` assegnato. Parte dalla sola prima, l'unica che ce l'ha
-  // anche nell'HTML pre-renderizzato: nessun mismatch in hydration.
+  // Slide impilate: `lazy` non basta. Solo la prima ha il `src` anche nell'HTML statico.
   const [loaded, setLoaded] = useState(() => new Set([0]))
-  // Lo Short in riproduzione. Non tocca `paused`, che resta la scelta di chi guarda.
+  // `paused` è la scelta di chi guarda; video e visibilità fermano a parte.
   const [videoActive, setVideoActive] = useState(false)
   const [videoMuted, setVideoMuted] = useState(false)
-  // Pausa automatica fuori vista o a scheda nascosta (diversa da `paused`, che sceglie chi guarda).
   const [inView, setInView] = useState(true)
   const [tabVisible, setTabVisible] = useState(true)
   const container = useRef(null)
@@ -40,10 +34,10 @@ export default function Carousel({ images, title }) {
   const n = images.length
   const slideVideo = images[index]?.video || null
 
-  const touch = useRef(null) // { x, y, trascinato } del tocco in corso
+  const touch = useRef(null)
   const firstRun = useRef(true)
 
-  // Il reel parte da solo una volta, muto, solo col consenso e dopo il `load` della pagina.
+  // Una volta sola, muto, col consenso e dopo il `load`.
   useEffect(() => {
     if (consent !== 'yes') return
     if (autoStarted.current || index !== 0 || !images[0]?.video) return
@@ -64,8 +58,6 @@ export default function Carousel({ images, title }) {
   }, [consent, index, images])
 
   const go = (i) => {
-    // Ogni cambio slide passa di qui: frecce, pallini, dito. L'autoplay no, ma
-    // mentre lo Short va è fermo, quindi non può scavalcare questa riga.
     setVideoActive(false)
     setVideoMuted(false)
     setIndex((i + n) % n)
@@ -89,13 +81,12 @@ export default function Carousel({ images, title }) {
     else prev()
   }
 
-  // Slide corrente più le due vicine. Al primo giro aspetta il `load`: la prima
-  // è l'elemento LCP della scheda e le vicine le toglierebbero banda.
+  // Corrente più le due vicine; al primo giro dopo il `load`, per non togliere banda all'LCP.
   useEffect(() => {
     const expand = () =>
       setLoaded((prevSet) => {
         const neighbors = [index, (index + 1) % n, (index - 1 + n) % n]
-        if (neighbors.every((i) => prevSet.has(i))) return prevSet // stesso riferimento: niente render in più
+        if (neighbors.every((i) => prevSet.has(i))) return prevSet
         const nextSet = new Set(prevSet)
         neighbors.forEach((i) => nextSet.add(i))
         return nextSet
@@ -111,7 +102,6 @@ export default function Carousel({ images, title }) {
     return () => window.removeEventListener('load', expand)
   }, [index, n])
 
-  // Fuori dallo schermo il carosello non scorre.
   useEffect(() => {
     const el = container.current
     if (!el || typeof IntersectionObserver === 'undefined') return
@@ -122,7 +112,6 @@ export default function Carousel({ images, title }) {
     return () => observer.disconnect()
   }, [])
 
-  /* Stessa ragione, per la scheda del browser passata in secondo piano. */
   useEffect(() => {
     const update = () => setTabVisible(!document.hidden)
     document.addEventListener('visibilitychange', update)
@@ -146,13 +135,11 @@ export default function Carousel({ images, title }) {
     pinnedArrows ? 'flex opacity-100' : 'hidden opacity-0 group-hover:opacity-100'
   }`
 
-  // La foto mostrata intera non copre la cornice: il colore del suo bordo
-  // (`bg`, da `photoFit`) riempie lo scoperto, in dissolvenza come lei.
+  // Una foto intera non copre la cornice: lo scoperto prende il colore del suo bordo.
   const bg = slideVideo ? VIDEO_BACKGROUND : photoFit[images[index]?.src]?.bg
 
   return (
-    // Le frecce da tastiera raccolgono gli eventi in risalita dai comandi veri,
-    // che sono tutti <button>. Il contenitore non è focusabile di suo.
+    // Raccoglie le frecce in risalita dai <button>; di suo non è focusabile.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       ref={container}
@@ -165,8 +152,7 @@ export default function Carousel({ images, title }) {
         if (e.key === 'ArrowLeft') prev()
       }}
     >
-      {/* Clic sulla foto = pausa: scorciatoia col mouse. L'equivalente da
-          tastiera è il pulsante contatore qui sotto. */}
+      {/* Clic = pausa; da tastiera la dà il contatore. */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         className="relative aspect-square w-full cursor-pointer select-none overflow-hidden bg-placeholder transition-colors duration-700 ease-[cubic-bezier(.2,.7,.2,1)]"
@@ -179,10 +165,8 @@ export default function Carousel({ images, title }) {
         }}
       >
         {images.map(({ src, alt, video, ai }, i) => {
-          // Il 9:16 del reel si mostra intero: tagliarlo butterebbe metà inquadratura.
           const fit = video ? { fit: 'contain' } : photoFit[src]
-          // Foto ed etichetta svaniscono insieme: le slide sono impilate, e una
-          // targhetta rimasta indietro dichiarerebbe la foto sbagliata.
+          // Insieme: un'etichetta rimasta indietro dichiarerebbe la foto sbagliata.
           const fade = `transition-opacity duration-700 ease-[cubic-bezier(.2,.7,.2,1)] ${
             i === index ? 'opacity-100' : 'opacity-0'
           }`
@@ -206,8 +190,7 @@ export default function Carousel({ images, title }) {
           )
         })}
 
-        {/* Solo la slide in vista: il tasto play delle altre sarebbe invisibile
-            ma raggiungibile da tastiera. */}
+        {/* Solo in vista: nascosto, il tasto play resterebbe raggiungibile da tastiera. */}
         {slideVideo && (
           <VideoYouTube
             videoId={slideVideo}
@@ -215,7 +198,7 @@ export default function Carousel({ images, title }) {
             active={videoActive}
             muted={videoMuted}
             onStart={() => {
-              setVideoMuted(false) // premuto a mano: con l'audio
+              setVideoMuted(false)
               setVideoActive(true)
             }}
           />
@@ -240,8 +223,7 @@ export default function Carousel({ images, title }) {
               →
             </button>
 
-            {/* Il contatore è anche il comando di pausa: lo scorrimento parte da
-                solo, e la WCAG 2.2.2 chiede di poterlo fermare da tastiera. */}
+            {/* Anche pausa: la WCAG 2.2.2 chiede di fermare lo scorrimento da tastiera. */}
             <button
               type="button"
               onClick={() => setPaused((p) => !p)}
@@ -259,8 +241,7 @@ export default function Carousel({ images, title }) {
       </div>
 
       {n > 1 && (
-        /* `before` allarga il bersaglio dei pallini; lo stacco di 20px evita che si accavallino.
-           `px-2.5` tiene dentro l'allargamento degli estremi, che a fila piena sbordava dallo schermo. */
+        /* Stacco di 20px: le aree allargate dei pallini non si accavallano. `px-2.5` evita lo sbordo. */
         <div className="mt-4 flex flex-wrap items-center justify-center gap-5 px-2.5">
           {images.map((_, i) => (
             <button
