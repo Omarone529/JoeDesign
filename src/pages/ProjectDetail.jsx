@@ -154,7 +154,8 @@ export default function ProjectDetail({ slug }) {
       {/* Parte solo col play, anche col consenso: quaggiù si arriva scorrendo. */}
       {filmPoster && (
         <section className="px-5 pt-14 sm:px-8 lg:px-[72px] lg:pt-20">
-          <figure className="m-0 border-t border-line pt-6">
+          {/* Il player è centrato e più stretto: sopra lo stesso stacco che la sezione dopo lascia sotto. */}
+          <figure className="m-0 border-t border-line pt-14 lg:pt-20">
             <ProjectFilm
               videoId={item.film}
               title={item.title}

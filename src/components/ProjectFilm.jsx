@@ -13,12 +13,17 @@ export default function ProjectFilm({ videoId, title, poster, alt }) {
   const [active, setActive] = useState(false)
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden bg-night">
+    /*
+     * Il 16:9 prende l'altezza dalla larghezza, quindi si limita la larghezza: 1200px sugli schermi
+     * larghi, e su quelli bassi (telefono girato, finestra schiacciata) quanto ne entra in altezza.
+     * La riserva di 9rem è quella del carosello.
+     */
+    <div className="relative mx-auto aspect-video w-full max-w-[min(1200px,calc((var(--screen-height,100vh)-9rem)*16/9))] overflow-hidden bg-night">
       {/* Resta sotto il player: toglierlo farebbe lampeggiare il fondo mentre YouTube carica. */}
       <img
         src={poster}
         srcSet={srcSetDi(poster)}
-        sizes={SIZES.filled}
+        sizes={SIZES.film}
         alt={alt}
         loading="lazy"
         decoding="async"

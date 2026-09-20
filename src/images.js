@@ -14,6 +14,8 @@ export const SIZES = {
   archive: '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw',
   areas: '(min-width: 1024px) 580px, (min-width: 640px) 470px, 100vw',
   filled: '100vw',
+  // Il player di ProjectFilm.jsx non supera mai i 1200px: sotto i 1344 di finestra riempie la colonna.
+  film: '(min-width: 1344px) 1200px, 100vw',
   half: '(min-width: 768px) 55vw, 100vw',
   skillCards: '(min-width: 640px) 45vw, 100vw',
   // Da tenere allineato alle classi del ritratto in About.jsx.
