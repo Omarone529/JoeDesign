@@ -4,7 +4,7 @@ import { Link, pathFor, useLang } from '../router'
 
 /*
  * Banner cookie e privacy, su tutte le pagine finché non si risponde. Il sito non usa cookie:
- * il consenso serve solo al reel di YouTube. ⚠️ I due tasti restano identici: un consenso
+ * il consenso serve solo al reel di YouTube. I due tasti restano identici: un consenso
  * spinto verso "Accetta" non è libero. Nessuna chiusura senza scegliere.
  */
 export default function PrivacyBanner() {
