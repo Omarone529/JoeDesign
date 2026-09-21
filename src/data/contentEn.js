@@ -12,6 +12,8 @@ export const profileEn = {
 
 export const aboutEn = {
   intro:
+    'I’m Joe, a designer driven by the curiosity to turn what surrounds me into new ideas. I’m interested in designing objects that bring together functionality, research and identity, from the first sketch to the prototype.',
+  description:
     'Product designer from Reggio Emilia. Objects that bring together aesthetics, function and an emotional dimension, with attention to production and to the relationship between form and user.',
   /* Le card di "Chi sono", agganciate per `key` a quelle di `siteData.js`.
      Gli strumenti non passano di qui: sono nomi propri di software e non si

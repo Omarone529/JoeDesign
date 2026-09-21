@@ -145,7 +145,7 @@ export function metaForRoute(route) {
     return {
       ...common,
       title: T.seo.aboutTitle(SIGNATURE, p.role),
-      description: clip(about.intro),
+      description: clip(about.description),
       canonical: url('about', {}, lang),
       image: ogImage('about', lang),
       // Descrive l'anteprima di og-image.js: se là cambia la foto, cambia anche qui.
@@ -264,7 +264,7 @@ function personNode(lang) {
     name: p.name,
     alternateName: [p.displayName, p.nick],
     jobTitle: p.role,
-    description: clip(about.intro),
+    description: clip(about.description),
     url: url('about', {}, lang),
     image: abs(about.photos.hero.src),
     email: `mailto:${p.email}`,

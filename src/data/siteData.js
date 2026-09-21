@@ -46,6 +46,9 @@ export const manifestoPhoto = {
 
 export const about = {
   intro:
+    'Sono Joe, designer con la curiosità di trasformare ciò che mi circonda in nuove idee. Mi interessa progettare oggetti che uniscono funzionalità, ricerca e identità, dal primo schizzo al prototipo.',
+  // Per Google e JSON-LD, al posto dell'intro in prima persona.
+  description:
     'Product designer di Reggio Emilia. Oggetti che uniscono estetica, funzione e dimensione emotiva, con attenzione alla produzione e al rapporto tra forma e utente.',
   // Elenco piatto per il JSON-LD. Uno strumento nuovo va anche in `skillCards`.
   skills: [
@@ -777,6 +780,7 @@ export function profileIn(lang) {
 const aboutEnFull = {
   ...about,
   intro: aboutEn.intro,
+  description: aboutEn.description,
   // Per `key`, non per posizione: senza gemella la card resta in italiano.
   skillCards: about.skillCards.map((c) => {
     const en = aboutEn.skillCards.find((v) => v.key === c.key)
