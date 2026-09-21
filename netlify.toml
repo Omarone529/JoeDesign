@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
+# Senza, SITE prende `URL` di Netlify, che può restare su *.netlify.app.
+[build.environment]
+  SITE_URL = "https://joesarchiolla.com"
+
 # Node viene da `.nvmrc`: ripeterlo qui farebbe due numeri da tenere allineati.
 
 [[headers]]
