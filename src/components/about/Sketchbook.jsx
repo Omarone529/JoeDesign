@@ -386,8 +386,12 @@ export default function Sketchbook() {
   return (
     // `clip` e non `hidden`: taglia lo sbordo del canvas ai lati, non la pagina che gira sopra e sotto.
     <section className="overflow-x-clip border-t border-line px-5 py-16 sm:px-8 sm:py-20 lg:px-[72px] lg:py-24">
-      <div className="mb-10 text-[11px] uppercase tracking-[0.24em] text-muted">
-        {T.about.sketchbook}
+      {/* U+FE0E forza la freccia testuale: su iOS uscirebbe come emoji a colori. */}
+      <div className="mb-8 flex items-center gap-2 lg:mb-12">
+        <span aria-hidden className="text-[15px] leading-none lg:text-[17px]">{'↘︎'}</span>
+        <h2 className="m-0 text-[13px] font-bold uppercase tracking-[0.22em] lg:text-[15px]">
+          {T.about.sketchbook}
+        </h2>
       </div>
 
       <div className="flex flex-col items-center">
