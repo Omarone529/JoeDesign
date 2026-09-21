@@ -39,6 +39,13 @@
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
 
+# Netlify non rimanda da solo il sottodominio al dominio primario.
+[[redirects]]
+  from = "https://joedesig.netlify.app/*"
+  to = "https://joesarchiolla.com/:splat"
+  status = 301
+  force = true
+
 # 404 vera, non un 200 sulla home. Prima quella inglese.
 [[redirects]]
   from = "/en/*"
