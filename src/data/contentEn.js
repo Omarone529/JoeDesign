@@ -21,23 +21,27 @@ export const aboutEn = {
       key: 'printing',
       title: '3D printing',
       text: 'From digital design to the physical making of the product.',
+      alt: 'Bambu Lab 3D printer at work on red DOSE containers',
     },
     {
       key: 'graphics',
       title: 'Graphic design',
       text:
         'Graphic projects, logos and visual identities for competitions, open calls and personal projects.',
+      alt: 'Magazine open on the Graphic design section, with black, red and yellow illustrations',
     },
     {
       key: 'modeling',
       title: '3D modelling',
       text: 'Development and modelling of three-dimensional products and projects.',
+      alt: 'Black modular lamps and components with a fluted section and red details',
     },
     {
       key: 'prototypes',
       title: 'Prototypes and models',
       text:
         'Physical prototypes and models, made through woodworking and experimentation with materials.',
+      alt: 'Joe Sarchiolla assembling a prototype of orange tubes with white and black caps',
     },
   ],
   photos: {

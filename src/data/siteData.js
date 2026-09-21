@@ -63,14 +63,17 @@ export const about = {
     'Keynote',
     'Canva',
   ],
-  // Traduzione in `aboutEn.skillCards`, per `key`. `photos: null` finché mancano le foto.
+  // Traduzione in `aboutEn.skillCards`, per `key`. `photos: null` lascia il grigio.
   skillCards: [
     {
       key: 'printing',
       title: 'Stampa 3D',
       text: 'Dalla progettazione digitale alla realizzazione fisica del prodotto.',
       tools: [],
-      photos: null,
+      photos: {
+        src: '/images/about/skills/printing.webp',
+        alt: 'Stampante 3D Bambu Lab al lavoro su contenitori rossi DOSE',
+      },
     },
     {
       key: 'graphics',
@@ -78,14 +81,20 @@ export const about = {
       text:
         'Sviluppo di progetti grafici, loghi e identità visive per concorsi, bandi e progetti personali.',
       tools: ['Illustrator', 'Photoshop', 'InDesign', 'Affinity', 'Canva'],
-      photos: null,
+      photos: {
+        src: '/images/about/skills/graphics.webp',
+        alt: 'Rivista aperta sulla sezione Graphic design, con illustrazioni in nero, rosso e giallo',
+      },
     },
     {
       key: 'modeling',
       title: 'Modellazione 3D',
       text: 'Sviluppo e modellazione di prodotti e progetti tridimensionali.',
       tools: ['Rhino 3D', 'Shapr3D'],
-      photos: null,
+      photos: {
+        src: '/images/about/skills/modeling.webp',
+        alt: 'Lampade e componenti modulari neri a sezione scanalata, con dettagli rossi',
+      },
     },
     {
       key: 'prototypes',
@@ -93,7 +102,10 @@ export const about = {
       text:
         'Realizzazione di prototipi e modelli fisici attraverso la lavorazione del legno e la sperimentazione dei materiali.',
       tools: [],
-      photos: null,
+      photos: {
+        src: '/images/about/skills/prototypes.webp',
+        alt: 'Joe Sarchiolla monta un prototipo di tubi arancioni con tappi bianchi e neri',
+      },
     },
   ],
   // `hero` è scontornato; `sketches` ha fondo bianco e va in mix-blend-multiply.
@@ -768,7 +780,9 @@ const aboutEnFull = {
   // Per `key`, non per posizione: senza gemella la card resta in italiano.
   skillCards: about.skillCards.map((c) => {
     const en = aboutEn.skillCards.find((v) => v.key === c.key)
-    return en ? { ...c, title: en.title, text: en.text } : c
+    return en
+      ? { ...c, title: en.title, text: en.text, photos: c.photos && { ...c.photos, alt: en.alt } }
+      : c
   }),
   photos: {
     hero: { ...about.photos.hero, alt: aboutEn.photos.hero },
