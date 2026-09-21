@@ -99,7 +99,7 @@ export default function Footer() {
         </div>
 
         <p className="m-0 mt-8 max-w-[38ch] text-[14px] leading-[1.55] text-night-soft">
-          {T.footer.row(profile.role, profile.place)}
+          {T.footer.row(profile.role, profile.country)}
         </p>
       </div>
 
