@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#f4f3f1',
+        paper: '#f7f7f7',
         ink: '#14110f',
         // 4.76:1 su `paper`. Su `night` si usa `night-soft`.
         muted: '#6f6b67',

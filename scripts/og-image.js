@@ -27,7 +27,7 @@ const outDir = path.join(root, 'public', 'images', 'og')
 const W = 1200
 const H = 630
 
-const PAPER = '#f4f3f1'
+const PAPER = '#f7f7f7'
 const INK = '#14110f'
 const MUTED = '#8f8b86'
 const LINE = '#d7d4cf'

@@ -33,7 +33,7 @@ sottili.
 
 | Token         | Colore    | Uso                                  |
 | ------------- | --------- | ------------------------------------ |
-| `paper`       | `#f4f3f1` | sfondo principale                    |
+| `paper`       | `#f7f7f7` | sfondo principale                    |
 | `ink`         | `#14110f` | testo / nero caldo                   |
 | `muted`       | `#6f6b67` | testo secondario su fondo chiaro     |
 | `night-soft`  | `#c8c4bf` | testo secondario su fondo `night`    |
