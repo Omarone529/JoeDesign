@@ -51,7 +51,8 @@ export default {
         },
       },
       animation: {
-        viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
+        // `backwards` e non `both`: finita non lascia un transform su <main>, che su iPhone fa tremare gli sticky.
+        viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) backwards',
         letterIn: 'letterIn .9s cubic-bezier(.2,.7,.2,1) both',
         // Partenze sfalsate apposta; la curva è quasi tutta decelerazione.
         titleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .2s both',
