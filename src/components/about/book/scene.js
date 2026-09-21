@@ -240,7 +240,7 @@ export async function createScene({ THREE, container, plates, initialPage, activ
     geo.computeBoundingSphere()
   }
 
-  const pageColor = new THREE.Color('#f7f7f7')
+  const pageColor = new THREE.Color('#fafafa')
 
   // Qui e non più in basso: `resize()` le legge subito.
   let resizeObserver = null

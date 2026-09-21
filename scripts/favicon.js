@@ -12,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicDir = path.resolve(__dirname, '..', 'public')
 const logoPath = path.join(publicDir, 'images', 'navbar', 'logo.webp')
 
-const PAPER = '#f7f7f7'
+const PAPER = '#fafafa'
 
 const transparentIcon = (side) => sharp(logoPath).resize(side, side).png({ compressionLevel: 9 })
 
