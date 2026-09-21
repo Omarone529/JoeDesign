@@ -3,6 +3,7 @@
 export const profileEn = {
   role: 'Product Designer',
   place: 'Reggio Emilia, Italy',
+  country: 'Italy',
   education: 'Academy of Fine Arts, Bologna',
   manifesto:
     'Inspiration comes from art, fashion and graphics, and from there the product takes shape. The search is always for the form that needs no words.',

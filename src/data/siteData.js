@@ -9,6 +9,7 @@ export const profile = {
   nick: 'Joe',
   role: 'Product Designer',
   place: 'Reggio Emilia, Italia',
+  country: 'Italia',
   education: 'Accademia di Belle Arti, Bologna',
   handle: 'joesarchiolla.design',
   instagram: 'https://instagram.com/joesarchiolla.design',

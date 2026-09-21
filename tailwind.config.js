@@ -8,9 +8,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#f4f3f1',
+        paper: '#fafafa',
         ink: '#14110f',
-        // 4.76:1 su `paper`. Su `night` si usa `night-soft`.
+        // 5.06:1 su `paper`. Su `night` si usa `night-soft`.
         muted: '#6f6b67',
         line: '#d7d4cf',
         'line-soft': '#e4e1dd',
@@ -51,7 +51,8 @@ export default {
         },
       },
       animation: {
-        viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) both',
+        // `backwards` e non `both`: finita non lascia un transform su <main>, che su iPhone fa tremare gli sticky.
+        viewIn: 'viewIn .5s cubic-bezier(.2,.7,.2,1) backwards',
         letterIn: 'letterIn .9s cubic-bezier(.2,.7,.2,1) both',
         // Partenze sfalsate apposta; la curva è quasi tutta decelerazione.
         titleIn: 'fromLeft 1.25s cubic-bezier(.16,1,.3,1) .2s both',

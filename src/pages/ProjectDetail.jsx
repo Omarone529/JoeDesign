@@ -113,9 +113,10 @@ export default function ProjectDetail({ slug }) {
             </div>
           </div>
 
-          {/* Altezza fissa: i disegni hanno proporzioni diverse, la pagina salterebbe. */}
+          {/* Da md, accanto alla scheda, il disegno esce dal flusso e ne prende l'altezza:
+              parte dal filo del `dl` (pt-6 + etichetta da 15px + mt-6). Sotto, altezza fissa. */}
           {drawing && (
-            <figure className="m-0 border-t border-line pt-6">
+            <figure className="relative m-0 border-t border-line pt-6">
               <img
                 src={drawing}
                 srcSet={srcSetDi(drawing)}
@@ -123,7 +124,7 @@ export default function ProjectDetail({ slug }) {
                 alt={altDrawing(item, lang)}
                 loading="lazy"
                 decoding="async"
-                className="mt-6 h-[clamp(260px,calc(var(--screen-height,100vh)*0.38),420px)] w-full object-contain lg:h-[clamp(300px,calc(var(--screen-height,100vh)*0.46),560px)]"
+                className="mt-6 h-[clamp(260px,calc(var(--screen-height,100vh)*0.38),420px)] w-full object-contain md:absolute md:inset-x-0 md:top-[calc(3rem+15px)] md:mt-0 md:h-[calc(100%-3rem-15px)]"
               />
             </figure>
           )}
