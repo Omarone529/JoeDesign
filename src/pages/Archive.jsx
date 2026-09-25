@@ -104,7 +104,7 @@ function AreaChooser() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-baseline justify-between gap-4 text-[11px] uppercase tracking-[0.2em] text-muted transition-colors group-hover:text-ink">
+                <div className="mt-4 flex items-baseline justify-between gap-4 text-[11px] uppercase leading-none tracking-[0.12em] text-muted transition-colors group-hover:text-ink">
                   <span>{T.archive.openArea}</span>
                   <span className="whitespace-nowrap">{periodText(periodOf(projects))}</span>
                 </div>
