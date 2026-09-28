@@ -37,10 +37,10 @@ export default function Carousel({ images, title }) {
   const touch = useRef(null)
   const firstRun = useRef(true)
 
-  // Una volta sola, muto, col consenso e dopo il `load`.
+  // Una volta sola, muto, col consenso e dopo il `load`, quando si arriva sulla slide del reel.
   useEffect(() => {
     if (consent !== 'yes') return
-    if (autoStarted.current || index !== 0 || !images[0]?.video) return
+    if (autoStarted.current || !images[index]?.video) return
     if (reducedMotion()) return
 
     const start = () => {
