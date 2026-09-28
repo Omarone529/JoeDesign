@@ -199,8 +199,8 @@ const projects = [
     drawing: true,
     backdrop: true,
     video: 'G5DdfSOzRIo',
-    // Il reel apre il carosello, quindi qui i numeri slittano di uno rispetto
-    // alle slide: 01 e 04 sono la seconda e la quinta cosa che si vede.
+    // Il reel è la seconda slide, quindi da 02 in poi i numeri slittano di uno:
+    // 01 e 04 sono la prima e la quinta cosa che si vede.
     ai: { modified: [1, 4], backdrop: 'modified' },
     plate: 12,
     desc: 'DADO LAMP è una lampada realizzata in stampa 3D che unisce funzionalità e linguaggio estetico contemporaneo. Il manico integrato diventa parte della forma e ne facilita il trasporto, mentre il cavo elettrico è trasformato in un elemento grafico visibile. La struttura scanalata contrasta con la sfera in vetro fumé, creando un equilibrio tra materia tecnica e leggerezza luminosa.',
@@ -232,7 +232,7 @@ const projects = [
   {
     slug: 'orbit',
     title: 'ORBIT',
-    cat: 'Servomuto · HIRO',
+    cat: 'Servomuto',
     year: '2026',
     photos: 6,
     drawing: true,
@@ -242,7 +242,7 @@ const projects = [
     desc: 'ORBIT è un servomuto progettato per il concorso promosso da HIRO Design, sviluppato a partire dall’esplorazione della geometria circolare come principio generatore della forma. Il progetto riflette una ricerca personale sul rapporto tra geometria, struttura e processo produttivo applicato al design di arredi in metallo.',
     spec: {
       Oggetto: 'Servomuto',
-      Contesto: 'Concorso HIRO Design · Concept design',
+      Contesto: 'Concept design per concorso HIRO',
       Materiale: 'Acciaio',
       Colore: 'Arancione / Nero',
     },
@@ -488,6 +488,7 @@ const projects = [
     photos: 4,
     drawing: true,
     backdrop: true,
+    ai: { generated: 'all', backdrop: 'generated' },
     plate: 4,
     desc: 'LUNCH BOX è un concept di design sviluppato durante il percorso universitario, nato dalla volontà di semplificare e rendere più funzionale la pausa pranzo in qualsiasi situazione. Il progetto ripensa la classica lunch box attraverso un sistema pensato per organizzare e trasportare il pasto in modo semplice, pratico e intuitivo, adattandosi alle diverse esigenze della quotidianità. L’obiettivo è progettare un oggetto capace di accompagnare l’utente fuori casa, al lavoro, all’università o durante gli spostamenti, rendendo più immediata la gestione del momento del pranzo.',
     spec: {
@@ -515,20 +516,21 @@ const projects = [
       Colore: 'Nero / Trasparente',
     },
   },
-  {
-    slug: 'rilegno',
-    title: 'IL VALORE DEL LEGNO',
-    cat: 'Illustrazione',
-    area: 'graphic',
-    year: '2026',
-    photos: 4,
-    plate: 7,
-    desc: 'Una sedia in equilibrio su una catasta di scarti: il legno che torna materia e poi di nuovo oggetto. Illustrazione di copertina per Walden, la rivista di Rilegno dedicata all’economia circolare.',
-    spec: {
-      Oggetto: 'Illustrazione · Copertina',
-      Contesto: 'Walden · rivista di Rilegno',
-    },
-  },
+  // Nascosto per ora: per pubblicarlo basta scommentare (anche in contentEn.js).
+  // {
+  //   slug: 'rilegno',
+  //   title: 'IL VALORE DEL LEGNO',
+  //   cat: 'Illustrazione',
+  //   area: 'graphic',
+  //   year: '2026',
+  //   photos: 4,
+  //   plate: 7,
+  //   desc: 'Una sedia in equilibrio su una catasta di scarti: il legno che torna materia e poi di nuovo oggetto. Illustrazione di copertina per Walden, la rivista di Rilegno dedicata all’economia circolare.',
+  //   spec: {
+  //     Oggetto: 'Illustrazione · Copertina',
+  //     Contesto: 'Walden · rivista di Rilegno',
+  //   },
+  // },
   {
     slug: 'direzione-tolleranza',
     title: 'DIREZIONE TOLLERANZA',
@@ -537,10 +539,15 @@ const projects = [
     year: '2025',
     photos: 2,
     plate: 6,
-    desc: 'Frecce e segnaletica urbana: ogni elemento mantiene la propria direzione ma convive in un unico sistema. La parola TOLLERANZA contiene le differenze.',
+    desc:
+      'Un sistema di direzioni differenti che converge verso un unico valore.\n\n' +
+      'Il progetto nasce dalla volontà di rappresentare la tolleranza come capacità di convivere con direzioni, identità e punti di vista differenti.\n\n' +
+      'L’immagine prende spunto dalla segnaletica urbana e dalla forma delle frecce. Ogni freccia segue una propria traiettoria, con dimensioni e orientamenti differenti, creando un insieme apparentemente disordinato.\n\n' +
+      'Al centro emerge però una freccia più grande e definita: una direzione comune che attraversa tutte le altre senza cancellarle. È la rappresentazione di una società nella quale le differenze possono continuare a esistere senza necessariamente entrare in conflitto.',
     spec: {
       Oggetto: 'Manifesto',
-      Contesto: 'Concorso · Friuli-Venezia Giulia',
+      Concorso: 'Manifesta la tolleranza',
+      Festival: 'Varcare la Frontiera – Tolleranza · XII edizione',
     },
   },
   {
@@ -565,11 +572,17 @@ const projects = [
     year: '2025',
     photos: 4,
     plate: 4,
-    desc: 'Un pacco da spedizione che ruota attorno a un mondo stilizzato: metafora di un’Europa in movimento che unisce persone, culture e valori.',
+    desc:
+      'Un pacco che viaggia attraverso un’Europa in movimento.\n\n' +
+      'Il progetto nasce dal tema della cittadinanza europea e dall’idea di rappresentare l’Europa come uno spazio capace di mettere in relazione persone, culture e territori differenti.\n\n' +
+      'Il concept prende forma attraverso l’immagine di un pacco in movimento, trasformato in un piccolo personaggio che attraversa un mondo stilizzato. Il pacco diventa così una metafora di ciò che viaggia e crea connessioni: idee, persone, culture e valori.\n\n' +
+      'La grafica combina illustrazione, tipografia e simboli immediatamente riconoscibili, costruendo un linguaggio semplice e contemporaneo. Il carattere antropomorfo del pacco introduce un elemento più giocoso e accessibile, mentre il globo rappresenta lo spazio comune all’interno del quale queste connessioni prendono forma.\n\n' +
+      'Il risultato è un manifesto pensato per comunicare il concetto di un’Europa che non è soltanto un territorio, ma una rete di relazioni e scambi, capace di unire differenze attraverso il movimento.',
     spec: {
       Oggetto: 'Manifesto',
-      Contesto: 'Concorso · Emilia-Romagna',
-      Esito: 'Vincitore · 3° posto',
+      Concorso: 'Disegnare la cittadinanza – Giovani sguardi sull’Europa',
+      'Organizzato da': 'Comune di Reggio Emilia × Fondazione E35',
+      Risultato: '3° classificato',
     },
   },
   {
@@ -580,24 +593,35 @@ const projects = [
     year: '2025',
     photos: 3,
     plate: 3,
-    desc: 'Due sedie vuote e un giallo acceso per richiamare il dialogo che manca e invitare i giovani a fermarsi, incontrarsi e tornare a parlare.',
+    desc:
+      'Un manifesto che trasforma il dialogo in un’immagine.\n\n' +
+      'Il progetto nasce dalla volontà di rappresentare il rapporto tra la città e le persone che la vivono, partendo da una domanda semplice: la città parla, ma noi siamo davvero disposti ad ascoltarla?\n\n' +
+      'La composizione utilizza un linguaggio grafico essenziale e diretto. Al centro del manifesto, due sedie diventano il simbolo del confronto: due presenze diverse, rivolte l’una verso l’altra, che suggeriscono uno spazio aperto al dialogo, all’ascolto e alla partecipazione.\n\n' +
+      'La scelta di un fondo giallo acceso crea un forte contrasto con il tratto nero dell’illustrazione e rende il messaggio immediatamente riconoscibile nello spazio urbano. La tipografia assume invece un ruolo protagonista, giocando sulla contrapposizione tra “Parla” e “Tu?”, trasformando il titolo stesso in una domanda rivolta direttamente al pubblico.',
     spec: {
       Oggetto: 'Manifesto',
-      Contesto: 'IGPDecaux Graphic Award, Milano',
+      Concorso: 'IGPDecaux Graphic Award',
+      Tema: 'Spazi di vita sostenibili per la città e i suoi cittadini',
     },
   },
   {
     slug: 'in-the-box',
     title: 'IN THE BOX',
-    cat: 'Manifesto',
+    cat: 'Grafica per skateboard',
     area: 'graphic',
     year: '2025',
     photos: 4,
     plate: 2,
-    desc: 'Una riflessione sulla condizione abitativa del futuro: la città racchiusa in uno scatolone, simbolo di spazi sempre più piccoli e temporanei.',
+    desc:
+      'La proposta nasce dall’idea di trasformare la metropoli in un elemento dinamico, quasi organico. Grattacieli, infrastrutture e percorsi urbani si sovrappongono e vengono attraversati da una forma continua che avvolge l’architettura, creando un dialogo tra costruito e movimento.\n\n' +
+      'L’elemento centrale diventa così una sorta di nastro urbano, una linea che percorre la città e ne modifica la percezione. Il suo andamento richiama il flusso delle persone, delle strade e delle connessioni che caratterizzano la vita metropolitana.\n\n' +
+      'La composizione è stata sviluppata pensando fin dall’inizio alla forma della tavola da skateboard, trasformando il supporto stesso in parte integrante del progetto. Il risultato è un’immagine essenziale e monocromatica, costruita attraverso un linguaggio grafico fatto di volumi, linee e sovrapposizioni.\n\n' +
+      'Il progetto è stato sviluppato per Sketch Your Deck 2025 – Metropolis, con l’obiettivo di tradurre l’immaginario urbano in una grafica applicabile a una serie limitata di skateboard.',
     spec: {
-      Oggetto: 'Manifesto',
-      Contesto: 'Sketch your Deck · Bonobolabo, Bologna',
+      Oggetto: 'Grafica per skateboard',
+      Concorso: 'Sketch Your Deck 2025',
+      Tema: 'Metropolis – Visioni Urbane su Skateboard',
+      Organizzazione: 'Bonobolabo',
     },
   },
   {
@@ -608,11 +632,19 @@ const projects = [
     year: '2024',
     photos: 3,
     plate: 1,
-    desc: 'Un invito a credere nella rinascita anche nei momenti più oscuri: i fiori come simboli fragili ma ostinati di vita, contro l’ombra della guerra.',
+    desc:
+      'Un messaggio di speranza attraverso un’immagine semplice e diretta.\n\n' +
+      'Possiamo ancora far crescere i fiori nasce dall’idea che, nonostante i conflitti e la distruzione, non sia ancora troppo tardi per cambiare ciò che ci circonda.\n\n' +
+      'Il fiore rappresenta la vita, la rinascita e la possibilità di ricominciare. Il suo colore rosso emerge con forza dalla composizione e si sovrappone alla parola FIORI, diventando parte stessa del messaggio.\n\n' +
+      'La frase non vuole raccontare una possibilità astratta, ma affermare che siamo ancora in tempo: anche sulla terra segnata dalla guerra, dove oggi esistono distruzione e dolore, può tornare a crescere qualcosa.\n\n' +
+      'Il manifesto utilizza quindi un linguaggio volutamente semplice. Poche parole e un’immagine immediata per trasmettere un concetto universale: la guerra può distruggere la terra, ma non deve impedirci di immaginare e costruire un futuro in cui possano tornare a crescere i fiori.',
     spec: {
-      Oggetto: 'Manifesto',
-      Contesto: 'Concorso · Emilia-Romagna',
-      Esito: '4° posto',
+      Concorso: 'Se vuoi la pace prepara la pace – Chiamata urgente alle arti',
+      Esito: '6° classificato',
+      Tecnica: 'Graphic design digitale',
+      Output: 'Manifesto / Poster',
+      Promotori:
+        'Comune di Reggio Emilia · Reggiana Educatori · Fondazione E35 · Fondazione Mondinsieme · Movimento Nonviolento',
     },
   },
 ]

@@ -122,11 +122,11 @@ export const projectsEn = {
     },
   },
   orbit: {
-    cat: 'Valet stand · HIRO',
+    cat: 'Valet stand',
     desc: 'ORBIT is a valet stand designed for the competition promoted by HIRO Design, developed from the exploration of circular geometry as the generating principle of the form. The project reflects a personal enquiry into the relationship between geometry, structure and production process applied to metal furniture design.',
     spec: {
       Object: 'Valet stand',
-      Context: 'HIRO Design competition · Concept design',
+      Context: 'Concept design for the HIRO competition',
       Material: 'Steel',
       Colour: 'Orange / Black',
     },
@@ -289,20 +289,26 @@ export const projectsEn = {
       Colour: 'Black / Transparent',
     },
   },
-  rilegno: {
-    cat: 'Illustration',
-    desc: 'A chair balanced on a stack of offcuts: wood that becomes matter again, and then object again. Cover illustration for Walden, the Rilegno magazine devoted to the circular economy.',
-    spec: {
-      Object: 'Illustration · Cover',
-      Context: 'Walden · Rilegno magazine',
-    },
-  },
+  // Nascosto per ora, come in siteData.js.
+  // rilegno: {
+  //   cat: 'Illustration',
+  //   desc: 'A chair balanced on a stack of offcuts: wood that becomes matter again, and then object again. Cover illustration for Walden, the Rilegno magazine devoted to the circular economy.',
+  //   spec: {
+  //     Object: 'Illustration · Cover',
+  //     Context: 'Walden · Rilegno magazine',
+  //   },
+  // },
   'direzione-tolleranza': {
     cat: 'Poster',
-    desc: 'Arrows and urban signage: every element keeps its own direction yet lives within a single system. The word TOLLERANZA holds the differences together.',
+    desc:
+      'A system of different directions converging towards a single value.\n\n' +
+      'The project stems from the wish to portray tolerance as the ability to live alongside different directions, identities and points of view.\n\n' +
+      'The image draws on urban signage and the shape of arrows. Each arrow follows its own path, with different sizes and orientations, creating a seemingly disordered whole.\n\n' +
+      'At the centre, however, a larger and sharper arrow emerges: a shared direction that crosses all the others without erasing them. It portrays a society in which differences can go on existing without necessarily coming into conflict.',
     spec: {
       Object: 'Poster',
-      Context: 'Competition · Friuli-Venezia Giulia',
+      Competition: 'Manifesta la tolleranza',
+      Festival: 'Varcare la Frontiera – Tolleranza · 12th edition',
     },
   },
   'il-fauno': {
@@ -315,36 +321,61 @@ export const projectsEn = {
   },
   'europa-unisce': {
     cat: 'Poster',
-    desc: 'A shipping parcel turning around a stylised world: a metaphor for a Europe in movement that brings together people, cultures and values.',
+    desc:
+      'A parcel travelling across a Europe in movement.\n\n' +
+      'The project stems from the theme of European citizenship and from the idea of portraying Europe as a space able to connect different people, cultures and places.\n\n' +
+      'The concept takes shape through the image of a parcel in motion, turned into a small character crossing a stylised world. The parcel thus becomes a metaphor for what travels and creates connections: ideas, people, cultures and values.\n\n' +
+      'The graphics combine illustration, typography and instantly recognisable symbols, building a simple, contemporary language. The anthropomorphic character of the parcel adds a more playful and approachable note, while the globe stands for the shared space in which these connections take shape.\n\n' +
+      'The result is a poster meant to convey the idea of a Europe that is not just a territory, but a network of relationships and exchanges, able to unite differences through movement.',
     spec: {
       Object: 'Poster',
-      Context: 'Competition · Emilia-Romagna',
-      Result: 'Winner · 3rd place',
+      Competition: 'Disegnare la cittadinanza – Giovani sguardi sull’Europa',
+      'Organised by': 'City of Reggio Emilia × Fondazione E35',
+      Result: '3rd place',
     },
   },
   'citta-parla': {
     cat: 'Poster',
-    desc: 'Two empty chairs and a bright yellow, calling out the dialogue that is missing and inviting young people to stop, meet and speak to one another again.',
+    desc:
+      'A poster that turns dialogue into an image.\n\n' +
+      'The project stems from the wish to portray the relationship between the city and the people who live in it, starting from a simple question: the city speaks, but are we really willing to listen to it?\n\n' +
+      'The composition uses an essential, direct graphic language. At the centre of the poster, two chairs become the symbol of exchange: two different presences, facing each other, suggesting a space open to dialogue, listening and participation.\n\n' +
+      'A bright yellow background creates a strong contrast with the black line of the illustration and makes the message instantly recognisable in the urban space. Typography takes a leading role, playing on the contrast between “Parla” (speaks) and “Tu?” (you?), turning the title itself into a question addressed directly to the audience.',
     spec: {
       Object: 'Poster',
-      Context: 'IGPDecaux Graphic Award, Milan',
+      Competition: 'IGPDecaux Graphic Award',
+      Theme: 'Sustainable living spaces for the city and its citizens',
     },
   },
   'in-the-box': {
-    cat: 'Poster',
-    desc: 'A reflection on the housing condition of the future: the city enclosed in a cardboard box, a symbol of ever smaller and more temporary spaces.',
+    cat: 'Skateboard graphic',
+    desc:
+      'The proposal stems from the idea of turning the metropolis into a dynamic, almost organic element. Skyscrapers, infrastructure and urban routes overlap and are crossed by a continuous form that wraps around the architecture, creating a dialogue between the built environment and movement.\n\n' +
+      'The central element thus becomes a kind of urban ribbon, a line that runs through the city and changes the way it is perceived. Its course recalls the flow of people, streets and connections that shape metropolitan life.\n\n' +
+      'The composition was developed with the shape of the skateboard deck in mind from the very start, making the medium itself an integral part of the project. The result is an essential, monochrome image, built through a graphic language of volumes, lines and overlaps.\n\n' +
+      'The project was developed for Sketch Your Deck 2025 – Metropolis, with the aim of translating the urban imagination into a graphic that could be applied to a limited series of skateboards.',
     spec: {
-      Object: 'Poster',
-      Context: 'Sketch your Deck · Bonobolabo, Bologna',
+      Object: 'Skateboard graphic',
+      Competition: 'Sketch Your Deck 2025',
+      Theme: 'Metropolis – Urban Visions on Skateboards',
+      Organisation: 'Bonobolabo',
     },
   },
   fiori: {
     cat: 'Poster',
-    desc: 'An invitation to believe in rebirth even in the darkest moments: flowers as fragile yet stubborn symbols of life, against the shadow of war.',
+    desc:
+      'A message of hope through a simple, direct image.\n\n' +
+      'Possiamo ancora far crescere i fiori (We can still grow flowers) stems from the idea that, despite conflict and destruction, it is not yet too late to change what surrounds us.\n\n' +
+      'The flower stands for life, rebirth and the chance to start again. Its red colour stands out strongly from the composition and overlaps the word FIORI (flowers), becoming part of the message itself.\n\n' +
+      'The phrase does not describe an abstract possibility, but states that there is still time: even on land scarred by war, where destruction and pain exist today, something can grow again.\n\n' +
+      'The poster therefore uses a deliberately simple language. A few words and an immediate image to convey a universal idea: war can destroy the land, but it must not stop us from imagining and building a future in which flowers can grow again.',
     spec: {
-      Object: 'Poster',
-      Context: 'Competition · Emilia-Romagna',
-      Result: '4th place',
+      Competition: 'Se vuoi la pace prepara la pace – Chiamata urgente alle arti',
+      Result: '6th place',
+      Technique: 'Digital graphic design',
+      Output: 'Poster',
+      Promoters:
+        'City of Reggio Emilia · Reggiana Educatori · Fondazione E35 · Fondazione Mondinsieme · Movimento Nonviolento',
     },
   },
 }

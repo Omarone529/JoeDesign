@@ -35,7 +35,8 @@ export default function ProjectDetail({ slug }) {
     ai: aiPhoto(item, i + 1),
   }))
   const reel = item.video ? [{ src: videoPoster, alt: altVideo(item, lang), video: item.video }] : []
-  const slides = [...reel, ...photos]
+  // Il reel è la seconda slide: la scheda si apre su una foto ferma.
+  const slides = [photos[0], ...reel, ...photos.slice(1)].filter(Boolean)
 
   const area = areasIn(lang).find((a) => a.key === areaOf(item))
   const siblings = archive.filter((p) => areaOf(p) === areaOf(item))
@@ -69,11 +70,18 @@ export default function ProjectDetail({ slug }) {
             <div className="mb-4 text-[10px] uppercase tracking-[0.24em] text-muted">
               {item.cat}
             </div>
-            {item.desc?.trim() && (
-              <p className="m-0 max-w-[52ch] text-[clamp(16px,1.35vw,19px)] leading-[1.5]">
-                {item.desc}
-              </p>
-            )}
+            {/* Una riga vuota nel testo separa i paragrafi. */}
+            {item.desc
+              ?.split(/\n\s*\n/)
+              .filter((par) => par.trim())
+              .map((par, i) => (
+                <p
+                  key={i}
+                  className="m-0 max-w-[52ch] text-[clamp(16px,1.35vw,19px)] leading-[1.5] [&+p]:mt-4"
+                >
+                  {par.trim()}
+                </p>
+              ))}
           </div>
         </div>
 

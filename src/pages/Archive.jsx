@@ -24,9 +24,9 @@ function periodText(period) {
 function Heading({ left, right }) {
   return (
     <div className="mb-6 flex items-baseline justify-between gap-4 border-t border-line pt-5 sm:mb-8">
-      <span className="text-[11px] uppercase tracking-[0.2em] text-muted">{left}</span>
+      <span className="text-[11px] uppercase tracking-[0.1em] text-muted">{left}</span>
       {right && (
-        <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.2em] text-muted">
+        <span className="whitespace-nowrap text-[11px] uppercase tracking-[0.1em] text-muted">
           {right}
         </span>
       )}
@@ -211,7 +211,7 @@ function AreaGrid({ area }) {
             to={pathFor('archive', { area: other.slug }, lang)}
             className="group block px-5 py-10 transition-colors hover:bg-hover sm:px-8 lg:px-[72px] lg:py-16"
           >
-            <div className="text-[10px] uppercase tracking-[0.24em] text-muted">
+            <div className="text-[10px] uppercase tracking-[0.1em] text-muted">
               {T.archive.otherArea}
             </div>
             <div className="mt-2 text-[clamp(20px,3vw,40px)] font-bold uppercase tracking-[-0.02em]">
