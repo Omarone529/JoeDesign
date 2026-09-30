@@ -57,9 +57,6 @@ export const photoFit = {
   "/images/products/flue/backdrop.webp": {
     "pos": "34% 50%"
   },
-  "/images/products/il-fauno/cover.webp": {
-    "pos": "50% 45%"
-  },
   "/images/products/in-the-box/cover.webp": {
     "fit": "contain",
     "bg": "#ffffff"

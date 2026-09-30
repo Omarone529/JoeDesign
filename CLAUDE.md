@@ -18,7 +18,7 @@ npm run build      # client + SSR + pre-rendering → dist/ (prima gira test + v
 npm run lint       # deve restare a zero
 npm test           # node:test: rotte, seo, dati, parità it/en
 npm run verify     # dati di siteData ↔ file su disco
-npm run hydration  # dopo la build: controlla l'aggancio di React sulle 66 pagine (gira anche in CI)
+npm run hydration  # dopo la build: controlla l'aggancio di React sulle 62 pagine (gira anche in CI)
 ```
 
 Ogni pagina è un file JS caricato a richiesta (`src/pageLoader.js`): una pagina nuova va
