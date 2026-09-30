@@ -311,14 +311,6 @@ export const projectsEn = {
       Festival: 'Varcare la Frontiera – Tolleranza · 12th edition',
     },
   },
-  'il-fauno': {
-    cat: 'Mascot',
-    desc: 'A tribute to Fortunato Depero, master of Futurism, reinterpreted in a contemporary key with sharp lines and geometric forms.',
-    spec: {
-      Object: 'Mascot · Visual identity',
-      Context: 'Competition · Emilia-Romagna',
-    },
-  },
   'europa-unisce': {
     cat: 'Poster',
     desc:

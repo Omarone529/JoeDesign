@@ -524,7 +524,7 @@ const projects = [
   //   area: 'graphic',
   //   year: '2026',
   //   photos: 4,
-  //   plate: 7,
+  //   plate: 6,
   //   desc: 'Una sedia in equilibrio su una catasta di scarti: il legno che torna materia e poi di nuovo oggetto. Illustrazione di copertina per Walden, la rivista di Rilegno dedicata all’economia circolare.',
   //   spec: {
   //     Oggetto: 'Illustrazione · Copertina',
@@ -538,7 +538,7 @@ const projects = [
     area: 'graphic',
     year: '2025',
     photos: 2,
-    plate: 6,
+    plate: 5,
     desc:
       'Un sistema di direzioni differenti che converge verso un unico valore.\n\n' +
       'Il progetto nasce dalla volontà di rappresentare la tolleranza come capacità di convivere con direzioni, identità e punti di vista differenti.\n\n' +
@@ -548,20 +548,6 @@ const projects = [
       Oggetto: 'Manifesto',
       Concorso: 'Manifesta la tolleranza',
       Festival: 'Varcare la Frontiera – Tolleranza · XII edizione',
-    },
-  },
-  {
-    slug: 'il-fauno',
-    title: 'IL FAUNO',
-    cat: 'Mascotte',
-    area: 'graphic',
-    year: '2025',
-    photos: 3,
-    plate: 5,
-    desc: 'Omaggio a Fortunato Depero, maestro del Futurismo, reinterpretato in chiave contemporanea con linee nette e forme geometriche.',
-    spec: {
-      Oggetto: 'Mascotte · Identità visiva',
-      Contesto: 'Concorso · Emilia-Romagna',
     },
   },
   {
