@@ -30,10 +30,7 @@ export const SITE = (ENV_SITE || 'https://joesarchiolla.com').replace(/\/+$/, ''
 
 const abs = (p) => (/^https?:/.test(p) ? p : SITE + p)
 
-// Slash finale: Netlify serve `/archivio/index.html` e manda `/archivio` in 301 su `/archivio/`.
-export const pageUrl = (path) => SITE + path.replace(/\/?$/, '/')
-
-const url = (name, params, lang) => pageUrl(pathFor(name, params, lang))
+const url = (name, params, lang) => SITE + pathFor(name, params, lang)
 
 const PERIOD = archivePeriod
   ? archivePeriod.first === archivePeriod.last
@@ -97,8 +94,8 @@ function periodLabel(period) {
 function alternative(route) {
   if (route.name === 'notfound') return []
   return [
-    ...LANGS.map((l) => ({ lang: l, href: pageUrl(translatedPath(route, l)) })),
-    { lang: 'x-default', href: pageUrl(translatedPath(route, 'it')) },
+    ...LANGS.map((l) => ({ lang: l, href: SITE + translatedPath(route, l) })),
+    { lang: 'x-default', href: SITE + translatedPath(route, 'it') },
   ]
 }
 

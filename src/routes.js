@@ -10,8 +10,13 @@ const SEGMENTS = {
 
 const PREFIX = { it: '', en: '/en' }
 
-/* L'indirizzo di una pagina, nella lingua chiesta. Da usare in ogni <Link>. */
+/* L'indirizzo di una pagina, nella lingua chiesta. Da usare in ogni <Link>.
+   Slash finale: Netlify serve `/archivio/index.html` e manda `/archivio` in 301 su `/archivio/`. */
 export function pathFor(name, params = {}, lang = DEFAULT_LANG) {
+  return `${pagePath(name, params, lang)}/`
+}
+
+function pagePath(name, params, lang) {
   const l = normalizeLang(lang)
   const base = PREFIX[l]
   const seg = SEGMENTS[l]
@@ -26,7 +31,7 @@ export function pathFor(name, params = {}, lang = DEFAULT_LANG) {
     case 'privacy':
       return `${base}/${seg.privacy}`
     default:
-      return base || '/'
+      return base
   }
 }
 
