@@ -50,13 +50,13 @@ test('gli slug percent-encoded si decodificano', () => {
 
 test('percorsoTradotto dà la gemella, e per la 404 la home', () => {
   const it = parsePath('/chi-sono')
-  assert.equal(translatedPath(it, 'en'), '/en/about')
+  assert.equal(translatedPath(it, 'en'), '/en/about/')
   assert.equal(translatedPath(parsePath('/en/refuso'), 'it'), '/')
 })
 
 test('una lingua non valida ripiega sull’italiano invece di rompere', () => {
-  assert.equal(pathFor('about', {}, 'de'), '/chi-sono')
-  assert.equal(pathFor('about', {}, undefined), '/chi-sono')
+  assert.equal(pathFor('about', {}, 'de'), '/chi-sono/')
+  assert.equal(pathFor('about', {}, undefined), '/chi-sono/')
 })
 
 test('ogni indirizzo generato viene riletto come la pagina che è', () => {

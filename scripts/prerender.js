@@ -146,7 +146,7 @@ const XHTML_NS = 'http://www.w3.org/1999/xhtml'
 const sitemapEntry = (r) => {
   const route = parsePath(r)
   const meta = metaForRoute(route)
-  const loc = `${SITE}${r === '/' ? '/' : r}`
+  const loc = SITE + r
   const alternative = (meta.alternate || [])
     .map(
       (a) =>
