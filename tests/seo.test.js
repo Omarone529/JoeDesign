@@ -1,7 +1,8 @@
-// clip(): il taglio delle meta description.
+// clip(): il taglio delle meta description. Poi gli indirizzi assoluti.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { clip } from '../src/seo.js'
+import { allRoutes, clip, metaForRoute } from '../src/seo.js'
+import { parsePath } from '../src/routes.js'
 
 test('un testo già corto passa intero', () => {
   assert.equal(clip('Lampada da tavolo in PLA.'), 'Lampada da tavolo in PLA.')
@@ -37,5 +38,15 @@ test('non supera mai il massimo richiesto', () => {
   const t = 'Frase. '.repeat(80)
   for (const max of [60, 100, 155, 200]) {
     assert.ok(clip(t, max).length <= max, `max ${max}`)
+  }
+})
+
+// Senza slash Netlify risponde 301: canonical e sitemap puntavano a un reindirizzamento.
+test('canonical e hreflang finiscono con lo slash', () => {
+  for (const r of allRoutes()) {
+    const meta = metaForRoute(parsePath(r))
+    for (const href of [meta.canonical, ...meta.alternate.map((a) => a.href)]) {
+      assert.ok(href.endsWith('/'), href)
+    }
   }
 })
