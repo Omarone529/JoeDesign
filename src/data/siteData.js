@@ -185,7 +185,7 @@ const projects = [
     desc: 'Arrow è un progetto pensato per chi ama lo stile industriale e il design essenziale. La freccia direzionale, elemento grafico ricorrente, diventa qui il fulcro del prodotto, conferendogli un forte valore geometrico, grafico e industriale.',
     spec: {
       Oggetto: 'Appendiabiti',
-      Contesto: 'Concorso Design Wanted',
+      Contesto: 'Progetto Personale',
       Materiale: 'Acciaio',
       Colore: 'Nero / Rosso',
     },

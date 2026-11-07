@@ -96,7 +96,7 @@ export const projectsEn = {
     desc: 'Arrow is a project for those who love industrial style and essential design. The directional arrow, a recurring graphic element, becomes the core of the product, giving it a strong geometric, graphic and industrial value.',
     spec: {
       Object: 'Coat rack',
-      Context: 'Design Wanted competition',
+      Context: 'Personal project',
       Material: 'Steel',
       Colour: 'Black / Red',
     },
